@@ -69,8 +69,6 @@ const COMPANY = {
 // ---- synthetic palette and its palettes.md --------------------------------------------------------
 const BASE = HASH + hx(18, 52, 86);
 const SHARED = HASH + hx(171, 205, 239);
-const DENIED = HASH + hx(154, 152, 200);
-const EXTRA = HASH + hx(1, 35, 69);
 const MARK = 'zz-marker-zz';
 
 const palette = (over = {}) => ({
@@ -80,10 +78,6 @@ const palette = (over = {}) => ({
     { hex: OK.hex6, role: 'ground', name: 'Ground' },
     { hex: BASE, role: 'text', name: 'Text' },
     { hex: SHARED, role: 'rule', name: 'Rule', shared: true },
-  ],
-  rulings: [
-    { id: 'ink', allowed: false, hex: [DENIED], reason: 'fixture denial' },
-    { id: 'extra', allowed: true, hex: [EXTRA], reason: 'fixture allowance' },
   ],
   ...over,
 });
@@ -285,15 +279,14 @@ test('hex boundaries: only 3, 4, 6 and 8 digits are colours', () => {
   assert.deepEqual(scanText(`${HASH}FF00FFF`, PAL), []);
 });
 
-// ---- palette record, rulings, agreement -----------------------------------------------------------
-test('rulings: a denied colour is refused like any other, with no ruling text; an allowed ruling adds a colour', () => {
-  const [denied] = scanText(`x = "${DENIED}"`, PAL);
-  const [unknown] = scanText(`x = "${RED.hex6}"`, PAL);
-  assert.equal(denied.reason, unknown.reason);
-  assert.doesNotMatch(denied.reason, /ink|ruling|fixture/);
-  assert.deepEqual(scanText(`x = "${EXTRA}"`, PAL), []);
-  const flipped = parsePalette(JSON.stringify(palette({ rulings: [{ id: 'ink', allowed: true, hex: [DENIED], reason: 'flipped' }] })));
-  assert.deepEqual(scanText(`x = "${DENIED}"`, flipped), []);
+// ---- palette record ---------------------------------------------------------------------------------
+test('colors is the only allow-list: a record that carries rulings is refused, even an empty list', () => {
+  for (const rulings of [[], [{ id: MARK, allowed: true, hex: [RED.hex6], reason: MARK }]]) {
+    const text = JSON.stringify(palette({ rulings }));
+    assert.throws(() => parsePalette(text), (e) => e instanceof ConfigError && /only allow-list/.test(e.message) && !e.message.includes(MARK));
+  }
+  assert.deepEqual([...parsePalette(JSON.stringify(palette())).allowed].sort(), [OK.hex6, BASE, SHARED].sort());
+  assert.equal(scanText(`x = "${RED.hex6}"`, PAL).length, 1);
 });
 
 test('the palette record is validated, and its errors carry none of its text', () => {
@@ -303,8 +296,6 @@ test('the palette record is validated, and its errors carry none of its text', (
   assert.throws(() => parsePalette(JSON.stringify(palette({ colors: [] }))), ConfigError);
   const bad = JSON.stringify(palette({ colors: [{ hex: 'nothex', role: MARK, name: MARK }] }));
   assert.throws(() => parsePalette(bad), (e) => e instanceof ConfigError && !e.message.includes(MARK) && !e.message.includes('nothex'));
-  const clash = JSON.stringify(palette({ rulings: [{ id: MARK, allowed: false, hex: [OK.hex6], reason: MARK }] }));
-  assert.throws(() => parsePalette(clash), (e) => /also a palette colour/.test(e.message) && !e.message.includes(MARK) && !e.message.includes(OK.hex6));
 });
 
 test('palettes.md may hold no hex code: the line numbers are found, the text is not kept', () => {
@@ -406,11 +397,10 @@ test('main: a hex code in palettes.md fails (1), naming line numbers and nothing
 test('main: the log never holds palette or vault text', async () => {
   const p = palette({
     colors: [{ hex: OK.hex6, role: MARK, name: MARK }, { hex: BASE, role: MARK, name: MARK }],
-    rulings: [{ id: MARK, allowed: false, hex: [DENIED], reason: MARK }, { id: MARK, allowed: true, hex: [EXTRA], reason: MARK }],
   });
   const md = `${MARK}\n${mdFor(p, { hexLine: `${MARK} ${HASH}369` })}`;
   const gateway = async () => response(200, gatewayBody(p, md));
-  const files = { 'a.ts': `export const c = "${RED.hex6}"; export const d = "${DENIED}"; export const e = "${OK.hex6}";\n` };
+  const files = { 'a.ts': `export const c = "${RED.hex6}"; export const e = "${OK.hex6}";\n` };
   const failing = await run(files, { fetchImpl: gateway });
   const passing = await run({ 'a.ts': `export const c = "${OK.hex6}";\n` }, { fetchImpl: async () => response(200, gatewayBody(p, mdFor(p))) });
   const refused = await run(files, { fetchImpl: async () => response(200, { result: { isError: true, structuredContent: { error: { code: 'upstream_error', reason: MARK } } } }) });
@@ -418,7 +408,7 @@ test('main: the log never holds palette or vault text', async () => {
   assert.equal(failing.code, 1);
   assert.equal(passing.code, 0);
   assert.equal(refused.code, 2);
-  for (const secret of [MARK, BASE, EXTRA, OK.hex6.toLowerCase().slice(1, 5)]) assert.equal(log.includes(secret), false, `log holds ${secret}`);
+  for (const secret of [MARK, BASE, OK.hex6.toLowerCase().slice(1, 5)]) assert.equal(log.includes(secret), false, `log holds ${secret}`);
   assert.match(log, new RegExp(`FAIL a.ts:1:\\d+  ${RED.hex6}  `));
 });
 
@@ -428,6 +418,8 @@ test('main: every way of not having a palette is exit 2, never a pass', async ()
   assert.equal((await run(files, { fetchImpl: async () => { throw new Error('offline'); } })).code, 2);
   assert.equal((await run(files, { env: { ...ENV, GAETWAY_KEY: '' } })).code, 2);
   assert.equal((await run(files, { env: {} })).code, 2);
+  const withRulings = palette({ rulings: [] });
+  assert.equal((await run(files, { fetchImpl: async () => response(200, gatewayBody(withRulings, mdFor(withRulings))) })).code, 2);
   const company = palette({ palette: 'company' });
   assert.equal((await run(files, { fetchImpl: async () => response(200, gatewayBody(company, mdFor(company))) })).code, 2);
   const none = await main(['--root', makeRepo({}, { initialise: true })], ENV, { ...capture().io, fetchImpl: async () => response(200, gatewayBody()), retryDelayMs: 0 });
