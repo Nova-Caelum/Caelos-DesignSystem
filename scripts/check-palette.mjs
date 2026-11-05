@@ -1,10 +1,11 @@
 // Palette check. Every colour in every git-tracked text file under the scan root must be in the
 // product palette, which is read at run time from the Nova Caelum brand library through the vault
 // gateway. palettes.md, read the same way, must hold no hex code at all: every hex lives in the
-// palette record.
+// palette record. With --tokens FILE, that file (relative to the scan root) must hold exactly the
+// record's colours, role for role and value for value.
 //
-// Exit 0: every colour is allowed and palettes.md holds no hex code.
-// Exit 1: a colour is not allowed, or palettes.md holds a hex code.
+// Exit 0: every colour is allowed, palettes.md holds no hex code, and the tokens file matches.
+// Exit 1: a colour is not allowed, palettes.md holds a hex code, or the tokens file differs.
 // Exit 2: the check could not run (no palette, bad configuration, no git). Never a pass.
 //
 // The scan root is data. Nothing under it is executed or imported, and a link inside it is never
@@ -79,11 +80,71 @@ export function parsePalette(text) {
   if (!Array.isArray(doc.colors) || doc.colors.length === 0) throw new ConfigError('the palette record has no colors');
   const hexRe = /^#[0-9A-Fa-f]{6}$/;
   const allowed = new Set();
+  const roles = new Map();
+  let duplicateRoles = false;
   for (const [i, c] of doc.colors.entries()) {
     if (!c || !hexRe.test(c.hex) || !c.role || !c.name) throw new ConfigError(`palette colour ${i} is malformed`);
     allowed.add(c.hex.toUpperCase());
+    if (roles.has(c.role)) duplicateRoles = true;
+    roles.set(c.role, c.hex.toUpperCase());
   }
-  return { allowed };
+  return { allowed, roles, duplicateRoles };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Tokens file: one `export const color = {` block of `  'role': '#RRGGBB',` lines, closed by
+// `} as const;`. Any other line inside the block is a problem, so the format cannot hide a value.
+
+const TOKEN_OPEN = 'export const color = {';
+const TOKEN_CLOSE = '} as const;';
+const TOKEN_LINE = /^  '([a-z0-9]+(?:-[a-z0-9]+)*)': '(#[0-9A-F]{6})',$/;
+
+export function parseTokens(text) {
+  const lines = text.split('\n');
+  const roles = new Map();
+  const opens = lines.flatMap((l, i) => (l === TOKEN_OPEN ? [i] : []));
+  if (opens.length !== 1) return { roles, problems: [`must hold exactly one \`${TOKEN_OPEN}\` line, found ${opens.length}`] };
+  const end = lines.indexOf(TOKEN_CLOSE, opens[0]);
+  if (end < 0) return { roles, problems: [`the colour block is not closed by \`${TOKEN_CLOSE}\``] };
+  const problems = [];
+  for (let i = opens[0] + 1; i < end; i++) {
+    const m = TOKEN_LINE.exec(lines[i]);
+    if (!m) problems.push(`line ${i + 1} is not a \`  'role': '#RRGGBB',\` entry`);
+    else if (roles.has(m[1])) problems.push(`line ${i + 1} repeats role '${m[1]}'`);
+    else roles.set(m[1], { hex: m[2], line: i + 1 });
+  }
+  return { roles, problems };
+}
+
+// Problems are named from the tokens file's side only: a role that is in the record but missing
+// from the file is counted, never named, so the log holds no palette text.
+export function compareTokens({ roles, problems }, palette) {
+  const out = [...problems];
+  if (palette.duplicateRoles) out.push('the palette record repeats a role, so the tokens cannot be compared with it');
+  for (const [role, { hex, line }] of roles) {
+    const want = palette.roles.get(role);
+    if (want === undefined) out.push(`line ${line}: role '${role}' is not in the palette record`);
+    else if (want !== hex) out.push(`line ${line}: role '${role}' does not have the palette record's value`);
+  }
+  const missing = [...palette.roles.keys()].filter((r) => !roles.has(r)).length;
+  if (missing) out.push(`${missing} role(s) of the palette record are missing`);
+  return out;
+}
+
+export function readTokens(root, rel) {
+  if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) throw new ConfigError('--tokens must be a path inside the scan root');
+  const full = path.join(root, rel);
+  let st;
+  try {
+    st = lstatSync(full);
+  } catch {
+    return { roles: new Map(), problems: ['the file is missing'] };
+  }
+  if (!st.isFile()) return { roles: new Map(), problems: ['is not a regular file (a link or a directory)'] };
+  const realRoot = realpathSync(root);
+  const parent = realpathSync(path.dirname(full));
+  if (parent !== realRoot && !parent.startsWith(realRoot + path.sep)) return { roles: new Map(), problems: ['resolves outside the scan root'] };
+  return parseTokens(readFileSync(full, 'utf8'));
 }
 
 // Line numbers of palettes.md that hold a hex code. Self-contained on purpose: it also runs inside the
@@ -404,10 +465,10 @@ export function scanRepo(root, palette) {
 // Command line
 
 function parseArgs(argv) {
-  const opts = { root: null, palette: null, paletteMd: null };
+  const opts = { root: null, palette: null, paletteMd: null, tokens: null };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
-    const key = { '--root': 'root', '--palette': 'palette', '--palette-md': 'paletteMd' }[flag];
+    const key = { '--root': 'root', '--palette': 'palette', '--palette-md': 'paletteMd', '--tokens': 'tokens' }[flag];
     if (!key || i + 1 >= argv.length) throw new ConfigError(`unknown or incomplete argument: ${flag}`);
     opts[key] = argv[++i];
   }
@@ -441,12 +502,15 @@ export async function main(argv, env, io = {}) {
     const palette = parsePalette(paletteText);
     const root = path.resolve(opts.root ?? '.');
     const { findings, scanned, binary, submodules } = scanRepo(root, palette);
+    const tokenProblems = opts.tokens ? compareTokens(readTokens(root, opts.tokens), palette) : [];
     out(`palette source: ${source}\n`);
     out(`scanned ${scanned} text files (${binary} binary and ${submodules} submodule paths skipped)\n`);
+    if (opts.tokens && !tokenProblems.length) out(`${opts.tokens} matches the palette record (${palette.roles.size} roles)\n`);
     if (mdHexLines.length) err(`FAIL palettes.md: hex code at line ${mdHexLines.join(', ')}; palettes.md must name colours only\n`);
     for (const f of findings) err(`FAIL ${f.file}:${f.line}:${f.col}  ${f.value}  ${f.reason}\n`);
-    if (mdHexLines.length || findings.length) {
-      err(`palette check FAILED: ${findings.length} colour(s) outside the product palette in ${new Set(findings.map((f) => f.file)).size} file(s); palettes.md holds hex codes on ${mdHexLines.length} line(s)\n`);
+    for (const t of tokenProblems) err(`FAIL ${opts.tokens}: ${t}\n`);
+    if (mdHexLines.length || findings.length || tokenProblems.length) {
+      err(`palette check FAILED: ${findings.length} colour(s) outside the product palette in ${new Set(findings.map((f) => f.file)).size} file(s); palettes.md holds hex codes on ${mdHexLines.length} line(s); ${tokenProblems.length} tokens problem(s)\n`);
       return 1;
     }
     out('palette check passed\n');

@@ -13,11 +13,13 @@ import { fileURLToPath } from 'node:url';
 import {
   ConfigError,
   NAMED_COLOUR_COUNT,
+  compareTokens,
   PALETTES_MD_PATH,
   PRODUCT_PALETTE_PATH,
   hexLineNumbers,
   main,
   parsePalette,
+  parseTokens,
   readFromGateway,
   scanRepo,
   scanText,
@@ -27,6 +29,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(HERE, '..', 'scripts', 'check-palette.mjs');
 const WORKFLOW = path.join(HERE, '..', '.github', 'workflows', 'palette.yml');
 const UNIT_WORKFLOW = path.join(HERE, '..', '.github', 'workflows', 'unit.yml');
+const TOKENS = path.join(HERE, '..', 'src', 'tokens.ts');
 
 // ---- colour builders (no literal colours in this file) ------------------------------------------
 const HASH = '#';
@@ -514,6 +517,94 @@ test('changing one product colour in the record changes the verdict with no app-
   assert.equal(verdict(palette().colors.map((c) => (c.hex === OK.hex6 ? { ...c, hex: RED.hex6 } : c))), 1);
 });
 
+// ---- tokens file ---------------------------------------------------------------------------------
+// Lines: 1 comment, 2 blank, 3 open, 4.. one entry per record colour, then the close.
+const tokensFor = (p) =>
+  ['// tokens', '', 'export const color = {', ...p.colors.map((c) => `  '${c.role}': '${c.hex.toUpperCase()}',`), '} as const;', ''].join('\n');
+const problemsOf = (text, pal = PAL) => compareTokens(parseTokens(text), pal);
+
+test('tokens: a file that matches the record has no problems', () => {
+  assert.deepEqual(problemsOf(tokensFor(palette())), []);
+});
+
+test('tokens: a palette colour under the wrong role, a missing role and an extra role are each a problem', () => {
+  const p = palette();
+  const [ground, text, rule] = p.colors;
+  const swapped = tokensFor(palette({ colors: [{ ...ground, hex: text.hex }, { ...text, hex: ground.hex }, rule] }));
+  assert.deepEqual(problemsOf(swapped), [
+    "line 4: role 'ground' does not have the palette record's value",
+    "line 5: role 'text' does not have the palette record's value",
+  ]);
+  assert.deepEqual(problemsOf(tokensFor(palette({ colors: [text, rule] }))), ['1 role(s) of the palette record are missing']);
+  assert.deepEqual(problemsOf(tokensFor(palette({ colors: [...p.colors, { ...ground, role: 'extra' }] }))), [
+    "line 7: role 'extra' is not in the palette record",
+  ]);
+});
+
+test('tokens: the format is strict, so no line in the block can hide a value', () => {
+  const good = tokensFor(palette());
+  const lines = good.split('\n');
+  const withLine = (i, extra) => [...lines.slice(0, i), extra, ...lines.slice(i)].join('\n');
+  // SHARED has letters in every pair, so lower case is a visible change; the record compares upper case.
+  assert.match(problemsOf(good.replace(SHARED, SHARED.toLowerCase()))[0], /^line 6 is not a `  'role': '#RRGGBB',` entry$/);
+  assert.match(problemsOf(withLine(3, '  // note'))[0], /^line 4 is not a /);
+  assert.match(problemsOf(withLine(4, lines[3]))[0], /^line 5 repeats role 'ground'$/);
+  assert.equal(problemsOf(`${good}${good}`)[0], 'must hold exactly one `export const color = {` line, found 2');
+  assert.equal(problemsOf(good.replace('} as const;', '}'))[0], 'the colour block is not closed by `} as const;`');
+  assert.equal(problemsOf(good.replace(/\n/g, '\r\n'))[0], 'must hold exactly one `export const color = {` line, found 0');
+  assert.equal(problemsOf('')[0], 'must hold exactly one `export const color = {` line, found 0');
+  const repeated = parsePalette(JSON.stringify(palette({ colors: [...palette().colors, { hex: BASE, role: 'ground', name: 'Again' }] })));
+  assert.match(problemsOf(good, repeated)[0], /repeats a role/);
+});
+
+test('tokens: a role missing from the file is counted, never named, so the log holds no record text', () => {
+  const p = palette({ colors: [...palette().colors, { hex: BASE, role: MARK, name: MARK }] });
+  const problems = problemsOf(tokensFor(palette()), parsePalette(JSON.stringify(p)));
+  assert.deepEqual(problems, ['1 role(s) of the palette record are missing']);
+  assert.equal(problems.join('\n').includes(MARK), false);
+});
+
+test('tokens: the repository file parses with no format problem', () => {
+  const { roles, problems } = parseTokens(readFileSync(TOKENS, 'utf8'));
+  assert.deepEqual(problems, []);
+  assert.ok(roles.size > 0);
+});
+
+test('main --tokens: a match passes (0); drift, a missing file or a link fails (1); a path out of the root is exit 2', async () => {
+  const p = palette();
+  const go = async (dir, rel = 'src/tokens.ts') => {
+    const { lines, io } = capture();
+    const code = await main(['--root', dir, '--tokens', rel], ENV, { ...io, fetchImpl: async () => response(200, gatewayBody(p)), retryDelayMs: 0 });
+    return { code, ...lines };
+  };
+  const good = await go(makeRepo({ 'src/tokens.ts': tokensFor(p) }));
+  assert.equal(good.code, 0, good.err);
+  assert.match(good.out, /src\/tokens.ts matches the palette record \(3 roles\)/);
+  // Every value is a palette colour, so only the tokens comparison can catch this.
+  const wrongRole = tokensFor(palette({ colors: [{ ...p.colors[0], hex: BASE }, ...p.colors.slice(1)] }));
+  const drift = await go(makeRepo({ 'src/tokens.ts': wrongRole }));
+  assert.equal(drift.code, 1);
+  assert.match(drift.err, /FAIL src\/tokens.ts: line 4: role 'ground' does not have the palette record's value/);
+  assert.match(drift.err, /0 colour\(s\) outside the product palette/);
+  const missing = await go(makeRepo({ 'a.ts': 'export const c = 1;\n' }));
+  assert.equal(missing.code, 1);
+  assert.match(missing.err, /FAIL src\/tokens.ts: the file is missing/);
+  const outside = mkdtempSync(path.join(tmpdir(), 'palette-outside-'));
+  writeFileSync(path.join(outside, 'tokens.ts'), tokensFor(p));
+  const linked = makeRepo({ 'a.ts': 'export const c = 1;\n' });
+  mkdirSync(path.join(linked, 'src'));
+  symlinkSync(path.join(outside, 'tokens.ts'), path.join(linked, 'src', 'tokens.ts'));
+  const link = await go(linked);
+  assert.equal(link.code, 1);
+  assert.match(link.err, /FAIL src\/tokens.ts: is not a regular file/);
+  const swappedDir = makeRepo({ 'a.ts': 'export const c = 1;\n' });
+  symlinkSync(outside, path.join(swappedDir, 'src'));
+  const escaped = await go(swappedDir);
+  assert.equal(escaped.code, 1);
+  assert.match(escaped.err, /FAIL src\/tokens.ts: resolves outside the scan root/);
+  assert.equal((await go(makeRepo({ 'src/tokens.ts': tokensFor(p) }), '../tokens.ts')).code, 2);
+});
+
 // ---- machine agnostic ------------------------------------------------------------------------------
 test('the check and the workflows contain no absolute, home-relative or machine-specific path', () => {
   const forbidden = [
@@ -549,7 +640,7 @@ test('palette.yml: main runs the script, the change is data, secrets are in one 
   assert.match(text, /GIT_LFS_SKIP_SMUDGE: '1'/);
   assert.match(text, /ref: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}\n {10}path: pr\n/);
   const runs = text.match(/^ +run: .*$/gm);
-  assert.deepEqual(runs.map((r) => r.trim()), ['run: node scripts/check-palette.mjs --root pr']);
+  assert.deepEqual(runs.map((r) => r.trim()), ['run: node scripts/check-palette.mjs --root pr --tokens src/tokens.ts']);
   assert.doesNotMatch(text, /npm|pnpm|yarn|pip |make |node --test|working-directory|cd pr|\.\/pr|--palette/);
   const [before, after] = text.split('- name: Palette check');
   assert.doesNotMatch(before, /secrets\./);
