@@ -1,6 +1,8 @@
 name: Palette
+# Runs from main, never from the change it judges (pull_request_target). The change is checked out
+# into pr/ and scanned as data: nothing under pr/ is executed, imported, installed or tested.
 on:
-  pull_request:
+  pull_request_target:
   push:
     branches: [main]
 permissions:
@@ -9,16 +11,25 @@ jobs:
   palette:
     name: palette
     runs-on: ubuntu-latest
+    environment: palette
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out main for the script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Unit tests
-        run: node --test
+      - name: Check out the change as data
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        env:
+          GIT_LFS_SKIP_SMUDGE: '1'
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: pr
+          persist-credentials: false
       - name: Palette check
         env:
           GAETWAY_URL: ${{ secrets.PALETTE_GAETWAY_URL }}
           GAETWAY_AGENT: ${{ secrets.PALETTE_GAETWAY_AGENT }}
           GAETWAY_KEY: ${{ secrets.PALETTE_GAETWAY_KEY }}
-        run: node scripts/check-palette.mjs
+        run: node scripts/check-palette.mjs --root pr

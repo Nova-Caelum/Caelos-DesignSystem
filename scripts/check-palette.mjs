@@ -1,15 +1,19 @@
-// Palette check. Every colour in every git-tracked text file must be in the product palette,
-// which is read at run time from the Nova Caelum brand library through the vault gateway.
+// Palette check. Every colour in every git-tracked text file under the scan root must be in the
+// product palette, which is read at run time from the Nova Caelum brand library through the vault
+// gateway. palettes.md, read the same way, must hold no hex code at all: every hex lives in the
+// palette record.
 //
-// Exit 0: every colour is allowed and palettes.md agrees with product-palette.json.
-// Exit 1: a colour is not allowed, or palettes.md disagrees with product-palette.json.
+// Exit 0: every colour is allowed and palettes.md holds no hex code.
+// Exit 1: a colour is not allowed, or palettes.md holds a hex code.
 // Exit 2: the check could not run (no palette, bad configuration, no git). Never a pass.
 //
-// There are no exclusions, no ignore comments and no allowlist in this file.
+// The scan root is data. Nothing under it is executed or imported, and a link inside it is never
+// followed out of it. The output holds hashes, line numbers and the scanned colours with file:line;
+// it never holds palette or vault text. There are no exclusions, no ignore comments and no allowlist.
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
+import { lstatSync, readFileSync, readlinkSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -67,67 +71,39 @@ export function parsePalette(text) {
   }
   if (!doc || doc.schema !== 1) throw new ConfigError('the palette record must have "schema": 1');
   if (doc.palette !== 'product') {
-    throw new ConfigError(`the palette record is "${doc.palette}", not "product": this check reads the product palette only`);
+    throw new ConfigError('the palette record is not the product palette: this check reads the product palette only');
   }
   if (!Array.isArray(doc.colors) || doc.colors.length === 0) throw new ConfigError('the palette record has no colors');
   const hexRe = /^#[0-9A-Fa-f]{6}$/;
   const colorHexes = new Set();
-  for (const c of doc.colors) {
-    if (!c || !hexRe.test(c.hex) || !c.role || !c.name) throw new ConfigError(`bad palette entry: ${JSON.stringify(c)}`);
+  for (const [i, c] of doc.colors.entries()) {
+    if (!c || !hexRe.test(c.hex) || !c.role || !c.name) throw new ConfigError(`palette colour ${i} is malformed`);
     colorHexes.add(c.hex.toUpperCase());
   }
   const allowed = new Set(colorHexes);
-  const denied = new Map();
-  for (const r of Array.isArray(doc.rulings) ? doc.rulings : []) {
+  for (const [i, r] of (Array.isArray(doc.rulings) ? doc.rulings : []).entries()) {
     if (!r || !r.id || typeof r.allowed !== 'boolean' || !Array.isArray(r.hex) || !r.reason) {
-      throw new ConfigError(`bad ruling: ${JSON.stringify(r)}`);
+      throw new ConfigError(`palette ruling ${i} is malformed`);
     }
     for (const h of r.hex) {
-      if (!hexRe.test(h)) throw new ConfigError(`bad ruling hex: ${JSON.stringify(h)}`);
+      if (!hexRe.test(h)) throw new ConfigError(`palette ruling ${i} has a malformed hex`);
       const up = h.toUpperCase();
       if (r.allowed) allowed.add(up);
-      else {
-        if (colorHexes.has(up)) throw new ConfigError(`ruling "${r.id}" denies ${up}, which is also a palette colour`);
-        denied.set(up, r);
-      }
+      else if (colorHexes.has(up)) throw new ConfigError(`palette ruling ${i} denies a colour that is also a palette colour`);
     }
   }
-  return { allowed, denied, colorHexes };
+  return { allowed };
 }
 
-// Self-contained on purpose: it is also sent to the gateway as text, so only the sections travel.
-export function sliceSections(md) {
-  const lines = md.split('\n');
-  const take = (heading) => {
-    const i = lines.findIndex((l) => l === heading || l.startsWith(heading + ' '));
-    if (i < 0) return null;
-    let j = i + 1;
-    while (j < lines.length && !lines[j].startsWith('## ')) j++;
-    return lines.slice(i, j).join('\n');
-  };
-  return { product: take('## Product'), shared: take('## Shared foundations') };
-}
-
-export function checkAgreement(colorHexes, sections) {
-  if (!sections || typeof sections.product !== 'string' || typeof sections.shared !== 'string') {
-    throw new ConfigError('palettes.md has no "## Product" and "## Shared foundations" sections');
-  }
-  const found = new Set();
-  for (const m of `${sections.product}\n${sections.shared}`.matchAll(/#([0-9A-Fa-f]{6})(?![0-9A-Za-z_])/g)) {
-    found.add(`#${m[1].toUpperCase()}`);
-  }
-  const findings = [];
-  for (const h of [...found].sort()) {
-    if (!colorHexes.has(h)) {
-      findings.push({ file: 'palettes.md', line: 0, col: 0, value: h, reason: 'is in the palettes.md Product or Shared tables but not in product-palette.json' });
-    }
-  }
-  for (const h of [...colorHexes].sort()) {
-    if (!found.has(h)) {
-      findings.push({ file: 'product-palette.json', line: 0, col: 0, value: h, reason: 'is in product-palette.json but not in the palettes.md Product or Shared tables' });
-    }
-  }
-  return findings;
+// Line numbers of palettes.md that hold a hex code. Self-contained on purpose: it also runs inside the
+// gateway, so the markdown never leaves the vault, only these numbers do.
+export function hexLineNumbers(md) {
+  const re = /#[0-9a-fA-F]{3,8}\b/;
+  const lines = [];
+  md.split('\n').forEach((line, i) => {
+    if (re.test(line)) lines.push(i + 1);
+  });
+  return lines;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -135,10 +111,10 @@ export function checkAgreement(colorHexes, sections) {
 
 function buildProgram() {
   return [
-    sliceSections.toString(),
+    hexLineNumbers.toString(),
     `const j = await vault.read({ path: ${JSON.stringify(PRODUCT_PALETTE_PATH)} });`,
     `const m = await vault.read({ path: ${JSON.stringify(PALETTES_MD_PATH)} });`,
-    'return { json: { hash: j.hash, encoding: j.encoding, content: j.content }, md: { hash: m.hash, sections: sliceSections(m.content) } };',
+    'return { json: { hash: j.hash, encoding: j.encoding, content: j.content }, md: { hash: m.hash, hexLines: hexLineNumbers(m.content) } };',
   ].join('\n');
 }
 
@@ -185,16 +161,18 @@ export async function readFromGateway({ url, agent, key, fetchImpl = fetch, retr
     payload = null;
   }
   if (res.status !== 200) {
-    const why = payload?.reason ?? payload?.code ?? '';
-    throw new ConfigError(`the gateway answered HTTP ${res.status}${why ? ` (${why})` : ''}; check GAETWAY_AGENT and GAETWAY_KEY`);
+    const code = typeof payload?.code === 'string' ? payload.code : '';
+    throw new ConfigError(`the gateway answered HTTP ${res.status}${code ? ` (${code})` : ''}; check GAETWAY_AGENT and GAETWAY_KEY`);
   }
   const structured = payload?.result?.structuredContent;
   if (payload?.result?.isError || !structured || structured.error) {
     const e = structured?.error;
-    throw new ConfigError(`the gateway refused the read${e ? `: ${e.code}: ${e.reason}` : ''}`);
+    const code = typeof e?.code === 'string' ? `: ${e.code}` : '';
+    const id = typeof e?.request_id === 'string' ? ` (request ${e.request_id})` : '';
+    throw new ConfigError(`the gateway refused the read${code}${id}`);
   }
   const value = structured.result;
-  if (!value?.json || typeof value.json.content !== 'string' || !value?.md) {
+  if (!value?.json || typeof value.json.content !== 'string' || !Array.isArray(value?.md?.hexLines)) {
     throw new ConfigError('the gateway returned no palette (result missing or truncated)');
   }
   const sha = createHash('sha256').update(value.json.content, 'utf8').digest('hex');
@@ -203,7 +181,7 @@ export async function readFromGateway({ url, agent, key, fetchImpl = fetch, retr
   }
   return {
     paletteText: value.json.content,
-    sections: value.md.sections,
+    mdHexLines: value.md.hexLines,
     source: `vault ${PRODUCT_PALETTE_PATH} sha256=${value.json.hash}; vault ${PALETTES_MD_PATH} sha256=${value.md.hash}`,
   };
 }
@@ -327,8 +305,7 @@ export function scanText(text, palette) {
   };
   const judge = (index, shown, hex) => {
     if (palette.allowed.has(hex)) return;
-    const ruling = palette.denied.get(hex);
-    add(index, shown, ruling ? `not allowed in product code (ruling "${ruling.id}": ${ruling.reason})` : 'not in the product palette');
+    add(index, shown, 'not in the product palette');
   };
 
   // Hex colours, including the percent-encoded form used inside data URLs.
@@ -398,6 +375,7 @@ export function scanRepo(root, palette) {
     throw new ConfigError('git ls-files failed: is this a git checkout?');
   }
   const files = listed.split('\0').filter(Boolean);
+  const realRoot = realpathSync(root);
   const findings = [];
   let scanned = 0;
   let binary = 0;
@@ -406,6 +384,10 @@ export function scanRepo(root, palette) {
     const full = path.join(root, rel);
     let buf;
     try {
+      const parent = realpathSync(path.dirname(full));
+      if (parent !== realRoot && !parent.startsWith(realRoot + path.sep)) {
+        throw new ConfigError(`tracked path ${rel} resolves outside the scan root`);
+      }
       const st = lstatSync(full);
       if (st.isDirectory()) {
         submodules++;
@@ -413,6 +395,7 @@ export function scanRepo(root, palette) {
       }
       buf = st.isSymbolicLink() ? Buffer.from(readlinkSync(full)) : readFileSync(full);
     } catch (e) {
+      if (e instanceof ConfigError) throw e;
       throw new ConfigError(`could not read tracked file ${rel}: ${e.code ?? e.message}`);
     }
     if (buf.subarray(0, 8192).includes(0)) {
@@ -447,16 +430,16 @@ export async function main(argv, env, io = {}) {
   try {
     const opts = parseArgs(argv);
     let paletteText;
-    let sections;
+    let mdHexLines;
     let source;
     if (opts.palette) {
       paletteText = readFileSync(opts.palette, 'utf8');
-      sections = sliceSections(readFileSync(opts.paletteMd, 'utf8'));
+      mdHexLines = hexLineNumbers(readFileSync(opts.paletteMd, 'utf8'));
       source = 'local fixtures (--palette, tests only)';
     } else {
       const missing = ['GAETWAY_URL', 'GAETWAY_AGENT', 'GAETWAY_KEY'].filter((k) => !env[k]);
       if (missing.length) throw new ConfigError(`not configured: set ${missing.join(', ')}`);
-      ({ paletteText, sections, source } = await readFromGateway({
+      ({ paletteText, mdHexLines, source } = await readFromGateway({
         url: env.GAETWAY_URL,
         agent: env.GAETWAY_AGENT,
         key: env.GAETWAY_KEY,
@@ -465,16 +448,14 @@ export async function main(argv, env, io = {}) {
       }));
     }
     const palette = parsePalette(paletteText);
-    const agreement = checkAgreement(palette.colorHexes, sections);
     const root = path.resolve(opts.root ?? '.');
     const { findings, scanned, binary, submodules } = scanRepo(root, palette);
     out(`palette source: ${source}\n`);
-    out(`allowed: ${palette.allowed.size} colours; scanned ${scanned} text files (${binary} binary and ${submodules} submodule paths skipped)\n`);
-    for (const f of agreement) err(`FAIL ${f.file}: ${f.value} ${f.reason}\n`);
+    out(`scanned ${scanned} text files (${binary} binary and ${submodules} submodule paths skipped)\n`);
+    if (mdHexLines.length) err(`FAIL palettes.md: hex code at line ${mdHexLines.join(', ')}; palettes.md must name colours only\n`);
     for (const f of findings) err(`FAIL ${f.file}:${f.line}:${f.col}  ${f.value}  ${f.reason}\n`);
-    const total = agreement.length + findings.length;
-    if (total) {
-      err(`palette check FAILED: ${findings.length} colour(s) outside the product palette in ${new Set(findings.map((f) => f.file)).size} file(s); ${agreement.length} disagreement(s) between palettes.md and product-palette.json\n`);
+    if (mdHexLines.length || findings.length) {
+      err(`palette check FAILED: ${findings.length} colour(s) outside the product palette in ${new Set(findings.map((f) => f.file)).size} file(s); palettes.md holds hex codes on ${mdHexLines.length} line(s)\n`);
       return 1;
     }
     out('palette check passed\n');

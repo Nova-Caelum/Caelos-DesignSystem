@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -15,18 +15,18 @@ import {
   NAMED_COLOUR_COUNT,
   PALETTES_MD_PATH,
   PRODUCT_PALETTE_PATH,
-  checkAgreement,
+  hexLineNumbers,
   main,
   parsePalette,
   readFromGateway,
   scanRepo,
   scanText,
-  sliceSections,
 } from '../scripts/check-palette.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(HERE, '..', 'scripts', 'check-palette.mjs');
 const WORKFLOW = path.join(HERE, '..', '.github', 'workflows', 'palette.yml');
+const UNIT_WORKFLOW = path.join(HERE, '..', '.github', 'workflows', 'unit.yml');
 
 // ---- colour builders (no literal colours in this file) ------------------------------------------
 const HASH = '#';
@@ -71,7 +71,7 @@ const BASE = HASH + hx(18, 52, 86);
 const SHARED = HASH + hx(171, 205, 239);
 const DENIED = HASH + hx(154, 152, 200);
 const EXTRA = HASH + hx(1, 35, 69);
-const COMPANY_ONLY_IN_MD = HASH + hx(9, 8, 7);
+const MARK = 'zz-marker-zz';
 
 const palette = (over = {}) => ({
   schema: 1,
@@ -87,19 +87,16 @@ const palette = (over = {}) => ({
   ],
   ...over,
 });
-const mdFor = (p, { productExtra = '', sharedExtra = '' } = {}) =>
+const mdFor = (p, { hexLine = '' } = {}) =>
   [
     '# Palettes',
     '## Company',
-    `| Ground | \`${COMPANY_ONLY_IN_MD}\` |`,
+    '| Ground | Midnight |',
     '## Product',
-    ...p.colors.filter((c) => !c.shared).map((c) => `| ${c.name} | \`${c.hex}\` |`),
-    productExtra,
+    ...p.colors.filter((c) => !c.shared).map((c) => `| ${c.name} | Approved |`),
+    hexLine,
     '## Shared foundations and derived states',
-    ...p.colors.filter((c) => c.shared).map((c) => `| ${c.name} | \`${c.hex}\` |`),
-    sharedExtra,
-    '## Greens',
-    `| Card ink | \`${DENIED}\` |`,
+    ...p.colors.filter((c) => c.shared).map((c) => `| ${c.name} | Approved |`),
     '',
   ].join('\n');
 const PAL = parsePalette(JSON.stringify(palette()));
@@ -129,7 +126,7 @@ const gatewayBody = (p = palette(), md = mdFor(p)) => {
     result: {
       isError: false,
       content: [{ type: 'text', text: '{}' }],
-      structuredContent: { result: { json: { hash: sha(content), encoding: 'text', content }, md: { hash: sha(md), sections: sliceSections(md) } } },
+      structuredContent: { result: { json: { hash: sha(content), encoding: 'text', content }, md: { hash: sha(md), hexLines: hexLineNumbers(md) } } },
     },
   };
 };
@@ -289,44 +286,33 @@ test('hex boundaries: only 3, 4, 6 and 8 digits are colours', () => {
 });
 
 // ---- palette record, rulings, agreement -----------------------------------------------------------
-test('rulings: a denied colour is named in the refusal; an allowed ruling adds a colour', () => {
+test('rulings: a denied colour is refused like any other, with no ruling text; an allowed ruling adds a colour', () => {
   const [denied] = scanText(`x = "${DENIED}"`, PAL);
-  assert.match(denied.reason, /ruling "ink"/);
+  const [unknown] = scanText(`x = "${RED.hex6}"`, PAL);
+  assert.equal(denied.reason, unknown.reason);
+  assert.doesNotMatch(denied.reason, /ink|ruling|fixture/);
   assert.deepEqual(scanText(`x = "${EXTRA}"`, PAL), []);
   const flipped = parsePalette(JSON.stringify(palette({ rulings: [{ id: 'ink', allowed: true, hex: [DENIED], reason: 'flipped' }] })));
   assert.deepEqual(scanText(`x = "${DENIED}"`, flipped), []);
 });
 
-test('the palette record is validated', () => {
+test('the palette record is validated, and its errors carry none of its text', () => {
   assert.throws(() => parsePalette('nope'), ConfigError);
-  assert.throws(() => parsePalette(JSON.stringify(palette({ palette: 'company' }))), /not "product"/);
+  assert.throws(() => parsePalette(JSON.stringify(palette({ palette: 'company' }))), /not the product palette/);
   assert.throws(() => parsePalette(JSON.stringify(palette({ schema: 2 }))), ConfigError);
   assert.throws(() => parsePalette(JSON.stringify(palette({ colors: [] }))), ConfigError);
-  assert.throws(() => parsePalette(JSON.stringify(palette({ colors: [{ hex: 'nothex', role: 'a', name: 'b' }] }))), ConfigError);
-  assert.throws(() => parsePalette(JSON.stringify(palette({ rulings: [{ id: 'x', allowed: false, hex: [OK.hex6], reason: 'contradiction' }] }))), /also a palette colour/);
+  const bad = JSON.stringify(palette({ colors: [{ hex: 'nothex', role: MARK, name: MARK }] }));
+  assert.throws(() => parsePalette(bad), (e) => e instanceof ConfigError && !e.message.includes(MARK) && !e.message.includes('nothex'));
+  const clash = JSON.stringify(palette({ rulings: [{ id: MARK, allowed: false, hex: [OK.hex6], reason: MARK }] }));
+  assert.throws(() => parsePalette(clash), (e) => /also a palette colour/.test(e.message) && !e.message.includes(MARK) && !e.message.includes(OK.hex6));
 });
 
-test('agreement: palettes.md and the record must list the same Product and Shared colours', () => {
-  const p = palette();
-  const sections = (md) => sliceSections(md);
-  assert.deepEqual(checkAgreement(PAL.colorHexes, sections(mdFor(p))), []);
-  const mdExtra = checkAgreement(PAL.colorHexes, sections(mdFor(p, { productExtra: `| New | \`${EXTRA}\` |` })));
-  assert.equal(mdExtra.length, 1);
-  assert.match(mdExtra[0].reason, /not in product-palette.json/);
-  const sharedExtra = checkAgreement(PAL.colorHexes, sections(mdFor(p, { sharedExtra: `| New | \`${DENIED}\` |` })));
-  assert.equal(sharedExtra.length, 1);
-  const jsonExtra = parsePalette(JSON.stringify(palette({ colors: [...p.colors, { hex: EXTRA, role: 'x', name: 'X' }] })));
-  const missing = checkAgreement(jsonExtra.colorHexes, sections(mdFor(p)));
-  assert.equal(missing.length, 1);
-  assert.match(missing[0].reason, /not in the palettes.md/);
-  assert.throws(() => checkAgreement(PAL.colorHexes, sliceSections('# nothing here\n')), ConfigError);
-});
-
-test('the section slicer survives being sent to the gateway as text', () => {
-  const md = mdFor(palette());
-  const rebuilt = new Function(`${sliceSections.toString()}\nreturn sliceSections;`)();
-  assert.deepEqual(rebuilt(md), sliceSections(md));
-  assert.equal(sliceSections(md).product.includes(COMPANY_ONLY_IN_MD), false);
+test('palettes.md may hold no hex code: the line numbers are found, the text is not kept', () => {
+  assert.deepEqual(hexLineNumbers(mdFor(palette())), []);
+  const lines = ['# Palettes', `Ground ${HASH}369`, '| a | b |', `see ${HASH}FF00FF and ${HASH}12345678`, `${HASH}123`, `${HASH}ab`, '## Heading', `${HASH}12345678901`];
+  assert.deepEqual(hexLineNumbers(lines.join('\n')), [2, 4, 5]);
+  assert.deepEqual(hexLineNumbers(`${HASH}abcde`), [1]);
+  assert.deepEqual(hexLineNumbers(`${HASH}abcdefg`), []);
 });
 
 // ---- the gateway read -----------------------------------------------------------------------------
@@ -347,9 +333,9 @@ test('the gateway request names only the two vault-relative paths and carries th
   assert.match(got.source, /sha256=[0-9a-f]{64}/);
 });
 
-test('the program sent to the gateway returns the record and only the two md sections', async () => {
+test('the program sent to the gateway returns the record and only line numbers from palettes.md', async () => {
   const p = palette();
-  const md = mdFor(p);
+  const md = mdFor(p, { hexLine: `${MARK} ${HASH}369` });
   const files = { [PRODUCT_PALETTE_PATH]: JSON.stringify(p), [PALETTES_MD_PATH]: md };
   let code;
   await readFromGateway({ url: ENV.GAETWAY_URL, agent: 'a', key: 'k', fetchImpl: async (u, init) => ((code = JSON.parse(init.body).params.arguments.code), response(200, gatewayBody())) });
@@ -357,20 +343,24 @@ test('the program sent to the gateway returns the record and only the two md sec
   const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
   const result = await new AsyncFunction('vault', code)(vault);
   assert.equal(result.json.content, files[PRODUCT_PALETTE_PATH]);
-  assert.deepEqual(result.md.sections, sliceSections(md));
-  assert.equal(JSON.stringify(result).includes(COMPANY_ONLY_IN_MD), false);
+  assert.deepEqual(result.md, { hash: sha(md), hexLines: hexLineNumbers(md) });
+  assert.equal(result.md.hexLines.length, 1);
+  assert.equal(JSON.stringify(result.md).includes(MARK), false);
 });
 
 test('the gateway read fails closed', async () => {
   const cfg = { url: ENV.GAETWAY_URL, agent: 'a', key: 'k', retryDelayMs: 0 };
   const read = (fetchImpl, over = {}) => readFromGateway({ ...cfg, ...over, fetchImpl });
-  await assert.rejects(read(async () => response(401, { code: 'key_mismatch', reason: 'no' })), /HTTP 401 \(no\)/);
-  await assert.rejects(read(async () => response(200, { result: { isError: true, structuredContent: { error: { code: 'upstream_error', reason: 'not found: x' } } } })), /upstream_error: not found/);
+  await assert.rejects(read(async () => response(401, { code: 'key_mismatch', reason: MARK })), (e) => /HTTP 401 \(key_mismatch\)/.test(e.message) && !e.message.includes(MARK));
+  await assert.rejects(read(async () => response(200, { result: { isError: true, structuredContent: { error: { code: 'upstream_error', reason: `not found: ${MARK}` } } } })), (e) => /upstream_error/.test(e.message) && !e.message.includes(MARK));
   await assert.rejects(read(async () => response(200, { result: { isError: false, structuredContent: { result: null } } })), /truncated/);
   const bad = gatewayBody();
   bad.result.structuredContent.result.json.hash = 'f'.repeat(64);
   await assert.rejects(read(async () => response(200, bad)), /hash check/);
   await assert.rejects(read(async () => response(200, 'not an object')), ConfigError);
+  const noLines = gatewayBody();
+  delete noLines.result.structuredContent.result.md.hexLines;
+  await assert.rejects(read(async () => response(200, noLines)), /no palette/);
   await assert.rejects(read(async () => { throw new Error('offline'); }), /could not be reached: offline/);
   await assert.rejects(read(async () => response(200, gatewayBody()), { url: 'http://gateway.example.test/mcp' }), /https/);
   await assert.rejects(read(async () => response(200, gatewayBody()), { url: 'not a url' }), /not a URL/);
@@ -404,12 +394,32 @@ test('main: clean repo passes (0), violation fails (1) naming file, line, column
   assert.match(bad.err, new RegExp(`FAIL src/a.ts:2:19  ${COMPANY.hex6}  not in the product palette`));
 });
 
-test('main: palettes.md disagreeing with the record fails (1)', async () => {
+test('main: a hex code in palettes.md fails (1), naming line numbers and nothing else', async () => {
   const p = palette();
-  const fetchImpl = async () => response(200, gatewayBody(p, mdFor(p, { productExtra: `| New | \`${EXTRA}\` |` })));
-  const r = await run({ 'a.ts': `export const c = "${OK.hex6}";\n` }, { fetchImpl });
+  const md = mdFor(p, { hexLine: `${MARK} ${HASH}369` });
+  const r = await run({ 'a.ts': `export const c = "${OK.hex6}";\n` }, { fetchImpl: async () => response(200, gatewayBody(p, md)) });
   assert.equal(r.code, 1);
-  assert.match(r.err, /FAIL palettes.md: .* not in product-palette.json/);
+  assert.match(r.err, /FAIL palettes.md: hex code at line 7; palettes.md must name colours only/);
+  assert.equal((r.out + r.err).includes(MARK), false);
+});
+
+test('main: the log never holds palette or vault text', async () => {
+  const p = palette({
+    colors: [{ hex: OK.hex6, role: MARK, name: MARK }, { hex: BASE, role: MARK, name: MARK }],
+    rulings: [{ id: MARK, allowed: false, hex: [DENIED], reason: MARK }, { id: MARK, allowed: true, hex: [EXTRA], reason: MARK }],
+  });
+  const md = `${MARK}\n${mdFor(p, { hexLine: `${MARK} ${HASH}369` })}`;
+  const gateway = async () => response(200, gatewayBody(p, md));
+  const files = { 'a.ts': `export const c = "${RED.hex6}"; export const d = "${DENIED}"; export const e = "${OK.hex6}";\n` };
+  const failing = await run(files, { fetchImpl: gateway });
+  const passing = await run({ 'a.ts': `export const c = "${OK.hex6}";\n` }, { fetchImpl: async () => response(200, gatewayBody(p, mdFor(p))) });
+  const refused = await run(files, { fetchImpl: async () => response(200, { result: { isError: true, structuredContent: { error: { code: 'upstream_error', reason: MARK } } } }) });
+  const log = [failing, passing, refused].map((r) => r.out + r.err).join('\n');
+  assert.equal(failing.code, 1);
+  assert.equal(passing.code, 0);
+  assert.equal(refused.code, 2);
+  for (const secret of [MARK, BASE, EXTRA, OK.hex6.toLowerCase().slice(1, 5)]) assert.equal(log.includes(secret), false, `log holds ${secret}`);
+  assert.match(log, new RegExp(`FAIL a.ts:1:\\d+  ${RED.hex6}  `));
 });
 
 test('main: every way of not having a palette is exit 2, never a pass', async () => {
@@ -432,6 +442,39 @@ test('main: binary files are skipped and counted, text files still scanned', asy
   execFileSync('git', ['-C', dir, 'add', '-A']);
   const { findings, scanned, binary } = scanRepo(dir, PAL);
   assert.deepEqual([findings.length, scanned, binary], [0, 1, 1]);
+});
+
+test('scan root: a link is read as a link and never followed out of the root', () => {
+  const outside = mkdtempSync(path.join(tmpdir(), 'palette-outside-'));
+  writeFileSync(path.join(outside, 'secret.txt'), `"${RED.hex6}" ${MARK}\n`);
+  const dir = makeRepo({ 'a.ts': `export const c = "${OK.hex6}";\n` });
+  symlinkSync(path.join(outside, 'secret.txt'), path.join(dir, 'leak.txt'));
+  execFileSync('git', ['-C', dir, 'add', '-A']);
+  const { findings, scanned } = scanRepo(dir, PAL);
+  assert.deepEqual(findings, []);
+  assert.equal(scanned, 2);
+});
+
+test('scan root: a tracked path whose directory was swapped for a link out of the root is refused', () => {
+  const outside = mkdtempSync(path.join(tmpdir(), 'palette-outside-'));
+  writeFileSync(path.join(outside, 'x.txt'), `"${RED.hex6}"\n`);
+  const dir = makeRepo({ 'a.ts': 'export const c = 1;\n', 'd/x.txt': 'clean\n' });
+  rmSync(path.join(dir, 'd'), { recursive: true });
+  symlinkSync(outside, path.join(dir, 'd'));
+  assert.throws(() => scanRepo(dir, PAL), (e) => e instanceof ConfigError && /outside the scan root/.test(e.message));
+});
+
+test('scan root: the root is an argument and the script itself is never the scanned tree', async () => {
+  const dir = makeRepo({ 'a.ts': `export const c = "${RED.hex6}";\n` });
+  const here = process.cwd();
+  const { code, err } = await (async () => {
+    const { lines, io } = capture();
+    const c = await main(['--root', dir], ENV, { ...io, fetchImpl: async () => response(200, gatewayBody()), retryDelayMs: 0 });
+    return { code: c, err: lines.err };
+  })();
+  assert.equal(code, 1);
+  assert.match(err, /FAIL a.ts:1:/);
+  assert.equal(process.cwd(), here);
 });
 
 // ---- command line, in a real process --------------------------------------------------------------
@@ -480,7 +523,7 @@ test('changing one product colour in the record changes the verdict with no app-
 });
 
 // ---- machine agnostic ------------------------------------------------------------------------------
-test('the check and the workflow contain no absolute, home-relative or machine-specific path', () => {
+test('the check and the workflows contain no absolute, home-relative or machine-specific path', () => {
   const forbidden = [
     /\/(Users|home|root|var|tmp|etc|opt|mnt|private|Volumes|usr)\//,
     /\b[A-Za-z]:\\/,
@@ -489,7 +532,7 @@ test('the check and the workflow contain no absolute, home-relative or machine-s
     /localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]/,
     /file:\/\//,
   ];
-  for (const file of [SCRIPT, WORKFLOW]) {
+  for (const file of [SCRIPT, WORKFLOW, UNIT_WORKFLOW]) {
     const text = readFileSync(file, 'utf8');
     for (const re of forbidden) assert.equal(re.test(text), false, `${path.basename(file)} matches ${re}`);
   }
@@ -502,14 +545,32 @@ test('the check reads configuration only from the three gateway variables', () =
   assert.equal(text.match(/process\.env/g).length, 1);
 });
 
-test('the workflow runs on pull_request and main, never pull_request_target, never the fixtures override', () => {
+test('palette.yml: main runs the script, the change is data, secrets are in one step and behind an environment', () => {
   const text = readFileSync(WORKFLOW, 'utf8');
-  assert.match(text, /^on:\n {2}pull_request:\n {2}push:\n {4}branches: \[main\]/m);
-  assert.doesNotMatch(text, /pull_request_target/);
-  assert.doesNotMatch(text, /--palette/);
-  assert.match(text, /^ {2}palette:\n {4}name: palette$/m);
-  assert.match(text, /GAETWAY_URL: \$\{\{ secrets\.PALETTE_GAETWAY_URL \}\}/);
-  assert.match(text, /GAETWAY_AGENT: \$\{\{ secrets\.PALETTE_GAETWAY_AGENT \}\}/);
-  assert.match(text, /GAETWAY_KEY: \$\{\{ secrets\.PALETTE_GAETWAY_KEY \}\}/);
-  assert.match(text, /permissions:\n {2}contents: read/);
+  assert.match(text, /^on:\n {2}pull_request_target:\n {2}push:\n {4}branches: \[main\]$/m);
+  assert.doesNotMatch(text, /^ {2}pull_request:/m);
+  assert.match(text, /^ {2}palette:\n {4}name: palette\n {4}runs-on: ubuntu-latest\n {4}environment: palette$/m);
+  assert.match(text, /^permissions:\n {2}contents: read$/m);
+  const checkouts = text.match(/uses: actions\/checkout@[0-9a-f]{40} # v\S+/g);
+  assert.equal(checkouts.length, 2);
+  assert.equal(text.match(/persist-credentials: false/g).length, 2);
+  assert.match(text, /GIT_LFS_SKIP_SMUDGE: '1'/);
+  assert.match(text, /ref: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}\n {10}path: pr\n/);
+  const runs = text.match(/^ +run: .*$/gm);
+  assert.deepEqual(runs.map((r) => r.trim()), ['run: node scripts/check-palette.mjs --root pr']);
+  assert.doesNotMatch(text, /npm|pnpm|yarn|pip |make |node --test|working-directory|cd pr|\.\/pr|--palette/);
+  const [before, after] = text.split('- name: Palette check');
+  assert.doesNotMatch(before, /secrets\./);
+  assert.equal(after.match(/secrets\./g).length, 3);
+  assert.match(after, /GAETWAY_URL: \$\{\{ secrets\.PALETTE_GAETWAY_URL \}\}/);
+  assert.match(after, /GAETWAY_AGENT: \$\{\{ secrets\.PALETTE_GAETWAY_AGENT \}\}/);
+  assert.match(after, /GAETWAY_KEY: \$\{\{ secrets\.PALETTE_GAETWAY_KEY \}\}/);
+});
+
+test('unit.yml: the tests run on pull_request with no secret and no environment', () => {
+  const text = readFileSync(UNIT_WORKFLOW, 'utf8');
+  assert.match(text, /^on:\n {2}pull_request:$/m);
+  assert.doesNotMatch(text, /pull_request_target|secrets|environment|push:/);
+  assert.match(text, /^ {2}unit:\n {4}name: unit$/m);
+  assert.deepEqual(text.match(/^ +- run: .*$/gm).map((r) => r.trim()), ['- run: node --test']);
 });
