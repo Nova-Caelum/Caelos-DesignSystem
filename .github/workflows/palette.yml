@@ -1,0 +1,24 @@
+name: Palette
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  palette:
+    name: palette
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Unit tests
+        run: node --test
+      - name: Palette check
+        env:
+          GAETWAY_URL: ${{ secrets.PALETTE_GAETWAY_URL }}
+          GAETWAY_AGENT: ${{ secrets.PALETTE_GAETWAY_AGENT }}
+          GAETWAY_KEY: ${{ secrets.PALETTE_GAETWAY_KEY }}
+        run: node scripts/check-palette.mjs
