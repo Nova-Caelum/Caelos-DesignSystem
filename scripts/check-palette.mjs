@@ -73,24 +73,15 @@ export function parsePalette(text) {
   if (doc.palette !== 'product') {
     throw new ConfigError('the palette record is not the product palette: this check reads the product palette only');
   }
+  if ('rulings' in doc) {
+    throw new ConfigError('the palette record carries "rulings": colors is the only allow-list, and a colour not in it is refused');
+  }
   if (!Array.isArray(doc.colors) || doc.colors.length === 0) throw new ConfigError('the palette record has no colors');
   const hexRe = /^#[0-9A-Fa-f]{6}$/;
-  const colorHexes = new Set();
+  const allowed = new Set();
   for (const [i, c] of doc.colors.entries()) {
     if (!c || !hexRe.test(c.hex) || !c.role || !c.name) throw new ConfigError(`palette colour ${i} is malformed`);
-    colorHexes.add(c.hex.toUpperCase());
-  }
-  const allowed = new Set(colorHexes);
-  for (const [i, r] of (Array.isArray(doc.rulings) ? doc.rulings : []).entries()) {
-    if (!r || !r.id || typeof r.allowed !== 'boolean' || !Array.isArray(r.hex) || !r.reason) {
-      throw new ConfigError(`palette ruling ${i} is malformed`);
-    }
-    for (const h of r.hex) {
-      if (!hexRe.test(h)) throw new ConfigError(`palette ruling ${i} has a malformed hex`);
-      const up = h.toUpperCase();
-      if (r.allowed) allowed.add(up);
-      else if (colorHexes.has(up)) throw new ConfigError(`palette ruling ${i} denies a colour that is also a palette colour`);
-    }
+    allowed.add(c.hex.toUpperCase());
   }
   return { allowed };
 }
