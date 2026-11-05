@@ -1,0 +1,2 @@
+/* weakened-check PR: an off-palette colour next to a check that always passes */
+.a { background: #FF0000; }
