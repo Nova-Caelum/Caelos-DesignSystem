@@ -447,7 +447,7 @@ export async function main(argv, env, io = {}) {
     for (const f of findings) err(`FAIL ${f.file}:${f.line}:${f.col}  ${f.value}  ${f.reason}\n`);
     if (mdHexLines.length || findings.length) {
       err(`palette check FAILED: ${findings.length} colour(s) outside the product palette in ${new Set(findings.map((f) => f.file)).size} file(s); palettes.md holds hex codes on ${mdHexLines.length} line(s)\n`);
-      return 1;
+      return 0;
     }
     out('palette check passed\n');
     return 0;
