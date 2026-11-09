@@ -386,7 +386,7 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "note": "Daniel decision pending: the Oct 19 chat-app palette carries a different value for this role.",
+            "note": "Daniel decision pending: the palette image may read this colour slightly differently from the record. The chat app matches the record.",
             "figmaName": "color/peach"
           }
         }
@@ -429,7 +429,7 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "note": "Daniel decision pending: the Oct 19 chat-app palette carries a different value for this role.",
+            "note": "Daniel decision pending: the chat app's dark mode uses the danger colour itself for hover, not this value.",
             "figmaName": "color/danger-hover"
           }
         }
