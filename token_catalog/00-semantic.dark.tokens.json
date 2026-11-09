@@ -1,0 +1,548 @@
+{
+  "sys": {
+    "$description": "Tier 0 semantic roles, dark mode. References foundations only.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 0,
+        "open": [
+          {
+            "item": "light parity",
+            "ref": "G08",
+            "why": "See the light file: most colour roles have no light value."
+          }
+        ],
+        "mode": "dark"
+      }
+    },
+    "color": {
+      "chrome": {
+        "$type": "color",
+        "$value": "{base.color.chrome}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/chrome"
+          }
+        }
+      },
+      "ground": {
+        "$type": "color",
+        "$value": "{base.color.ground}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/ground"
+          }
+        }
+      },
+      "elevated": {
+        "$type": "color",
+        "$value": "{base.color.elevated}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/elevated"
+          }
+        }
+      },
+      "elevated-2": {
+        "$type": "color",
+        "$value": "{base.color.elevated-2}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/elevated-2"
+          }
+        }
+      },
+      "top": {
+        "$type": "color",
+        "$value": "{base.color.top}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/top"
+          }
+        }
+      },
+      "text-primary": {
+        "$type": "color",
+        "$value": "{base.color.text-primary}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/text-primary"
+          }
+        }
+      },
+      "text-supporting": {
+        "$type": "color",
+        "$value": "{base.color.text-supporting}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/text-supporting"
+          }
+        }
+      },
+      "text-tertiary": {
+        "$type": "color",
+        "$value": "{base.color.text-tertiary}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/text-tertiary"
+          }
+        }
+      },
+      "text-faint": {
+        "$type": "color",
+        "$value": "{base.color.text-faint}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/text-faint"
+          }
+        }
+      },
+      "action-blue": {
+        "$type": "color",
+        "$value": "{base.color.action-blue}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/action-blue"
+          }
+        }
+      },
+      "action-blue-hover": {
+        "$type": "color",
+        "$value": "{base.color.action-blue-hover}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/action-blue-hover"
+          }
+        }
+      },
+      "success": {
+        "$type": "color",
+        "$value": "{base.color.success}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/success"
+          }
+        }
+      },
+      "gold-accent": {
+        "$type": "color",
+        "$value": "{base.color.gold-accent}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/gold"
+          }
+        }
+      },
+      "peach": {
+        "$type": "color",
+        "$value": "{base.color.peach}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/peach"
+          }
+        }
+      },
+      "danger": {
+        "$type": "color",
+        "$value": "{base.color.danger}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/danger"
+          }
+        }
+      },
+      "danger-hover": {
+        "$type": "color",
+        "$value": "{base.color.danger-hover}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/danger-hover"
+          }
+        }
+      },
+      "ready": {
+        "$type": "color",
+        "$value": "{base.color.ready}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/ready"
+          }
+        }
+      },
+      "structural-violet": {
+        "$type": "color",
+        "$value": "{base.color.structural-violet}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/structural-violet"
+          }
+        }
+      },
+      "rose-hover": {
+        "$type": "color",
+        "$value": "{base.color.rose-hover}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/rose-hover"
+          }
+        }
+      }
+    },
+    "space": {
+      "field-interior": {
+        "$type": "dimension",
+        "$value": "{base.space.field-interior}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D12",
+            "figmaName": "layout/field-interior"
+          }
+        }
+      },
+      "field-group": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-07}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/field-group/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "inset": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-07}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/inset/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "section-stack": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-09}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/section-stack/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-10}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "section-intro": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-04}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "title-description": {
+        "$type": "dimension",
+        "$value": "{base.space.step-02}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D06",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "inline-cluster": {
+        "$type": "dimension",
+        "$value": "{base.space.step-03}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D08",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "action-row": {
+        "$type": "dimension",
+        "$value": "{base.space.step-03}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D09",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "stack": {
+        "$type": "dimension",
+        "$value": "{base.space.step-04}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D11",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "grid-gap": {
+        "$type": "dimension",
+        "$value": "{base.space.step-08}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D10",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "grid-column-min": {
+        "$type": "dimension",
+        "$value": "{base.layout.grid-column-min}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D10",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      }
+    },
+    "material": {
+      "panel": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{base.material.dark.base-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.material.dark.blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{base.material.dark.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{base.material.saturation.panel}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        }
+      },
+      "menu": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{base.material.dark.base-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.material.dark.blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{base.material.dark.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{base.material.saturation.menu}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        }
+      },
+      "glass-blur": {
+        "$type": "dimension",
+        "$value": "{base.material.dark.blur}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "decision": "D31",
+            "note": "D31 decides one role for content behind glass; its value is assumed equal to the panel blur (D29)."
+          }
+        }
+      }
+    }
+  }
+}

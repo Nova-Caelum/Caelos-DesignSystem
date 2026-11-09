@@ -1,0 +1,940 @@
+{
+  "patterns": {
+    "$description": "Patterns: several controls working as one. References only lower tiers.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 4,
+        "open": []
+      }
+    },
+    "shared": {
+      "buttonGroupVariants": {
+        "$description": "Coordinate joined button orientation and shared edges.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "buttonGroupVariants",
+            "recipeInStaging": true,
+            "variants": {
+              "orientation": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            "defaultVariants": {
+              "orientation": "horizontal"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "inputGroupAddonVariants": {
+        "$description": "Position contextual adornments around an input.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "inputGroupAddonVariants",
+            "recipeInStaging": true,
+            "variants": {
+              "align": [
+                "inline-start",
+                "inline-end",
+                "block-start",
+                "block-end"
+              ]
+            },
+            "defaultVariants": {
+              "align": "inline-start"
+            },
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "inputGroupButtonVariants": {
+        "$description": "Style actions embedded within an input group.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "inputGroupButtonVariants",
+            "recipeInStaging": true,
+            "variants": {
+              "size": [
+                "xs",
+                "sm",
+                "icon-xs",
+                "icon-sm"
+              ]
+            },
+            "defaultVariants": {
+              "size": "xs"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "controlLayout": {
+        "$description": "Coordinate field groups, labels, input adornments and grouped controls.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "controlLayout",
+            "recipeInStaging": true,
+            "slots": [
+              "button",
+              "input",
+              "label",
+              "popover",
+              "skeleton",
+              "spinner",
+              "tooltip",
+              "group",
+              "groupText",
+              "groupSeparator",
+              "message",
+              "userMessage",
+              "messageContent",
+              "messageActions",
+              "srOnly",
+              "branches",
+              "branch",
+              "branchSelector",
+              "branchPage",
+              "response",
+              "messageToolbar",
+              "attachmentStack",
+              "loading",
+              "session",
+              "surface",
+              "artifactProse",
+              "artifactGutter",
+              "artifactAction",
+              "artifactTools",
+              "artifactClose"
+            ],
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active",
+              "disabled",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "filterSort": {
+        "$description": "Arrange filtering and sorting controls and their menus.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "filterSort",
+            "recipeInStaging": true,
+            "slots": [
+              "trigger",
+              "content",
+              "icon"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "interactionLayout": {
+        "$description": "Arrange command, menu, select, dialog, sheet and scroll interaction parts.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "interactionLayout",
+            "recipeInStaging": true,
+            "slots": [
+              "commandRoot",
+              "commandDialog",
+              "commandInputWrapper",
+              "commandInputGroup",
+              "commandInput",
+              "commandIcon",
+              "commandList",
+              "commandEmpty",
+              "commandGroup",
+              "commandSeparator",
+              "commandItem",
+              "dialog",
+              "close",
+              "srOnly",
+              "header",
+              "footer",
+              "description",
+              "menuContent",
+              "item",
+              "choice",
+              "indicator",
+              "inset",
+              "shortcut",
+              "chevron",
+              "selectGroup",
+              "selectTrigger",
+              "selectIcon",
+              "selectContent",
+              "selectViewport",
+              "scrollButton",
+              "scrollRoot",
+              "scrollViewport",
+              "scrollBar",
+              "scrollThumb",
+              "sheet",
+              "sheetHeader",
+              "sheetFooter",
+              "sheetTitle"
+            ],
+            "states": [
+              "hover",
+              "focus",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "overviewCard": {
+        "$description": "Present conversation overview cards and their expandable content.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "overviewCard",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "surface"
+            ],
+            "variants": {
+              "variant": [
+                "chat",
+                "project"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "chat"
+            },
+            "states": [
+              "hover",
+              "focus",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "card": {
+        "$description": "Present flat, lifted or glass content surfaces and interactive card states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "card",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "flat",
+                "lifted",
+                "glass"
+              ],
+              "interactive": [
+                true
+              ]
+            },
+            "defaultVariants": {
+              "variant": "flat"
+            },
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "row": {
+        "$description": "Arrange reusable list rows and their selection or interaction states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "row",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "sidebar",
+                "list",
+                "tab",
+                "tabUnderline",
+                "crumb"
+              ],
+              "size": [
+                "sm",
+                "md"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "sidebar",
+              "size": "md"
+            },
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "identity": {
+        "$description": "Arrange a person identity, avatar and supporting labels.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "identity",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "text",
+              "name",
+              "description",
+              "actions"
+            ],
+            "variants": {
+              "variant": [
+                "chip",
+                "card"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "card"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "disclosure": {
+        "$description": "Coordinate expandable triggers, chevrons and revealed content.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "disclosure",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "heading",
+              "trigger",
+              "chevron",
+              "panel",
+              "content"
+            ],
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "sidebarSearch": {
+        "$description": "Present the sidebar search field and search affordances.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "sidebarSearch",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "field",
+              "action"
+            ],
+            "variants": {
+              "variant": [
+                "chat",
+                "taskgraph"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "chat"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "chatOverviewLayout": {
+        "$description": "Arrange chat overview content through shared global class selectors.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "chatOverviewLayout",
+            "recipeInStaging": true,
+            "slots": [
+              "accessory",
+              "agent",
+              "chevron",
+              "context",
+              "details",
+              "id",
+              "identity",
+              "metadata",
+              "more",
+              "open",
+              "reference",
+              "roster",
+              "stack",
+              "title",
+              "trigger"
+            ],
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "artifactCard": {
+        "$description": "Provide the shared material shell for an artifact card.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "artifactCard",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "artifactStrip": {
+        "$description": "Provide the artifact card header strip and its spacing.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "artifactStrip",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "progressiveSelectorCss": {
+        "$description": "Present the progressive selector trigger, expansion and option menu.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "progressiveSelectorCss",
+            "recipeInStaging": true,
+            "slots": [
+              "root"
+            ],
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active",
+              "open",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "projectOverviewLayout": {
+        "$description": "Arrange project overview panels through shared global class selectors.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "projectOverviewLayout",
+            "recipeInStaging": true,
+            "slots": [
+              "activity-row",
+              "description",
+              "detail-copy",
+              "details",
+              "disclosure",
+              "eyebrow",
+              "facts",
+              "footer",
+              "identity",
+              "kind",
+              "next-action",
+              "next-preview",
+              "open",
+              "owner",
+              "path",
+              "preview",
+              "progress",
+              "separator",
+              "task-counts",
+              "team-count",
+              "title",
+              "work"
+            ],
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ProgressiveSelector-style": {
+        "$description": "Position a docked selection surface relative to its trigger and available viewport.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "ProgressiveSelector.style",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Collapsible": {
+        "$description": "Specify collapsible coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.collapsible.Collapsible",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CollapsibleTrigger": {
+        "$description": "Specify collapsible trigger coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.collapsible.CollapsibleTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CollapsibleContent": {
+        "$description": "Specify collapsible content coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.collapsible.CollapsibleContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InputGroup": {
+        "$description": "Specify input group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.input-group.InputGroup",
+            "recipeInStaging": false,
+            "states": [
+              "focus-visible",
+              "focus",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InputGroupText": {
+        "$description": "Specify input group text coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.input-group.InputGroupText",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InputGroupInput": {
+        "$description": "Specify input group input coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.input-group.InputGroupInput",
+            "recipeInStaging": false,
+            "states": [
+              "focus-visible",
+              "focus",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InputGroupTextarea": {
+        "$description": "Specify input group textarea coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.input-group.InputGroupTextarea",
+            "recipeInStaging": false,
+            "states": [
+              "focus-visible",
+              "focus",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Select": {
+        "$description": "Specify select coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.select.Select",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SelectValue": {
+        "$description": "Specify select value coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.select.SelectValue",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AgentAvatar": {
+        "$description": "Specify agent avatar coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.AgentMessage.AgentAvatar",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ChatOverviewCard": {
+        "$description": "Specify chat overview card coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.ChatOverviewCard.ChatOverviewCard",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "RowGroup": {
+        "$description": "Specify row group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.RowGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "StatusSelect": {
+        "$description": "Specify status select coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.StatusSelect",
+            "recipeInStaging": false,
+            "variants": {
+              "disabled": [
+                "boolean"
+              ],
+              "align": [
+                "start",
+                "center",
+                "end"
+              ],
+              "side": [
+                "top",
+                "bottom"
+              ]
+            },
+            "states": [
+              "disabled",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TabsRoot": {
+        "$description": "Specify tabs root coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.TabsRoot",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TabsList": {
+        "$description": "Specify tabs list coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.TabsList",
+            "recipeInStaging": false,
+            "variants": {
+              "enclosed": [
+                "boolean"
+              ],
+              "appearance": [
+                "pill",
+                "underline"
+              ]
+            },
+            "states": [
+              "active",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TabsContent": {
+        "$description": "Specify tabs content coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.TabsContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Tabs": {
+        "$description": "Specify tabs coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.Tabs",
+            "recipeInStaging": false,
+            "variants": {
+              "enclosed": [
+                "boolean"
+              ],
+              "disabled": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Breadcrumb": {
+        "$description": "Specify breadcrumb coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.Breadcrumb",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

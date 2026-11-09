@@ -1,0 +1,128 @@
+{
+  "sys": {
+    "$description": "Tier 0 semantic roles, light mode. Same paths as dark; holds only decided light values.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 0,
+        "open": [
+          {
+            "item": "colour roles",
+            "ref": "D47, G08",
+            "why": "Light is decided as a variant switching every colour role, but only ground has a decided light value."
+          }
+        ],
+        "mode": "light"
+      }
+    },
+    "color": {
+      "ground": {
+        "$type": "color",
+        "$value": "{base.color.light-ground}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "note": "Dawn ground."
+          }
+        }
+      }
+    },
+    "material": {
+      "panel": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{base.material.light.base-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.material.light.blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{base.material.light.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{base.material.saturation.panel}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        }
+      },
+      "menu": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{base.material.light.base-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.material.light.blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{base.material.light.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{base.material.saturation.menu}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        }
+      },
+      "glass-blur": {
+        "$type": "dimension",
+        "$value": "{base.material.light.blur}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "decision": "D31",
+            "note": "D31 decides one role for content behind glass; its value is assumed equal to the panel blur (D29)."
+          }
+        }
+      }
+    }
+  }
+}

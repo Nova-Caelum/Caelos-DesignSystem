@@ -1,0 +1,1200 @@
+{
+  "overlays": {
+    "$description": "Overlays and feedback: floats above or announces. References only lower tiers.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 3,
+        "open": [
+          {
+            "item": "panel slide",
+            "ref": "D38",
+            "why": "One shared role for drawer and sidebar; duration and curve undecided."
+          }
+        ]
+      }
+    },
+    "shared": {
+      "alert": {
+        "$description": "Present alert content, emphasis and its dismiss or follow-up actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "alert",
+            "recipeInStaging": true,
+            "slots": [
+              "stage",
+              "root",
+              "head",
+              "icon",
+              "title",
+              "kicker",
+              "pager",
+              "body",
+              "lede",
+              "command",
+              "actions",
+              "choices"
+            ],
+            "variants": {
+              "tone": [
+                "progress",
+                "accent",
+                "ready",
+                "danger",
+                "sage",
+                "none"
+              ],
+              "material": [
+                "tonal",
+                "glass"
+              ],
+              "edge": [
+                "system",
+                "tone"
+              ],
+              "glow": [
+                true,
+                false
+              ]
+            },
+            "defaultVariants": {
+              "tone": "none",
+              "material": "tonal",
+              "edge": "system",
+              "glow": true
+            },
+            "states": [
+              "active",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D62",
+              "D26"
+            ],
+            "note": "Padding is decided as 15 / 18 / 18px, but which side takes which value was not recorded (D62)."
+          }
+        },
+        "stack-gap": {
+          "$type": "dimension",
+          "$value": "{base.measure.alert-stack-gap}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.xl}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "icon-size": {
+          "$type": "dimension",
+          "$value": "{base.measure.alert-icon}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "icon-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "edge-width": {
+          "$type": "dimension",
+          "$value": "{base.border.hairline}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D26"
+            }
+          }
+        }
+      },
+      "contextMenu": {
+        "$description": "Present contextual action surfaces, items and separators.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "contextMenu",
+            "recipeInStaging": true,
+            "slots": [
+              "content",
+              "item",
+              "label",
+              "separator"
+            ],
+            "variants": {
+              "target": [
+                "chat",
+                "project",
+                "initiative",
+                "module",
+                "task",
+                "cycle",
+                "file"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D33"
+            ]
+          }
+        },
+        "open-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.open-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33"
+            }
+          }
+        },
+        "close-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.close-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33"
+            }
+          }
+        },
+        "open-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.open-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision."
+            }
+          }
+        },
+        "close-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.close-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision."
+            }
+          }
+        }
+      },
+      "notification": {
+        "$description": "Present notification popups, inbox items and feedback actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "notification",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "source",
+              "controls",
+              "detail",
+              "actions",
+              "reveal",
+              "editor",
+              "choices",
+              "bell",
+              "count",
+              "inbox",
+              "item",
+              "rail"
+            ],
+            "variants": {
+              "kind": [
+                "error",
+                "permission",
+                "question",
+                "ready",
+                "attention"
+              ]
+            },
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active",
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "menu": {
+        "$description": "Present menu triggers, surfaces, choices and separators.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "menu",
+            "recipeInStaging": true,
+            "slots": [
+              "content",
+              "item",
+              "label",
+              "separator"
+            ],
+            "variants": {
+              "layout": [
+                "action"
+              ]
+            },
+            "states": [
+              "disabled",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D33"
+            ]
+          }
+        },
+        "open-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.open-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33"
+            }
+          }
+        },
+        "close-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.close-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33"
+            }
+          }
+        },
+        "open-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.open-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision."
+            }
+          }
+        },
+        "close-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.close-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision."
+            }
+          }
+        }
+      },
+      "tooltip": {
+        "$description": "Present contextual text attached to a trigger.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "tooltip",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "default",
+                "path"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "default"
+            },
+            "states": [
+              "active",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D30"
+            ]
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{sys.color.success}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30",
+              "note": "Sage."
+            }
+          }
+        },
+        "fill-opacity": {
+          "$type": "number",
+          "$value": "{base.opacity.tooltip-fill}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30"
+            }
+          }
+        },
+        "backdrop-blur": {
+          "$type": "dimension",
+          "$value": "{base.material.tooltip-blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30"
+            }
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.measure.tooltip-radius}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30"
+            }
+          }
+        },
+        "padding-block": {
+          "$type": "dimension",
+          "$value": "{base.measure.tooltip-padding-block}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30"
+            }
+          }
+        },
+        "padding-inline": {
+          "$type": "dimension",
+          "$value": "{base.measure.tooltip-padding-inline}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30"
+            }
+          }
+        },
+        "edge-width": {
+          "$type": "dimension",
+          "$value": "{base.border.hairline}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30",
+              "note": "Uniform."
+            }
+          }
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D30",
+              "note": "Cream in dark mode."
+            }
+          }
+        }
+      },
+      "overlay": {
+        "$description": "Present dialog, drawer and popover surfaces with their backdrop and actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "overlay",
+            "recipeInStaging": true,
+            "slots": [
+              "backdrop",
+              "content",
+              "header",
+              "title",
+              "body"
+            ],
+            "variants": {
+              "placement": [
+                "dialog",
+                "drawer"
+              ]
+            },
+            "defaultVariants": {
+              "placement": "dialog"
+            },
+            "states": [
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialog": {
+        "$description": "Specify alert dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialog",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogTrigger": {
+        "$description": "Specify alert dialog trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogPortal": {
+        "$description": "Specify alert dialog portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogPortal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogHeader": {
+        "$description": "Specify alert dialog header overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogHeader",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogFooter": {
+        "$description": "Specify alert dialog footer overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogFooter",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogMedia": {
+        "$description": "Specify alert dialog media overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogMedia",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogDescription": {
+        "$description": "Specify alert dialog description overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogDescription",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogAction": {
+        "$description": "Specify alert dialog action overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogAction",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AlertDialogCancel": {
+        "$description": "Specify alert dialog cancel overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.alert-dialog.AlertDialogCancel",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "dialog-Dialog": {
+        "$description": "Specify dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dialog.Dialog",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DialogTrigger": {
+        "$description": "Specify dialog trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dialog.DialogTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DialogPortal": {
+        "$description": "Specify dialog portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dialog.DialogPortal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DialogClose": {
+        "$description": "Specify dialog close overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dialog.DialogClose",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenu": {
+        "$description": "Specify dropdown menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenu",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenuPortal": {
+        "$description": "Specify dropdown menu portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenuPortal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenuTrigger": {
+        "$description": "Specify dropdown menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenuTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenuGroup": {
+        "$description": "Specify dropdown menu group overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenuGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenuRadioGroup": {
+        "$description": "Specify dropdown menu radio group overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenuRadioGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DropdownMenuSub": {
+        "$description": "Specify dropdown menu sub overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.dropdown-menu.DropdownMenuSub",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "HoverCard": {
+        "$description": "Specify hover card overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.hover-card.HoverCard",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "HoverCardTrigger": {
+        "$description": "Specify hover card trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.hover-card.HoverCardTrigger",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PopoverRoot": {
+        "$description": "Specify popover root overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.popover.PopoverRoot",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "popover-PopoverTrigger": {
+        "$description": "Specify popover trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.popover.PopoverTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PopoverAnchor": {
+        "$description": "Specify popover anchor overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.popover.PopoverAnchor",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Sheet": {
+        "$description": "Specify sheet overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.sheet.Sheet",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SheetTrigger": {
+        "$description": "Specify sheet trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.sheet.SheetTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SheetClose": {
+        "$description": "Specify sheet close overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.sheet.SheetClose",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SheetPortal": {
+        "$description": "Specify sheet portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.sheet.SheetPortal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Tooltip": {
+        "$description": "Specify tooltip overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.tooltip.Tooltip",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TooltipTrigger": {
+        "$description": "Specify tooltip trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ui.tooltip.TooltipTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TargetContextMenu": {
+        "$description": "Specify target context menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.TargetContextMenu.TargetContextMenu",
+            "recipeInStaging": false,
+            "variants": {
+              "disabled": [
+                "boolean"
+              ],
+              "allowMove": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus",
+              "disabled",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Popover": {
+        "$description": "Specify popover overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.foundation.Popover",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "foundation-PopoverTrigger": {
+        "$description": "Specify popover trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.foundation.PopoverTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PopoverClose": {
+        "$description": "Specify popover close overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.foundation.PopoverClose",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Toaster": {
+        "$description": "Specify toaster overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.foundation.Toaster",
+            "recipeInStaging": false,
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "overlays-Dialog": {
+        "$description": "Specify dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.Dialog",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Drawer": {
+        "$description": "Specify drawer overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.Drawer",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ContextMenu": {
+        "$description": "Specify context menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.ContextMenu",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ContextMenuTrigger": {
+        "$description": "Specify context menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.ContextMenuTrigger",
+            "recipeInStaging": false,
+            "states": [
+              "focus",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ActionMenuRoot": {
+        "$description": "Specify action menu root overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.ActionMenuRoot",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ActionMenuTrigger": {
+        "$description": "Specify action menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.overlays.ActionMenuTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    },
+    "chat": {
+      "Hint": {
+        "$description": "Specify hint overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.composer-internal.Hint",
+            "recipeInStaging": false,
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
