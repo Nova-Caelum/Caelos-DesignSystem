@@ -158,14 +158,14 @@
           }
         }
       },
-      "peach": {
+      "peach-gold": {
         "$type": "color",
-        "$value": "{base.color.peach}",
+        "$value": "{base.color.peach-gold}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
             "decision": "D47",
-            "figmaName": "color/peach"
+            "figmaName": "color/peach-gold"
           }
         }
       },
