@@ -1,0 +1,2055 @@
+{
+  "primitives": {
+    "$description": "Primitives: one token-bound element, nothing interactive. References only lower tiers.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 1,
+        "open": []
+      }
+    },
+    "shared": {
+      "relation": {
+        "$description": "Express spacing relationships between grouped elements in the spacing study.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "relation",
+            "recipeInStaging": true,
+            "variants": {
+              "kind": [
+                "stack",
+                "fields",
+                "sections",
+                "section",
+                "intro",
+                "cluster",
+                "actions",
+                "grid",
+                "inset"
+              ],
+              "density": [
+                "comfortable",
+                "default",
+                "compact"
+              ]
+            },
+            "defaultVariants": {
+              "kind": "stack",
+              "density": "default"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "typography": {
+        "$description": "Apply semantic heading, body, metadata and code typography.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "typography",
+            "recipeInStaging": true,
+            "variants": {
+              "role": [
+                "body",
+                "small",
+                "label",
+                "mono",
+                "display",
+                "page",
+                "section",
+                "title"
+              ],
+              "tone": [
+                "default",
+                "muted",
+                "dim",
+                "accent"
+              ]
+            },
+            "defaultVariants": {
+              "role": "body",
+              "tone": "default"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "foundation": {
+        "$description": "Inventory the mixed primitive, control and toast styling currently grouped by kind.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "foundation",
+            "recipeInStaging": true,
+            "variants": {
+              "kind": [
+                "identifier",
+                "announce",
+                "popover",
+                "range",
+                "checkbox",
+                "separator",
+                "progress",
+                "resize",
+                "dot"
+              ],
+              "tone": [
+                "neutral",
+                "ready",
+                "progress",
+                "done",
+                "sage",
+                "danger",
+                "atmospheric",
+                "structural"
+              ]
+            },
+            "states": [
+              "focus-visible",
+              "focus",
+              "active",
+              "disabled",
+              "open",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "scrollArea": {
+        "$description": "Present scroll viewports, tracks and thumbs.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "scrollArea",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "viewport",
+              "track",
+              "thumb"
+            ],
+            "states": [
+              "focus-visible",
+              "focus",
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D42",
+              "D44"
+            ]
+          }
+        },
+        "thumb": {
+          "$type": "dimension",
+          "$value": "{base.size.scrollbar.thumb}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44"
+            }
+          }
+        },
+        "track": {
+          "$type": "dimension",
+          "$value": "{base.size.scrollbar.track}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44"
+            }
+          }
+        },
+        "thumb-min": {
+          "$type": "dimension",
+          "$value": "{base.size.scrollbar.thumb-min}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44"
+            }
+          }
+        },
+        "opacity-rest": {
+          "$type": "number",
+          "$value": "{base.opacity.scrollbar.rest}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42"
+            }
+          }
+        },
+        "opacity-drag": {
+          "$type": "number",
+          "$value": "{base.opacity.scrollbar.drag}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42"
+            }
+          }
+        },
+        "fill-duration": {
+          "$type": "duration",
+          "$value": "{base.motion.scrollbar.fill}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42"
+            }
+          }
+        }
+      },
+      "spacing": {
+        "$description": "Express layout density and relationships for stacks, groups, grids and sections.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "spacing",
+            "recipeInStaging": true,
+            "variants": {
+              "kind": [
+                "stack",
+                "fields",
+                "sections",
+                "section",
+                "intro",
+                "cluster",
+                "actions",
+                "grid",
+                "inset"
+              ],
+              "density": [
+                "comfortable",
+                "default",
+                "compact"
+              ]
+            },
+            "defaultVariants": {
+              "kind": "stack",
+              "density": "default"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D01",
+              "D03",
+              "D13"
+            ]
+          }
+        }
+      },
+      "surface": {
+        "$description": "Apply material layers, glass and graph surface treatments.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "surface",
+            "recipeInStaging": true,
+            "variants": {
+              "layer": [
+                "chrome",
+                "ground",
+                "elevated",
+                "elevated-2",
+                "top"
+              ],
+              "texture": [
+                "auto",
+                "plain",
+                "graph",
+                "glass"
+              ]
+            },
+            "defaultVariants": {
+              "layer": "ground",
+              "texture": "auto"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D29"
+            ]
+          }
+        }
+      },
+      "title": {
+        "$description": "Apply semantic title typography and title presentation.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "title",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "project",
+                "module",
+                "task",
+                "conversation",
+                "navigation"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "task"
+            },
+            "states": [
+              "focus-visible",
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "conversationType": {
+        "$description": "Provide the shared conversation text treatment.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "conversationType",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "metaType": {
+        "$description": "Provide subdued metadata typography.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "metaType",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "proseType": {
+        "$description": "Provide reading typography for message and document prose.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "proseType",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "chevronMotion": {
+        "$description": "Provide open-state rotation for disclosure chevrons.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "chevronMotion",
+            "recipeInStaging": true,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "artifactPaperBody": {
+        "$description": "Provide the material transition into an artifact body.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "artifactPaperBody",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "chatheadMaterial": {
+        "$description": "Provide the shared conversation-header material treatment.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "chatheadMaterial",
+            "recipeInStaging": true,
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "titleType": {
+        "$description": "Provide conversation-header title typography.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "titleType",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "titleTypography": {
+        "$description": "Provide foundation title typography.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "titleTypography",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "agentAvatarSizes": {
+        "$description": "Inventory named avatar geometry for extraction into foundation tokens.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "agentAvatarSizes",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "approvedHeaderLayout": {
+        "$description": "Inventory header geometry and spacing relationships for foundation design.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "approvedHeaderLayout",
+            "recipeInStaging": true,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "approvedHeaderMotion": {
+        "$description": "Inventory header transition roles for extraction into motion tokens.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "approvedHeaderMotion",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "icon": {
+        "$description": "Provide shared icon geometry for interaction controls.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "icon",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "interaction-layout-recipe-column": {
+        "$description": "Provide vertical arrangement for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "interaction-layout-recipe.column",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "centered": {
+        "$description": "Provide centered alignment for interaction parts.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "centered",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "reveal": {
+        "$description": "Provide notification reveal motion.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "reveal",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "lettering": {
+        "$description": "Provide base text typography for shared controls.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "lettering",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "recipes-focus": {
+        "$description": "Provide visible keyboard-focus treatment for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "recipes.focus",
+            "recipeInStaging": true,
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "feather": {
+        "$description": "Provide a subtle material overlay for shared component surfaces.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "feather",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "sidebar-recipe-focus": {
+        "$description": "Provide visible keyboard-focus treatment for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "sidebar-recipe.focus",
+            "recipeInStaging": true,
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "sidebar-recipe-column": {
+        "$description": "Provide vertical arrangement for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "sidebar-recipe.column",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "glyph": {
+        "$description": "Provide sidebar icon geometry and alignment.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "glyph",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "graph": {
+        "$description": "Provide the graph surface material.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "graph",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "glass": {
+        "$description": "Provide a translucent surface material.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "glass",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D29",
+              "D31"
+            ]
+          }
+        }
+      },
+      "accountLayout": {
+        "$description": "Provide account identity and action alignment.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "accountLayout",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "workspace-layout-recipe-column": {
+        "$description": "Provide vertical arrangement for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "workspace-layout-recipe.column",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Icon": {
+        "$description": "Specify icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.ArtifactPreview.Icon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "IconArtwork": {
+        "$description": "Specify icon artwork primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.CaelosLogo.IconArtwork",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "WordmarkArtwork": {
+        "$description": "Specify wordmark artwork primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.CaelosLogo.WordmarkArtwork",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CaelosIcon": {
+        "$description": "Specify caelos icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.CaelosLogo.CaelosIcon",
+            "recipeInStaging": false,
+            "variants": {
+              "decorative": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CaelosWordmark": {
+        "$description": "Specify caelos wordmark primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.CaelosLogo.CaelosWordmark",
+            "recipeInStaging": false,
+            "variants": {
+              "decorative": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CaelosLogo": {
+        "$description": "Specify caelos logo primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.CaelosLogo.CaelosLogo",
+            "recipeInStaging": false,
+            "variants": {
+              "decorative": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ClaudeCodeIcon": {
+        "$description": "Specify claude code icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.HarnessIcons.ClaudeCodeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodexIcon": {
+        "$description": "Specify codex icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.HarnessIcons.CodexIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "HermesIcon": {
+        "$description": "Specify hermes icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.HarnessIcons.HermesIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LayersArrowUp": {
+        "$description": "Specify layers arrow up primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.TargetContextMenu.LayersArrowUp",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PermissionsIcon": {
+        "$description": "Specify permissions icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.PermissionsIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "BreadcrumbSeparator": {
+        "$description": "Specify breadcrumb separator primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.BreadcrumbSeparator",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    },
+    "chat": {
+      "composerKeyframes": {
+        "$description": "Name composer animation sequences for later token-based reconstruction.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "composerKeyframes",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Icon": {
+        "$description": "Specify icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.Icon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "BotIcon": {
+        "$description": "Specify bot icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.BotIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "UserIcon": {
+        "$description": "Specify user icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.UserIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AttachmentIcon": {
+        "$description": "Specify attachment icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.AttachmentIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "VercelIcon": {
+        "$description": "Specify vercel icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.VercelIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "GitIcon": {
+        "$description": "Specify git icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.GitIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "BoxIcon": {
+        "$description": "Specify box icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.BoxIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "HomeIcon": {
+        "$description": "Specify home icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.HomeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "GPSIcon": {
+        "$description": "Specify gpsicon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.GPSIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InvoiceIcon": {
+        "$description": "Specify invoice icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.InvoiceIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LogoOpenAI": {
+        "$description": "Specify logo open ai primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LogoOpenAI",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LogoGoogle": {
+        "$description": "Specify logo google primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LogoGoogle",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LogoAnthropic": {
+        "$description": "Specify logo anthropic primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LogoAnthropic",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "RouteIcon": {
+        "$description": "Specify route icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.RouteIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "FileIcon": {
+        "$description": "Specify file icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.FileIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LoaderIcon": {
+        "$description": "Specify loader icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LoaderIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "UploadIcon": {
+        "$description": "Specify upload icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.UploadIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MenuIcon": {
+        "$description": "Specify menu icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.MenuIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PencilEditIcon": {
+        "$description": "Specify pencil edit icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PencilEditIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CheckedSquare": {
+        "$description": "Specify checked square primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CheckedSquare",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "UncheckedSquare": {
+        "$description": "Specify unchecked square primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.UncheckedSquare",
+            "recipeInStaging": false,
+            "states": [
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MoreIcon": {
+        "$description": "Specify more icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.MoreIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TrashIcon": {
+        "$description": "Specify trash icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.TrashIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "InfoIcon": {
+        "$description": "Specify info icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.InfoIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ArrowUpIcon": {
+        "$description": "Specify arrow up icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ArrowUpIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "StopIcon": {
+        "$description": "Specify stop icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.StopIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PaperclipIcon": {
+        "$description": "Specify paperclip icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PaperclipIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MoreHorizontalIcon": {
+        "$description": "Specify more horizontal icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.MoreHorizontalIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MessageIcon": {
+        "$description": "Specify message icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.MessageIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CrossIcon": {
+        "$description": "Specify cross icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CrossIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CrossSmallIcon": {
+        "$description": "Specify cross small icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CrossSmallIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "UndoIcon": {
+        "$description": "Specify undo icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.UndoIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "RedoIcon": {
+        "$description": "Specify redo icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.RedoIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DeltaIcon": {
+        "$description": "Specify delta icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.DeltaIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CpuIcon": {
+        "$description": "Specify cpu icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CpuIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PenIcon": {
+        "$description": "Specify pen icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PenIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SummarizeIcon": {
+        "$description": "Specify summarize icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.SummarizeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SidebarLeftIcon": {
+        "$description": "Specify sidebar left icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.SidebarLeftIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PlusIcon": {
+        "$description": "Specify plus icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PlusIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CopyIcon": {
+        "$description": "Specify copy icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CopyIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ThumbUpIcon": {
+        "$description": "Specify thumb up icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ThumbUpIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ThumbDownIcon": {
+        "$description": "Specify thumb down icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ThumbDownIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ChevronDownIcon": {
+        "$description": "Specify chevron down icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ChevronDownIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SparklesIcon": {
+        "$description": "Specify sparkles icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.SparklesIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CheckCircleFillIcon": {
+        "$description": "Specify check circle fill icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CheckCircleFillIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "GlobeIcon": {
+        "$description": "Specify globe icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.GlobeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LockIcon": {
+        "$description": "Specify lock icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LockIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "EyeIcon": {
+        "$description": "Specify eye icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.EyeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ShareIcon": {
+        "$description": "Specify share icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ShareIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeIcon": {
+        "$description": "Specify code icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.CodeIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PlayIcon": {
+        "$description": "Specify play icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PlayIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PythonIcon": {
+        "$description": "Specify python icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.PythonIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TerminalWindowIcon": {
+        "$description": "Specify terminal window icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.TerminalWindowIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TerminalIcon": {
+        "$description": "Specify terminal icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.TerminalIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ClockRewind": {
+        "$description": "Specify clock rewind primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ClockRewind",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LogsIcon": {
+        "$description": "Specify logs icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LogsIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ImageIcon": {
+        "$description": "Specify image icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.ImageIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "FullscreenIcon": {
+        "$description": "Specify fullscreen icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.FullscreenIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DownloadIcon": {
+        "$description": "Specify download icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.DownloadIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LineChartIcon": {
+        "$description": "Specify line chart icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.LineChartIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "WarningIcon": {
+        "$description": "Specify warning icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.icons.WarningIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "HarnessMark": {
+        "$description": "Specify harness mark primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.HarnessMark",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SunIcon": {
+        "$description": "Specify sun icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.weather.SunIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MoonIcon": {
+        "$description": "Specify moon icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.weather.MoonIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CloudIcon": {
+        "$description": "Specify cloud icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.weather.CloudIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PermissionsIcon": {
+        "$description": "Specify permissions icon primitive presentation if retained; token-bound primitive or layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.composer-internal.PermissionsIcon",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

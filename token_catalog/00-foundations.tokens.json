@@ -1,0 +1,1973 @@
+{
+  "base": {
+    "$description": "Tier 0 foundations: every raw value in the system.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 0,
+        "open": [
+          {
+            "item": "radius lg",
+            "ref": "D21",
+            "why": "D21 keeps lg, but no value is recorded. The draft's 20px contradicts D21, which maps the 20px call sites to xl."
+          },
+          {
+            "item": "second spacing scale",
+            "ref": "D01, D14",
+            "why": "The Figma draft's space/2xs to 3xl (2, 4, 8, 12, 16, 24, 32, 48px) is a second scale; D01 and D14 decide one 3px system. Not admitted. The draft's buttons and chip are bound to it."
+          },
+          {
+            "item": "off-grid measurements",
+            "ref": "D01, D14, D30, D53, D62, D64",
+            "why": "metric 5, 7, 10, 14 and 20, the tooltip's 10, 11 and 13, the alert's 10 and 16, and the question inset 19 are decided or measured values off the 3px grid. Whether each stays off-grid is undecided."
+          },
+          {
+            "item": "value-named tokens",
+            "ref": "D02, D48, G03",
+            "why": "metric, shape.radius, size.glyph, size.control, size.picker and size.dock are named after their values. Role names are owed."
+          },
+          {
+            "item": "spacing role names",
+            "ref": "G03",
+            "why": "The final role names for every spacing token are not decided."
+          },
+          {
+            "item": "alert edge colour",
+            "ref": "D26",
+            "why": "Decided as a 1px neutral hairline, but its recorded colour is not in the product palette."
+          },
+          {
+            "item": "scrollbar colour",
+            "ref": "D42",
+            "why": "Light mode uses Structural Violet. Dark mode's atmospheric violet is not in the product palette."
+          },
+          {
+            "item": "Supporting Lavender",
+            "ref": "Daniel",
+            "why": "On the palette image, not in the palette record. Awaiting Daniel's call."
+          },
+          {
+            "item": "danger text",
+            "ref": "Daniel",
+            "why": "Used by the chat app, not in the palette record. Awaiting Daniel's call."
+          },
+          {
+            "item": "gold rename",
+            "ref": "Daniel",
+            "why": "The palette role is a CSS colour keyword. Held as gold-accent until Daniel picks the name."
+          },
+          {
+            "item": "focus indicator",
+            "ref": "G05, D25",
+            "why": "Colour, width, offset and keyboard state are undecided. The sharp action-blue outline is rejected."
+          },
+          {
+            "item": "type metric matrix",
+            "ref": "G06",
+            "why": "Sizes, lines and weights after the font swap are undecided."
+          },
+          {
+            "item": "control sizes, breakpoints, z-index",
+            "ref": "G07, D41, D43",
+            "why": "No product matrix. The brand z-index table and the 44px icon target are brand scope; product adoption is unverified."
+          },
+          {
+            "item": "elevation, shadows, hover lift",
+            "ref": "G08, D27, D28",
+            "why": "Brand-scope decisions only; product adoption is unverified."
+          },
+          {
+            "item": "control and panel motion",
+            "ref": "G04, D38",
+            "why": "Button and chip press, release and focus timings, and the shared panel slide, are undecided."
+          },
+          {
+            "item": "reduced-transparency mode",
+            "ref": "none",
+            "why": "No decision was found."
+          },
+          {
+            "item": "scrollbar fill curve",
+            "ref": "D42",
+            "why": "Recorded as a deceleration; the curve was not."
+          }
+        ],
+        "rules": [
+          "Raw values live only in this file. Every other file references tokens.",
+          "Keep the default slashed zero on every surface; never enable the font's plain-zero feature (D68).",
+          "Density is chosen explicitly; width never selects it (D03, D45).",
+          "A parent owns sibling gaps, a field owns its interior, the host owns viewport position (D13)."
+        ]
+      }
+    },
+    "color": {
+      "chrome": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0314,
+            0.0314,
+            0.0902
+          ],
+          "alpha": 1,
+          "hex": "#080817"
+        },
+        "$description": "Deep frame (palette role chrome)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/chrome"
+          }
+        }
+      },
+      "ground": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0627,
+            0.0588,
+            0.1098
+          ],
+          "alpha": 1,
+          "hex": "#100F1C"
+        },
+        "$description": "Ink Indigo (palette role ground)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/ground"
+          }
+        }
+      },
+      "elevated": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0863,
+            0.0863,
+            0.1529
+          ],
+          "alpha": 1,
+          "hex": "#161627"
+        },
+        "$description": "Panels (palette role elevated)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/elevated"
+          }
+        }
+      },
+      "elevated-2": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1176,
+            0.1176,
+            0.1882
+          ],
+          "alpha": 1,
+          "hex": "#1E1E30"
+        },
+        "$description": "Raised layer (palette role elevated-2)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/elevated-2"
+          }
+        }
+      },
+      "top": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.149,
+            0.149,
+            0.2235
+          ],
+          "alpha": 1,
+          "hex": "#262639"
+        },
+        "$description": "Highest layer (palette role top)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/top"
+          }
+        }
+      },
+      "text-primary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.8902,
+            0.8118
+          ],
+          "alpha": 1,
+          "hex": "#EDE3CF"
+        },
+        "$description": "Primary text (palette role text-primary)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/text-primary"
+          }
+        }
+      },
+      "text-supporting": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6078,
+            0.5843,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#9B958B"
+        },
+        "$description": "Supporting and placeholder text (palette role text-supporting)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/text-supporting"
+          }
+        }
+      },
+      "text-tertiary": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4431,
+            0.4431,
+            0.5176
+          ],
+          "alpha": 1,
+          "hex": "#717184"
+        },
+        "$description": "Tertiary text (palette role text-tertiary)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/text-tertiary"
+          }
+        }
+      },
+      "text-faint": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3255,
+            0.3294,
+            0.4314
+          ],
+          "alpha": 1,
+          "hex": "#53546E"
+        },
+        "$description": "Faint text (palette role text-faint)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/text-faint"
+          }
+        }
+      },
+      "action-blue": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4039,
+            0.5451,
+            0.9255
+          ],
+          "alpha": 1,
+          "hex": "#678BEC"
+        },
+        "$description": "Action Blue (palette role action-blue)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/action-blue"
+          }
+        }
+      },
+      "action-blue-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4667,
+            0.6118,
+            1.0
+          ],
+          "alpha": 1,
+          "hex": "#779CFF"
+        },
+        "$description": "Action Blue hover (palette role action-blue-hover)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/action-blue-hover"
+          }
+        }
+      },
+      "success": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5451,
+            0.7098,
+            0.6588
+          ],
+          "alpha": 1,
+          "hex": "#8BB5A8"
+        },
+        "$description": "Sage / Sea Green (palette role success)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/success"
+          }
+        }
+      },
+      "gold-accent": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7686,
+            0.6745,
+            0.4863
+          ],
+          "alpha": 1,
+          "hex": "#C4AC7C"
+        },
+        "$description": "Gold (palette role gold)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "note": "The palette role is named after a CSS colour keyword, which the palette check refuses as a key. Held as gold-accent until Daniel picks the rename.",
+            "figmaName": "color/gold"
+          }
+        }
+      },
+      "peach": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9098,
+            0.7216,
+            0.4784
+          ],
+          "alpha": 1,
+          "hex": "#E8B87A"
+        },
+        "$description": "Peach (palette role peach)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "note": "Daniel decision pending: the Oct 19 chat-app palette carries a different value for this role.",
+            "figmaName": "color/peach"
+          }
+        }
+      },
+      "danger": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7608,
+            0.3569,
+            0.3843
+          ],
+          "alpha": 1,
+          "hex": "#C25B62"
+        },
+        "$description": "Danger Red (palette role danger)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/danger"
+          }
+        }
+      },
+      "danger-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7882,
+            0.5216,
+            0.5373
+          ],
+          "alpha": 1,
+          "hex": "#C98589"
+        },
+        "$description": "Danger Red hover (palette role danger-hover)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "note": "Daniel decision pending: the Oct 19 chat-app palette carries a different value for this role.",
+            "figmaName": "color/danger-hover"
+          }
+        }
+      },
+      "ready": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5569,
+            0.5882,
+            0.8
+          ],
+          "alpha": 1,
+          "hex": "#8E96CC"
+        },
+        "$description": "Ready Lavender (palette role ready)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/ready"
+          }
+        }
+      },
+      "light-ground": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.949,
+            0.9098,
+            0.851
+          ],
+          "alpha": 1,
+          "hex": "#F2E8D9"
+        },
+        "$description": "Dawn light ground (palette role light-ground)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/light-ground",
+            "shared": true
+          }
+        }
+      },
+      "structural-violet": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2471,
+            0.2392,
+            0.4235
+          ],
+          "alpha": 1,
+          "hex": "#3F3D6C"
+        },
+        "$description": "Structural Violet (palette role structural-violet)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/structural-violet",
+            "shared": true
+          }
+        }
+      },
+      "rose-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7882,
+            0.5216,
+            0.5373
+          ],
+          "alpha": 1,
+          "hex": "#C98589"
+        },
+        "$description": "Rose hover / hot (palette role rose-hover)",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "product palette record",
+            "figmaName": "color/rose-hover",
+            "shared": true
+          }
+        }
+      }
+    },
+    "space": {
+      "none": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/none"
+          }
+        }
+      },
+      "step-01": {
+        "$type": "dimension",
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-01"
+          }
+        }
+      },
+      "step-02": {
+        "$type": "dimension",
+        "$value": {
+          "value": 6,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-02"
+          }
+        }
+      },
+      "step-03": {
+        "$type": "dimension",
+        "$value": {
+          "value": 9,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-03"
+          }
+        }
+      },
+      "step-04": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-04"
+          }
+        }
+      },
+      "step-05": {
+        "$type": "dimension",
+        "$value": {
+          "value": 15,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-05"
+          }
+        }
+      },
+      "step-06": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-06"
+          }
+        }
+      },
+      "step-07": {
+        "$type": "dimension",
+        "$value": {
+          "value": 21,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-07"
+          }
+        }
+      },
+      "step-08": {
+        "$type": "dimension",
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-08"
+          }
+        }
+      },
+      "step-09": {
+        "$type": "dimension",
+        "$value": {
+          "value": 27,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-09"
+          }
+        }
+      },
+      "step-10": {
+        "$type": "dimension",
+        "$value": {
+          "value": 30,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D01",
+            "figmaName": "space/step-10"
+          }
+        }
+      },
+      "field-interior": {
+        "$type": "dimension",
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D12",
+            "note": "Off the 3px grid by decision: approved Sep 8, reaffirmed Nov 8.",
+            "figmaName": "space/field-interior"
+          }
+        }
+      }
+    },
+    "layout": {
+      "grid-column-min": {
+        "$type": "dimension",
+        "$value": {
+          "value": 240,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D10",
+            "note": "Nominal; may shrink inside a narrower container."
+          }
+        }
+      }
+    },
+    "radius": {
+      "sm": {
+        "$type": "dimension",
+        "$value": {
+          "value": 6,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No product radius scale was decided for sm.",
+            "figmaName": "radius/sm"
+          }
+        }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No product radius scale was decided for md.",
+            "figmaName": "radius/md"
+          }
+        }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18.23,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D21",
+            "note": "Card surfaces; the 18 and 20px call sites map here."
+          }
+        }
+      },
+      "category-label": {
+        "$type": "dimension",
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D24",
+            "note": "Category and status pills 10, 12 and 14px high."
+          }
+        }
+      }
+    },
+    "shape": {
+      "radius": {
+        "27": {
+          "$type": "dimension",
+          "$value": {
+            "value": 27,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "shape/radius/27",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        },
+        "22": {
+          "$type": "dimension",
+          "$value": {
+            "value": 22,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "shape/radius/22",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        },
+        "12": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "shape/radius/12",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        },
+        "13": {
+          "$type": "dimension",
+          "$value": {
+            "value": 13,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D54",
+              "figmaName": "shape/radius/13",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        }
+      }
+    },
+    "border": {
+      "hairline": {
+        "$type": "dimension",
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D26",
+            "figmaName": "border/hairline"
+          }
+        }
+      },
+      "focus": {
+        "$type": "dimension",
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No focus indicator was decided (G05).",
+            "figmaName": "border/focus"
+          }
+        }
+      }
+    },
+    "type": {
+      "family": {
+        "ui": {
+          "$type": "fontFamily",
+          "$value": "Caelum Sans",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D17",
+              "figmaName": "type/family/ui"
+            }
+          }
+        },
+        "mono": {
+          "$type": "fontFamily",
+          "$value": "Caelum Mono",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D17",
+              "figmaName": "type/family/mono"
+            }
+          }
+        },
+        "display": {
+          "$type": "fontFamily",
+          "$value": "Yrsa",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D17",
+              "note": "Identity of a conversation, project or window only (D19).",
+              "figmaName": "type/family/display"
+            }
+          }
+        },
+        "micro": {
+          "$type": "fontFamily",
+          "$value": "Caelum Sans Micro",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D69",
+              "note": "UI text at 10 to 11px."
+            }
+          }
+        }
+      },
+      "size": {
+        "label": {
+          "$type": "dimension",
+          "$value": {
+            "value": 14,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/size/label"
+            }
+          }
+        },
+        "body": {
+          "$type": "dimension",
+          "$value": {
+            "value": 16,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/size/body"
+            }
+          }
+        },
+        "title": {
+          "$type": "dimension",
+          "$value": {
+            "value": 28,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/size/title"
+            }
+          }
+        },
+        "editor": {
+          "$type": "dimension",
+          "$value": {
+            "value": 14,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "type/size/editor"
+            }
+          }
+        },
+        "picker-model": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D55",
+              "figmaName": "type/size/picker-model"
+            }
+          }
+        },
+        "picker-reply": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12.5,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D55",
+              "figmaName": "type/size/picker-reply"
+            }
+          }
+        }
+      },
+      "line": {
+        "label": {
+          "$type": "dimension",
+          "$value": {
+            "value": 20,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/line/label"
+            }
+          }
+        },
+        "body": {
+          "$type": "dimension",
+          "$value": {
+            "value": 24,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/line/body"
+            }
+          }
+        },
+        "title": {
+          "$type": "dimension",
+          "$value": {
+            "value": 36,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/line/title"
+            }
+          }
+        },
+        "editor": {
+          "$type": "dimension",
+          "$value": {
+            "value": 24,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "type/line/editor"
+            }
+          }
+        },
+        "picker-model": {
+          "$type": "dimension",
+          "$value": {
+            "value": 20,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D55",
+              "figmaName": "type/line/picker-model"
+            }
+          }
+        },
+        "picker-reply": {
+          "$type": "dimension",
+          "$value": {
+            "value": 19,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D55",
+              "figmaName": "type/line/picker-reply"
+            }
+          }
+        }
+      },
+      "weight": {
+        "regular": {
+          "$type": "fontWeight",
+          "$value": 400,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/weight/regular"
+            }
+          }
+        },
+        "medium": {
+          "$type": "fontWeight",
+          "$value": 500,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/weight/medium"
+            }
+          }
+        },
+        "semibold": {
+          "$type": "fontWeight",
+          "$value": 600,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "No type metric matrix was decided after the font swap (G06).",
+              "figmaName": "type/weight/semibold"
+            }
+          }
+        }
+      },
+      "tracking": {
+        "ui": {
+          "$type": "number",
+          "$value": 0.019,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D18",
+              "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06)."
+            }
+          }
+        }
+      },
+      "word-spacing": {
+        "ui": {
+          "$type": "number",
+          "$value": 0.055,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D18",
+              "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06)."
+            }
+          }
+        }
+      }
+    },
+    "size": {
+      "control-height": {
+        "$type": "dimension",
+        "$value": {
+          "value": 44,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No product control-size matrix was decided (G07). Renamed from size/control so size/control/34 can nest.",
+            "figmaName": "size/control"
+          }
+        }
+      },
+      "press": {
+        "$type": "dimension",
+        "$value": {
+          "value": 42,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No product control-size matrix was decided (G07).",
+            "figmaName": "size/press"
+          }
+        }
+      },
+      "icon": {
+        "$type": "dimension",
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "No product control-size matrix was decided (G07).",
+            "figmaName": "size/icon"
+          }
+        }
+      },
+      "glyph": {
+        "17": {
+          "$type": "dimension",
+          "$value": {
+            "value": 17,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D55",
+              "figmaName": "size/glyph/17",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        }
+      },
+      "control": {
+        "34": {
+          "$type": "dimension",
+          "$value": {
+            "value": 34,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "size/control/34",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        }
+      },
+      "picker": {
+        "42": {
+          "$type": "dimension",
+          "$value": {
+            "value": 42,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D54",
+              "figmaName": "size/picker/42",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        }
+      },
+      "dock": {
+        "47": {
+          "$type": "dimension",
+          "$value": {
+            "value": 47,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D54",
+              "note": "Reserved below the writing surface even when closed.",
+              "figmaName": "size/dock/47",
+              "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+            }
+          }
+        }
+      },
+      "scrollbar": {
+        "thumb": {
+          "$type": "dimension",
+          "$value": {
+            "value": 6,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44",
+              "note": "Visible thumb width."
+            }
+          }
+        },
+        "track": {
+          "$type": "dimension",
+          "$value": {
+            "value": 22,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44",
+              "note": "Interaction track width."
+            }
+          }
+        },
+        "thumb-min": {
+          "$type": "dimension",
+          "$value": {
+            "value": 28,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D44",
+              "note": "Minimum thumb height."
+            }
+          }
+        }
+      }
+    },
+    "metric": {
+      "2": {
+        "$type": "dimension",
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D54",
+            "figmaName": "metric/2",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "4": {
+        "$type": "dimension",
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D54",
+            "figmaName": "metric/4",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "5": {
+        "$type": "dimension",
+        "$value": {
+          "value": 5,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "composer-derived",
+            "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+            "figmaName": "metric/5",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "7": {
+        "$type": "dimension",
+        "$value": {
+          "value": 7,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "composer-derived",
+            "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+            "figmaName": "metric/7",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "10": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "composer-derived",
+            "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+            "figmaName": "metric/10",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "14": {
+        "$type": "dimension",
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "composer-derived",
+            "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+            "figmaName": "metric/14",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      },
+      "20": {
+        "$type": "dimension",
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "composer-derived",
+            "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+            "figmaName": "metric/20",
+            "naming": "Named after its value; a role name is owed (D02, D48, G03)."
+          }
+        }
+      }
+    },
+    "motion": {
+      "duration": {
+        "fast": {
+          "$type": "duration",
+          "$value": {
+            "value": 120,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "Production timings were never decided (G04).",
+              "figmaName": "motion/duration/fast"
+            }
+          }
+        },
+        "standard": {
+          "$type": "duration",
+          "$value": {
+            "value": 220,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "Production timings were never decided (G04).",
+              "figmaName": "motion/duration/standard"
+            }
+          }
+        },
+        "settle": {
+          "$type": "duration",
+          "$value": {
+            "value": 360,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "Production timings were never decided (G04).",
+              "figmaName": "motion/duration/settle"
+            }
+          }
+        },
+        "reduced": {
+          "$type": "duration",
+          "$value": {
+            "value": 0,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D40",
+              "note": "Reduced-motion value only. Normal motion must never inherit it (D40).",
+              "figmaName": "motion/duration/reduced"
+            }
+          }
+        }
+      },
+      "easing": {
+        "$type": "cubicBezier",
+        "$value": [
+          0,
+          0,
+          0.58,
+          1
+        ],
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "The draft's ease-out. Production timings were never decided (G04).",
+            "figmaName": "motion/easing"
+          }
+        }
+      },
+      "menu": {
+        "open-ms": {
+          "$type": "duration",
+          "$value": {
+            "value": 260,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33",
+              "figmaName": "motion/menu/open-ms"
+            }
+          }
+        },
+        "close-ms": {
+          "$type": "duration",
+          "$value": {
+            "value": 160,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D33",
+              "figmaName": "motion/menu/close-ms"
+            }
+          }
+        },
+        "open-curve": {
+          "$type": "cubicBezier",
+          "$value": [
+            0.16,
+            1,
+            0.3,
+            1
+          ],
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "motion/menu/open-curve"
+            }
+          }
+        },
+        "close-curve": {
+          "$type": "cubicBezier",
+          "$value": [
+            0.4,
+            0,
+            0.8,
+            0.3
+          ],
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "motion/menu/close-curve"
+            }
+          }
+        }
+      },
+      "chat": {
+        "phrase": {
+          "$type": "duration",
+          "$value": {
+            "value": 400,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D34",
+              "note": "Per phrase of an arriving chat message."
+            }
+          }
+        }
+      },
+      "artifact": {
+        "paragraph": {
+          "$type": "duration",
+          "$value": {
+            "value": 650,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D35",
+              "note": "Per newly streamed paragraph, fired once."
+            }
+          }
+        }
+      },
+      "header": {
+        "disclosure": {
+          "$type": "duration",
+          "$value": {
+            "value": 260,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D37"
+            }
+          }
+        },
+        "title-reveal": {
+          "$type": "duration",
+          "$value": {
+            "value": 340,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D37"
+            }
+          }
+        },
+        "collapse": {
+          "$type": "duration",
+          "$value": {
+            "value": 130,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D37"
+            }
+          }
+        },
+        "spring": {
+          "stiffness": {
+            "$type": "number",
+            "$value": 280,
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon",
+                "decision": "D37"
+              }
+            }
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 34,
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon",
+                "decision": "D37"
+              }
+            }
+          },
+          "mass": {
+            "$type": "number",
+            "$value": 1,
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon",
+                "decision": "D37"
+              }
+            }
+          }
+        }
+      },
+      "selection": {
+        "duration": {
+          "$type": "duration",
+          "$value": {
+            "value": 320,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D79"
+            }
+          }
+        },
+        "expansion": {
+          "$type": "duration",
+          "$value": {
+            "value": 380,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D79"
+            }
+          }
+        },
+        "curve": {
+          "$type": "cubicBezier",
+          "$value": [
+            0.4,
+            0,
+            0.2,
+            1
+          ],
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D79"
+            }
+          }
+        }
+      },
+      "scrollbar": {
+        "fill": {
+          "$type": "duration",
+          "$value": {
+            "value": 180,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42",
+              "note": "Fill deceleration; its curve was not recorded."
+            }
+          }
+        }
+      }
+    },
+    "opacity": {
+      "scrollbar": {
+        "rest": {
+          "$type": "number",
+          "$value": 0.15,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42",
+              "note": "Rest and hover."
+            }
+          }
+        },
+        "drag": {
+          "$type": "number",
+          "$value": 0.24,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D42"
+            }
+          }
+        }
+      },
+      "tooltip-fill": {
+        "$type": "number",
+        "$value": 0.8,
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D30"
+          }
+        }
+      }
+    },
+    "material": {
+      "dark": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": 0.24,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": {
+            "value": 19,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "Backdrop blur."
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": 0.14,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "Violet tint strength."
+            }
+          }
+        }
+      },
+      "light": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": 0.76,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": {
+            "value": 2,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "Backdrop blur."
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": 0.23,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "Violet tint strength."
+            }
+          }
+        }
+      },
+      "saturation": {
+        "panel": {
+          "$type": "number",
+          "$value": 1.2,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "120%."
+            }
+          }
+        },
+        "menu": {
+          "$type": "number",
+          "$value": 1.35,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "135%, portal menus."
+            }
+          }
+        }
+      },
+      "tint-falloff": {
+        "strength": {
+          "$type": "number",
+          "$value": 0.2,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "The tint gradient falls to 20% strength..."
+            }
+          }
+        },
+        "at": {
+          "$type": "number",
+          "$value": 0.72,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "note": "...at 72%."
+            }
+          }
+        }
+      },
+      "tooltip-blur": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D30"
+          }
+        }
+      }
+    },
+    "measure": {
+      "tooltip-padding-block": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D30"
+          }
+        }
+      },
+      "tooltip-padding-inline": {
+        "$type": "dimension",
+        "$value": {
+          "value": 13,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D30"
+          }
+        }
+      },
+      "tooltip-radius": {
+        "$type": "dimension",
+        "$value": {
+          "value": 11,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D30"
+          }
+        }
+      },
+      "alert-stack-gap": {
+        "$type": "dimension",
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D62",
+            "note": "Between stacked alerts."
+          }
+        }
+      },
+      "alert-icon": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D62"
+          }
+        }
+      },
+      "question-answer-inset": {
+        "$type": "dimension",
+        "$value": {
+          "value": 19,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D64",
+            "note": "Stacked answers, both sides."
+          }
+        }
+      }
+    }
+  }
+}

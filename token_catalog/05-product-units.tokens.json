@@ -1,0 +1,4020 @@
+{
+  "units": {
+    "$description": "Product units: product components for every surface (chat, task graph, dashboard). References only lower tiers.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 5,
+        "open": [
+          {
+            "item": "tier placement",
+            "ref": "unverified",
+            "why": "Tiers were assigned from source folders and names. 54 product-specific components were moved here from tiers 3 and 4 (movedFromTier). Every placement still needs a check."
+          },
+          {
+            "item": "question alert",
+            "ref": "D64",
+            "why": "No inventory entry. Decided: Glass Card, 19px blur, no tone glow; answers inset 19px both sides (base.measure.question-answer-inset); 24px label pad on the title axis."
+          },
+          {
+            "item": "header",
+            "ref": "D60, D61",
+            "why": "Header layout and avatar sizes are decided but belong to tier 6 (regions), outside this catalog."
+          }
+        ]
+      }
+    },
+    "chat": {
+      "activity": {
+        "$description": "Present live activity and expandable work groups inside a conversation.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "activity",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "agentName",
+              "summary",
+              "summaryChevron",
+              "chain",
+              "step",
+              "stepBody",
+              "stepTrigger",
+              "stepAnchor",
+              "stepLabel",
+              "stepStatus",
+              "stepChevron",
+              "detailText",
+              "detailCode",
+              "detailEmbed"
+            ],
+            "variants": {
+              "speaker": [
+                "neutral",
+                "sage",
+                "ready"
+              ],
+              "summary": [
+                true,
+                false
+              ],
+              "anchored": [
+                true,
+                false
+              ]
+            },
+            "defaultVariants": {
+              "summary": false,
+              "anchored": false
+            },
+            "states": [
+              "active",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "agentMessage": {
+        "$description": "Present agent-authored message content and its metadata.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "agentMessage",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "avatar",
+              "byline",
+              "name",
+              "content"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D59"
+            ]
+          }
+        }
+      },
+      "artifactPreview": {
+        "$description": "Present inline artifact previews with a shared card and content surface.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "artifactPreview",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "trigger",
+              "triggerChevron",
+              "card",
+              "strip",
+              "name",
+              "nameText",
+              "title",
+              "meta",
+              "actions",
+              "body",
+              "excerpt",
+              "generating",
+              "notice"
+            ],
+            "states": [
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "chatStatus": {
+        "$description": "Present chat status labels and contextual status indicators.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "chatStatus",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "icon",
+              "label"
+            ],
+            "variants": {
+              "status": [
+                "attention",
+                "responding",
+                "rest",
+                "idle"
+              ],
+              "display": [
+                "compact",
+                "labeled"
+              ]
+            },
+            "defaultVariants": {
+              "status": "rest",
+              "display": "labeled"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "conversationMessage": {
+        "$description": "Arrange conversation message content and associated actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "conversationMessage",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "turn",
+              "name",
+              "avatarTurn",
+              "avatar",
+              "body",
+              "prose",
+              "phrase",
+              "actions"
+            ],
+            "variants": {
+              "speaker": [
+                "sage",
+                "ready"
+              ],
+              "arrival": [
+                "phrase",
+                "paragraph",
+                "none"
+              ]
+            },
+            "defaultVariants": {
+              "speaker": "sage",
+              "arrival": "phrase"
+            },
+            "states": [
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "errorMessage": {
+        "$description": "Present a chat error and its recovery actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "errorMessage",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "open",
+              "symbol",
+              "label",
+              "name",
+              "detail"
+            ],
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "fileCard": {
+        "$description": "Present file identity, metadata and file actions in a card.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "fileCard",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "open",
+              "symbol",
+              "label",
+              "name",
+              "detail"
+            ],
+            "states": [
+              "focus-visible",
+              "focus",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D71"
+            ]
+          }
+        }
+      },
+      "inlineSource": {
+        "$description": "Present a source citation inline with conversation content.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "inlineSource",
+            "recipeInStaging": true,
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "recovery": {
+        "$description": "Present retry, jump-to-latest and compact error recovery controls.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "recovery",
+            "recipeInStaging": true,
+            "slots": [
+              "unread",
+              "error",
+              "errorText",
+              "navigation",
+              "jump"
+            ],
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "userMessage": {
+        "$description": "Present user-authored message content and its associated metadata.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "userMessage",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "bubble",
+              "text",
+              "editor",
+              "editRow",
+              "submit",
+              "actions"
+            ],
+            "states": [
+              "focus-visible",
+              "focus",
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "composerCss": {
+        "$description": "Present the composer shell, selection menus, attachments and action controls.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "composerCss",
+            "recipeInStaging": true,
+            "slots": [
+              "root"
+            ],
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "active",
+              "disabled",
+              "open",
+              "selected",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ResponsiveConversationPreview-style": {
+        "$description": "Position the responsive conversation review pane.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "ResponsiveConversationPreview.style",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "composer-internal-style": {
+        "$description": "Position a docked selection surface relative to its trigger and available viewport.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "composer-internal.style",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TokenSpan": {
+        "$description": "Specify token span chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.TokenSpan",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "LineSpan": {
+        "$description": "Specify line span chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.LineSpan",
+            "recipeInStaging": false,
+            "variants": {
+              "showLineNumbers": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockBody": {
+        "$description": "Specify code block body chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockBody",
+            "recipeInStaging": false,
+            "variants": {
+              "showLineNumbers": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockContainer": {
+        "$description": "Specify code block container chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockContainer",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockHeader": {
+        "$description": "Specify code block header chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockHeader",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockTitle": {
+        "$description": "Specify code block title chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockTitle",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockFilename": {
+        "$description": "Specify code block filename chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockFilename",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockActions": {
+        "$description": "Specify code block actions chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockActions",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockContent": {
+        "$description": "Specify code block content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockContent",
+            "recipeInStaging": false,
+            "variants": {
+              "showLineNumbers": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlock": {
+        "$description": "Specify code block chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlock",
+            "recipeInStaging": false,
+            "variants": {
+              "showLineNumbers": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockCopyButton": {
+        "$description": "Specify code block copy button chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockCopyButton",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockLanguageSelector": {
+        "$description": "Specify code block language selector chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelector",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockLanguageSelectorTrigger": {
+        "$description": "Specify code block language selector trigger chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockLanguageSelectorValue": {
+        "$description": "Specify code block language selector value chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorValue",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockLanguageSelectorContent": {
+        "$description": "Specify code block language selector content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CodeBlockLanguageSelectorItem": {
+        "$description": "Specify code block language selector item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Conversation": {
+        "$description": "Specify conversation chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.conversation.Conversation",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ConversationContent": {
+        "$description": "Specify conversation content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.conversation.ConversationContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ConversationEmptyState": {
+        "$description": "Specify conversation empty state chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.conversation.ConversationEmptyState",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ConversationScrollButton": {
+        "$description": "Specify conversation scroll button chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.conversation.ConversationScrollButton",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ConversationDownload": {
+        "$description": "Specify conversation download chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.conversation.ConversationDownload",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MessageBranchPrevious": {
+        "$description": "Specify message branch previous chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.message.MessageBranchPrevious",
+            "recipeInStaging": false,
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MessageBranchNext": {
+        "$description": "Specify message branch next chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.message.MessageBranchNext",
+            "recipeInStaging": false,
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ModelSelector": {
+        "$description": "Specify model selector coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelector",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorTrigger": {
+        "$description": "Specify model selector trigger coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorContent": {
+        "$description": "Specify model selector content coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorInput": {
+        "$description": "Specify model selector input coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorInput",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorList": {
+        "$description": "Specify model selector list coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorList",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorEmpty": {
+        "$description": "Specify model selector empty coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorEmpty",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorGroup": {
+        "$description": "Specify model selector group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorItem": {
+        "$description": "Specify model selector item coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorShortcut": {
+        "$description": "Specify model selector shortcut coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorShortcut",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorSeparator": {
+        "$description": "Specify model selector separator coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorSeparator",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorLogo": {
+        "$description": "Specify model selector logo coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorLogo",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorLogoGroup": {
+        "$description": "Specify model selector logo group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorLogoGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ModelSelectorName": {
+        "$description": "Specify model selector name coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.model-selector.ModelSelectorName",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "PromptInputActionAddAttachments": {
+        "$description": "Specify prompt input action add attachments chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputActionAddAttachments",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInput": {
+        "$description": "Specify prompt input chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInput",
+            "recipeInStaging": false,
+            "variants": {
+              "multiple": [
+                "boolean"
+              ],
+              "globalDrop": [
+                "boolean"
+              ],
+              "syncHiddenInput": [
+                "boolean"
+              ],
+              "code": [
+                "max_files",
+                "max_file_size",
+                "accept"
+              ]
+            },
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputBody": {
+        "$description": "Specify prompt input body chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputBody",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTextarea": {
+        "$description": "Specify prompt input textarea chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTextarea",
+            "recipeInStaging": false,
+            "states": [
+              "active",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputHeader": {
+        "$description": "Specify prompt input header chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputHeader",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputFooter": {
+        "$description": "Specify prompt input footer chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputFooter",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTools": {
+        "$description": "Specify prompt input tools chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTools",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputButton": {
+        "$description": "Specify prompt input button chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputButton",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputActionMenu": {
+        "$description": "Specify prompt input action menu chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenu",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputActionMenuTrigger": {
+        "$description": "Specify prompt input action menu trigger chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputActionMenuContent": {
+        "$description": "Specify prompt input action menu content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputActionMenuItem": {
+        "$description": "Specify prompt input action menu item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSubmit": {
+        "$description": "Specify prompt input submit chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSubmit",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSelect": {
+        "$description": "Specify prompt input select chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSelect",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSelectTrigger": {
+        "$description": "Specify prompt input select trigger chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectTrigger",
+            "recipeInStaging": false,
+            "states": [
+              "hover",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSelectContent": {
+        "$description": "Specify prompt input select content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSelectItem": {
+        "$description": "Specify prompt input select item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputSelectValue": {
+        "$description": "Specify prompt input select value chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectValue",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputHoverCard": {
+        "$description": "Specify prompt input hover card chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCard",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputHoverCardTrigger": {
+        "$description": "Specify prompt input hover card trigger chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCardTrigger",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputHoverCardContent": {
+        "$description": "Specify prompt input hover card content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCardContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTabsList": {
+        "$description": "Specify prompt input tabs list chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTabsList",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTab": {
+        "$description": "Specify prompt input tab chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTab",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTabLabel": {
+        "$description": "Specify prompt input tab label chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTabLabel",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTabBody": {
+        "$description": "Specify prompt input tab body chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTabBody",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputTabItem": {
+        "$description": "Specify prompt input tab item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputTabItem",
+            "recipeInStaging": false,
+            "states": [
+              "hover"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommand": {
+        "$description": "Specify prompt input command chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommand",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandInput": {
+        "$description": "Specify prompt input command input chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandInput",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandList": {
+        "$description": "Specify prompt input command list chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandList",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandEmpty": {
+        "$description": "Specify prompt input command empty chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandEmpty",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandGroup": {
+        "$description": "Specify prompt input command group chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandGroup",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandItem": {
+        "$description": "Specify prompt input command item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PromptInputCommandSeparator": {
+        "$description": "Specify prompt input command separator chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandSeparator",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ReasoningTrigger": {
+        "$description": "Specify reasoning trigger chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.reasoning.ReasoningTrigger",
+            "recipeInStaging": false,
+            "states": [
+              "hover",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ReasoningContent": {
+        "$description": "Specify reasoning content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.reasoning.ReasoningContent",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ShimmerComponent": {
+        "$description": "Specify shimmer component coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.shimmer.ShimmerComponent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Shimmer": {
+        "$description": "Specify shimmer coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.shimmer.Shimmer",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Suggestions": {
+        "$description": "Specify suggestions chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.suggestion.Suggestions",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Suggestion": {
+        "$description": "Specify suggestion chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.suggestion.Suggestion",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ToolHeader": {
+        "$description": "Specify tool header chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.tool.ToolHeader",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ToolContent": {
+        "$description": "Specify tool content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.tool.ToolContent",
+            "recipeInStaging": false,
+            "states": [
+              "open",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ToolInput": {
+        "$description": "Specify tool input chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.tool.ToolInput",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ToolOutput": {
+        "$description": "Specify tool output chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.tool.ToolOutput",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Output": {
+        "$description": "Specify output chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.ai-elements.tool.Output",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AddAgentDialog": {
+        "$description": "Specify add agent dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.add-agent-dialog.AddAgentDialog",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open",
+              "loading",
+              "error",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 3
+          }
+        }
+      },
+      "AddresseeField": {
+        "$description": "Specify addressee field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.addressee-field.AddresseeField",
+            "recipeInStaging": false,
+            "variants": {
+              "disabled": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ApprovalAlert": {
+        "$description": "Specify approval alert chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.approval-alert.ApprovalAlert",
+            "recipeInStaging": false,
+            "states": [
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D63"
+            ],
+            "note": "Permission alert: peach-gold opaque tonal wash, danger-text Deny, tonal Clarify, primary Allow (D63). The wash's exact colour derivation is not recorded."
+          }
+        }
+      },
+      "Attribution": {
+        "$description": "Specify attribution chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.approval-card.Attribution",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Settled": {
+        "$description": "Specify settled chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.approval-card.Settled",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SettledRow": {
+        "$description": "Specify settled row chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.approval-card.SettledRow",
+            "recipeInStaging": false,
+            "variants": {
+              "kind": [
+                "approval",
+                "trust"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ApprovalCard": {
+        "$description": "Specify approval card chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.approval-card.ApprovalCard",
+            "recipeInStaging": false,
+            "variants": {
+              "current": [
+                "boolean"
+              ],
+              "primary": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "OverviewChoice": {
+        "$description": "Specify overview choice chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.chat-overview-view.OverviewChoice",
+            "recipeInStaging": false,
+            "states": [
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CommsComposer": {
+        "$description": "Specify comms composer chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.comms-composer.CommsComposer",
+            "recipeInStaging": false,
+            "variants": {
+              "retryable": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DocumentPreviewCard": {
+        "$description": "Specify document preview card chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.document-preview.DocumentPreviewCard",
+            "recipeInStaging": false,
+            "variants": {
+              "phase": [
+                "waiting",
+                "working",
+                "complete"
+              ]
+            },
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DocumentPreview": {
+        "$description": "Specify document preview chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.document-preview.DocumentPreview",
+            "recipeInStaging": false,
+            "variants": {
+              "isReadonly": [
+                "boolean"
+              ],
+              "isUpdate": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DocumentContent": {
+        "$description": "Specify document content chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.document-preview.DocumentContent",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DocumentToolResult": {
+        "$description": "Specify document tool result chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.document.DocumentToolResult",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DocumentToolCall": {
+        "$description": "Specify document tool call chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.document.DocumentToolCall",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "AgentPicker": {
+        "$description": "Specify agent picker coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.launch.agent-picker.AgentPicker",
+            "recipeInStaging": false,
+            "states": [
+              "open",
+              "loading",
+              "error",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "LaunchProgress": {
+        "$description": "Specify launch progress chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.launch.launch-progress.LaunchProgress",
+            "recipeInStaging": false,
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "NewSessionDialog": {
+        "$description": "Specify new session dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.launch.launch-sheet.NewSessionDialog",
+            "recipeInStaging": false,
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 3
+          }
+        }
+      },
+      "Field": {
+        "$description": "Specify field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.launch.launch-sheet.Field",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "MessageActions": {
+        "$description": "Specify message actions chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message-actions.MessageActions",
+            "recipeInStaging": false,
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MessageReasoning": {
+        "$description": "Specify message reasoning chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message-reasoning.MessageReasoning",
+            "recipeInStaging": false,
+            "variants": {
+              "isLoading": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "MessageTurn": {
+        "$description": "Specify message turn chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message-turn.MessageTurn",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ThinkingMessage": {
+        "$description": "Specify thinking message chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.ThinkingMessage",
+            "recipeInStaging": false,
+            "states": [
+              "active",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CommsActions": {
+        "$description": "Specify comms actions chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.CommsActions",
+            "recipeInStaging": false,
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Addressed": {
+        "$description": "Specify addressed chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.Addressed",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CommsMessageItem": {
+        "$description": "Specify comms message item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.CommsMessageItem",
+            "recipeInStaging": false,
+            "variants": {
+              "agentAuthor": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PreviewAttachment": {
+        "$description": "Specify preview attachment chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.preview-attachment.PreviewAttachment",
+            "recipeInStaging": false,
+            "variants": {
+              "isUploading": [
+                "boolean"
+              ],
+              "failed": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SideChatAction": {
+        "$description": "Specify side chat action chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.side-chat-action.SideChatAction",
+            "recipeInStaging": false,
+            "variants": {
+              "compact": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ChatItem": {
+        "$description": "Specify chat item chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.sidebar-history-item.ChatItem",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "CommsChatRow": {
+        "$description": "Specify comms chat row chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.sidebar-history.CommsChatRow",
+            "recipeInStaging": false,
+            "states": [
+              "active",
+              "disabled",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SignOutForm": {
+        "$description": "Specify sign out form coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.sign-out-form.SignOutForm",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "SuggestedActions": {
+        "$description": "Specify suggested actions chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.suggested-actions.SuggestedActions",
+            "recipeInStaging": false,
+            "states": [
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "SurfaceSwitch": {
+        "$description": "Specify surface switch chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.surface-switch.SurfaceSwitch",
+            "recipeInStaging": false,
+            "states": [
+              "hover",
+              "focus",
+              "active",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Tool": {
+        "$description": "Specify tool chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.toolbar.Tool",
+            "recipeInStaging": false,
+            "variants": {
+              "isToolbarVisible": [
+                "boolean"
+              ],
+              "isAnimating": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ReadingLevelSelector": {
+        "$description": "Specify reading level selector coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.toolbar.ReadingLevelSelector",
+            "recipeInStaging": false,
+            "variants": {
+              "isAnimating": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Tools": {
+        "$description": "Specify tools chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.toolbar.Tools",
+            "recipeInStaging": false,
+            "variants": {
+              "isAnimating": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "TrustCard": {
+        "$description": "Specify trust card chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.trust-card.TrustCard",
+            "recipeInStaging": false,
+            "variants": {
+              "current": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled",
+              "open",
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "composer-root": {
+        "$description": "Compose a thread message and coordinate context, agent settings, reply format, dictation, live conversation and send/stop actions.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "composer.root",
+            "recipeInStaging": true,
+            "slots": [
+              "shell",
+              "editor",
+              "toolbar",
+              "dock",
+              "picker",
+              "context",
+              "backdrop",
+              "menuMotion"
+            ],
+            "variants": {
+              "State": [
+                "Empty",
+                "Draft",
+                "Expanded",
+                "Model",
+                "Reply",
+                "Add",
+                "Context",
+                "Live",
+                "Dictating",
+                "Sending",
+                "Disabled",
+                "Pinned model",
+                "Pinned reply"
+              ],
+              "Agents": [
+                "Single",
+                "Multi"
+              ],
+              "Motion": [
+                "Normal",
+                "Reduced"
+              ]
+            },
+            "defaultVariants": {
+              "State": "Empty",
+              "Agents": "Single",
+              "Motion": "Normal"
+            },
+            "states": [
+              "Empty",
+              "Draft",
+              "Expanded",
+              "Model",
+              "Reply",
+              "Add",
+              "Context",
+              "Live",
+              "Dictating",
+              "Sending",
+              "Disabled",
+              "Pinned model",
+              "Pinned reply"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D01",
+              "D02",
+              "D03",
+              "D04",
+              "D05",
+              "D06",
+              "D07",
+              "D53",
+              "D54",
+              "D55",
+              "D56",
+              "D57",
+              "D77",
+              "D78"
+            ],
+            "slotRoles": {
+              "shell": {
+                "paddingTop": "composer/shell-top",
+                "paddingInline": "composer/shell-inline",
+                "paddingBottom": "composer/shell-bottom",
+                "radius": "composer/shell-radius",
+                "expandedRadius": "composer/expanded-radius",
+                "fill": "composer/fill",
+                "edge": "composer/neutral-edge",
+                "edgeWidth": "composer/hairline"
+              },
+              "editor": {
+                "inset": "composer/editor-inset",
+                "font": "composer/family",
+                "weight": "composer/weight",
+                "size": "composer/editor-size",
+                "lineHeight": "composer/editor-line",
+                "text": "composer/text",
+                "placeholder": "composer/muted"
+              },
+              "toolbar": {
+                "offset": "composer/controls-offset",
+                "gap": "composer/control-gap",
+                "controlSize": "composer/control-size",
+                "corner": "composer/control-radius",
+                "glyph": "composer/glyph-size",
+                "supporting": "composer/supporting",
+                "disabled": "composer/disabled",
+                "sendFill": "composer/send-fill"
+              },
+              "dock": {
+                "reserve": "composer/dock-reserve",
+                "gap": "composer/dock-gap",
+                "floor": "composer/dock-floor"
+              },
+              "picker": {
+                "height": "composer/dock-height",
+                "padding": "composer/dock-pad",
+                "radius": "composer/dock-radius",
+                "optionInset": "composer/option-inset",
+                "fill": "composer/option-fill",
+                "selectedFill": "composer/selected-fill",
+                "modelSize": "composer/model-size",
+                "modelLine": "composer/model-line",
+                "replySize": "composer/reply-size",
+                "replyLine": "composer/reply-line"
+              },
+              "context": {
+                "gap": "composer/context-gap"
+              },
+              "backdrop": {
+                "fill": "composer/ground"
+              },
+              "menuMotion": {
+                "openDuration": "composer/open-ms",
+                "closeDuration": "composer/close-ms",
+                "openCurve": "composer/open-curve",
+                "closeCurve": "composer/close-curve",
+                "reducedDuration": "composer/reduced-ms"
+              }
+            },
+            "constraints": [
+              "Pinned model and Pinned reply require Multi.",
+              "Set density explicitly. Available width never selects a density.",
+              "Reserve dock clearance when closed. Only model and reply use the dock. Open Add separately at its trigger. Flip the compact picker above when viewport space requires it.",
+              "Grow from one to eight lines, then scroll. Figma demonstrates short and expanded examples.",
+              "Single agent omits the agent table. In Multi, the model table owns identity, model, reasoning and permission. The reply table owns identity and reply format.",
+              "Unavailable controls stay visible, use the disabled treatment and reject interactions.",
+              "Use current product colour roles, Caelum Sans for UI and a rounded neutral edge."
+            ],
+            "modeEvidence": {
+              "dark": "Figma visual draft",
+              "reduced-motion": "instant menu transitions in Figma",
+              "light": "open",
+              "reduced-transparency": "open"
+            }
+          }
+        },
+        "shell-top": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/shell-top"
+            }
+          }
+        },
+        "shell-inline": {
+          "$type": "dimension",
+          "$value": "{base.metric.14}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/shell-inline"
+            }
+          }
+        },
+        "shell-bottom": {
+          "$type": "dimension",
+          "$value": "{base.metric.10}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/shell-bottom"
+            }
+          }
+        },
+        "shell-radius": {
+          "$type": "dimension",
+          "$value": "{base.shape.radius.27}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/shell-radius"
+            }
+          }
+        },
+        "expanded-radius": {
+          "$type": "dimension",
+          "$value": "{base.shape.radius.22}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/expanded-radius"
+            }
+          }
+        },
+        "editor-inset": {
+          "$type": "dimension",
+          "$value": "{base.metric.7}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/editor-inset"
+            }
+          }
+        },
+        "editor-size": {
+          "$type": "dimension",
+          "$value": "{base.type.size.editor}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/editor-size"
+            }
+          }
+        },
+        "editor-line": {
+          "$type": "dimension",
+          "$value": "{base.type.line.editor}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/editor-line"
+            }
+          }
+        },
+        "controls-offset": {
+          "$type": "dimension",
+          "$value": "{base.metric.20}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/controls-offset"
+            }
+          }
+        },
+        "control-gap": {
+          "$type": "dimension",
+          "$value": "{base.metric.5}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/control-gap"
+            }
+          }
+        },
+        "control-size": {
+          "$type": "dimension",
+          "$value": "{base.size.control.34}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/control-size"
+            }
+          }
+        },
+        "control-radius": {
+          "$type": "dimension",
+          "$value": "{base.shape.radius.12}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/control-radius"
+            }
+          }
+        },
+        "glyph-size": {
+          "$type": "dimension",
+          "$value": "{base.size.glyph.17}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/glyph-size"
+            }
+          }
+        },
+        "dock-height": {
+          "$type": "dimension",
+          "$value": "{base.size.picker.42}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-height"
+            }
+          }
+        },
+        "dock-pad": {
+          "$type": "dimension",
+          "$value": "{base.metric.4}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-pad"
+            }
+          }
+        },
+        "dock-radius": {
+          "$type": "dimension",
+          "$value": "{base.shape.radius.13}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-radius"
+            }
+          }
+        },
+        "dock-gap": {
+          "$type": "dimension",
+          "$value": "{base.metric.2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-gap"
+            }
+          }
+        },
+        "dock-floor": {
+          "$type": "dimension",
+          "$value": "{base.space.step-01}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-floor"
+            }
+          }
+        },
+        "dock-reserve": {
+          "$type": "dimension",
+          "$value": "{base.size.dock.47}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/dock-reserve"
+            }
+          }
+        },
+        "model-size": {
+          "$type": "dimension",
+          "$value": "{base.type.size.picker-model}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/model-size"
+            }
+          }
+        },
+        "model-line": {
+          "$type": "dimension",
+          "$value": "{base.type.line.picker-model}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/model-line"
+            }
+          }
+        },
+        "reply-size": {
+          "$type": "dimension",
+          "$value": "{base.type.size.picker-reply}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/reply-size"
+            }
+          }
+        },
+        "reply-line": {
+          "$type": "dimension",
+          "$value": "{base.type.line.picker-reply}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/reply-line"
+            }
+          }
+        },
+        "option-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/option-inset"
+            }
+          }
+        },
+        "context-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-02}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/context-gap"
+            }
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{sys.color.elevated}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/fill"
+            }
+          }
+        },
+        "option-fill": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/option-fill"
+            }
+          }
+        },
+        "selected-fill": {
+          "$type": "color",
+          "$value": "{sys.color.top}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/selected-fill"
+            }
+          }
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/text"
+            }
+          }
+        },
+        "supporting": {
+          "$type": "color",
+          "$value": "{sys.color.text-supporting}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/supporting"
+            }
+          }
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "{sys.color.text-tertiary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/muted"
+            }
+          }
+        },
+        "disabled": {
+          "$type": "color",
+          "$value": "{sys.color.text-faint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/disabled"
+            }
+          }
+        },
+        "family": {
+          "$type": "fontFamily",
+          "$value": "{base.type.family.ui}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/family"
+            }
+          }
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "$value": "{base.type.weight.medium}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "composer/weight"
+            }
+          }
+        },
+        "open-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.open-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/open-ms"
+            }
+          }
+        },
+        "close-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.menu.close-ms}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/close-ms"
+            }
+          }
+        },
+        "open-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.open-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/open-curve"
+            }
+          }
+        },
+        "close-curve": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.menu.close-curve}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "composer-derived",
+              "note": "Measured from the approved Composer (D53), not written down as its own decision.",
+              "figmaName": "composer/close-curve"
+            }
+          }
+        },
+        "reduced-ms": {
+          "$type": "duration",
+          "$value": "{base.motion.duration.reduced}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "composer/reduced-ms"
+            }
+          }
+        },
+        "hairline": {
+          "$type": "dimension",
+          "$value": "{base.border.hairline}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/hairline"
+            }
+          }
+        },
+        "neutral-edge": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/neutral-edge"
+            }
+          }
+        },
+        "send-fill": {
+          "$type": "color",
+          "$value": "{sys.color.action-blue}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/send-fill"
+            }
+          }
+        },
+        "ground": {
+          "$type": "color",
+          "$value": "{sys.color.ground}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "composer/ground"
+            }
+          }
+        }
+      },
+      "PermissionControl": {
+        "$description": "Specify permission control chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.Composer.PermissionControl",
+            "recipeInStaging": false,
+            "variants": {
+              "menuSide": [
+                "top",
+                "right"
+              ],
+              "showLabel": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ComposerChoice": {
+        "$description": "Specify composer choice chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.Composer.ComposerChoice",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ReplyFormat": {
+        "$description": "Specify reply format chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.composer-internal.ReplyFormat",
+            "recipeInStaging": false,
+            "states": [
+              "active",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "ComposerChoiceInternal": {
+        "$description": "Specify composer choice chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.composer-internal.ComposerChoiceInternal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PermissionControlInternal": {
+        "$description": "Specify permission control chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.composer-internal.PermissionControlInternal",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "PreviewMessage": {
+        "$description": "Specify preview message chat content presentation and actions if retained; chat/content product unit.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.message.PreviewMessage",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "PanelNote": {
+        "$description": "Specify panel note coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.pages.dashboard.DashboardView.PanelNote",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "HealthChipView": {
+        "$description": "Specify health chip view coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.pages.dashboard.DashboardView.HealthChipView",
+            "recipeInStaging": false,
+            "variants": {
+              "causeMono": [
+                "boolean"
+              ],
+              "primary": [
+                "boolean"
+              ],
+              "retryable": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Linkified": {
+        "$description": "Specify linkified coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.pages.dashboard.DashboardView.Linkified",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Outline": {
+        "$description": "Specify outline coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.pages.dashboard.DashboardView.Outline",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      }
+    },
+    "task-graph": {
+      "ArchiveDialog": {
+        "$description": "Specify archive dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.archive-dialog.ArchiveDialog",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "loading",
+              "error",
+              "closed"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 3
+          }
+        }
+      },
+      "DocumentRow": {
+        "$description": "Specify document row coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.document-links.DocumentRow",
+            "recipeInStaging": false,
+            "variants": {
+              "disabled": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "DocumentLinks": {
+        "$description": "Specify document links coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.document-links.DocumentLinks",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Gated": {
+        "$description": "Specify gated coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.gated.Gated",
+            "recipeInStaging": false,
+            "variants": {
+              "disabled": [
+                "boolean"
+              ],
+              "aria-disabled": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus",
+              "active",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ActionField": {
+        "$description": "Specify action field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.graph-actions.ActionField",
+            "recipeInStaging": false,
+            "variants": {
+              "busy": [
+                "boolean"
+              ],
+              "required": [
+                "boolean"
+              ],
+              "multiline": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "GraphActionDialog": {
+        "$description": "Specify graph action dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.graph-actions.GraphActionDialog",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 3
+          }
+        }
+      },
+      "InitiativeLinksEditor": {
+        "$description": "Specify initiative links editor coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.initiative-actions.InitiativeLinksEditor",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ChatLinkPicker": {
+        "$description": "Specify chat link picker coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.linked-work.chat-link-picker.ChatLinkPicker",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "loading",
+              "error",
+              "selected"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "PreviewError": {
+        "$description": "Specify preview error coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.linked-work.chat-linked-work.PreviewError",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ChatLinkedWork": {
+        "$description": "Specify chat linked work coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.linked-work.chat-linked-work.ChatLinkedWork",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "LinkedProject": {
+        "$description": "Specify linked project coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.linked-work.chat-linked-work.LinkedProject",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "LinkedItem": {
+        "$description": "Specify linked item coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.linked-work.chat-linked-work.LinkedItem",
+            "recipeInStaging": false,
+            "variants": {
+              "open": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "open",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "LinkRow": {
+        "$description": "Specify link row coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.initiative-page.LinkRow",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "InitiativeCard": {
+        "$description": "Specify initiative card coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.overview-page.InitiativeCard",
+            "recipeInStaging": false,
+            "states": [
+              "active"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "TaskGraphPageFrame": {
+        "$description": "Specify task graph page frame coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.page-frame.TaskGraphPageFrame",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "SourceLink": {
+        "$description": "Specify source link coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-agents.SourceLink",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ProfileEdit": {
+        "$description": "Specify profile edit coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-agents.ProfileEdit",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Harness": {
+        "$description": "Specify harness coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-agents.Harness",
+            "recipeInStaging": false,
+            "states": [
+              "focus",
+              "active",
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Loadout": {
+        "$description": "Specify loadout coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-agents.Loadout",
+            "recipeInStaging": false,
+            "states": [
+              "open"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "FieldList": {
+        "$description": "Specify field list coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-drawers.FieldList",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "Prose": {
+        "$description": "Specify prose coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-drawers.Prose",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "AcceptanceCriteria": {
+        "$description": "Specify acceptance criteria coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-drawers.AcceptanceCriteria",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "InfoTab": {
+        "$description": "Specify info tab coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-page.InfoTab",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "CyclesTab": {
+        "$description": "Specify cycles tab coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.project-page.CyclesTab",
+            "recipeInStaging": false,
+            "states": [
+              "disabled",
+              "loading",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "TaskGraphLoading": {
+        "$description": "Specify task graph loading coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.states.TaskGraphLoading",
+            "recipeInStaging": false,
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "TaskGraphEmpty": {
+        "$description": "Specify task graph empty coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.states.TaskGraphEmpty",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "TaskGraphError": {
+        "$description": "Specify task graph error coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.pages.states.TaskGraphError",
+            "recipeInStaging": false,
+            "states": [
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      },
+      "ReorderControl": {
+        "$description": "Specify reorder control coordinated control layout and states if retained; coordinated controls or reusable pattern.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.taskgraph.reorder-control.ReorderControl",
+            "recipeInStaging": false,
+            "variants": {
+              "kind": [
+                "work-items",
+                "modules"
+              ],
+              "disabled": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "focus",
+              "active",
+              "disabled",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "movedFromTier": 4
+          }
+        }
+      }
+    }
+  }
+}

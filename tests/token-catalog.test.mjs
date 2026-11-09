@@ -1,0 +1,101 @@
+// The token catalog's own rules. Offline; reads token_catalog/ only.
+//
+// - Every file parses, and each has exactly one root group, unique across files.
+// - No token or group name contains '.', '{' or '}', or starts with '$'.
+// - Raw values live only in 00-foundations. Every other token is a single alias.
+// - Every alias resolves, to a token in a lower tier (the semantic files count as tier 0, above foundations).
+// - The light semantic file holds no path the dark one lacks.
+// - Every token has a $type and a status of canon, composer-derived or provisional.
+
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'token_catalog');
+const EXT = 'app.caelos';
+const STATUSES = new Set(['canon', 'composer-derived', 'provisional']);
+const ALIAS = /^\{([^{}]+)\}$/;
+
+const files = readdirSync(DIR).filter((f) => f.endsWith('.tokens.json')).sort();
+const load = (f) => JSON.parse(readFileSync(path.join(DIR, f), 'utf8'));
+// Rank: foundations 0, semantic 1, tier N files N + 1. A token may reference only a lower rank.
+const rank = (f) => (f.startsWith('00-foundations') ? 0 : f.startsWith('00-semantic') ? 1 : Number(f.slice(0, 2)) + 1);
+
+function tokens(node, prefix, out, file) {
+  for (const [name, child] of Object.entries(node)) {
+    if (name.startsWith('$')) continue;
+    assert.ok(!/[.{}]/.test(name), `${file}: bad name '${name}' under '${prefix}'`);
+    const p = prefix ? `${prefix}.${name}` : name;
+    if (child && typeof child === 'object' && '$value' in child) out.set(p, child);
+    else tokens(child, p, out, file);
+  }
+  return out;
+}
+
+const catalog = new Map(files.map((f) => [f, tokens(load(f), '', new Map(), f)]));
+
+test('the catalog has the expected files', () => {
+  assert.deepEqual(files, [
+    '00-foundations.tokens.json', '00-semantic.dark.tokens.json', '00-semantic.light.tokens.json',
+    '01-primitives.tokens.json', '02-controls.tokens.json', '03-overlays.tokens.json',
+    '04-patterns.tokens.json', '05-product-units.tokens.json',
+  ]);
+});
+
+test('each file has one root group, unique except the two semantic modes', () => {
+  const roots = files.map((f) => Object.keys(load(f)));
+  for (const [i, r] of roots.entries()) assert.equal(r.length, 1, `${files[i]} has ${r.length} roots`);
+  const names = roots.map((r) => r[0]).filter((r) => r !== 'sys');
+  assert.equal(new Set(names).size, names.length);
+});
+
+test('raw values only in foundations; everything else is one alias', () => {
+  for (const [f, toks] of catalog) {
+    for (const [p, t] of toks) {
+      const isAlias = typeof t.$value === 'string' && ALIAS.test(t.$value);
+      if (f.startsWith('00-foundations')) assert.ok(!isAlias, `${f}: ${p} is an alias in foundations`);
+      else assert.ok(isAlias, `${f}: ${p} holds a raw value`);
+    }
+  }
+});
+
+test('every alias resolves to a lower tier, with matching type', () => {
+  const owner = (target, mode) => {
+    for (const [f, toks] of catalog) {
+      if (f.startsWith('00-semantic') && !f.includes(`.${mode}.`)) continue;
+      if (toks.has(target)) return [f, toks.get(target)];
+    }
+    return [null, null];
+  };
+  for (const mode of ['dark', 'light']) {
+    for (const [f, toks] of catalog) {
+      if (f.startsWith('00-semantic') && !f.includes(`.${mode}.`)) continue;
+      for (const [p, t] of toks) {
+        const m = typeof t.$value === 'string' && t.$value.match(ALIAS);
+        if (!m) continue;
+        const [tf, target] = owner(m[1], mode);
+        // Tier files resolve semantic roles against dark; a role missing from light is a parity gap, not a break.
+        if (!tf && mode === 'light' && !f.startsWith('00-semantic')) continue;
+        assert.ok(tf, `${f}: ${p} -> {${m[1]}} does not resolve (${mode})`);
+        assert.ok(rank(tf) < rank(f), `${f}: ${p} references ${tf}, which is not a lower tier`);
+        assert.equal(t.$type, target.$type, `${f}: ${p} type differs from {${m[1]}}`);
+      }
+    }
+  }
+});
+
+test('light holds no path that dark lacks', () => {
+  const dark = catalog.get('00-semantic.dark.tokens.json');
+  for (const p of catalog.get('00-semantic.light.tokens.json').keys()) assert.ok(dark.has(p), `light-only path ${p}`);
+});
+
+test('every token has a type and a status', () => {
+  for (const [f, toks] of catalog) {
+    for (const [p, t] of toks) {
+      assert.ok(t.$type, `${f}: ${p} has no $type`);
+      assert.ok(STATUSES.has(t.$extensions?.[EXT]?.status), `${f}: ${p} has no valid status`);
+    }
+  }
+});

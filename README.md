@@ -4,7 +4,7 @@ The single source of truth for Caelos design tokens and components. Caelos apps 
 
 Raw values live only in the bottom tier. Every tier above it uses only tokens and components from the tiers below.
 
-**Status:** empty. The first tier has not been built yet.
+**Status:** the token catalog is in. [`token_catalog/`](token_catalog/README.md) lists every token from tier 0 to tier 5, with its value where one is decided, its status, and the items still undecided. No components have been built yet.
 
 Copyright 2026 Nova Caelum & Co. All rights reserved. See [LICENSE](LICENSE).
 

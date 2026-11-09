@@ -1,0 +1,558 @@
+{
+  "controls": {
+    "$description": "Controls: one interactive element. References only lower tiers.",
+    "$extensions": {
+      "app.caelos": {
+        "tier": 2,
+        "open": [
+          {
+            "item": "button and chip values",
+            "ref": "D50, D81, G04, G05",
+            "why": "No decided padding, height, radius, timing or focus. The Figma draft's values are not admitted."
+          }
+        ]
+      }
+    },
+    "shared": {
+      "badgeVariants": {
+        "$description": "Set badge emphasis and status treatments.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "badgeVariants",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "default",
+                "secondary",
+                "destructive",
+                "outline",
+                "ghost",
+                "link"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "default"
+            },
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "buttonVariants": {
+        "$description": "Set host button size and action emphasis.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "buttonVariants",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "default",
+                "outline",
+                "secondary",
+                "ghost",
+                "destructive",
+                "link"
+              ],
+              "size": [
+                "default",
+                "xs",
+                "sm",
+                "lg",
+                "icon",
+                "icon-xs",
+                "icon-sm",
+                "icon-lg"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "default",
+              "size": "default"
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D50"
+            ]
+          }
+        }
+      },
+      "controlSkin": {
+        "$description": "Express destructive and non-destructive control emphasis.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "controlSkin",
+            "recipeInStaging": true,
+            "variants": {
+              "kind": [
+                "danger",
+                "glass"
+              ]
+            },
+            "defaultVariants": {
+              "kind": "danger"
+            },
+            "states": [
+              "hover",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "button": {
+        "$description": "Express shared action emphasis, size and button states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "button",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "primary",
+                "tonal",
+                "text"
+              ],
+              "size": [
+                "sm",
+                "md"
+              ],
+              "danger": [
+                true
+              ]
+            },
+            "defaultVariants": {
+              "variant": "tonal",
+              "size": "md"
+            },
+            "states": [
+              "hover",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D50",
+              "D82",
+              "D25"
+            ],
+            "note": "The Figma draft's 26 button tokens are not admitted: their padding uses the rejected second scale (D01)."
+          }
+        }
+      },
+      "input": {
+        "$description": "Present input containers, labels and editable field states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "input",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "control",
+              "icon",
+              "clear",
+              "label",
+              "description"
+            ],
+            "variants": {
+              "variant": [
+                "text",
+                "search",
+                "large"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "text"
+            },
+            "states": [
+              "hover",
+              "focus",
+              "active",
+              "disabled",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D12",
+              "D52"
+            ]
+          }
+        },
+        "label-gap": {
+          "$type": "dimension",
+          "$value": "{sys.space.field-interior}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D12",
+              "note": "Label to control."
+            }
+          }
+        },
+        "description-gap": {
+          "$type": "dimension",
+          "$value": "{sys.space.field-interior}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D12",
+              "note": "Control to help text."
+            }
+          }
+        }
+      },
+      "chip": {
+        "$description": "Present compact labels and selectable chip states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "chip",
+            "recipeInStaging": true,
+            "variants": {
+              "variant": [
+                "filter",
+                "status",
+                "count",
+                "category"
+              ],
+              "tone": [
+                "neutral",
+                "ready",
+                "progress",
+                "done",
+                "sage",
+                "danger",
+                "atmospheric",
+                "structural"
+              ]
+            },
+            "defaultVariants": {
+              "variant": "filter",
+              "tone": "neutral"
+            },
+            "states": [
+              "hover",
+              "active",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D81",
+              "D24"
+            ],
+            "note": "The Figma draft's 9 chip tokens are not admitted: padding on the rejected second scale, 20px radius (D21)."
+          }
+        }
+      },
+      "avatar": {
+        "$description": "Present identity images, fallbacks and status indicators.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "avatar",
+            "recipeInStaging": true,
+            "slots": [
+              "root",
+              "frame",
+              "image",
+              "fallback",
+              "badge"
+            ],
+            "variants": {
+              "shape": [
+                "circle",
+                "square"
+              ],
+              "size": [
+                "sm",
+                "md",
+                "lg",
+                "xl",
+                "xxl"
+              ],
+              "status": [
+                "attention",
+                "running"
+              ]
+            },
+            "defaultVariants": {
+              "shape": "circle",
+              "size": "md"
+            },
+            "states": [
+              "focus-visible",
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "rippleLoader": {
+        "$description": "Present ripple loading indicators and their motion states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "rippleLoader",
+            "recipeInStaging": true,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "decisions": [
+              "D39"
+            ]
+          }
+        }
+      },
+      "quietTrigger": {
+        "$description": "Provide a quiet disclosure trigger with hover and keyboard focus states.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "quietTrigger",
+            "recipeInStaging": true,
+            "states": [
+              "hover",
+              "focus-visible",
+              "focus"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "recipes-control": {
+        "$description": "Provide common control geometry and interactive treatment for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "recipes.control",
+            "recipeInStaging": true,
+            "states": [
+              "focus-visible",
+              "focus",
+              "active",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "sidebar-recipe-control": {
+        "$description": "Provide common control geometry and interactive treatment for the owning recipe.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "sidebar-recipe.control",
+            "recipeInStaging": true,
+            "states": [
+              "hover",
+              "focus",
+              "active",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Link": {
+        "$description": "Specify link control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.link.Link",
+            "recipeInStaging": false,
+            "variants": {
+              "prefetch": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "NovaLoader": {
+        "$description": "Specify nova loader control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.NovaLoader.NovaLoader",
+            "recipeInStaging": false,
+            "variants": {
+              "paused": [
+                "boolean"
+              ]
+            },
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "IconButton": {
+        "$description": "Specify icon button control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.IconButton",
+            "recipeInStaging": false,
+            "variants": {
+              "tooltip": [
+                "boolean"
+              ]
+            },
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "Loading": {
+        "$description": "Specify loading control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.foundation.Loading",
+            "recipeInStaging": false,
+            "states": [
+              "loading"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "RefreshButton": {
+        "$description": "Specify refresh button control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "client.pages.dashboard.DashboardView.RefreshButton",
+            "recipeInStaging": false,
+            "states": [
+              "loading",
+              "error"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    },
+    "chat": {
+      "ConnectionIndicator": {
+        "$description": "Specify connection indicator control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.connection-indicator.ConnectionIndicator",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      },
+      "DeliveryChip": {
+        "$description": "Specify delivery chip control affordances and interaction states if retained; single control or control indicator.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "components.chat.delivery-chip.DeliveryChip",
+            "recipeInStaging": false,
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
