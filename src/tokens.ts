@@ -17,7 +17,7 @@ export const color = {
   'action-blue-hover': '#779CFF',
   'success': '#8BB5A8',
   'golden-sand': '#C4AC7C',
-  'peach': '#E8B87A',
+  'peach-gold': '#E8B67A',
   'danger': '#C25B62',
   'danger-hover': '#C98589',
   'ready': '#8E96CC',

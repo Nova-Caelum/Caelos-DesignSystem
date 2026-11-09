@@ -369,25 +369,25 @@
           }
         }
       },
-      "peach": {
+      "peach-gold": {
         "$type": "color",
         "$value": {
           "colorSpace": "srgb",
           "components": [
             0.9098,
-            0.7216,
+            0.7137,
             0.4784
           ],
           "alpha": 1,
-          "hex": "#E8B87A"
+          "hex": "#E8B67A"
         },
-        "$description": "Peach (palette role peach)",
+        "$description": "Peach Gold (palette role peach-gold)",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "note": "Daniel decision pending: the palette image may read this colour slightly differently from the record. The chat app matches the record.",
-            "figmaName": "color/peach"
+            "note": "Canon set by Daniel on 2026-11-09: one value shared by the company and product palettes. Renamed from peach; was color/peach in Figma: rename that variable so its bindings survive.",
+            "figmaName": "color/peach-gold"
           }
         }
       },
