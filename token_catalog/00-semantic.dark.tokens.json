@@ -147,14 +147,14 @@
           }
         }
       },
-      "gold-accent": {
+      "golden-sand": {
         "$type": "color",
-        "$value": "{base.color.gold-accent}",
+        "$value": "{base.color.golden-sand}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
             "decision": "D47",
-            "figmaName": "color/gold"
+            "figmaName": "color/golden-sand"
           }
         }
       },
