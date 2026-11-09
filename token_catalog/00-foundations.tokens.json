@@ -51,11 +51,6 @@
             "why": "Used by the chat app, not in the palette record. Awaiting Daniel's call."
           },
           {
-            "item": "gold rename",
-            "ref": "Daniel",
-            "why": "The palette role is a CSS colour keyword. Held as gold-accent until Daniel picks the name."
-          },
-          {
             "item": "focus indicator",
             "ref": "G05, D25",
             "why": "Colour, width, offset and keyboard state are undecided. The sharp action-blue outline is rejected."
@@ -352,7 +347,7 @@
           }
         }
       },
-      "gold-accent": {
+      "golden-sand": {
         "$type": "color",
         "$value": {
           "colorSpace": "srgb",
@@ -364,13 +359,13 @@
           "alpha": 1,
           "hex": "#C4AC7C"
         },
-        "$description": "Gold (palette role gold)",
+        "$description": "Gold (palette role golden-sand)",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "note": "The palette role is named after a CSS colour keyword, which the palette check refuses as a key. Held as gold-accent until Daniel picks the rename.",
-            "figmaName": "color/gold"
+            "figmaName": "color/golden-sand",
+            "note": "Renamed from gold on 2026-11-09 (Daniel). Was color/gold in Figma: rename that variable so its bindings survive."
           }
         }
       },
