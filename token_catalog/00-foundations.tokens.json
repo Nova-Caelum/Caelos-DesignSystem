@@ -2158,6 +2158,34 @@
             }
           }
         }
+      },
+      "cloud": {
+        "duration": {
+          "$type": "duration",
+          "$value": {
+            "value": 320,
+            "unit": "ms"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "ease": {
+          "$type": "cubicBezier",
+          "$value": [
+            0.4,
+            0,
+            0.2,
+            1
+          ],
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        }
       }
     },
     "opacity": {
@@ -2222,6 +2250,98 @@
           "app.caelos": {
             "status": "provisional",
             "note": "Focus edge study; requires review in both themes."
+          }
+        }
+      },
+      "cloud": {
+        "body-alpha": {
+          "$type": "number",
+          "$value": 0.396078431372549,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-start-alpha": {
+          "$type": "number",
+          "$value": 0.043137254901960784,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-end-alpha": {
+          "$type": "number",
+          "$value": 0.023529411764705882,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-start-alpha": {
+          "$type": "number",
+          "$value": 0.22,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-end-alpha": {
+          "$type": "number",
+          "$value": 0.16,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-rest": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-hover": {
+          "$type": "number",
+          "$value": 0.22,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-focus": {
+          "$type": "number",
+          "$value": 1,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "disabled-alpha": {
+          "$type": "number",
+          "$value": 0.5,
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        }
+      },
+      "button-tint": {
+        "$type": "number",
+        "$value": 0.5,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
           }
         }
       }
@@ -2394,6 +2514,24 @@
               "decision": "D31",
               "note": "Full overlap, or no host measurement."
             }
+          }
+        }
+      },
+      "cloud-angle": {
+        "$type": "number",
+        "$value": 135,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
+      },
+      "underlay-order": {
+        "$type": "number",
+        "$value": -1,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
           }
         }
       }
