@@ -14,13 +14,13 @@ test('fields inherit every dark Cloud value, including the recovered state and m
     assert.equal(get('field-' + role),value);
   }
 });
-const rgb = hex => hex.slice(1).match(/../g).map(x => parseInt(x,16)/255);
+const channels = hex => hex.slice(1).match(/../g).map(x => parseInt(x,16)/255);
 const lum = color => color.map(v => v<=0.04045 ? v/12.92 : ((v+0.055)/1.055)**2.4).reduce((a,n,i) => a + n*[0.2126,0.7152,0.0722][i],0);
 test('normal primary ink stays cream and readable over every active tint', () => {
   assert.equal(get('button-foreground'), '#EDE3CF');
-  const bed = rgb(get('button-bed')), tint = parseFloat(get('button-tint'))/100;
+  const bed = channels(get('button-bed')), tint = parseFloat(get('button-tint'))/100;
   for (const state of ['default','hover','pressed','success']) {
-    const fill = rgb(get('button-'+state)).map((v,i) => v*tint+bed[i]*(1-tint));
-    assert.ok((lum(rgb(get('button-foreground')))+0.05)/(lum(fill)+0.05)>=4.5,state);
+    const fill = channels(get('button-'+state)).map((v,i) => v*tint+bed[i]*(1-tint));
+    assert.ok((lum(channels(get('button-foreground')))+0.05)/(lum(fill)+0.05)>=4.5,state);
   }
 });
