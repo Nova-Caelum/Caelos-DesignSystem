@@ -45,3 +45,15 @@ for mode in ['Dark', 'Light']:
 `], {encoding:'utf8'});
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
+
+test('node opacity bindings use percentages and other numeric variables retain their units', () => {
+  const result = spawnSync('python3', ['-c', `
+import runpy
+number = runpy.run_path('scripts/figma-catalog.py')['figma_number']
+for fraction, percent in [(0, 0), (0.15, 15), (0.24, 24), (1, 100)]:
+    assert number('base.opacity.scrollbar.rest', fraction) == percent
+assert number('base.size.scrollbar.thumb', {'value': 6, 'unit': 'px'}) == 6
+assert number('base.material.dark.base-alpha', 0.5) == 0.5
+`], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});

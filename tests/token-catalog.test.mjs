@@ -135,3 +135,22 @@ test('missing roles, invalid channels and opacity are refused', () => {
   const errors = validateColors(doc);
   for (const part of ['missing','color.chrome','color.top']) assert.ok(errors.some(m => m.includes(part)));
 });
+
+test('the icon glossary preserves distinct activity meanings and composer actions', () => {
+  const { glossary } = load('01-primitives.tokens.json').primitives.shared.icon.$extensions[EXT];
+  for (const rows of [glossary.conversation, glossary.composer]) {
+    assert.equal(new Set(rows.map(row => row.glyph)).size, rows.length);
+    assert.ok(rows.every(row => row.glyph && row.action && row.meaning));
+  }
+  const byAction = rows => Object.fromEntries(rows.map(row => [row.action, row.glyph]));
+  const conversation = byAction(glossary.conversation);
+  assert.equal(conversation['Thinking · reasoning'], 'Zap');
+  assert.equal(conversation['General action · Request suggestions'], 'Flame');
+  assert.equal(conversation['Reading the workspace brief'], 'Wrench');
+  assert.equal(conversation['Athena · checking spacing / Agent session'], 'Bot');
+  const composer = byAction(glossary.composer);
+  assert.equal(composer['Model settings'], 'Brain');
+  assert.equal(composer['Live Conversation Mode'], 'AudioLines');
+  assert.equal(composer['Send message'], 'ArrowUp');
+  assert.equal(composer['Stop response / live conversation'], 'Square');
+});

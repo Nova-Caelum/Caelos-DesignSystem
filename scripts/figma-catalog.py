@@ -35,6 +35,14 @@ def float32(value):
     return struct.unpack("!f", struct.pack("!f", value))[0]
 
 
+def figma_number(path, value):
+    number = value["value"] if isinstance(value, dict) else value
+    # Figma node opacity binds in percent. Catalog opacities are fractions.
+    if path.startswith("base.opacity."):
+        number *= 100
+    return float32(number)
+
+
 def palette_caption(path, token, mode):
     if token["$type"] != "color":
         return None
@@ -77,7 +85,7 @@ def compile_catalog(revision):
             elif kind == "cubicBezier":
                 value = ",".join(str(x) for x in value)
             elif vt == "FLOAT":
-                value = float32(value["value"] if isinstance(value, dict) else value)
+                value = figma_number(path, value)
             row = rows[group].setdefault(name, {"name":name,"type":vt,"values":{}})
             if mode in row["values"] or row["type"] != vt:
                 raise ValueError("Conflicting variables at " + name)

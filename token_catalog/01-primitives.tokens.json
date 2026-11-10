@@ -4,7 +4,26 @@
     "$extensions": {
       "app.caelos": {
         "tier": 1,
-        "open": []
+        "open": [
+          {
+            "item": "Focus treatment",
+            "ref": "D25, G05",
+            "why": "Focus changes text or icon ink and adds a glow at the surface edge. Foreground and glow roles by theme still require visual review."
+          },
+          {
+            "item": "Separator fade",
+            "why": "Thickness has a foundation alias. Ink and fade stops for both orientations still need named roles."
+          },
+          {
+            "item": "Dark scrollbar",
+            "ref": "D42",
+            "why": "Structural Violet is the light thumb. Dark atmospheric violet needs its own palette role."
+          },
+          {
+            "item": "Surface and type coverage",
+            "why": "Plain surface layers and core text metrics have aliases. Graph, glass, texture modes and the complete role and tone mappings await rendered review."
+          }
+        ]
       }
     },
     "shared": {
@@ -50,7 +69,7 @@
         "$description": "Apply semantic heading, body, metadata and code typography.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "typography",
             "recipeInStaging": true,
             "variants": {
@@ -82,13 +101,138 @@
               "reduced-transparency"
             ]
           }
+        },
+        "size": {
+          "label": {
+            "$type": "dimension",
+            "$value": "{base.type.size.label}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "body": {
+            "$type": "dimension",
+            "$value": "{base.type.size.body}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "title": {
+            "$type": "dimension",
+            "$value": "{base.type.size.title}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          }
+        },
+        "line": {
+          "label": {
+            "$type": "dimension",
+            "$value": "{base.type.line.label}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "body": {
+            "$type": "dimension",
+            "$value": "{base.type.line.body}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "title": {
+            "$type": "dimension",
+            "$value": "{base.type.line.title}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          }
+        },
+        "family": {
+          "ui": {
+            "$type": "fontFamily",
+            "$value": "{base.type.family.ui}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "mono": {
+            "$type": "fontFamily",
+            "$value": "{base.type.family.mono}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "display": {
+            "$type": "fontFamily",
+            "$value": "{base.type.family.display}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
+        },
+        "tone": {
+          "default": {
+            "$type": "color",
+            "$value": "{sys.color.text-primary}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "muted": {
+            "$type": "color",
+            "$value": "{sys.color.text-supporting}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "dim": {
+            "$type": "color",
+            "$value": "{sys.color.text-tertiary}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "accent": {
+            "$type": "color",
+            "$value": "{sys.color.action-blue}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
         }
       },
       "foundation": {
         "$description": "Inventory the mixed primitive, control and toast styling currently grouped by kind.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "foundation",
             "recipeInStaging": true,
             "variants": {
@@ -128,6 +272,17 @@
               "reduced-motion",
               "reduced-transparency"
             ]
+          }
+        },
+        "separator": {
+          "thickness": {
+            "$type": "dimension",
+            "$value": "{base.border.hairline}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
           }
         }
       },
@@ -220,13 +375,22 @@
               "decision": "D42"
             }
           }
+        },
+        "light-ink": {
+          "$type": "color",
+          "$value": "{sys.color.structural-violet}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
         }
       },
       "spacing": {
         "$description": "Express layout density and relationships for stacks, groups, grids and sections.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "spacing",
             "recipeInStaging": true,
             "variants": {
@@ -263,13 +427,89 @@
               "D13"
             ]
           }
+        },
+        "stack": {
+          "$type": "dimension",
+          "$value": "{sys.space.stack}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "inline-cluster": {
+          "$type": "dimension",
+          "$value": "{sys.space.inline-cluster}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "field-group": {
+          "compact": {
+            "$type": "dimension",
+            "$value": "{sys.space.field-group.compact}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "default": {
+            "$type": "dimension",
+            "$value": "{sys.space.field-group.default}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "comfortable": {
+            "$type": "dimension",
+            "$value": "{sys.space.field-group.comfortable}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
+        },
+        "inset": {
+          "compact": {
+            "$type": "dimension",
+            "$value": "{sys.space.inset.compact}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "default": {
+            "$type": "dimension",
+            "$value": "{sys.space.inset.default}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "comfortable": {
+            "$type": "dimension",
+            "$value": "{sys.space.inset.comfortable}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
         }
       },
       "surface": {
         "$description": "Apply material layers, glass and graph surface treatments.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "surface",
             "recipeInStaging": true,
             "variants": {
@@ -300,6 +540,62 @@
             "decisions": [
               "D29"
             ]
+          }
+        },
+        "layer": {
+          "chrome": {
+            "$type": "color",
+            "$value": "{sys.color.chrome}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "ground": {
+            "$type": "color",
+            "$value": "{sys.color.ground}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "elevated": {
+            "$type": "color",
+            "$value": "{sys.color.elevated}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "elevated-2": {
+            "$type": "color",
+            "$value": "{sys.color.elevated-2}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "top": {
+            "$type": "color",
+            "$value": "{sys.color.top}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
+        },
+        "card-radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.xl}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
           }
         }
       },
@@ -524,7 +820,7 @@
         "$description": "Provide shared icon geometry for interaction controls.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "icon",
             "recipeInStaging": true,
             "modes": [
@@ -532,7 +828,292 @@
               "light",
               "reduced-motion",
               "reduced-transparency"
-            ]
+            ],
+            "glossary": {
+              "library": "lucide-react",
+              "version": "0.487.0",
+              "conversation": [
+                {
+                  "glyph": "Zap",
+                  "action": "Thinking · reasoning",
+                  "meaning": "Approved thinking symbol."
+                },
+                {
+                  "glyph": "Flame",
+                  "action": "General action · Request suggestions",
+                  "meaning": "Approved general-action symbol when no more specific action applies."
+                },
+                {
+                  "glyph": "Wrench",
+                  "action": "Reading the workspace brief",
+                  "meaning": "Tool action in the activity chain. The verb identifies what the tool does."
+                },
+                {
+                  "glyph": "Bot",
+                  "action": "Athena · checking spacing / Agent session",
+                  "meaning": "Delegated activity and its session preview."
+                },
+                {
+                  "glyph": "FileText",
+                  "action": "Document · Read document · PDF",
+                  "meaning": "Document preview, filename strip, attachment, and exit editing."
+                },
+                {
+                  "glyph": "Globe",
+                  "action": "Web preview",
+                  "meaning": "Web section header."
+                },
+                {
+                  "glyph": "ChevronDown",
+                  "action": "3 steps · Document · Web preview",
+                  "meaning": "Open or close disclosure; rotates on expansion."
+                },
+                {
+                  "glyph": "ChevronRight",
+                  "action": "Action detail · Next question · Show document tools",
+                  "meaning": "Expand detail or move forward, depending on the labelled control."
+                },
+                {
+                  "glyph": "ChevronLeft",
+                  "action": "Previous question",
+                  "meaning": "Return to an earlier question."
+                },
+                {
+                  "glyph": "ChevronsRight",
+                  "action": "Collapse document tools",
+                  "meaning": "Hide the expanded toolbar."
+                },
+                {
+                  "glyph": "Maximize2",
+                  "action": "Expand preview · Full screen editor",
+                  "meaning": "Open a reading workspace or enlarge it."
+                },
+                {
+                  "glyph": "Minimize2",
+                  "action": "Exit full screen",
+                  "meaning": "Return to the side panel."
+                },
+                {
+                  "glyph": "PanelLeft",
+                  "action": "Toggle left side panel",
+                  "meaning": "One generic mark for the left-hand panel. Approved mapping 2026-09-20: the open and close states share this icon and this label; the panel’s own state says which way it will go, so the icon never changes."
+                },
+                {
+                  "glyph": "PanelRight",
+                  "action": "Toggle right side panel",
+                  "meaning": "One generic mark for the right-hand panel (the artifact workspace). Approved mapping 2026-09-20: the open and close states share this icon and this label."
+                },
+                {
+                  "glyph": "Pencil",
+                  "action": "Edit message · Edit document",
+                  "meaning": "Enter editing."
+                },
+                {
+                  "glyph": "Check",
+                  "action": "Save message · Selected answer",
+                  "meaning": "Confirm an edit or identify an answered choice. Not used on Allow."
+                },
+                {
+                  "glyph": "Copy",
+                  "action": "Copy response / message / code / document / path / URL",
+                  "meaning": "Copies the object named in the tooltip."
+                },
+                {
+                  "glyph": "Download",
+                  "action": "Download preview · Export review",
+                  "meaning": "Save the fixture document or review file."
+                },
+                {
+                  "glyph": "Undo2",
+                  "action": "Undo",
+                  "meaning": "Previous local document version."
+                },
+                {
+                  "glyph": "Redo2",
+                  "action": "Redo",
+                  "meaning": "Next local document version."
+                },
+                {
+                  "glyph": "RotateCcw",
+                  "action": "Retry upload / response · Revert document · Reset examples",
+                  "meaning": "Retry failures, restore the original document, or reset a study; tooltip makes the action explicit."
+                },
+                {
+                  "glyph": "ThumbsUp",
+                  "action": "Good response",
+                  "meaning": "Positive response feedback."
+                },
+                {
+                  "glyph": "ThumbsDown",
+                  "action": "Poor response",
+                  "meaning": "Negative response feedback."
+                },
+                {
+                  "glyph": "ArrowUpRight",
+                  "action": "Workspace guide · Spacing reference",
+                  "meaning": "External source chip opens a new tab."
+                },
+                {
+                  "glyph": "ArrowDown",
+                  "action": "Jump to latest",
+                  "meaning": "Finished work below the current scroll position."
+                },
+                {
+                  "glyph": "X",
+                  "action": "Upload interrupted",
+                  "meaning": "Failed file indicator. Not used on Deny."
+                },
+                {
+                  "glyph": "Play",
+                  "action": "Play",
+                  "meaning": "Start or resume the study timeline."
+                },
+                {
+                  "glyph": "Pause",
+                  "action": "Pause",
+                  "meaning": "Pause the study timeline."
+                }
+              ],
+              "composer": [
+                {
+                  "glyph": "Plus",
+                  "action": "Add to conversation",
+                  "meaning": "Opens the addition menu."
+                },
+                {
+                  "glyph": "Folder",
+                  "action": "File or folder",
+                  "meaning": "Addition menu."
+                },
+                {
+                  "glyph": "Bot",
+                  "action": "Agent",
+                  "meaning": "Addition menu."
+                },
+                {
+                  "glyph": "Goal",
+                  "action": "Goal",
+                  "meaning": "Addition menu and goal context pill."
+                },
+                {
+                  "glyph": "FileText",
+                  "action": "Session instruction",
+                  "meaning": "Addition menu and instruction context pill."
+                },
+                {
+                  "glyph": "Mic",
+                  "action": "Dictate a message",
+                  "meaning": "Composer toolbar."
+                },
+                {
+                  "glyph": "Brain",
+                  "action": "Model settings",
+                  "meaning": "Agent, model and reasoning controls."
+                },
+                {
+                  "glyph": "MessageSquare",
+                  "action": "Text",
+                  "meaning": "Reply format: text only."
+                },
+                {
+                  "glyph": "Volume2",
+                  "action": "Voice",
+                  "meaning": "Reply format: voice only."
+                },
+                {
+                  "glyph": "Captions",
+                  "action": "Text + voice",
+                  "meaning": "Reply format: both."
+                },
+                {
+                  "glyph": "AudioLines",
+                  "action": "Live Conversation Mode",
+                  "meaning": "Primary action when the composer is empty."
+                },
+                {
+                  "glyph": "ArrowUp",
+                  "action": "Send message",
+                  "meaning": "Primary action when ready to submit."
+                },
+                {
+                  "glyph": "Square",
+                  "action": "Stop response / live conversation",
+                  "meaning": "Replaces the primary action while active."
+                },
+                {
+                  "glyph": "KeyRound",
+                  "action": "Conversation permissions",
+                  "meaning": "Permission selector above the writing surface."
+                },
+                {
+                  "glyph": "Check",
+                  "action": "Selected option",
+                  "meaning": "Choice menu selection indicator."
+                },
+                {
+                  "glyph": "X",
+                  "action": "Remove goal / instruction",
+                  "meaning": "Context pill remove control."
+                }
+              ],
+              "harnesses": [
+                {
+                  "glyph": "Hermes",
+                  "action": "Hermes agent"
+                },
+                {
+                  "glyph": "ClaudeCode",
+                  "action": "Claude Code"
+                },
+                {
+                  "glyph": "Codex",
+                  "action": "Codex"
+                }
+              ],
+              "statusReferences": [
+                {
+                  "component": "RippleLoader",
+                  "action": "Working · Waiting · Uploading"
+                },
+                {
+                  "component": "NovaLoader",
+                  "action": "Generating document · Working below"
+                }
+              ],
+              "textOnly": [
+                "Deny",
+                "Clarify",
+                "Allow"
+              ],
+              "harnessStatus": "Foundry review drafts"
+            }
+          }
+        },
+        "ink": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "size": {
+          "$type": "dimension",
+          "$value": "{base.size.icon}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "picker-size": {
+          "$type": "dimension",
+          "$value": "{base.size.glyph.17}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
           }
         }
       },
