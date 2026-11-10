@@ -229,7 +229,7 @@
             "figmaName": "color/structural-violet"
           }
         },
-        "$description": "Light scrollbar, rules and connectors"
+        "$description": "Scrollbar thumb in both themes, rules and connectors"
       }
     },
     "space": {
