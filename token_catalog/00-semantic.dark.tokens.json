@@ -587,7 +587,7 @@
       "panel": {
         "base-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-24}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -607,7 +607,7 @@
         },
         "tint": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-14}",
+          "$value": "{base.opacity.fraction-0-15}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -629,7 +629,7 @@
       "menu": {
         "base-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-24}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -649,7 +649,7 @@
         },
         "tint": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-14}",
+          "$value": "{base.opacity.fraction-0-15}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",

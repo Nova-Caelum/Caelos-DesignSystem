@@ -10,7 +10,7 @@ test('fields inherit every dark Cloud value, including the recovered state and m
   assert.equal(parseFloat(get('field-angle')), 135);
   assert.equal(parseFloat(get('field-duration')), 320);
   assert.equal(parseFloat(get('field-reduced-duration')), 0);
-  for (const [role, value] of Object.entries({'wash-rest':'0', 'wash-hover':'0.22', 'wash-focus':'1', 'disabled-alpha':'0.5'})) {
+  for (const [role, value] of Object.entries({'wash-rest':'0', 'wash-hover':'0.23', 'wash-focus':'1', 'disabled-alpha':'0.5'})) {
     assert.equal(get('field-' + role),value);
   }
 });

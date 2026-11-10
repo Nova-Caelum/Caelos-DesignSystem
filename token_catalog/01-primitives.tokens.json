@@ -398,7 +398,7 @@
         },
         "opacity-drag": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-24}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -1537,7 +1537,7 @@
         },
         "glow-opacity": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-24}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2150,7 +2150,7 @@
         },
         "wash-start-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-22}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2159,7 +2159,7 @@
         },
         "wash-end-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-16}",
+          "$value": "{base.opacity.fraction-0-15}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2177,7 +2177,7 @@
         },
         "wash-hover": {
           "$type": "number",
-          "$value": "{base.opacity.fraction-0-22}",
+          "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"

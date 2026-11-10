@@ -180,7 +180,7 @@
                 }
               }
             ],
-            "displayName": "Ink Indigo — ground"
+            "displayName": "Ink Indigo \u2014 ground"
           }
         }
       },
@@ -348,7 +348,7 @@
                 }
               }
             ],
-            "displayName": "DawnCream2 — primary text",
+            "displayName": "DawnCream2 \u2014 primary text",
             "displayNameSource": "Daniel approved DawnCream2 to distinguish the product primary-text colour from company Dawn Cream; see the respective palette records."
           }
         }
@@ -517,7 +517,7 @@
                 }
               }
             ],
-            "displayName": "Action Blue — primary action"
+            "displayName": "Action Blue \u2014 primary action"
           }
         }
       },
@@ -559,7 +559,7 @@
                 }
               }
             ],
-            "displayName": "Action Blue hover — hover / focused ink"
+            "displayName": "Action Blue hover \u2014 hover / focused ink"
           }
         }
       },
@@ -601,7 +601,7 @@
                 }
               }
             ],
-            "displayName": "Sage / Sea Green — success"
+            "displayName": "Sage / Sea Green \u2014 success"
           }
         }
       },
@@ -645,7 +645,7 @@
                 }
               }
             ],
-            "displayName": "Golden Sand — emphasis"
+            "displayName": "Golden Sand \u2014 emphasis"
           }
         }
       },
@@ -689,7 +689,7 @@
                 }
               }
             ],
-            "displayName": "Peach Gold — attention / progress"
+            "displayName": "Peach Gold \u2014 attention / progress"
           }
         }
       },
@@ -731,7 +731,7 @@
                 }
               }
             ],
-            "displayName": "Danger Red — danger"
+            "displayName": "Danger Red \u2014 danger"
           }
         }
       },
@@ -775,7 +775,7 @@
                 }
               }
             ],
-            "displayName": "Danger Red hover — danger hover"
+            "displayName": "Danger Red hover \u2014 danger hover"
           }
         }
       },
@@ -817,7 +817,7 @@
                 }
               }
             ],
-            "displayName": "Ready Lavender — ready"
+            "displayName": "Ready Lavender \u2014 ready"
           }
         }
       },
@@ -861,7 +861,7 @@
                 }
               }
             ],
-            "displayName": "Dawn light ground — light ground"
+            "displayName": "Dawn light ground \u2014 light ground"
           }
         }
       },
@@ -905,7 +905,7 @@
                 }
               }
             ],
-            "displayName": "Structural Violet — structural accents"
+            "displayName": "Structural Violet \u2014 structural accents"
           }
         }
       }
@@ -4919,13 +4919,17 @@
         "$extensions": {
           "app.caelos": {
             "status": "canon",
-            "decision": "D42",
-            "note": "Rest and hover.",
+            "decision": "Daniel approval \u00b7 2026-11-10 \u00b7 opacity consolidation",
+            "note": "Approved shared foundation value. Historical application evidence remains in provenance; consuming recipe review status is unchanged.",
             "formerPaths": [
-              "base.opacity.scrollbar.rest"
+              "base.opacity.scrollbar.rest",
+              "base.material.dark.tint",
+              "base.opacity.cloud.wash-end-alpha"
             ],
             "figmaPreviousNames": [
-              "base/opacity/scrollbar/rest"
+              "base/opacity/scrollbar/rest",
+              "opacity/fraction-0-14",
+              "opacity/fraction-0-16"
             ],
             "figmaName": "opacity/fraction-0-15",
             "family": "base.opacity",
@@ -4938,57 +4942,43 @@
                   "decision": "D42",
                   "note": "Rest and hover."
                 }
-              }
-            ]
-          }
-        },
-        "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
-      },
-      "fraction-0-24": {
-        "$type": "number",
-        "$value": 0.24,
-        "$extensions": {
-          "app.caelos": {
-            "status": "provisional",
-            "decision": "D42; Unrecorded; D29",
-            "formerPaths": [
-              "base.opacity.scrollbar.drag",
-              "base.opacity.focus-glow",
-              "base.material.dark.base-alpha"
-            ],
-            "figmaPreviousNames": [
-              "base/opacity/scrollbar/drag",
-              "base/opacity/focus-glow",
-              "base/material/dark/base-alpha"
-            ],
-            "figmaName": "opacity/fraction-0-24",
-            "family": "base.opacity",
-            "provenance": [
+              },
               {
-                "path": "base.opacity.scrollbar.drag",
+                "path": "base.material.dark.tint",
                 "description": "",
                 "record": {
                   "status": "canon",
-                  "decision": "D42"
+                  "decision": "D29",
+                  "note": "Violet tint strength."
                 }
               },
               {
-                "path": "base.opacity.focus-glow",
+                "path": "base.opacity.cloud.wash-end-alpha",
                 "description": "",
                 "record": {
-                  "status": "provisional",
-                  "note": "Focus edge study; requires review in both themes."
-                }
-              },
-              {
-                "path": "base.material.dark.base-alpha",
-                "description": "",
-                "record": {
-                  "status": "canon",
-                  "decision": "D29"
+                  "status": "provisional"
                 }
               }
-            ]
+            ],
+            "consolidation": {
+              "date": "2026-11-10",
+              "approvedBy": "Daniel",
+              "originals": [
+                {
+                  "path": "base.opacity.fraction-0-15",
+                  "value": 0.15
+                },
+                {
+                  "path": "base.opacity.fraction-0-14",
+                  "value": 0.14
+                },
+                {
+                  "path": "base.opacity.fraction-0-16",
+                  "value": 0.16
+                }
+              ],
+              "reason": "Consolidate adjacent opacity values into one reusable foundation."
+            }
           }
         },
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
@@ -5174,71 +5164,6 @@
         },
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
       },
-      "fraction-0-22": {
-        "$type": "number",
-        "$value": 0.22,
-        "$extensions": {
-          "app.caelos": {
-            "status": "provisional",
-            "formerPaths": [
-              "base.opacity.cloud.wash-start-alpha",
-              "base.opacity.cloud.wash-hover"
-            ],
-            "figmaPreviousNames": [
-              "base/opacity/cloud/wash-start-alpha",
-              "base/opacity/cloud/wash-hover"
-            ],
-            "figmaName": "opacity/fraction-0-22",
-            "family": "base.opacity",
-            "provenance": [
-              {
-                "path": "base.opacity.cloud.wash-start-alpha",
-                "description": "",
-                "record": {
-                  "status": "provisional"
-                }
-              },
-              {
-                "path": "base.opacity.cloud.wash-hover",
-                "description": "",
-                "record": {
-                  "status": "provisional"
-                }
-              }
-            ],
-            "decision": "Unrecorded"
-          }
-        },
-        "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
-      },
-      "fraction-0-16": {
-        "$type": "number",
-        "$value": 0.16,
-        "$extensions": {
-          "app.caelos": {
-            "status": "provisional",
-            "formerPaths": [
-              "base.opacity.cloud.wash-end-alpha"
-            ],
-            "figmaPreviousNames": [
-              "base/opacity/cloud/wash-end-alpha"
-            ],
-            "figmaName": "opacity/fraction-0-16",
-            "family": "base.opacity",
-            "provenance": [
-              {
-                "path": "base.opacity.cloud.wash-end-alpha",
-                "description": "",
-                "record": {
-                  "status": "provisional"
-                }
-              }
-            ],
-            "decision": "Unrecorded"
-          }
-        },
-        "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
-      },
       "fraction-0": {
         "$type": "number",
         "$value": 0,
@@ -5304,37 +5229,6 @@
         },
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
       },
-      "fraction-0-14": {
-        "$type": "number",
-        "$value": 0.14,
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "D29",
-            "note": "Violet tint strength.",
-            "formerPaths": [
-              "base.material.dark.tint"
-            ],
-            "figmaPreviousNames": [
-              "base/material/dark/tint"
-            ],
-            "figmaName": "opacity/fraction-0-14",
-            "family": "base.opacity",
-            "provenance": [
-              {
-                "path": "base.material.dark.tint",
-                "description": "",
-                "record": {
-                  "status": "canon",
-                  "decision": "D29",
-                  "note": "Violet tint strength."
-                }
-              }
-            ]
-          }
-        },
-        "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
-      },
       "fraction-0-76": {
         "$type": "number",
         "$value": 0.76,
@@ -5370,13 +5264,23 @@
         "$extensions": {
           "app.caelos": {
             "status": "canon",
-            "decision": "D29",
-            "note": "Violet tint strength.",
+            "decision": "Daniel approval \u00b7 2026-11-10 \u00b7 opacity consolidation",
+            "note": "Approved shared foundation value. Historical application evidence remains in provenance; consuming recipe review status is unchanged.",
             "formerPaths": [
-              "base.material.light.tint"
+              "base.material.light.tint",
+              "base.opacity.cloud.wash-start-alpha",
+              "base.opacity.cloud.wash-hover",
+              "base.opacity.scrollbar.drag",
+              "base.opacity.focus-glow",
+              "base.material.dark.base-alpha"
             ],
             "figmaPreviousNames": [
-              "base/material/light/tint"
+              "base/material/light/tint",
+              "opacity/fraction-0-22",
+              "base/opacity/cloud/wash-hover",
+              "opacity/fraction-0-24",
+              "base/opacity/focus-glow",
+              "base/material/dark/base-alpha"
             ],
             "figmaName": "opacity/fraction-0-23",
             "family": "base.opacity",
@@ -5389,8 +5293,65 @@
                   "decision": "D29",
                   "note": "Violet tint strength."
                 }
+              },
+              {
+                "path": "base.opacity.cloud.wash-start-alpha",
+                "description": "",
+                "record": {
+                  "status": "provisional"
+                }
+              },
+              {
+                "path": "base.opacity.cloud.wash-hover",
+                "description": "",
+                "record": {
+                  "status": "provisional"
+                }
+              },
+              {
+                "path": "base.opacity.scrollbar.drag",
+                "description": "",
+                "record": {
+                  "status": "canon",
+                  "decision": "D42"
+                }
+              },
+              {
+                "path": "base.opacity.focus-glow",
+                "description": "",
+                "record": {
+                  "status": "provisional",
+                  "note": "Focus edge study; requires review in both themes."
+                }
+              },
+              {
+                "path": "base.material.dark.base-alpha",
+                "description": "",
+                "record": {
+                  "status": "canon",
+                  "decision": "D29"
+                }
               }
-            ]
+            ],
+            "consolidation": {
+              "date": "2026-11-10",
+              "approvedBy": "Daniel",
+              "originals": [
+                {
+                  "path": "base.opacity.fraction-0-23",
+                  "value": 0.23
+                },
+                {
+                  "path": "base.opacity.fraction-0-22",
+                  "value": 0.22
+                },
+                {
+                  "path": "base.opacity.fraction-0-24",
+                  "value": 0.24
+                }
+              ],
+              "reason": "Consolidate adjacent opacity values into one reusable foundation."
+            }
           }
         },
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
