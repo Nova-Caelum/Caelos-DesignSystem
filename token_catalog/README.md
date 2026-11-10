@@ -1,6 +1,6 @@
 # Token catalog
 
-The source of truth for every Caelos design token, one file per tier, in the Design Tokens format (DTCG 2025.10). A change starts here. The Figma library and the runtime package are built from these files and are never edited by hand.
+The source of truth for every Caelos design token, one file per tier, in the Design Tokens format (DTCG 2025.10). Product colours start in the product palette record. Each foundation colour declares its palette role and follows its value. All other values start in this catalog. Decisions come from the decision ledger.
 
 | File | Root | Holds |
 |---|---|---|
@@ -49,5 +49,12 @@ Tiers were assigned from source folders and names, and are unverified. 54 produc
 ## Not here yet
 
 - Tiers 6 (regions) and 7 (screens).
-- The sync that populates the Figma library from this catalog.
 - The build that turns this catalog into the package Caelos apps install.
+
+## Sync the merged catalog to Figma
+
+A signed-in Codex client with the Figma connector and edit access runs the sync. Set `CAELOS_FIGMA_FILE` locally to the destination file key. Set `CODEX_BIN` if the executable is outside PATH. Keep these settings outside the repository.
+
+Run `python3 scripts/figma-catalog.py watch` on the signed-in host. It fetches main at startup and every minute, applies each newly observed main revision and reads back all three collections. The host must be awake and connected. For a single update use `sync`. For a read-only comparison use `check`. A one-shot command exits 0 for identical collections, 1 for differences and 2 if verification could not run.
+
+The comparison includes legacy variables, mode names, values and collection-qualified alias targets. Variables without counterparts remain intact for binding review. A Figma default in a catalog role with no Light decision is reported as drift. The sync does not publish library updates to downstream design files.

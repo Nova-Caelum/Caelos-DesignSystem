@@ -1,0 +1,11 @@
+{
+  "name": "caelos-design-system-catalog",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "husky": "9.1.7"
+  }
+}

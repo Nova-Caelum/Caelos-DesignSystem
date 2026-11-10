@@ -123,6 +123,357 @@
           }
         }
       }
+    },
+    "space": {
+      "field-interior": {
+        "$type": "dimension",
+        "$value": "{base.space.field-interior}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D12",
+            "figmaName": "layout/field-interior"
+          }
+        }
+      },
+      "field-group": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-07}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/field-group/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D04",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "inset": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-07}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/inset/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D07",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "section-stack": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-09}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03).",
+              "figmaName": "layout/section-stack/default"
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-10}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D05",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "section-intro": {
+        "compact": {
+          "$type": "dimension",
+          "$value": "{base.space.step-04}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "default": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        },
+        "comfortable": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D06",
+              "note": "Relationship name from the decision; the exact string awaits review (G03)."
+            }
+          }
+        }
+      },
+      "title-description": {
+        "$type": "dimension",
+        "$value": "{base.space.step-02}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D06",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "inline-cluster": {
+        "$type": "dimension",
+        "$value": "{base.space.step-03}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D08",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "action-row": {
+        "$type": "dimension",
+        "$value": "{base.space.step-03}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D09",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "stack": {
+        "$type": "dimension",
+        "$value": "{base.space.step-04}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D11",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "grid-gap": {
+        "$type": "dimension",
+        "$value": "{base.space.step-08}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D10",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "grid-column-min": {
+        "$type": "dimension",
+        "$value": "{base.layout.grid-column-min}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D10",
+            "note": "Relationship name from the decision; the exact string awaits review (G03)."
+          }
+        }
+      },
+      "header": {
+        "leading-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "trailing-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-04}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "content-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "expanded-avatar-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-10}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "vertical-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
+            }
+          }
+        }
+      },
+      "alert": {
+        "padding-top": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "padding-inline": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "padding-bottom": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "icon-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        }
+      },
+      "dock": {
+        "viewport-floor": {
+          "$type": "dimension",
+          "$value": "{base.space.step-01}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D54"
+            }
+          }
+        }
+      },
+      "question": {
+        "answer-label-pad": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Question answer label aligned to the title axis.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D64"
+            }
+          }
+        }
+      }
     }
   }
 }

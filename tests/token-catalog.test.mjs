@@ -99,3 +99,39 @@ test('every token has a type and a status', () => {
     }
   }
 });
+
+import { compareTokens, parseCatalogColors, parsePalette, parseTokens } from '../scripts/check-palette.mjs';
+
+const foundationFile = '00-foundations.tokens.json';
+function expectedPalette() {
+  if (process.env.CAELOS_PRODUCT_PALETTE) {
+    return parsePalette(readFileSync(process.env.CAELOS_PRODUCT_PALETTE, 'utf8'));
+  }
+  // The protected workflow separately compares this public mirror and the catalog
+  // directly to the private product record, without running candidate code.
+  const mirror = parseTokens(readFileSync(path.join(DIR, '..', 'src', 'tokens.ts'), 'utf8'));
+  assert.deepEqual(mirror.problems, []);
+  return {roles:new Map([...mirror.roles].map(([role, entry]) => [role, entry.hex]))};
+}
+const validateColors = doc => compareTokens(parseCatalogColors(JSON.stringify(doc)), expectedPalette());
+
+test('every foundation colour matches its own product palette role', () => {
+  assert.deepEqual(validateColors(load(foundationFile)), []);
+});
+
+test('another legal palette colour cannot stand in for the declared role', () => {
+  const doc = load(foundationFile);
+  doc.base.color.ground.$value = doc.base.color.chrome.$value;
+  assert.ok(validateColors(doc).some(m => m.includes("role 'ground'")));
+  doc.base.color.ground.$extensions[EXT].paletteRole = 'chrome';
+  assert.ok(validateColors(doc).some(m => m.includes('own palette role')));
+});
+
+test('missing roles, invalid channels and opacity are refused', () => {
+  const doc = load(foundationFile);
+  delete doc.base.color.ground;
+  doc.base.color.chrome.$value.alpha = 0;
+  doc.base.color.top.$value.components = [];
+  const errors = validateColors(doc);
+  for (const part of ['missing','color.chrome','color.top']) assert.ok(errors.some(m => m.includes(part)));
+});
