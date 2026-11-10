@@ -1117,7 +1117,39 @@
                 "Clarify",
                 "Allow"
               ],
-              "harnessStatus": "Foundry review drafts"
+              "harnessStatus": "Foundry review drafts",
+              "providersAndFrameworks": [
+                {
+                  "glyph": "Claude",
+                  "action": "Claude",
+                  "meaning": "Anthropic chat assistant",
+                  "source": "assets/brands/claude.svg"
+                },
+                {
+                  "glyph": "ChatGPT",
+                  "action": "ChatGPT",
+                  "meaning": "OpenAI chat assistant",
+                  "source": "assets/brands/chatgpt.svg"
+                },
+                {
+                  "glyph": "OpenRouter",
+                  "action": "OpenRouter",
+                  "meaning": "Model routing service",
+                  "source": "assets/brands/openrouter.svg"
+                },
+                {
+                  "glyph": "PydanticGraph",
+                  "action": "Pydantic Graph",
+                  "meaning": "Typed workflow graph",
+                  "source": "assets/brands/pydantic.svg"
+                },
+                {
+                  "glyph": "PydanticAgent",
+                  "action": "Pydantic Agent",
+                  "meaning": "Agent built with Pydantic AI",
+                  "source": "assets/brands/pydantic.svg"
+                }
+              ]
             }
           }
         },

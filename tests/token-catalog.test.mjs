@@ -170,3 +170,21 @@ test('focused ink follows the palette hover role in each theme', () => {
     assert.equal(ink?.$value, '{base.color.action-blue-hover}');
   }
 });
+
+test('provider and framework glyphs resolve to their own monochrome artwork', () => {
+  const { glossary } = load('01-primitives.tokens.json').primitives.shared.icon.$extensions[EXT];
+  const marks = glossary.providersAndFrameworks;
+  for (const [glyph, artwork] of Object.entries({
+    Claude: 'claude', ChatGPT: 'chatgpt', OpenRouter: 'openrouter',
+    PydanticGraph: 'pydantic', PydanticAgent: 'pydantic',
+  })) {
+    const rows = marks.filter(row => row.glyph === glyph);
+    assert.equal(rows.length, 1, glyph);
+    assert.equal(rows[0].source, `assets/brands/${artwork}.svg`);
+    assert.ok(rows[0].action && rows[0].meaning);
+    const svg = readFileSync(path.join(DIR, '..', rows[0].source), 'utf8');
+    assert.match(svg, /fill="currentColor"/);
+    assert.doesNotMatch(svg, /(?:fill|stroke)="#/);
+    assert.ok(!glossary.harnesses.some(row => row.glyph === glyph));
+  }
+});
