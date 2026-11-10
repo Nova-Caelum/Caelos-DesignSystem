@@ -576,7 +576,8 @@
                 "graph",
                 "glass",
                 "portal",
-                "sage"
+                "sage",
+                "cloud"
               ]
             },
             "defaultVariants": {
@@ -609,6 +610,11 @@
               "clearToken": "primitives.shared.glass.overlap-clear",
               "coveredToken": "primitives.shared.glass.overlap-covered",
               "behavior": "The host sets measured overlap on this surface. Interpolate blur and saturation, preserve body opacity and tint. Without a measurement, use full filtering. Reduced transparency stays opaque."
+            },
+            "cloud": {
+              "theme": "dark",
+              "recipe": "primitives.shared.cloud",
+              "recovery": "Foundry body, resting ramp and active wash. Ready Lavender replaces the retired resting lavender stop."
             }
           }
         },
@@ -665,6 +671,80 @@
           "$extensions": {
             "app.caelos": {
               "status": "canon"
+            }
+          }
+        },
+        "button": {
+          "tint": {
+            "$type": "number",
+            "$value": "{base.opacity.button-tint}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "bed": {
+            "$type": "color",
+            "$value": "{sys.color.ground}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "default": {
+            "$type": "color",
+            "$value": "{sys.color.action-blue}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "hover": {
+            "$type": "color",
+            "$value": "{sys.color.action-blue-hover}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "pressed": {
+            "$type": "color",
+            "$value": "{sys.color.structural-violet}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "success": {
+            "$type": "color",
+            "$value": "{sys.color.success}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "glow-offset": {
+            "$type": "dimension",
+            "$value": "{base.space.none}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "disabled-bed": {
+            "$type": "color",
+            "$value": "{sys.color.elevated-2}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
             }
           }
         }
@@ -2010,6 +2090,197 @@
               "reduced-motion",
               "reduced-transparency"
             ]
+          }
+        }
+      },
+      "cloud": {
+        "body-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.body-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-start-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.rest-start-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-end-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.rest-end-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-start-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.wash-start-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-end-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.wash-end-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-rest": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.wash-rest}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-hover": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.wash-hover}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-focus": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.wash-focus}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "disabled-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.cloud.disabled-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "body": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-start": {
+          "$type": "color",
+          "$value": "{sys.color.ready}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "rest-end": {
+          "$type": "color",
+          "$value": "{sys.color.success}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-start": {
+          "$type": "color",
+          "$value": "{sys.color.ready}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "wash-end": {
+          "$type": "color",
+          "$value": "{sys.color.success}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "angle": {
+          "$type": "number",
+          "$value": "{base.material.cloud-angle}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "duration": {
+          "$type": "duration",
+          "$value": "{base.motion.cloud.duration}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "ease": {
+          "$type": "cubicBezier",
+          "$value": "{base.motion.cloud.ease}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "reduced-duration": {
+          "$type": "duration",
+          "$value": "{base.motion.duration.reduced}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "$extensions": {
+          "app.caelos": {
+            "inventoryName": "cloud",
+            "status": "provisional",
+            "modes": [
+              "dark"
+            ]
+          }
+        },
+        "inset": {
+          "$type": "dimension",
+          "$value": "{base.space.none}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "underlay": {
+          "$type": "number",
+          "$value": "{base.material.underlay-order}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
           }
         }
       }

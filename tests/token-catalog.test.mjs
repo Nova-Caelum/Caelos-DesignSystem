@@ -263,3 +263,28 @@ test('avatar initials use progressively larger typography roles across all five 
     previous = dimension.value;
   }
 });
+
+test('the shared Figma button radius follows the medium foundation', () => {
+  const { radius } = load('02-controls.tokens.json').controls.shared.button;
+  assert.equal(radius?.$value, '{base.radius.md}');
+  assert.equal(radius.$extensions[EXT].figmaName, 'button/radius');
+});
+
+test('each button state names existing paint roles and text buttons have no surface', () => {
+  const button = load('02-controls.tokens.json').controls.shared.button;
+  const paints = button.$extensions[EXT].statePaints;
+  const allStates = ['default', 'hover', 'pressed', 'success', 'focus', 'disabled'];
+  const tonalAndTextStates = ['default', 'success', 'disabled'];
+  assert.deepEqual(Object.keys(paints).sort(), ['primary', 'text', 'tonal']);
+  for (const [variant, states] of Object.entries(paints)) {
+    const expected = variant === 'primary' ? allStates : tonalAndTextStates;
+    assert.deepEqual(Object.keys(states).sort(), [...expected].sort());
+    for (const [state, slots] of Object.entries(states)) {
+      assert.ok(slots.foreground, variant + ' ' + state);
+      assert.equal(Object.hasOwn(slots, 'fill'), variant !== 'text');
+      for (const role of Object.values(slots)) {
+        assert.ok(button[role]?.$value, variant + ' ' + state + ' references missing ' + role);
+      }
+    }
+  }
+});
