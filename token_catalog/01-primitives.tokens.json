@@ -1096,7 +1096,7 @@
                   "meaning": "Composer toolbar."
                 },
                 {
-                  "glyph": "Zap",
+                  "glyph": "Atom",
                   "action": "Model settings",
                   "meaning": "Agent, model and reasoning controls."
                 },
@@ -1178,6 +1178,18 @@
                   "glyph": "FolderPen",
                   "action": "New project",
                   "meaning": "Create a project."
+                },
+                {
+                  "glyph": "RotateCcwClock",
+                  "action": "Activity",
+                  "meaning": "Open activity history.",
+                  "reactExport": "History",
+                  "source": "https://github.com/lucide-icons/lucide/blob/1.71.0/icons/rotate-ccw-clock.svg"
+                },
+                {
+                  "glyph": "ListFilter",
+                  "action": "Filter and sort",
+                  "meaning": "Open filtering and sorting options."
                 }
               ],
               "harnesses": [
@@ -1261,6 +1273,9 @@
                   "meaning": "Agent built with Pydantic AI",
                   "source": "assets/brands/pydantic.svg"
                 }
+              ],
+              "unassignedGlyphs": [
+                "Zap"
               ]
             }
           }
