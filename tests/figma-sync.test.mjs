@@ -22,3 +22,26 @@ assert not compare(plan, [])
 `], {encoding:'utf8'});
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
+
+test('each visible palette caption follows the colour or usage that owns it', () => {
+  const result = spawnSync('python3', ['-c', `
+import json, runpy
+from pathlib import Path
+caption = runpy.run_path('scripts/figma-catalog.py')['palette_caption']
+root = Path('token_catalog')
+base = json.loads((root / '00-foundations.tokens.json').read_text())['base']['color']
+for role, token in base.items():
+    def display():
+        return caption('base.color.' + role, token, 'Base')
+    assert display() == ('hex/' + role, 'Approved palette — ' + token['$value']['hex'].upper())
+    token['$value']['hex'] = '#' + format(int(token['$value']['hex'][1:], 16) ^ 1, '06x')
+    assert display()[1].endswith(token['$value']['hex'].upper())
+for mode in ['Dark', 'Light']:
+    colors = json.loads((root / ('00-semantic.' + mode.lower() + '.tokens.json')).read_text())['sys']['color']
+    for role, token in colors.items():
+        name, text = caption('sys.color.' + role, token, mode)
+        assert name == 'use/' + mode.lower() + '/' + role
+        assert text == 'Use · ' + token['$description']
+`], {encoding:'utf8'});
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});

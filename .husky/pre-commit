@@ -2,4 +2,11 @@ set -eu
 snapshot=$(mktemp -d)
 trap 'rm -rf "$snapshot"' EXIT
 git checkout-index --all --prefix="$snapshot/"
-(cd "$snapshot" && node --test)
+# Test fixtures create their own repositories. Do not pass this checkout's
+# Git directory or index into those repositories.
+repo_env=$(git rev-parse --local-env-vars)
+(
+  unset $repo_env
+  cd "$snapshot"
+  node --test
+)

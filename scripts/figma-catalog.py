@@ -12,8 +12,8 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-GROUPS = ["00 Base", "01 Semantic", "02 Control recipes"]
-MODES = [["Base"], ["Dark", "Light"], ["Default"]]
+GROUPS = ["00 Base", "01 Semantic", "02 Control recipes", "Palette captions"]
+MODES = [["Base"], ["Dark", "Light"], ["Default"], ["Default"]]
 
 
 def git(*args):
@@ -35,6 +35,18 @@ def float32(value):
     return struct.unpack("!f", struct.pack("!f", value))[0]
 
 
+def palette_caption(path, token, mode):
+    if token["$type"] != "color":
+        return None
+    if path.startswith("base.color."):
+        role = token["$extensions"]["app.caelos"]["paletteRole"]
+        return "hex/" + role, "Approved palette — " + token["$value"]["hex"].upper()
+    if path.startswith("sys.color.") and token.get("$description"):
+        role = path.removeprefix("sys.color.")
+        return "use/" + mode.lower() + "/" + role, "Use · " + token["$description"]
+    return None
+
+
 def compile_catalog(revision):
     files = git("ls-tree", "--name-only", revision + ":token_catalog").splitlines()
     rows = [{} for _ in GROUPS]
@@ -49,6 +61,10 @@ def compile_catalog(revision):
                 raise ValueError("Conflicting names across modes for " + path)
             names[path] = (group, name)
             value = token["$value"]
+            caption = palette_caption(path, token, mode)
+            if caption:
+                label, content = caption
+                rows[-1][label] = {"name":label, "type":"STRING", "values":{"Default":content}}
             kind = token["$type"]
             vt = {"color":"COLOR", "fontFamily":"STRING", "cubicBezier":"STRING",
                   "dimension":"FLOAT", "duration":"FLOAT", "number":"FLOAT", "fontWeight":"FLOAT"}[kind]

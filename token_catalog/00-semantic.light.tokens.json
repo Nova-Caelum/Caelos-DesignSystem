@@ -24,7 +24,8 @@
             "decision": "D47",
             "note": "Dawn ground."
           }
-        }
+        },
+        "$description": "Main background in the light theme"
       }
     },
     "material": {
