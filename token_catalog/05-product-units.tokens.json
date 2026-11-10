@@ -2977,7 +2977,7 @@
         },
         "reply-size": {
           "$type": "dimension",
-          "$value": "{base.type.size.px-12-5}",
+          "$value": "{base.type.size.px-12}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
