@@ -22,3 +22,20 @@ test('registered finishes and automatic layers agree with the ledger', () => {
     assert.equal(materialRecipe.variants.layer[layer]['--caelos-auto-image'], materialRecipe.variants.texture[finish].backgroundImage);
   }
 });
+
+test('adaptive filtering is shared by panel, portal and auto glass, isolated per surface', () => {
+  const input = catalog.primitives.shared.surface.$extensions['app.caelos'].backdropOverlap.input;
+  assert.equal(input, '--sys-glass-auto-blur');
+  assert.equal(materialRecipe.base[input], 'var(--caelos-material-overlap-covered)');
+  for (const key of ['glass', 'portal']) {
+    const style = materialRecipe.variants.texture[key];
+    assert.ok(style.backdropFilter.includes('clamp(var(--caelos-material-overlap-clear), var(' + input + '), var(--caelos-material-overlap-covered))'));
+    assert.ok(!style.backgroundColor.includes(input) && !style.backgroundImage.includes(input));
+    for (const fallback of Object.keys(style).filter(k => k.startsWith('@'))) {
+      assert.equal(style[fallback].backdropFilter, 'none');
+      assert.equal(style[fallback].backgroundColor, 'var(--caelos-material-body)');
+    }
+  }
+  assert.equal(materialRecipe.variants.layer.elevated['--caelos-auto-filter'], materialRecipe.variants.texture.glass.backdropFilter);
+  assert.ok(!materialRecipe.variants.texture.sage.backdropFilter.includes(input));
+});

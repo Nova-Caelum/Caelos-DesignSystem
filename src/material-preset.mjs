@@ -20,7 +20,7 @@ function themeVars(semantic) {
     const v = resolve(token);
     values['--caelos-material-' + name] = percentage ? (v * 100) + '%' : String(v);
   }
-  for (const name of ['body', 'foreground', 'tint-ink', 'sage', 'sage-blur']) add(name, glass[name]);
+  for (const name of ['body', 'foreground', 'tint-ink', 'sage', 'sage-blur', 'overlap-clear', 'overlap-covered', 'saturation-neutral']) add(name, glass[name]);
   add('sage-opacity', glass['sage-opacity'], true);
   add('falloff-at', glass['falloff-at'], true);
   for (const kind of ['panel', 'menu']) {
@@ -52,10 +52,14 @@ function glassStyle(kind) {
   const sage = kind === 'sage';
   const fill = sage ? ref('sage') : ref('body');
   const fallback = opaque(fill);
+  const input = surface.$extensions['app.caelos'].backdropOverlap.input;
+  const overlap = `clamp(${ref('overlap-clear')}, var(${input}), ${ref('overlap-covered')})`;
+  const neutral = ref('saturation-neutral');
+  const filter = `blur(calc(${role('blur')} * ${overlap})) saturate(calc(${neutral} + (${role('saturation')} - ${neutral}) * ${overlap}))`;
   return {
     backgroundColor: mix(fill, sage ? ref('sage-opacity') : role('base-alpha')),
     backgroundImage: sage ? 'none' : `linear-gradient(to right, ${mix(ref('tint-ink'), role('tint'))}, ${mix(ref('tint-ink'), role('end'))} ${ref('falloff-at')})`,
-    backdropFilter: sage ? `blur(${ref('sage-blur')})` : `blur(${role('blur')}) saturate(${role('saturation')})`,
+    backdropFilter: sage ? `blur(${ref('sage-blur')})` : filter,
     '@media (prefers-reduced-transparency: reduce)': fallback,
     '@supports not (backdrop-filter: none)': fallback,
   };
@@ -68,7 +72,7 @@ function autoVars(style) {
 }
 export const materialRecipe = {
   className: 'caelos-material',
-  base: { color: ref('foreground') },
+  base: { color: ref('foreground'), [surface.$extensions['app.caelos'].backdropOverlap.input]: ref('overlap-covered') },
   variants: {
     layer: Object.fromEntries(Object.entries(auto).map(([name, finish]) => [name, {
       '--caelos-surface-layer': ref('layer-' + name),

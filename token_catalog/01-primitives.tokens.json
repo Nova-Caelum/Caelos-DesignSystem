@@ -549,7 +549,8 @@
               "reduced-transparency"
             ],
             "decisions": [
-              "D29"
+              "D29",
+              "D31"
             ],
             "autoTexture": {
               "chrome": "graph",
@@ -557,6 +558,16 @@
               "elevated": "glass",
               "elevated-2": "glass",
               "top": "glass"
+            },
+            "backdropOverlap": {
+              "input": "--sys-glass-auto-blur",
+              "finishes": [
+                "glass",
+                "portal"
+              ],
+              "clearToken": "primitives.shared.glass.overlap-clear",
+              "coveredToken": "primitives.shared.glass.overlap-covered",
+              "behavior": "The host sets measured overlap on this surface. Interpolate blur and saturation, preserve body opacity and tint. Without a measurement, use full filtering. Reduced transparency stays opaque."
             }
           }
         },
@@ -1642,6 +1653,36 @@
           "$extensions": {
             "app.caelos": {
               "status": "canon"
+            }
+          }
+        },
+        "overlap-clear": {
+          "$type": "number",
+          "$value": "{base.material.overlap.clear}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31"
+            }
+          }
+        },
+        "overlap-covered": {
+          "$type": "number",
+          "$value": "{base.material.overlap.covered}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31"
+            }
+          }
+        },
+        "saturation-neutral": {
+          "$type": "number",
+          "$value": "{base.material.saturation.neutral}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31"
             }
           }
         }
