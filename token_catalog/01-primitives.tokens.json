@@ -1099,7 +1099,9 @@
                   "glyph": "Aelpha",
                   "action": "Aelpha",
                   "artwork": "Monochrome adaptation of Ae Logo v3",
-                  "brandAsset": "Ae_Logo_v3.svg"
+                  "brandAsset": "Ae_Logo_v3.svg",
+                  "sizeToken": "primitives.shared.icon.harness-monogram-size",
+                  "artworkFit": "Center the visible monogram and fit its width to the square, preserving its proportions."
                 }
               ],
               "statusReferences": [
@@ -1136,6 +1138,12 @@
                   "action": "OpenRouter",
                   "meaning": "Model routing service",
                   "source": "assets/brands/openrouter.svg"
+                },
+                {
+                  "glyph": "GitHub",
+                  "action": "GitHub",
+                  "meaning": "Repository hosting and collaboration",
+                  "source": "assets/brands/github.svg"
                 },
                 {
                   "glyph": "PydanticGraph",
@@ -1177,6 +1185,15 @@
           "$extensions": {
             "app.caelos": {
               "status": "canon"
+            }
+          }
+        },
+        "harness-monogram-size": {
+          "$type": "dimension",
+          "$value": "{base.space.step-10}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
             }
           }
         }

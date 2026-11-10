@@ -175,7 +175,7 @@ test('provider and framework glyphs resolve to their own monochrome artwork', ()
   const { glossary } = load('01-primitives.tokens.json').primitives.shared.icon.$extensions[EXT];
   const marks = glossary.providersAndFrameworks;
   for (const [glyph, artwork] of Object.entries({
-    Claude: 'claude', ChatGPT: 'chatgpt', OpenRouter: 'openrouter',
+    Claude: 'claude', ChatGPT: 'chatgpt', OpenRouter: 'openrouter', GitHub: 'github',
     PydanticGraph: 'pydantic', PydanticAgent: 'pydantic',
   })) {
     const rows = marks.filter(row => row.glyph === glyph);
@@ -187,4 +187,11 @@ test('provider and framework glyphs resolve to their own monochrome artwork', ()
     assert.doesNotMatch(svg, /(?:fill|stroke)="#/);
     assert.ok(!glossary.harnesses.some(row => row.glyph === glyph));
   }
+});
+
+test('Aelpha uses the harness monogram size from the foundation scale', () => {
+  const icon = load('01-primitives.tokens.json').primitives.shared.icon;
+  const monogram = icon.$extensions[EXT].glossary.harnesses.find(row => row.glyph === 'Aelpha');
+  assert.equal(monogram.sizeToken, 'primitives.shared.icon.harness-monogram-size');
+  assert.equal(icon['harness-monogram-size'].$value, '{base.space.step-10}');
 });
