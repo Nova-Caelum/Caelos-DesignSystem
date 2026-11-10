@@ -1,0 +1,26 @@
+name: Tier drift
+on:
+  pull_request_target:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  tier-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install trusted checker dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Check out the candidate as data
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          persist-credentials: false
+      - run: sh scripts/check-tier-index.sh candidate
