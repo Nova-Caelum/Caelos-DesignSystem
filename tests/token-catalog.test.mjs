@@ -263,3 +263,9 @@ test('avatar initials use progressively larger typography roles across all five 
     previous = dimension.value;
   }
 });
+
+test('the shared Figma button radius follows the medium foundation', () => {
+  const { radius } = load('02-controls.tokens.json').controls.shared.button;
+  assert.equal(radius?.$value, '{base.radius.md}');
+  assert.equal(radius.$extensions[EXT].figmaName, 'button/radius');
+});

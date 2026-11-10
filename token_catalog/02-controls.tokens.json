@@ -8,7 +8,7 @@
           {
             "item": "button and chip values",
             "ref": "D50, D81, G04, G05",
-            "why": "No decided padding, height, radius, timing or focus. The Figma draft's values are not admitted."
+            "why": "Button and chip padding, height, timing and focus remain open, as does chip radius. The shared button radius is decided."
           }
         ]
       }
@@ -125,7 +125,7 @@
         "$description": "Express shared action emphasis, size and button states.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "button",
             "recipeInStaging": true,
             "variants": {
@@ -161,7 +161,18 @@
               "D82",
               "D25"
             ],
-            "note": "The Figma draft's 26 button tokens are not admitted: their padding uses the rejected second scale (D01)."
+            "note": "The approved button radius applies across variants, sizes and states. Draft padding used the rejected second scale (D01)."
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.md}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "button/radius",
+              "note": "Medium corners approved in the Tier 2 Controls review against fused staging."
+            }
           }
         }
       },
