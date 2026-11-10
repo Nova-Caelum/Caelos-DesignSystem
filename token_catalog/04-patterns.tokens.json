@@ -934,6 +934,88 @@
             ]
           }
         }
+      },
+      "fusionCard": {
+        "$description": "Join a strip and body on one continuous card surface.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "fusionCard",
+            "recipeInStaging": false,
+            "slots": [
+              "root",
+              "strip",
+              "body",
+              "editor"
+            ],
+            "variants": {
+              "stripMaterial": [
+                "glass",
+                "cloud",
+                "paper"
+              ],
+              "bodyMaterial": [
+                "glass",
+                "cloud",
+                "paper"
+              ]
+            },
+            "states": [
+              "rest",
+              "editor-focus-visible",
+              "control-focus-visible"
+            ],
+            "modes": [
+              "dark",
+              "reduced-transparency",
+              "forced-colors"
+            ],
+            "reviewNotes": [
+              "The prototype defaults to a glass strip over paper. The action bar demonstrates a cloud strip over glass. Review each pairing independently.",
+              "Crossfade only the adjacent background planes. Text and controls stay opaque. A single outer edge follows the card shape through the join.",
+              "Editor focus belongs to the shell. A button inside the card keeps its own focus treatment.",
+              "Review the opaque fallback with reduced transparency or unavailable backdrop blur and check system colors in forced-colors mode."
+            ]
+          }
+        }
+      },
+      "actionBar": {
+        "$description": "Choose a command, edit its arguments inline, review the selection and execute it.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "actionBar",
+            "recipeInStaging": false,
+            "slots": [
+              "trigger",
+              "dialog",
+              "input",
+              "anchors",
+              "results",
+              "review",
+              "footer"
+            ],
+            "states": [
+              "closed",
+              "choosing-action",
+              "editing-argument",
+              "reviewing",
+              "executing",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "modes": [
+              "dark"
+            ],
+            "reviewNotes": [
+              "The prototype opens from a trigger or Command/Control+K. Escape steps back through arguments before closing. Closing returns focus to the invoking control.",
+              "Candidate matches stay in the list until confirmed. Confirmed arguments remain editable during review. Validate the selection before execution and retain input on failure.",
+              "The reference host can append to the current draft, open a recent conversation and change appearance. Draft insertion leaves sending to the user. Hosts own history access, routing and permissions.",
+              "The selected Cloud direction and the earlier prototype share interaction ideas. The leading command icon, confirmed-item treatment and keyboard hints need visual review against the selected direction."
+            ]
+          }
+        }
       }
     }
   }

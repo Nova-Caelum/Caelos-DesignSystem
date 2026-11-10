@@ -51,6 +51,14 @@ Tiers were assigned from source folders and names, and are unverified. 54 produc
 - Tiers 6 (regions) and 7 (screens).
 - The build that turns this catalog into the package Caelos apps install.
 
+## Recovered chat patterns awaiting review
+
+The open Tier 4 entries `patterns.shared.fusionCard` and `patterns.shared.actionBar` record behaviors from the React 19 prototype. Their slots, states and material choices are review inputs. Neither entry introduces a foundation value.
+
+The same prototype contains a **ChatInterface** candidate for the regions inventory. Its three variants are full conversation, single agent and dashboard. All three compose a header, a scrollable transcript and a composer. The full view keeps the header sticky inside the scrolling viewport, measures transcript and composer widths separately and includes a marker for header occlusion. The compact views place the header outside the scrolling viewport. Streaming follows the latest message while the reader is at the bottom, pauses when the reader scrolls back and resumes when they return. Review these variants with the existing header, transcript and composer when the regions tier opens.
+
+The historical implementation is identifiable at revision `e6cef8dff0`, in `packages/ui/src/FusionCard.tsx`, `components/action-bar/` and `packages/ui/src/ChatInterface.tsx`. The action-bar preview uses sample data. Authenticated history, keyboard behavior and rendered material transitions still need verification in the host.
+
 ## Sync the merged catalog to Figma
 
 A signed-in Codex client with the Figma connector and edit access runs the sync. Set `CAELOS_FIGMA_FILE` locally to the destination file key. Set `CODEX_BIN` if the executable is outside PATH. Keep these settings outside the repository.
