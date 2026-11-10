@@ -89,6 +89,16 @@
             "item": "new conversation arrival",
             "ref": "D36",
             "why": "Use the landing entrance on new conversation. Its five-part study is the reference. Individual timings and their assignment to product elements await confirmation."
+          },
+          {
+            "item": "category and status label corners",
+            "ref": "D24",
+            "why": "The 4px category/status radius is a formal brand decision. Product adoption is undecided."
+          },
+          {
+            "item": "zero-gap reset",
+            "ref": "D01",
+            "why": "Confirm whether a structural zero belongs beside the ten approved positive steps."
           }
         ],
         "rules": [
@@ -556,9 +566,9 @@
         },
         "$extensions": {
           "app.caelos": {
-            "status": "canon",
-            "decision": "D01",
-            "figmaName": "space/none"
+            "status": "provisional",
+            "figmaName": "space/none",
+            "note": "A zero-gap reset is used in the draft. D01 approves only the ten positive spacing steps."
           }
         },
         "$description": "Structural zero for removing a gap. The ten product steps start at step-01."
@@ -852,20 +862,6 @@
             "status": "canon",
             "decision": "D21",
             "note": "Card surfaces; the 18 and 20px call sites map here."
-          }
-        }
-      },
-      "category-label": {
-        "$type": "dimension",
-        "$value": {
-          "value": 4,
-          "unit": "px"
-        },
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "D24",
-            "note": "Category and status pills 10, 12 and 14px high."
           }
         }
       },
