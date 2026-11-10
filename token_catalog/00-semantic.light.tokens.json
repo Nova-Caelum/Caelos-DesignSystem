@@ -8,7 +8,7 @@
           {
             "item": "colour roles",
             "ref": "D47, G08",
-            "why": "Light is decided as a variant switching every colour role, but only ground has a decided light value."
+            "why": "Ground and hover blue have decided light values. The remaining light colour roles await review."
           }
         ],
         "mode": "light"
@@ -26,6 +26,18 @@
           }
         },
         "$description": "Main background in the light theme"
+      },
+      "action-blue-hover": {
+        "$type": "color",
+        "$value": "{base.color.action-blue-hover}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/action-blue-hover"
+          }
+        },
+        "$description": "Primary action hover or focus"
       }
     },
     "material": {
