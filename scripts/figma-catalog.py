@@ -38,7 +38,7 @@ def float32(value):
 def figma_number(path, value):
     number = value["value"] if isinstance(value, dict) else value
     # Figma node opacity binds in percent. Catalog opacities are fractions.
-    if path.startswith("base.opacity."):
+    if path.startswith("base.opacity.") or re.fullmatch(r"base\.material\.(dark|light)\.(base-alpha|tint)", path):
         number *= 100
     return float32(number)
 

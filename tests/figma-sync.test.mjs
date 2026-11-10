@@ -53,7 +53,11 @@ number = runpy.run_path('scripts/figma-catalog.py')['figma_number']
 for fraction, percent in [(0, 0), (0.15, 15), (0.24, 24), (1, 100)]:
     assert number('base.opacity.scrollbar.rest', fraction) == percent
 assert number('base.size.scrollbar.thumb', {'value': 6, 'unit': 'px'}) == 6
-assert number('base.material.dark.base-alpha', 0.5) == 0.5
+for mode in ['light', 'dark']:
+    for field in ['base-alpha','tint']:
+        assert number('base.material.' + mode + '.' + field, 0.5) == 50
+assert number('base.material.saturation.panel', 1.2) == number('unscaled', 1.2)
+assert number('base.material.tint-falloff.at', 0.72) == number('unscaled', 0.72)
 `], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });

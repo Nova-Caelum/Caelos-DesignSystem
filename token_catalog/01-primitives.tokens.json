@@ -21,7 +21,7 @@
           },
           {
             "item": "Surface and type coverage",
-            "why": "Plain surface layers and core text metrics have aliases. Graph, glass, texture modes and the complete role and tone mappings await rendered review."
+            "why": "Surface texture samples and glass roles are ready for review; graph pitch, palette mappings and full text-role parity remain provisional."
           }
         ]
       }
@@ -283,6 +283,15 @@
                 "status": "canon"
               }
             }
+          },
+          "ink": {
+            "$type": "color",
+            "$value": "{sys.material.grid}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
           }
         }
       },
@@ -524,7 +533,9 @@
                 "auto",
                 "plain",
                 "graph",
-                "glass"
+                "glass",
+                "portal",
+                "sage"
               ]
             },
             "defaultVariants": {
@@ -539,7 +550,14 @@
             ],
             "decisions": [
               "D29"
-            ]
+            ],
+            "autoTexture": {
+              "chrome": "graph",
+              "ground": "graph",
+              "elevated": "glass",
+              "elevated-2": "glass",
+              "top": "glass"
+            }
           }
         },
         "layer": {
@@ -1266,7 +1284,7 @@
         "$description": "Provide visible keyboard-focus treatment for the owning recipe.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "recipes.focus",
             "recipeInStaging": true,
             "states": [
@@ -1288,6 +1306,33 @@
             "app.caelos": {
               "status": "canon",
               "decision": "D25"
+            }
+          }
+        },
+        "glow-ink": {
+          "$type": "color",
+          "$value": "{sys.color.action-blue-hover}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "glow-blur": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "glow-opacity": {
+          "$type": "number",
+          "$value": "{base.opacity.focus-glow}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
             }
           }
         }
@@ -1363,7 +1408,7 @@
         "$description": "Provide the graph surface material.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "graph",
             "recipeInStaging": true,
             "modes": [
@@ -1373,13 +1418,50 @@
               "reduced-transparency"
             ]
           }
+        },
+        "ink": {
+          "$type": "color",
+          "$value": "{sys.material.grid}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "pitch": {
+          "$type": "dimension",
+          "$value": "{base.space.step-09}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "note": "Proposed 27px on the spacing scale; Foundry used a 28px grid."
+            }
+          }
+        },
+        "line": {
+          "$type": "dimension",
+          "$value": "{base.border.hairline}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "opacity": {
+          "$type": "number",
+          "$value": "{base.opacity.graph-line}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
         }
       },
       "glass": {
         "$description": "Provide a translucent surface material.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "glass",
             "recipeInStaging": true,
             "modes": [
@@ -1392,6 +1474,163 @@
               "D29",
               "D31"
             ]
+          }
+        },
+        "panel": {
+          "base-alpha": {
+            "$type": "number",
+            "$value": "{sys.material.panel.base-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "blur": {
+            "$type": "dimension",
+            "$value": "{sys.material.panel.blur}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "tint": {
+            "$type": "number",
+            "$value": "{sys.material.panel.tint}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "saturation": {
+            "$type": "number",
+            "$value": "{sys.material.panel.saturation}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
+        },
+        "menu": {
+          "base-alpha": {
+            "$type": "number",
+            "$value": "{sys.material.menu.base-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "blur": {
+            "$type": "dimension",
+            "$value": "{sys.material.menu.blur}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "tint": {
+            "$type": "number",
+            "$value": "{sys.material.menu.tint}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "saturation": {
+            "$type": "number",
+            "$value": "{sys.material.menu.saturation}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          }
+        },
+        "body": {
+          "$type": "color",
+          "$value": "{sys.material.body}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{sys.material.ink}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "tint-ink": {
+          "$type": "color",
+          "$value": "{sys.material.tint-ink}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "sage": {
+          "$type": "color",
+          "$value": "{sys.material.sage}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "falloff-at": {
+          "$type": "number",
+          "$value": "{base.material.tint-falloff.at}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "falloff-strength": {
+          "$type": "number",
+          "$value": "{base.material.tint-falloff.strength}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "opaque": {
+          "$type": "number",
+          "$value": "{base.opacity.material-text}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "sage-opacity": {
+          "$type": "number",
+          "$value": "{base.opacity.tooltip-fill}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "sage-blur": {
+          "$type": "dimension",
+          "$value": "{base.material.tooltip-blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
           }
         }
       },
