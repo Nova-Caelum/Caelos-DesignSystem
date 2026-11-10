@@ -2209,6 +2209,26 @@
             "decision": "D29"
           }
         }
+      },
+      "graph-line": {
+        "$type": "number",
+        "$value": 0.07,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "Foundry graph intensity; review with the current palette."
+          }
+        }
+      },
+      "focus-glow": {
+        "$type": "number",
+        "$value": 0.24,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "Focus edge study; requires review in both themes."
+          }
+        }
       }
     },
     "material": {
