@@ -2997,16 +2997,19 @@
           },
           "$extensions": {
             "app.caelos": {
-              "status": "provisional",
-              "decision": "D55; Unrecorded",
+              "status": "canon",
+              "decision": "Daniel approved 12px consolidation after side-by-side reply-picker review, 2026-11-10; supersedes D55 reply size",
               "figmaName": "type/size/px-12",
               "formerPaths": [
                 "base.type.size.picker-model",
-                "base.type.size.caption"
+                "base.type.size.caption",
+                "base.type.size.px-12-5",
+                "base.type.size.picker-reply"
               ],
               "figmaPreviousNames": [
                 "type/size/picker-model",
-                "type/size/caption"
+                "type/size/caption",
+                "type/size/px-12-5"
               ],
               "family": "base.type.size",
               "provenance": [
@@ -3026,31 +3029,7 @@
                     "status": "provisional",
                     "figmaName": "type/size/caption"
                   }
-                }
-              ]
-            }
-          },
-          "$description": "Reusable type size value. Original applications and evidence are retained in provenance."
-        },
-        "px-12-5": {
-          "$type": "dimension",
-          "$value": {
-            "value": 12.5,
-            "unit": "px"
-          },
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D55",
-              "figmaName": "type/size/px-12-5",
-              "formerPaths": [
-                "base.type.size.picker-reply"
-              ],
-              "figmaPreviousNames": [
-                "type/size/picker-reply"
-              ],
-              "family": "base.type.size",
-              "provenance": [
+                },
                 {
                   "path": "base.type.size.picker-reply",
                   "description": "",
@@ -3063,7 +3042,7 @@
               ]
             }
           },
-          "$description": "Reusable type size value. Original applications and evidence are retained in provenance."
+          "$description": "Shared 12px type size. The former 12.5px reply-picker size was consolidated after visual review; its 19px line height is unchanged. Original decisions remain in provenance."
         },
         "px-9": {
           "$type": "dimension",
