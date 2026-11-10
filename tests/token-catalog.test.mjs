@@ -144,13 +144,29 @@ test('the icon glossary preserves distinct activity meanings and composer action
   }
   const byAction = rows => Object.fromEntries(rows.map(row => [row.action, row.glyph]));
   const conversation = byAction(glossary.conversation);
-  assert.equal(conversation['Thinking · reasoning'], 'Zap');
+  assert.equal(conversation['Thinking · reasoning'], 'Brain');
   assert.equal(conversation['General action · Request suggestions'], 'Flame');
-  assert.equal(conversation['Reading the workspace brief'], 'Wrench');
+  assert.equal(conversation['Other tool action'], 'Wrench');
+  assert.equal(conversation['Write a document or artifact'], 'Feather');
+  assert.equal(conversation['Read documents or files'], 'BookOpen');
+  assert.equal(conversation['Run a Bash or code command'], 'Terminal');
+  assert.equal(conversation['Search tool'], 'Search');
+  const harnesses = byAction(glossary.harnesses);
+  assert.equal(harnesses['Oh My Pi'], 'OMP');
+  assert.equal(harnesses['Aelpha'], 'Aelpha');
   assert.equal(conversation['Athena · checking spacing / Agent session'], 'Bot');
   const composer = byAction(glossary.composer);
-  assert.equal(composer['Model settings'], 'Brain');
+  assert.equal(composer['Model settings'], 'Zap');
   assert.equal(composer['Live Conversation Mode'], 'AudioLines');
   assert.equal(composer['Send message'], 'ArrowUp');
   assert.equal(composer['Stop response / live conversation'], 'Square');
+});
+
+test('focused ink follows the palette hover role in each theme', () => {
+  const focus = load('01-primitives.tokens.json').primitives.shared['recipes-focus'];
+  assert.equal(focus.foreground?.$value, '{sys.color.action-blue-hover}');
+  for (const theme of ['dark', 'light']) {
+    const ink = load(`00-semantic.${theme}.tokens.json`).sys.color['action-blue-hover'];
+    assert.equal(ink?.$value, '{base.color.action-blue-hover}');
+  }
 });

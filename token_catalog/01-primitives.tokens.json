@@ -8,7 +8,7 @@
           {
             "item": "Focus treatment",
             "ref": "D25, G05",
-            "why": "Focus changes text or icon ink and adds a glow at the surface edge. Foreground and glow roles by theme still require visual review."
+            "why": "Focus uses hover blue for text and icons. Glow appearance and visibility on rendered controls in each theme still require review."
           },
           {
             "item": "Separator fade",
@@ -834,7 +834,7 @@
               "version": "0.487.0",
               "conversation": [
                 {
-                  "glyph": "Zap",
+                  "glyph": "Brain",
                   "action": "Thinking · reasoning",
                   "meaning": "Approved thinking symbol."
                 },
@@ -845,8 +845,8 @@
                 },
                 {
                   "glyph": "Wrench",
-                  "action": "Reading the workspace brief",
-                  "meaning": "Tool action in the activity chain. The verb identifies what the tool does."
+                  "action": "Other tool action",
+                  "meaning": "Fallback for a tool without a specific activity glyph."
                 },
                 {
                   "glyph": "Bot",
@@ -855,7 +855,7 @@
                 },
                 {
                   "glyph": "FileText",
-                  "action": "Document · Read document · PDF",
+                  "action": "Document preview · attachment · PDF",
                   "meaning": "Document preview, filename strip, attachment, and exit editing."
                 },
                 {
@@ -972,6 +972,26 @@
                   "glyph": "Pause",
                   "action": "Pause",
                   "meaning": "Pause the study timeline."
+                },
+                {
+                  "glyph": "Feather",
+                  "action": "Write a document or artifact",
+                  "meaning": "The tool creates or edits written output."
+                },
+                {
+                  "glyph": "BookOpen",
+                  "action": "Read documents or files",
+                  "meaning": "The tool opens or reads existing content."
+                },
+                {
+                  "glyph": "Terminal",
+                  "action": "Run a Bash or code command",
+                  "meaning": "The tool executes a shell or code command."
+                },
+                {
+                  "glyph": "Search",
+                  "action": "Search tool",
+                  "meaning": "The tool searches for matching content."
                 }
               ],
               "composer": [
@@ -1006,7 +1026,7 @@
                   "meaning": "Composer toolbar."
                 },
                 {
-                  "glyph": "Brain",
+                  "glyph": "Zap",
                   "action": "Model settings",
                   "meaning": "Agent, model and reasoning controls."
                 },
@@ -1068,6 +1088,18 @@
                 {
                   "glyph": "Codex",
                   "action": "Codex"
+                },
+                {
+                  "glyph": "OMP",
+                  "action": "Oh My Pi",
+                  "artwork": "Original monochrome pi and plug",
+                  "source": "assets/harnesses/omp.svg"
+                },
+                {
+                  "glyph": "Aelpha",
+                  "action": "Aelpha",
+                  "artwork": "Monochrome adaptation of Ae Logo v3",
+                  "brandAsset": "Ae_Logo_v3.svg"
                 }
               ],
               "statusReferences": [
@@ -1197,6 +1229,17 @@
               "reduced-motion",
               "reduced-transparency"
             ]
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{sys.color.action-blue-hover}",
+          "$description": "Focused text and icon ink on the owning surface.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D25"
+            }
           }
         }
       },
