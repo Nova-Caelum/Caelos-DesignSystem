@@ -4,9 +4,11 @@ trap 'rm -rf "$snapshot"' EXIT
 git checkout-index --all --prefix="$snapshot/"
 # Test fixtures create their own repositories. Do not pass this checkout's
 # Git directory or index into those repositories.
+export NODE_PATH="$(pwd)/node_modules"
 repo_env=$(git rev-parse --local-env-vars)
 (
   unset $repo_env
   cd "$snapshot"
+  node scripts/check-tier-drift.cjs "$snapshot"
   node --test
 )
