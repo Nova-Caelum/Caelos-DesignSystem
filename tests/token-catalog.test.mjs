@@ -164,7 +164,14 @@ test('the icon glossary preserves activity, workspace and composer actions', () 
   assert.equal(workspace['New module'], 'LayersPlus');
   assert.equal(workspace['New project'], 'FolderPen');
   assert.equal(glossary.workspace.find(row => row.glyph === 'LayersPlus').version, '0.577.0');
-  assert.equal(composer['Model settings'], 'Zap');
+  assert.equal(workspace.Activity, 'RotateCcwClock');
+  assert.equal(glossary.workspace.find(row => row.action === 'Activity').reactExport, 'History');
+  assert.equal(workspace['Filter and sort'], 'ListFilter');
+  assert.equal(composer['Model settings'], 'Atom');
+  assert.ok(glossary.unassignedGlyphs.includes('Zap'));
+  for (const rows of [glossary.conversation, glossary.workspace, glossary.composer]) {
+    assert.ok(rows.every(row => !glossary.unassignedGlyphs.includes(row.glyph)));
+  }
   assert.equal(composer['Live Conversation Mode'], 'AudioLines');
   assert.equal(composer['Send message'], 'ArrowUp');
   assert.equal(composer['Stop response / live conversation'], 'Square');
