@@ -82,7 +82,7 @@
         },
         "stack-gap": {
           "$type": "dimension",
-          "$value": "{base.measure.alert-stack-gap}",
+          "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -102,7 +102,7 @@
         },
         "icon-size": {
           "$type": "dimension",
-          "$value": "{base.measure.alert-icon}",
+          "$value": "{base.size.px-16}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -112,7 +112,7 @@
         },
         "icon-gap": {
           "$type": "dimension",
-          "$value": "{base.space.step-03}",
+          "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -122,7 +122,7 @@
         },
         "edge-width": {
           "$type": "dimension",
-          "$value": "{base.border.hairline}",
+          "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -168,7 +168,7 @@
         },
         "open-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.open-ms}",
+          "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -178,7 +178,7 @@
         },
         "close-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.close-ms}",
+          "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -188,7 +188,7 @@
         },
         "open-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.open-curve}",
+          "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -198,7 +198,7 @@
         },
         "close-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.close-curve}",
+          "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -290,7 +290,7 @@
         },
         "open-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.open-ms}",
+          "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -300,7 +300,7 @@
         },
         "close-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.close-ms}",
+          "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -310,7 +310,7 @@
         },
         "open-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.open-curve}",
+          "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -320,7 +320,7 @@
         },
         "close-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.close-curve}",
+          "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -373,7 +373,7 @@
         },
         "fill-opacity": {
           "$type": "number",
-          "$value": "{base.opacity.tooltip-fill}",
+          "$value": "{base.opacity.fraction-0-8}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -383,7 +383,7 @@
         },
         "backdrop-blur": {
           "$type": "dimension",
-          "$value": "{base.material.tooltip-blur}",
+          "$value": "{base.blur.px-10}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -393,7 +393,7 @@
         },
         "radius": {
           "$type": "dimension",
-          "$value": "{base.measure.tooltip-radius}",
+          "$value": "{base.radius.px-11}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -403,7 +403,7 @@
         },
         "padding-block": {
           "$type": "dimension",
-          "$value": "{base.measure.tooltip-padding-block}",
+          "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -413,7 +413,7 @@
         },
         "padding-inline": {
           "$type": "dimension",
-          "$value": "{base.measure.tooltip-padding-inline}",
+          "$value": "{base.space.px-13}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -423,7 +423,7 @@
         },
         "edge-width": {
           "$type": "dimension",
-          "$value": "{base.border.hairline}",
+          "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",

@@ -13,7 +13,7 @@
           {
             "item": "question alert",
             "ref": "D64",
-            "why": "No inventory entry. Decided: Glass Card, 19px blur, no tone glow; answers inset 19px both sides (base.measure.question-answer-inset); 24px label pad on the title axis."
+            "why": "No inventory entry. Decided: Glass Card, 19px blur, no tone glow; answers inset 19px both sides (base.space.px-19); 24px label pad on the title axis."
           },
           {
             "item": "header",
@@ -2756,7 +2756,7 @@
         },
         "shell-top": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2766,7 +2766,7 @@
         },
         "shell-inline": {
           "$type": "dimension",
-          "$value": "{base.metric.14}",
+          "$value": "{base.space.px-14}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2777,7 +2777,7 @@
         },
         "shell-bottom": {
           "$type": "dimension",
-          "$value": "{base.metric.10}",
+          "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2788,7 +2788,7 @@
         },
         "shell-radius": {
           "$type": "dimension",
-          "$value": "{base.shape.radius.27}",
+          "$value": "{base.radius.px-27}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2799,7 +2799,7 @@
         },
         "expanded-radius": {
           "$type": "dimension",
-          "$value": "{base.shape.radius.22}",
+          "$value": "{base.radius.px-22}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2810,7 +2810,7 @@
         },
         "editor-inset": {
           "$type": "dimension",
-          "$value": "{base.metric.7}",
+          "$value": "{base.space.px-7}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2821,7 +2821,7 @@
         },
         "editor-size": {
           "$type": "dimension",
-          "$value": "{base.type.size.editor}",
+          "$value": "{base.type.size.px-14}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2832,7 +2832,7 @@
         },
         "editor-line": {
           "$type": "dimension",
-          "$value": "{base.type.line.editor}",
+          "$value": "{base.type.line.px-24}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2843,7 +2843,7 @@
         },
         "controls-offset": {
           "$type": "dimension",
-          "$value": "{base.metric.20}",
+          "$value": "{base.space.px-20}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2854,7 +2854,7 @@
         },
         "control-gap": {
           "$type": "dimension",
-          "$value": "{base.metric.5}",
+          "$value": "{base.space.px-5}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2865,7 +2865,7 @@
         },
         "control-size": {
           "$type": "dimension",
-          "$value": "{base.size.control.34}",
+          "$value": "{base.size.px-34}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2876,7 +2876,7 @@
         },
         "control-radius": {
           "$type": "dimension",
-          "$value": "{base.shape.radius.12}",
+          "$value": "{base.radius.md}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -2887,7 +2887,7 @@
         },
         "glyph-size": {
           "$type": "dimension",
-          "$value": "{base.size.glyph.17}",
+          "$value": "{base.size.px-17}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2897,7 +2897,7 @@
         },
         "dock-height": {
           "$type": "dimension",
-          "$value": "{base.size.picker.42}",
+          "$value": "{base.size.px-42}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2907,7 +2907,7 @@
         },
         "dock-pad": {
           "$type": "dimension",
-          "$value": "{base.metric.4}",
+          "$value": "{base.space.px-4}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2917,7 +2917,7 @@
         },
         "dock-radius": {
           "$type": "dimension",
-          "$value": "{base.shape.radius.13}",
+          "$value": "{base.radius.px-13}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2927,7 +2927,7 @@
         },
         "dock-gap": {
           "$type": "dimension",
-          "$value": "{base.metric.2}",
+          "$value": "{base.space.px-2}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2937,7 +2937,7 @@
         },
         "dock-floor": {
           "$type": "dimension",
-          "$value": "{base.space.step-01}",
+          "$value": "{base.space.px-3}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2947,7 +2947,7 @@
         },
         "dock-reserve": {
           "$type": "dimension",
-          "$value": "{base.size.dock.47}",
+          "$value": "{base.size.px-47}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2957,7 +2957,7 @@
         },
         "model-size": {
           "$type": "dimension",
-          "$value": "{base.type.size.picker-model}",
+          "$value": "{base.type.size.px-12}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2967,7 +2967,7 @@
         },
         "model-line": {
           "$type": "dimension",
-          "$value": "{base.type.line.picker-model}",
+          "$value": "{base.type.line.px-20}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2977,7 +2977,7 @@
         },
         "reply-size": {
           "$type": "dimension",
-          "$value": "{base.type.size.picker-reply}",
+          "$value": "{base.type.size.px-12-5}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2987,7 +2987,7 @@
         },
         "reply-line": {
           "$type": "dimension",
-          "$value": "{base.type.line.picker-reply}",
+          "$value": "{base.type.line.px-19}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2997,7 +2997,7 @@
         },
         "option-inset": {
           "$type": "dimension",
-          "$value": "{base.space.step-03}",
+          "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -3007,7 +3007,7 @@
         },
         "context-gap": {
           "$type": "dimension",
-          "$value": "{base.space.step-02}",
+          "$value": "{base.space.px-6}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -3107,7 +3107,7 @@
         },
         "open-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.open-ms}",
+          "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -3117,7 +3117,7 @@
         },
         "close-ms": {
           "$type": "duration",
-          "$value": "{base.motion.menu.close-ms}",
+          "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -3127,7 +3127,7 @@
         },
         "open-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.open-curve}",
+          "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -3138,7 +3138,7 @@
         },
         "close-curve": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.menu.close-curve}",
+          "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
               "status": "composer-derived",
@@ -3149,7 +3149,7 @@
         },
         "reduced-ms": {
           "$type": "duration",
-          "$value": "{base.motion.duration.reduced}",
+          "$value": "{base.motion.duration.ms-0}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional",
@@ -3159,7 +3159,7 @@
         },
         "hairline": {
           "$type": "dimension",
-          "$value": "{base.border.hairline}",
+          "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",

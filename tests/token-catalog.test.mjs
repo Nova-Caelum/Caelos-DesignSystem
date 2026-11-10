@@ -213,7 +213,7 @@ test('Aelpha uses the harness monogram size from the foundation scale', () => {
   const icon = load('01-primitives.tokens.json').primitives.shared.icon;
   const monogram = icon.$extensions[EXT].glossary.harnesses.find(row => row.glyph === 'Aelpha');
   assert.equal(monogram.sizeToken, 'primitives.shared.icon.harness-monogram-size');
-  assert.equal(icon['harness-monogram-size'].$value, '{base.space.step-10}');
+  assert.equal(icon['harness-monogram-size'].$value, '{base.space.px-30}');
 });
 
 test('both scrollbar themes use Structural Violet through the shared thumb role', () => {

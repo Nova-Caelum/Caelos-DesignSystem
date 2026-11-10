@@ -6,6 +6,7 @@ async function libraryVariables(plan, apply) {
   const owned = new Map();
   const qualified = (collection, name) => collection + '/' + name;
   const expected = new Map();
+  const available = new Map(variables.map(v => [qualified(collections.find(c => c.id === v.variableCollectionId)?.name, v.name), v]));
   for (const spec of plan) {
     const matches = collections.filter(c => c.name === spec.name || c.name === 'Caelos Draft / ' + spec.name);
     if (matches.length > 1) throw Error('Ambiguous collection ' + spec.name);
@@ -20,13 +21,14 @@ async function libraryVariables(plan, apply) {
     for (const row of spec.variables) {
       let v = variables.find(v => v.variableCollectionId === c.id && v.name === row.name);
       if (!v && apply) {
-        const old = {'color/golden-sand':'color/gold','color/peach-gold':'color/peach'}[row.name];
-        v = variables.find(v => v.variableCollectionId === c.id && v.name === old);
+        const old = row.migrateFrom || [{'color/golden-sand':'color/gold','color/peach-gold':'color/peach'}[row.name]];
+        v = variables.find(v => v.variableCollectionId === c.id && old.includes(v.name));
         if (v) v.name = row.name;
-        else v = figma.variables.createVariable(row.name, c, row.type);
+        else { v = figma.variables.createVariable(row.name, c, row.type); v.scopes = []; }
         byId.set(v.id, v);
       }
       if (!v) continue;
+      if (apply && row.hidden) { v.hiddenFromPublishing = true; v.scopes = []; }
       if (apply && v.resolvedType !== row.type) throw Error('Incompatible type for ' + row.name);
       expected.set(qualified(spec.name,row.name), v);
     }
@@ -55,7 +57,7 @@ async function libraryVariables(plan, apply) {
         if (JSON.stringify(normal(before)) === JSON.stringify(value)) continue;
         let raw = value;
         if (value.alias) {
-          const target = expected.get(value.alias);
+          const target = expected.get(value.alias) || available.get(value.alias);
           if (!target) throw Error('Missing alias ' + value.alias);
           raw = figma.variables.createVariableAlias(target);
         } else if (row.type === 'COLOR') raw = {r:value[0],g:value[1],b:value[2],a:value[3]};

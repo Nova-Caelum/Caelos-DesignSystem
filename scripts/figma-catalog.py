@@ -90,6 +90,18 @@ def compile_catalog(revision):
             if mode in row["values"] or row["type"] != vt:
                 raise ValueError("Conflicting variables at " + name)
             row["values"][mode] = value
+            previous = token["$extensions"]["app.caelos"].get("figmaPreviousNames", [])
+            if previous:
+                row["migrateFrom"] = previous[:1]
+                # Keep duplicate variable IDs as hidden aliases so existing pages
+                # retain their bindings. There is only one raw foundation value.
+                for old in previous[1:]:
+                    legacy = "_compat/" + old
+                    if legacy in rows[group]:
+                        raise ValueError("Duplicate compatibility name " + legacy)
+                    rows[group][legacy] = {"name":legacy, "type":vt,
+                        "migrateFrom":[old], "hidden":True,
+                        "values":{mode:{"alias":GROUPS[group] + "/" + name}}}
     return [dict(name=name, modes=modes, variables=sorted(group.values(), key=lambda x:x["name"]))
             for name, modes, group in zip(GROUPS, MODES, rows)]
 
@@ -161,14 +173,18 @@ def compare(plan, live):
             clean = False
             continue
         current["variables"].sort(key=lambda x:x["name"])
-        actual, wanted = digest(current), digest(spec)
+        def values_only(collection):
+            return dict(name=collection["name"], modes=collection["modes"],
+                        variables=[{k:v[k] for k in ("name", "type", "values")}
+                                   for v in collection["variables"]])
+        actual, wanted = digest(values_only(current)), digest(values_only(spec))
         print(spec["name"], "live", actual, "catalog", wanted)
         if actual != wanted:
             clean = False
             if current["modes"] != spec["modes"]:
                 print("  modes", current["modes"], "expected", spec["modes"])
             old = {v["name"]:v for v in current["variables"]}
-            new = {v["name"]:v for v in spec["variables"]}
+            new = {v["name"]:{k:v[k] for k in ("name", "type", "values")} for v in spec["variables"]}
             for name in sorted(old.keys() | new.keys()):
                 if old.get(name) != new.get(name):
                     print(" ", "legacy" if name not in new else "missing" if name not in old else "changed", name)
@@ -188,13 +204,16 @@ def sync(revision, write):
                 raise RuntimeError("Figma returned no session identifier")
             session = match.group()
         def run(code, description):
-            result = client.tool("use_figma", {"fileKey":key,"sessionId":session,"code":code,"description":description})
+            result = client.tool("use_figma", {"fileKey":key,"sessionId":session,"code":code,"description":description,"skillNames":"figma-use,figma-generate-library"})
             return json.loads(result)
         plan = compile_catalog(revision)
         js = (ROOT / "scripts/figma-variables.js").read_text()
         if write:
-            run(js + "\nawait libraryVariables(" + json.dumps(plan, separators=(",", ":")) + ", true); return 'true';",
-                "Update library variables in place from the merged catalog")
+            for spec in plan:
+                code = js + "\nawait libraryVariables(" + json.dumps([spec], separators=(",", ":")) + ", true); return 'true';"
+                if len(code) > 50000:
+                    raise ValueError("Variable collection exceeds Figma request limit: " + spec["name"])
+                run(code, "Update " + spec["name"] + " variables in place from the merged catalog")
         live = []
         for spec in plan:
             # Request a single collection at a time to keep response sizes bounded.
