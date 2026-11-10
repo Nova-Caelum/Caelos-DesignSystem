@@ -159,6 +159,11 @@ test('the icon glossary preserves activity, workspace and composer actions', () 
   const workspace = byAction(glossary.workspace);
   assert.equal(workspace.Settings, 'Settings');
   assert.equal(workspace['Promote to module'], 'TrendingUp');
+  assert.equal(workspace['Projects'], 'FolderOpen');
+  assert.equal(workspace['Modules'], 'Layers');
+  assert.equal(workspace['New module'], 'LayersPlus');
+  assert.equal(workspace['New project'], 'FolderPen');
+  assert.equal(glossary.workspace.find(row => row.glyph === 'LayersPlus').version, '0.577.0');
   assert.equal(composer['Model settings'], 'Zap');
   assert.equal(composer['Live Conversation Mode'], 'AudioLines');
   assert.equal(composer['Send message'], 'ArrowUp');

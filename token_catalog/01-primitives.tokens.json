@@ -1120,6 +1120,28 @@
                   "glyph": "TrendingUp",
                   "action": "Promote to module",
                   "meaning": "Promote the selected item to a module."
+                },
+                {
+                  "glyph": "FolderOpen",
+                  "action": "Projects",
+                  "meaning": "Identify projects in the workspace."
+                },
+                {
+                  "glyph": "Layers",
+                  "action": "Modules",
+                  "meaning": "Identify modules in the workspace."
+                },
+                {
+                  "glyph": "LayersPlus",
+                  "action": "New module",
+                  "meaning": "Create a module.",
+                  "version": "0.577.0",
+                  "source": "https://github.com/lucide-icons/lucide/blob/0.577.0/icons/layers-plus.svg"
+                },
+                {
+                  "glyph": "FolderPen",
+                  "action": "New project",
+                  "meaning": "Create a project."
                 }
               ],
               "harnesses": [
