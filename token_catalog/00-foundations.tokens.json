@@ -2209,6 +2209,26 @@
             "decision": "D29"
           }
         }
+      },
+      "graph-line": {
+        "$type": "number",
+        "$value": 0.07,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "Foundry graph intensity; review with the current palette."
+          }
+        }
+      },
+      "focus-glow": {
+        "$type": "number",
+        "$value": 0.24,
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional",
+            "note": "Focus edge study; requires review in both themes."
+          }
+        }
       }
     },
     "material": {
@@ -2308,6 +2328,17 @@
               "note": "135%, portal menus."
             }
           }
+        },
+        "neutral": {
+          "$type": "number",
+          "$value": 1,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31",
+              "note": "Unfiltered backdrop saturation."
+            }
+          }
         }
       },
       "tint-falloff": {
@@ -2344,6 +2375,30 @@
           "app.caelos": {
             "status": "canon",
             "decision": "D30"
+          }
+        }
+      },
+      "overlap": {
+        "clear": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31",
+              "note": "No content behind the surface."
+            }
+          }
+        },
+        "covered": {
+          "$type": "number",
+          "$value": 1,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D31",
+              "note": "Full overlap, or no host measurement."
+            }
           }
         }
       }

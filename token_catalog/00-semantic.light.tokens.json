@@ -135,6 +135,51 @@
             "note": "D31 decides one role for content behind glass; its value is assumed equal to the panel blur (D29)."
           }
         }
+      },
+      "body": {
+        "$type": "color",
+        "$value": "{base.color.light-ground}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
+      },
+      "ink": {
+        "$type": "color",
+        "$value": "{base.color.ground}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
+      },
+      "tint-ink": {
+        "$type": "color",
+        "$value": "{base.color.structural-violet}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
+      },
+      "grid": {
+        "$type": "color",
+        "$value": "{base.color.structural-violet}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
+      },
+      "sage": {
+        "$type": "color",
+        "$value": "{base.color.success}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "provisional"
+          }
+        }
       }
     },
     "space": {
