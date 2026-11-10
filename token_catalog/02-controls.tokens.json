@@ -658,7 +658,7 @@
         },
         "min-height": {
           "$type": "dimension",
-          "$value": "{base.size.control-height}",
+          "$value": "{base.size.px-44}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -676,7 +676,7 @@
         },
         "block-inset": {
           "$type": "dimension",
-          "$value": "{base.space.step-03}",
+          "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"

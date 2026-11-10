@@ -235,7 +235,7 @@
     "space": {
       "field-interior": {
         "$type": "dimension",
-        "$value": "{base.space.field-interior}",
+        "$value": "{base.space.px-8}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -247,7 +247,7 @@
       "field-group": {
         "compact": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -258,7 +258,7 @@
         },
         "default": {
           "$type": "dimension",
-          "$value": "{base.space.step-07}",
+          "$value": "{base.space.px-21}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -270,7 +270,7 @@
         },
         "comfortable": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -283,7 +283,7 @@
       "inset": {
         "compact": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -294,7 +294,7 @@
         },
         "default": {
           "$type": "dimension",
-          "$value": "{base.space.step-07}",
+          "$value": "{base.space.px-21}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -306,7 +306,7 @@
         },
         "comfortable": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -319,7 +319,7 @@
       "section-stack": {
         "compact": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -330,7 +330,7 @@
         },
         "default": {
           "$type": "dimension",
-          "$value": "{base.space.step-09}",
+          "$value": "{base.space.px-27}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -342,7 +342,7 @@
         },
         "comfortable": {
           "$type": "dimension",
-          "$value": "{base.space.step-10}",
+          "$value": "{base.space.px-30}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -355,7 +355,7 @@
       "section-intro": {
         "compact": {
           "$type": "dimension",
-          "$value": "{base.space.step-04}",
+          "$value": "{base.space.px-12}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -366,7 +366,7 @@
         },
         "default": {
           "$type": "dimension",
-          "$value": "{base.space.step-05}",
+          "$value": "{base.space.px-15}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -377,7 +377,7 @@
         },
         "comfortable": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -389,7 +389,7 @@
       },
       "title-description": {
         "$type": "dimension",
-        "$value": "{base.space.step-02}",
+        "$value": "{base.space.px-6}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -400,7 +400,7 @@
       },
       "inline-cluster": {
         "$type": "dimension",
-        "$value": "{base.space.step-03}",
+        "$value": "{base.space.px-9}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -411,7 +411,7 @@
       },
       "action-row": {
         "$type": "dimension",
-        "$value": "{base.space.step-03}",
+        "$value": "{base.space.px-9}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -422,7 +422,7 @@
       },
       "stack": {
         "$type": "dimension",
-        "$value": "{base.space.step-04}",
+        "$value": "{base.space.px-12}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -433,7 +433,7 @@
       },
       "grid-gap": {
         "$type": "dimension",
-        "$value": "{base.space.step-08}",
+        "$value": "{base.space.px-24}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -444,7 +444,7 @@
       },
       "grid-column-min": {
         "$type": "dimension",
-        "$value": "{base.layout.grid-column-min}",
+        "$value": "{base.size.px-240}",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -456,7 +456,7 @@
       "header": {
         "leading-inset": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -467,7 +467,7 @@
         },
         "trailing-inset": {
           "$type": "dimension",
-          "$value": "{base.space.step-04}",
+          "$value": "{base.space.px-12}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -478,7 +478,7 @@
         },
         "content-gap": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -489,7 +489,7 @@
         },
         "expanded-avatar-gap": {
           "$type": "dimension",
-          "$value": "{base.space.step-10}",
+          "$value": "{base.space.px-30}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -500,7 +500,7 @@
         },
         "vertical-inset": {
           "$type": "dimension",
-          "$value": "{base.space.step-05}",
+          "$value": "{base.space.px-15}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -513,7 +513,7 @@
       "alert": {
         "padding-top": {
           "$type": "dimension",
-          "$value": "{base.space.step-05}",
+          "$value": "{base.space.px-15}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -524,7 +524,7 @@
         },
         "padding-inline": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -535,7 +535,7 @@
         },
         "padding-bottom": {
           "$type": "dimension",
-          "$value": "{base.space.step-06}",
+          "$value": "{base.space.px-18}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -546,7 +546,7 @@
         },
         "icon-gap": {
           "$type": "dimension",
-          "$value": "{base.space.step-03}",
+          "$value": "{base.space.px-9}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -559,7 +559,7 @@
       "dock": {
         "viewport-floor": {
           "$type": "dimension",
-          "$value": "{base.space.step-01}",
+          "$value": "{base.space.px-3}",
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
@@ -572,7 +572,7 @@
       "question": {
         "answer-label-pad": {
           "$type": "dimension",
-          "$value": "{base.space.step-08}",
+          "$value": "{base.space.px-24}",
           "$description": "Question answer label aligned to the title axis.",
           "$extensions": {
             "app.caelos": {
@@ -587,7 +587,7 @@
       "panel": {
         "base-alpha": {
           "$type": "number",
-          "$value": "{base.material.dark.base-alpha}",
+          "$value": "{base.opacity.fraction-0-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -597,7 +597,7 @@
         },
         "blur": {
           "$type": "dimension",
-          "$value": "{base.material.dark.blur}",
+          "$value": "{base.blur.px-19}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -607,7 +607,7 @@
         },
         "tint": {
           "$type": "number",
-          "$value": "{base.material.dark.tint}",
+          "$value": "{base.opacity.fraction-0-14}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -617,7 +617,7 @@
         },
         "saturation": {
           "$type": "number",
-          "$value": "{base.material.saturation.panel}",
+          "$value": "{base.saturation.factor-1-2}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -629,7 +629,7 @@
       "menu": {
         "base-alpha": {
           "$type": "number",
-          "$value": "{base.material.dark.base-alpha}",
+          "$value": "{base.opacity.fraction-0-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -639,7 +639,7 @@
         },
         "blur": {
           "$type": "dimension",
-          "$value": "{base.material.dark.blur}",
+          "$value": "{base.blur.px-19}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -649,7 +649,7 @@
         },
         "tint": {
           "$type": "number",
-          "$value": "{base.material.dark.tint}",
+          "$value": "{base.opacity.fraction-0-14}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -659,7 +659,7 @@
         },
         "saturation": {
           "$type": "number",
-          "$value": "{base.material.saturation.menu}",
+          "$value": "{base.saturation.factor-1-35}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -670,7 +670,7 @@
       },
       "glass-blur": {
         "$type": "dimension",
-        "$value": "{base.material.dark.blur}",
+        "$value": "{base.blur.px-19}",
         "$extensions": {
           "app.caelos": {
             "status": "provisional",

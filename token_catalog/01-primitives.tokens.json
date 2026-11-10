@@ -100,7 +100,7 @@
         "size": {
           "label": {
             "$type": "dimension",
-            "$value": "{base.type.size.label}",
+            "$value": "{base.type.size.px-14}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -109,7 +109,7 @@
           },
           "body": {
             "$type": "dimension",
-            "$value": "{base.type.size.body}",
+            "$value": "{base.type.size.px-16}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -118,7 +118,7 @@
           },
           "title": {
             "$type": "dimension",
-            "$value": "{base.type.size.title}",
+            "$value": "{base.type.size.px-28}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -127,7 +127,7 @@
           },
           "micro": {
             "$type": "dimension",
-            "$value": "{base.type.size.micro}",
+            "$value": "{base.type.size.px-9}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -136,7 +136,7 @@
           },
           "caption": {
             "$type": "dimension",
-            "$value": "{base.type.size.caption}",
+            "$value": "{base.type.size.px-12}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -145,7 +145,7 @@
           },
           "lead": {
             "$type": "dimension",
-            "$value": "{base.type.size.lead}",
+            "$value": "{base.type.size.px-18}",
             "$extensions": {
               "app.caelos": {
                 "status": "canon"
@@ -154,7 +154,7 @@
           },
           "subheading": {
             "$type": "dimension",
-            "$value": "{base.type.size.subheading}",
+            "$value": "{base.type.size.px-20}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -165,7 +165,7 @@
         "line": {
           "label": {
             "$type": "dimension",
-            "$value": "{base.type.line.label}",
+            "$value": "{base.type.line.px-20}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -174,7 +174,7 @@
           },
           "body": {
             "$type": "dimension",
-            "$value": "{base.type.line.body}",
+            "$value": "{base.type.line.px-24}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -183,7 +183,7 @@
           },
           "title": {
             "$type": "dimension",
-            "$value": "{base.type.line.title}",
+            "$value": "{base.type.line.px-36}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -308,7 +308,7 @@
         "separator": {
           "thickness": {
             "$type": "dimension",
-            "$value": "{base.border.hairline}",
+            "$value": "{base.border.px-1}",
             "$extensions": {
               "app.caelos": {
                 "status": "canon"
@@ -358,7 +358,7 @@
         },
         "thumb": {
           "$type": "dimension",
-          "$value": "{base.size.scrollbar.thumb}",
+          "$value": "{base.size.px-6}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -368,7 +368,7 @@
         },
         "track": {
           "$type": "dimension",
-          "$value": "{base.size.scrollbar.track}",
+          "$value": "{base.size.px-22}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -378,7 +378,7 @@
         },
         "thumb-min": {
           "$type": "dimension",
-          "$value": "{base.size.scrollbar.thumb-min}",
+          "$value": "{base.size.px-28}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -388,7 +388,7 @@
         },
         "opacity-rest": {
           "$type": "number",
-          "$value": "{base.opacity.scrollbar.rest}",
+          "$value": "{base.opacity.fraction-0-15}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -398,7 +398,7 @@
         },
         "opacity-drag": {
           "$type": "number",
-          "$value": "{base.opacity.scrollbar.drag}",
+          "$value": "{base.opacity.fraction-0-24}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -408,7 +408,7 @@
         },
         "fill-duration": {
           "$type": "duration",
-          "$value": "{base.motion.scrollbar.fill}",
+          "$value": "{base.motion.duration.ms-180}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -677,7 +677,7 @@
         "button": {
           "tint": {
             "$type": "number",
-            "$value": "{base.opacity.button-tint}",
+            "$value": "{base.opacity.fraction-0-5}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -731,7 +731,7 @@
           },
           "glow-offset": {
             "$type": "dimension",
-            "$value": "{base.space.none}",
+            "$value": "{base.space.px-0}",
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
@@ -1398,7 +1398,7 @@
         },
         "size": {
           "$type": "dimension",
-          "$value": "{base.size.icon}",
+          "$value": "{base.size.px-20}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -1407,7 +1407,7 @@
         },
         "picker-size": {
           "$type": "dimension",
-          "$value": "{base.size.glyph.17}",
+          "$value": "{base.size.px-17}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1416,7 +1416,7 @@
         },
         "harness-monogram-size": {
           "$type": "dimension",
-          "$value": "{base.space.step-10}",
+          "$value": "{base.space.px-30}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -1528,7 +1528,7 @@
         },
         "glow-blur": {
           "$type": "dimension",
-          "$value": "{base.space.step-03}",
+          "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -1537,7 +1537,7 @@
         },
         "glow-opacity": {
           "$type": "number",
-          "$value": "{base.opacity.focus-glow}",
+          "$value": "{base.opacity.fraction-0-24}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -1638,7 +1638,7 @@
         },
         "pitch": {
           "$type": "dimension",
-          "$value": "{base.space.step-09}",
+          "$value": "{base.space.px-27}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional",
@@ -1648,7 +1648,7 @@
         },
         "line": {
           "$type": "dimension",
-          "$value": "{base.border.hairline}",
+          "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1657,7 +1657,7 @@
         },
         "opacity": {
           "$type": "number",
-          "$value": "{base.opacity.graph-line}",
+          "$value": "{base.opacity.fraction-0-07}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -1798,7 +1798,7 @@
         },
         "falloff-at": {
           "$type": "number",
-          "$value": "{base.material.tint-falloff.at}",
+          "$value": "{base.position.fraction-0-72}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1807,7 +1807,7 @@
         },
         "falloff-strength": {
           "$type": "number",
-          "$value": "{base.material.tint-falloff.strength}",
+          "$value": "{base.opacity.fraction-0-2}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1816,7 +1816,7 @@
         },
         "opaque": {
           "$type": "number",
-          "$value": "{base.opacity.material-text}",
+          "$value": "{base.opacity.fraction-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1825,7 +1825,7 @@
         },
         "sage-opacity": {
           "$type": "number",
-          "$value": "{base.opacity.tooltip-fill}",
+          "$value": "{base.opacity.fraction-0-8}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1834,7 +1834,7 @@
         },
         "sage-blur": {
           "$type": "dimension",
-          "$value": "{base.material.tooltip-blur}",
+          "$value": "{base.blur.px-10}",
           "$extensions": {
             "app.caelos": {
               "status": "canon"
@@ -1843,7 +1843,7 @@
         },
         "overlap-clear": {
           "$type": "number",
-          "$value": "{base.material.overlap.clear}",
+          "$value": "{base.coverage.clear}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -1853,7 +1853,7 @@
         },
         "overlap-covered": {
           "$type": "number",
-          "$value": "{base.material.overlap.covered}",
+          "$value": "{base.coverage.covered}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -1863,7 +1863,7 @@
         },
         "saturation-neutral": {
           "$type": "number",
-          "$value": "{base.material.saturation.neutral}",
+          "$value": "{base.saturation.factor-1}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
@@ -2123,7 +2123,7 @@
       "cloud": {
         "body-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.body-alpha}",
+          "$value": "{base.opacity.fraction-0-396078431372549}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2132,7 +2132,7 @@
         },
         "rest-start-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.rest-start-alpha}",
+          "$value": "{base.opacity.fraction-0-043137254901960784}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2141,7 +2141,7 @@
         },
         "rest-end-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.rest-end-alpha}",
+          "$value": "{base.opacity.fraction-0-023529411764705882}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2150,7 +2150,7 @@
         },
         "wash-start-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.wash-start-alpha}",
+          "$value": "{base.opacity.fraction-0-22}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2159,7 +2159,7 @@
         },
         "wash-end-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.wash-end-alpha}",
+          "$value": "{base.opacity.fraction-0-16}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2168,7 +2168,7 @@
         },
         "wash-rest": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.wash-rest}",
+          "$value": "{base.opacity.fraction-0}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2177,7 +2177,7 @@
         },
         "wash-hover": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.wash-hover}",
+          "$value": "{base.opacity.fraction-0-22}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2186,7 +2186,7 @@
         },
         "wash-focus": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.wash-focus}",
+          "$value": "{base.opacity.fraction-1}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2195,7 +2195,7 @@
         },
         "disabled-alpha": {
           "$type": "number",
-          "$value": "{base.opacity.cloud.disabled-alpha}",
+          "$value": "{base.opacity.fraction-0-5}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2249,7 +2249,7 @@
         },
         "angle": {
           "$type": "number",
-          "$value": "{base.material.cloud-angle}",
+          "$value": "{base.angle.degrees-135}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2258,7 +2258,7 @@
         },
         "duration": {
           "$type": "duration",
-          "$value": "{base.motion.cloud.duration}",
+          "$value": "{base.motion.duration.ms-320}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2267,7 +2267,7 @@
         },
         "ease": {
           "$type": "cubicBezier",
-          "$value": "{base.motion.cloud.ease}",
+          "$value": "{base.motion.easing.curve-0-4-0-0-2-1}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2276,7 +2276,7 @@
         },
         "reduced-duration": {
           "$type": "duration",
-          "$value": "{base.motion.duration.reduced}",
+          "$value": "{base.motion.duration.ms-0}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2294,7 +2294,7 @@
         },
         "inset": {
           "$type": "dimension",
-          "$value": "{base.space.none}",
+          "$value": "{base.space.px-0}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -2303,7 +2303,7 @@
         },
         "underlay": {
           "$type": "number",
-          "$value": "{base.material.underlay-order}",
+          "$value": "{base.stack.below}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"

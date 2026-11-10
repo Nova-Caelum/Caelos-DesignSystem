@@ -10,7 +10,7 @@ test('panel and portal consume their own saturation roles in both themes', () =>
     const style = materialRecipe.variants.texture[finish];
     assert.ok(style.backdropFilter.includes('--caelos-material-' + role + '-saturation'));
     for (const vars of Object.values(materialPreset.globalCss)) {
-      assert.equal(Number(vars['--caelos-material-' + role + '-saturation']), base.base.material.saturation[role].$value);
+      assert.equal(Number(vars['--caelos-material-' + role + '-saturation']), base.base.saturation[role === 'panel' ? 'factor-1-2' : 'factor-1-35'].$value);
     }
     assert.equal(style['@media (prefers-reduced-transparency: reduce)'].backdropFilter, 'none');
   }
