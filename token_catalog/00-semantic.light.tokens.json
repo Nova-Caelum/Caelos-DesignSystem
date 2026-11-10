@@ -8,7 +8,7 @@
           {
             "item": "colour roles",
             "ref": "D47, G08",
-            "why": "Ground and hover blue have decided light values. The remaining light colour roles await review."
+            "why": "Ground, hover blue and Structural Violet have decided light values. The remaining light colour roles await review."
           }
         ],
         "mode": "light"
@@ -38,6 +38,18 @@
           }
         },
         "$description": "Primary action hover or focus"
+      },
+      "structural-violet": {
+        "$type": "color",
+        "$value": "{base.color.structural-violet}",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D47",
+            "figmaName": "color/structural-violet"
+          }
+        },
+        "$description": "Scrollbar thumb in both themes, rules and connectors"
       }
     },
     "material": {

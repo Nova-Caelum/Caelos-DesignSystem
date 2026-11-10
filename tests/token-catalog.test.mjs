@@ -198,3 +198,21 @@ test('Aelpha uses the harness monogram size from the foundation scale', () => {
   assert.equal(monogram.sizeToken, 'primitives.shared.icon.harness-monogram-size');
   assert.equal(icon['harness-monogram-size'].$value, '{base.space.step-10}');
 });
+
+test('both scrollbar themes use Structural Violet through the shared thumb role', () => {
+  const primitives = load('01-primitives.tokens.json').primitives;
+  const thumb = primitives.shared.scrollArea;
+  assert.equal(thumb.ink.$value, '{sys.color.structural-violet}');
+  assert.equal(thumb['light-ink'].$value, thumb.ink.$value);
+  for (const theme of ['dark', 'light']) {
+    const semantic = load(`00-semantic.${theme}.tokens.json`).sys;
+    assert.equal(semantic.color['structural-violet'].$value, '{base.color.structural-violet}');
+  }
+});
+
+test('each recovered primitive has a unique inventory name across shared and chat', () => {
+  const { shared, chat } = load('01-primitives.tokens.json').primitives;
+  const names = [...Object.values(shared), ...Object.values(chat)].map(group => group.$extensions[EXT].inventoryName);
+  assert.ok(names.every(name => typeof name === 'string' && name.trim()));
+  assert.equal(new Set(names).size, names.length);
+});

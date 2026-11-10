@@ -15,11 +15,6 @@
             "why": "Thickness has a foundation alias. Ink and fade stops for both orientations still need named roles."
           },
           {
-            "item": "Dark scrollbar",
-            "ref": "D42",
-            "why": "Structural Violet is the light thumb. Dark atmospheric violet needs its own palette role."
-          },
-          {
             "item": "Surface and type coverage",
             "why": "Surface texture samples and glass roles are ready for review; graph pitch, palette mappings and full text-role parity remain provisional."
           }
@@ -393,6 +388,16 @@
               "status": "canon"
             }
           }
+        },
+        "ink": {
+          "$type": "color",
+          "$value": "{sys.color.structural-violet}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          },
+          "$description": "Structural Violet thumb ink for both themes."
         }
       },
       "spacing": {
