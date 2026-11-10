@@ -12,6 +12,8 @@ Copyright 2026 Nova Caelum & Co. All rights reserved. See [LICENSE](LICENSE).
 
 Add `materialPreset` from [src/material-preset.mjs](src/material-preset.mjs) to the Panda configuration's presets. Use the generated `material({ layer: 'ground', texture: 'auto' })` recipe. Auto selects graph or glass by layer. Choose plain, graph, glass, portal, or sage for an explicit finish. Set `data-theme="light"` on a containing element for the light theme. Reduced transparency uses a solid fill for each glass finish.
 
+For panel and portal glass, the host sets `--sys-glass-auto-blur` **on the material element** to the measured fraction of content behind it. Clear, partial and full overlap interpolate between no filtering and the finish’s catalog blur and saturation. Unmeasured surfaces keep full filtering. Body opacity and tint stay fixed; reduced transparency stays opaque. Each nested material starts with its own default.
+
 ## Palette check
 
 Every colour in this repository must be in the Caelos product palette held in the Nova Caelum brand library. `scripts/check-palette.mjs` reads that palette at run time through the vault gateway and fails the pull request on any other colour. The `palette` job runs it from `main` on every pull request and on every push to `main`: the change under review is checked out as data and never executed. The same job fails if `src/tokens.ts` differs from the product palette record in any role or value, so the tokens cannot drift from the brand library. The `unit` job runs the check's own tests.
