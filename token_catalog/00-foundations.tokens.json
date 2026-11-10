@@ -1090,6 +1090,58 @@
               "figmaName": "type/size/picker-reply"
             }
           }
+        },
+        "micro": {
+          "$type": "dimension",
+          "$value": {
+            "value": 9,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "type/size/micro"
+            }
+          }
+        },
+        "caption": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "type/size/caption"
+            }
+          }
+        },
+        "lead": {
+          "$type": "dimension",
+          "$value": {
+            "value": 18,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "type/size/lead"
+            }
+          }
+        },
+        "subheading": {
+          "$type": "dimension",
+          "$value": {
+            "value": 20,
+            "unit": "px"
+          },
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "type/size/subheading"
+            }
+          }
         }
       },
       "line": {

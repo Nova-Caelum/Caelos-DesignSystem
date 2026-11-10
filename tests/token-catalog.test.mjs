@@ -159,6 +159,11 @@ test('the icon glossary preserves activity, workspace and composer actions', () 
   const workspace = byAction(glossary.workspace);
   assert.equal(workspace.Settings, 'Settings');
   assert.equal(workspace['Promote to module'], 'TrendingUp');
+  assert.equal(workspace['Projects'], 'FolderOpen');
+  assert.equal(workspace['Modules'], 'Layers');
+  assert.equal(workspace['New module'], 'LayersPlus');
+  assert.equal(workspace['New project'], 'FolderPen');
+  assert.equal(glossary.workspace.find(row => row.glyph === 'LayersPlus').version, '0.577.0');
   assert.equal(composer['Model settings'], 'Zap');
   assert.equal(composer['Live Conversation Mode'], 'AudioLines');
   assert.equal(composer['Send message'], 'ArrowUp');
@@ -231,5 +236,23 @@ test('field focus follows the shared focus primitive for ink, blur and opacity',
   const field = load('02-controls.tokens.json').controls.shared.input;
   for (const role of ['foreground', 'glow-ink', 'glow-blur', 'glow-opacity']) {
     assert.equal(field['focus-' + role].$value, '{primitives.shared.recipes-focus.' + role + '}');
+  }
+});
+
+test('avatar initials use progressively larger typography roles across all five sizes', () => {
+  const controls = catalog.get('02-controls.tokens.json');
+  const primitives = catalog.get('01-primitives.tokens.json');
+  const foundations = catalog.get('00-foundations.tokens.json');
+  let previous = 0;
+  for (const size of ['sm', 'md', 'lg', 'xl', 'xxl']) {
+    const recipe = controls.get('controls.shared.avatar.initials-size.' + size);
+    const primitive = ALIAS.exec(recipe.$value)[1];
+    assert.ok(primitive.startsWith('primitives.shared.typography.size.'), primitive);
+    const base = ALIAS.exec(primitives.get(primitive).$value)[1];
+    assert.ok(base.startsWith('base.type.size.'), base);
+    const dimension = foundations.get(base).$value;
+    assert.equal(dimension.unit, 'px');
+    assert.ok(dimension.value > previous, size + ' initials must increase in size');
+    previous = dimension.value;
   }
 });
