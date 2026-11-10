@@ -31,11 +31,6 @@
             "why": "Decided as a 1px neutral hairline, but its recorded colour is not in the product palette."
           },
           {
-            "item": "scrollbar colour",
-            "ref": "D42",
-            "why": "Light mode uses Structural Violet. Dark mode's atmospheric violet is not in the product palette."
-          },
-          {
             "item": "Supporting Lavender",
             "ref": "Daniel",
             "why": "On the palette image, not in the palette record. Awaiting Daniel's call."

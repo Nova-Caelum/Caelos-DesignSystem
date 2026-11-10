@@ -205,8 +205,21 @@
             ],
             "decisions": [
               "D12",
-              "D52"
-            ]
+              "D52",
+              "D25"
+            ],
+            "darkReview": {
+              "states": [
+                "rest",
+                "hover",
+                "focus",
+                "disabled",
+                "needs-attention"
+              ],
+              "requiredError": "empty required text field",
+              "multilineResize": "vertical",
+              "note": "Current role selections for geometry, surfaces and typography are pending visual review."
+            }
           }
         },
         "label-gap": {
@@ -228,6 +241,188 @@
               "status": "canon",
               "decision": "D12",
               "note": "Control to help text."
+            }
+          }
+        },
+        "surface": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.layer.elevated}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "hover-surface": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.layer.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.default}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "supporting-ink": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.muted}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "disabled-ink": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.dim}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "focus-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.foreground}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D25"
+            }
+          }
+        },
+        "focus-glow-ink": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.glow-ink}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D25"
+            }
+          }
+        },
+        "focus-glow-blur": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.recipes-focus.glow-blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "focus-glow-opacity": {
+          "$type": "number",
+          "$value": "{primitives.shared.recipes-focus.glow-opacity}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "error-ink": {
+          "$type": "color",
+          "$value": "{sys.color.danger}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "family": {
+          "$type": "fontFamily",
+          "$value": "{primitives.shared.typography.family.ui}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "text-size": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.size.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "text-line": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.line.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "text-weight": {
+          "$type": "fontWeight",
+          "$value": "{base.type.weight.medium}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "control-inset": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.spacing.inset.compact}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "icon-gap": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.spacing.inline-cluster}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.md}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "min-height": {
+          "$type": "dimension",
+          "$value": "{base.size.control-height}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "glyph-size": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.icon.picker-size}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "block-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
             }
           }
         }
