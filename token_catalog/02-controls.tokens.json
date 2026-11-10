@@ -521,6 +521,54 @@
               "reduced-transparency"
             ]
           }
+        },
+        "initials-size": {
+          "$description": "Initials font size by avatar frame size. XL uses the reviewed 18px step. XXL uses the 20px step derived from the original proportional sizing, pending visual review.",
+          "sm": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.typography.size.micro}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "md": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.typography.size.caption}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "lg": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.typography.size.body}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "xl": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.typography.size.lead}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "xxl": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.typography.size.subheading}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          }
         }
       },
       "rippleLoader": {

@@ -124,6 +124,42 @@
                 "status": "provisional"
               }
             }
+          },
+          "micro": {
+            "$type": "dimension",
+            "$value": "{base.type.size.micro}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "caption": {
+            "$type": "dimension",
+            "$value": "{base.type.size.caption}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "lead": {
+            "$type": "dimension",
+            "$value": "{base.type.size.lead}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "canon"
+              }
+            }
+          },
+          "subheading": {
+            "$type": "dimension",
+            "$value": "{base.type.size.subheading}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
           }
         },
         "line": {

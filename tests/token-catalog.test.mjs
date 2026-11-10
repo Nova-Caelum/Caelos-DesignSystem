@@ -238,3 +238,21 @@ test('field focus follows the shared focus primitive for ink, blur and opacity',
     assert.equal(field['focus-' + role].$value, '{primitives.shared.recipes-focus.' + role + '}');
   }
 });
+
+test('avatar initials use progressively larger typography roles across all five sizes', () => {
+  const controls = catalog.get('02-controls.tokens.json');
+  const primitives = catalog.get('01-primitives.tokens.json');
+  const foundations = catalog.get('00-foundations.tokens.json');
+  let previous = 0;
+  for (const size of ['sm', 'md', 'lg', 'xl', 'xxl']) {
+    const recipe = controls.get('controls.shared.avatar.initials-size.' + size);
+    const primitive = ALIAS.exec(recipe.$value)[1];
+    assert.ok(primitive.startsWith('primitives.shared.typography.size.'), primitive);
+    const base = ALIAS.exec(primitives.get(primitive).$value)[1];
+    assert.ok(base.startsWith('base.type.size.'), base);
+    const dimension = foundations.get(base).$value;
+    assert.equal(dimension.unit, 'px');
+    assert.ok(dimension.value > previous, size + ' initials must increase in size');
+    previous = dimension.value;
+  }
+});
