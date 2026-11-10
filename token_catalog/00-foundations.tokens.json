@@ -386,7 +386,7 @@
           "alpha": 1,
           "hex": "#C4AC7C"
         },
-        "$description": "Gold (palette role golden-sand)",
+        "$description": "Golden Sand (palette role golden-sand)",
         "$extensions": {
           "app.caelos": {
             "status": "canon",
@@ -530,29 +530,6 @@
             "figmaName": "color/structural-violet",
             "shared": true,
             "paletteRole": "structural-violet"
-          }
-        }
-      },
-      "rose-hover": {
-        "$type": "color",
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            0.7882,
-            0.5216,
-            0.5373
-          ],
-          "alpha": 1,
-          "hex": "#C98589"
-        },
-        "$description": "Rose hover / hot (palette role rose-hover)",
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "product palette record",
-            "figmaName": "color/rose-hover",
-            "shared": true,
-            "paletteRole": "rose-hover"
           }
         }
       }

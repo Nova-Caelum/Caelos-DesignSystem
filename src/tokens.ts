@@ -23,7 +23,6 @@ export const color = {
   'ready': '#8E96CC',
   'light-ground': '#F2E8D9',
   'structural-violet': '#3F3D6C',
-  'rose-hover': '#C98589',
 } as const;
 
 export type ColorRole = keyof typeof color;

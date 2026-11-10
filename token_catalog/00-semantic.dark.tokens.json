@@ -24,7 +24,8 @@
             "decision": "D47",
             "figmaName": "color/chrome"
           }
-        }
+        },
+        "$description": "Outer application frame"
       },
       "ground": {
         "$type": "color",
@@ -35,7 +36,8 @@
             "decision": "D47",
             "figmaName": "color/ground"
           }
-        }
+        },
+        "$description": "Main application background"
       },
       "elevated": {
         "$type": "color",
@@ -46,7 +48,8 @@
             "decision": "D47",
             "figmaName": "color/elevated"
           }
-        }
+        },
+        "$description": "Panel surface"
       },
       "elevated-2": {
         "$type": "color",
@@ -57,7 +60,8 @@
             "decision": "D47",
             "figmaName": "color/elevated-2"
           }
-        }
+        },
+        "$description": "Raised surface above a panel"
       },
       "top": {
         "$type": "color",
@@ -68,7 +72,8 @@
             "decision": "D47",
             "figmaName": "color/top"
           }
-        }
+        },
+        "$description": "Highest surface layer"
       },
       "text-primary": {
         "$type": "color",
@@ -79,7 +84,8 @@
             "decision": "D47",
             "figmaName": "color/text-primary"
           }
-        }
+        },
+        "$description": "Primary text and composer input"
       },
       "text-supporting": {
         "$type": "color",
@@ -90,7 +96,8 @@
             "decision": "D47",
             "figmaName": "color/text-supporting"
           }
-        }
+        },
+        "$description": "Supporting text and placeholders"
       },
       "text-tertiary": {
         "$type": "color",
@@ -101,7 +108,8 @@
             "decision": "D47",
             "figmaName": "color/text-tertiary"
           }
-        }
+        },
+        "$description": "Large, nonessential text"
       },
       "text-faint": {
         "$type": "color",
@@ -112,7 +120,8 @@
             "decision": "D47",
             "figmaName": "color/text-faint"
           }
-        }
+        },
+        "$description": "Disabled or decorative text"
       },
       "action-blue": {
         "$type": "color",
@@ -123,7 +132,8 @@
             "decision": "D47",
             "figmaName": "color/action-blue"
           }
-        }
+        },
+        "$description": "Primary actions and calls to action"
       },
       "action-blue-hover": {
         "$type": "color",
@@ -134,7 +144,8 @@
             "decision": "D47",
             "figmaName": "color/action-blue-hover"
           }
-        }
+        },
+        "$description": "Primary action hover or focus"
       },
       "success": {
         "$type": "color",
@@ -145,7 +156,8 @@
             "decision": "D47",
             "figmaName": "color/success"
           }
-        }
+        },
+        "$description": "Positive, success and done states"
       },
       "golden-sand": {
         "$type": "color",
@@ -156,7 +168,8 @@
             "decision": "D47",
             "figmaName": "color/golden-sand"
           }
-        }
+        },
+        "$description": "Marketing and identity emphasis"
       },
       "peach-gold": {
         "$type": "color",
@@ -167,7 +180,8 @@
             "decision": "D47",
             "figmaName": "color/peach-gold"
           }
-        }
+        },
+        "$description": "Attention, progress and permission alerts"
       },
       "danger": {
         "$type": "color",
@@ -178,7 +192,8 @@
             "decision": "D47",
             "figmaName": "color/danger"
           }
-        }
+        },
+        "$description": "Errors and destructive actions"
       },
       "danger-hover": {
         "$type": "color",
@@ -189,7 +204,8 @@
             "decision": "D47",
             "figmaName": "color/danger-hover"
           }
-        }
+        },
+        "$description": "Destructive action hover or focus"
       },
       "ready": {
         "$type": "color",
@@ -200,7 +216,8 @@
             "decision": "D47",
             "figmaName": "color/ready"
           }
-        }
+        },
+        "$description": "Ready state and calm category accents"
       },
       "structural-violet": {
         "$type": "color",
@@ -211,18 +228,8 @@
             "decision": "D47",
             "figmaName": "color/structural-violet"
           }
-        }
-      },
-      "rose-hover": {
-        "$type": "color",
-        "$value": "{base.color.rose-hover}",
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "D47",
-            "figmaName": "color/rose-hover"
-          }
-        }
+        },
+        "$description": "Light scrollbar, rules and connectors"
       }
     },
     "space": {
