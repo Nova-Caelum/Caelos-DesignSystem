@@ -640,7 +640,7 @@ test('palette.yml: main runs the script, the change is data, secrets are in one 
   assert.match(text, /GIT_LFS_SKIP_SMUDGE: '1'/);
   assert.match(text, /ref: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}\n {10}path: pr\n/);
   const runs = text.match(/^ +run: .*$/gm);
-  assert.deepEqual(runs.map((r) => r.trim()), ['run: node scripts/check-palette.mjs --root pr --tokens src/tokens.ts']);
+  assert.deepEqual(runs.map((r) => r.trim()), ['run: node scripts/check-palette.mjs --root pr --tokens src/tokens.ts --catalog token_catalog/00-foundations.tokens.json']);
   assert.doesNotMatch(text, /npm|pnpm|yarn|pip |make |node --test|working-directory|cd pr|\.\/pr|--palette/);
   const [before, after] = text.split('- name: Palette check');
   assert.doesNotMatch(before, /secrets\./);

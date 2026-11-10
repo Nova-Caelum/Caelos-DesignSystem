@@ -131,7 +131,41 @@ export function compareTokens({ roles, problems }, palette) {
   return out;
 }
 
-export function readTokens(root, rel) {
+// Read the PR catalog as data. Its role set, hex and sRGB channels must all agree.
+export function parseCatalogColors(text) {
+  const roles = new Map();
+  const problems = [];
+  const base = JSON.parse(text).base;
+  function visit(group, path) {
+    for (const [key, child] of Object.entries(group)) {
+      if (key.startsWith('$')) continue;
+      const parts = [...path, key];
+      if (!Object.hasOwn(child, '$value')) {
+        visit(child, parts);
+        continue;
+      }
+      if (child.$type !== 'color' && parts[0] !== 'color') continue;
+      const role = child.$extensions?.['app.caelos']?.paletteRole;
+      const value = child.$value;
+      if (parts.length !== 2 || parts[0] !== 'color' || role !== key || child.$type !== 'color') {
+        problems.push(parts.join('.') + ' must declare its own palette role and colour type');
+        continue;
+      }
+      const hex = value?.hex?.toUpperCase();
+      const channels = value?.components;
+      const valid = /^#[0-9A-F]{6}$/.test(hex) && value.colorSpace === 'srgb' && value.alpha === 1
+        && Array.isArray(channels) && channels.length === 3 && channels.every((n, i) =>
+          Number.isFinite(n) && n >= 0 && n <= 1 &&
+          Math.abs(n - parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255) <= 0.00005);
+      if (!valid) problems.push(parts.join('.') + ' has inconsistent hex, channels, space or opacity');
+      roles.set(role, { hex, line: role });
+    }
+  }
+  visit(base, []);
+  return { roles, problems };
+}
+
+export function readTokens(root, rel, parser = parseTokens) {
   if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) throw new ConfigError('--tokens must be a path inside the scan root');
   const full = path.join(root, rel);
   let st;
@@ -144,7 +178,7 @@ export function readTokens(root, rel) {
   const realRoot = realpathSync(root);
   const parent = realpathSync(path.dirname(full));
   if (parent !== realRoot && !parent.startsWith(realRoot + path.sep)) return { roles: new Map(), problems: ['resolves outside the scan root'] };
-  return parseTokens(readFileSync(full, 'utf8'));
+  return parser(readFileSync(full, 'utf8'));
 }
 
 // Line numbers of palettes.md that hold a hex code. Self-contained on purpose: it also runs inside the
@@ -468,7 +502,7 @@ function parseArgs(argv) {
   const opts = { root: null, palette: null, paletteMd: null, tokens: null };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
-    const key = { '--root': 'root', '--palette': 'palette', '--palette-md': 'paletteMd', '--tokens': 'tokens' }[flag];
+    const key = { '--root': 'root', '--palette': 'palette', '--palette-md': 'paletteMd', '--tokens': 'tokens', '--catalog': 'catalog' }[flag];
     if (!key || i + 1 >= argv.length) throw new ConfigError(`unknown or incomplete argument: ${flag}`);
     opts[key] = argv[++i];
   }
@@ -503,6 +537,8 @@ export async function main(argv, env, io = {}) {
     const root = path.resolve(opts.root ?? '.');
     const { findings, scanned, binary, submodules } = scanRepo(root, palette);
     const tokenProblems = opts.tokens ? compareTokens(readTokens(root, opts.tokens), palette) : [];
+    if (opts.catalog) tokenProblems.push(...compareTokens(readTokens(root, opts.catalog, parseCatalogColors), palette)
+      .map((message) => opts.catalog + ': ' + message));
     out(`palette source: ${source}\n`);
     out(`scanned ${scanned} text files (${binary} binary and ${submodules} submodule paths skipped)\n`);
     if (opts.tokens && !tokenProblems.length) out(`${opts.tokens} matches the palette record (${palette.roles.size} roles)\n`);

@@ -445,6 +445,135 @@
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
           }
         }
+      },
+      "header": {
+        "leading-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "trailing-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-04}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "content-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "expanded-avatar-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-10}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "vertical-inset": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
+            }
+          }
+        }
+      },
+      "alert": {
+        "padding-top": {
+          "$type": "dimension",
+          "$value": "{base.space.step-05}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "padding-inline": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "padding-bottom": {
+          "$type": "dimension",
+          "$value": "{base.space.step-06}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        },
+        "icon-gap": {
+          "$type": "dimension",
+          "$value": "{base.space.step-03}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D62"
+            }
+          }
+        }
+      },
+      "dock": {
+        "viewport-floor": {
+          "$type": "dimension",
+          "$value": "{base.space.step-01}",
+          "$description": "Shared across colour modes.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D54"
+            }
+          }
+        }
+      },
+      "question": {
+        "answer-label-pad": {
+          "$type": "dimension",
+          "$value": "{base.space.step-08}",
+          "$description": "Question answer label aligned to the title axis.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D64"
+            }
+          }
+        }
       }
     },
     "material": {

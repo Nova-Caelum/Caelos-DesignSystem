@@ -6,11 +6,6 @@
         "tier": 0,
         "open": [
           {
-            "item": "radius lg",
-            "ref": "D21",
-            "why": "D21 keeps lg, but no value is recorded. The draft's 20px contradicts D21, which maps the 20px call sites to xl."
-          },
-          {
             "item": "second spacing scale",
             "ref": "D01, D14",
             "why": "The Figma draft's space/2xs to 3xl (2, 4, 8, 12, 16, 24, 32, 48px) is a second scale; D01 and D14 decide one 3px system. Not admitted. The draft's buttons and chip are bound to it."
@@ -84,6 +79,16 @@
             "item": "scrollbar fill curve",
             "ref": "D42",
             "why": "Recorded as a deceleration; the curve was not."
+          },
+          {
+            "item": "danger hover in chat",
+            "ref": "D46",
+            "why": "The palette defines a separate hover role. Chat uses the resting role on hover. Product interaction routing awaits review."
+          },
+          {
+            "item": "new conversation arrival",
+            "ref": "D36",
+            "why": "Use the landing entrance on new conversation. Its five-part study is the reference. Individual timings and their assignment to product elements await confirmation."
           }
         ],
         "rules": [
@@ -112,7 +117,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/chrome"
+            "figmaName": "color/chrome",
+            "paletteRole": "chrome"
           }
         }
       },
@@ -133,7 +139,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/ground"
+            "figmaName": "color/ground",
+            "paletteRole": "ground"
           }
         }
       },
@@ -154,7 +161,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/elevated"
+            "figmaName": "color/elevated",
+            "paletteRole": "elevated"
           }
         }
       },
@@ -175,7 +183,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/elevated-2"
+            "figmaName": "color/elevated-2",
+            "paletteRole": "elevated-2"
           }
         }
       },
@@ -196,7 +205,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/top"
+            "figmaName": "color/top",
+            "paletteRole": "top"
           }
         }
       },
@@ -217,7 +227,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/text-primary"
+            "figmaName": "color/text-primary",
+            "paletteRole": "text-primary"
           }
         }
       },
@@ -238,7 +249,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/text-supporting"
+            "figmaName": "color/text-supporting",
+            "paletteRole": "text-supporting"
           }
         }
       },
@@ -259,7 +271,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/text-tertiary"
+            "figmaName": "color/text-tertiary",
+            "paletteRole": "text-tertiary"
           }
         }
       },
@@ -280,7 +293,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/text-faint"
+            "figmaName": "color/text-faint",
+            "paletteRole": "text-faint"
           }
         }
       },
@@ -301,7 +315,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/action-blue"
+            "figmaName": "color/action-blue",
+            "paletteRole": "action-blue"
           }
         }
       },
@@ -322,7 +337,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/action-blue-hover"
+            "figmaName": "color/action-blue-hover",
+            "paletteRole": "action-blue-hover"
           }
         }
       },
@@ -343,7 +359,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/success"
+            "figmaName": "color/success",
+            "paletteRole": "success"
           }
         }
       },
@@ -365,7 +382,8 @@
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/golden-sand",
-            "note": "Renamed from gold on 2026-11-09 (Daniel). Was color/gold in Figma: rename that variable so its bindings survive."
+            "note": "Renamed from gold on 2026-11-09 (Daniel). Was color/gold in Figma: rename that variable so its bindings survive.",
+            "paletteRole": "golden-sand"
           }
         }
       },
@@ -387,7 +405,8 @@
             "status": "canon",
             "decision": "product palette record",
             "note": "Canon set by Daniel on 2026-11-09: one value shared by the company and product palettes. Renamed from peach; was color/peach in Figma: rename that variable so its bindings survive.",
-            "figmaName": "color/peach-gold"
+            "figmaName": "color/peach-gold",
+            "paletteRole": "peach-gold"
           }
         }
       },
@@ -408,7 +427,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/danger"
+            "figmaName": "color/danger",
+            "paletteRole": "danger"
           }
         }
       },
@@ -430,7 +450,8 @@
             "status": "canon",
             "decision": "product palette record",
             "note": "Daniel decision pending: the chat app's dark mode uses the danger colour itself for hover, not this value.",
-            "figmaName": "color/danger-hover"
+            "figmaName": "color/danger-hover",
+            "paletteRole": "danger-hover"
           }
         }
       },
@@ -451,7 +472,8 @@
           "app.caelos": {
             "status": "canon",
             "decision": "product palette record",
-            "figmaName": "color/ready"
+            "figmaName": "color/ready",
+            "paletteRole": "ready"
           }
         }
       },
@@ -473,7 +495,8 @@
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/light-ground",
-            "shared": true
+            "shared": true,
+            "paletteRole": "light-ground"
           }
         }
       },
@@ -495,7 +518,8 @@
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/structural-violet",
-            "shared": true
+            "shared": true,
+            "paletteRole": "structural-violet"
           }
         }
       },
@@ -517,7 +541,8 @@
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/rose-hover",
-            "shared": true
+            "shared": true,
+            "paletteRole": "rose-hover"
           }
         }
       }
@@ -535,7 +560,8 @@
             "decision": "D01",
             "figmaName": "space/none"
           }
-        }
+        },
+        "$description": "Structural zero for removing a gap. The ten product steps start at step-01."
       },
       "step-01": {
         "$type": "dimension",
@@ -707,6 +733,83 @@
             "note": "Nominal; may shrink inside a narrower container."
           }
         }
+      },
+      "header": {
+        "rest-width": {
+          "$type": "number",
+          "$value": 0.45,
+          "$description": "Header proportion relative to the Composer or cap geometry.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "expanded-width": {
+          "$type": "number",
+          "$value": 0.56,
+          "$description": "Header proportion relative to the Composer or cap geometry.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "cap-compensation": {
+          "$type": "number",
+          "$value": 0.1,
+          "$description": "Header proportion relative to the Composer or cap geometry.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "trailing-cushion": {
+          "$type": "dimension",
+          "$value": {
+            "value": 60,
+            "unit": "px"
+          },
+          "$description": "Expanded header geometry, constrained to available space.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "content-min": {
+          "$type": "dimension",
+          "$value": {
+            "value": 280,
+            "unit": "px"
+          },
+          "$description": "Expanded header geometry, constrained to available space.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        },
+        "content-max": {
+          "$type": "dimension",
+          "$value": {
+            "value": 460,
+            "unit": "px"
+          },
+          "$description": "Expanded header geometry, constrained to available space.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D60"
+            }
+          }
+        }
       }
     },
     "radius": {
@@ -763,6 +866,21 @@
             "status": "canon",
             "decision": "D24",
             "note": "Category and status pills 10, 12 and 14px high."
+          }
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": {
+          "value": 13.5,
+          "unit": "px"
+        },
+        "$description": "Retained product large radius. Card surfaces use xl.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D21",
+            "figmaName": "radius/lg"
           }
         }
       }
@@ -905,6 +1023,17 @@
               "status": "canon",
               "decision": "D69",
               "note": "UI text at 10 to 11px."
+            }
+          }
+        },
+        "mono-micro": {
+          "$type": "fontFamily",
+          "$value": "Caelum Mono Micro",
+          "$description": "Micro companion for code, identifiers and shortcuts.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D69"
             }
           }
         }
@@ -1122,11 +1251,12 @@
           "$value": 0.019,
           "$extensions": {
             "app.caelos": {
-              "status": "canon",
+              "status": "provisional",
               "decision": "D18",
               "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06)."
             }
-          }
+          },
+          "$description": "Historical Plex lettering in em. Application to the current UI family awaits optical review."
         }
       },
       "word-spacing": {
@@ -1135,9 +1265,53 @@
           "$value": 0.055,
           "$extensions": {
             "app.caelos": {
-              "status": "canon",
+              "status": "provisional",
               "decision": "D18",
               "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06)."
+            }
+          },
+          "$description": "Historical Plex lettering in em. Application to the current UI family awaits optical review."
+        }
+      },
+      "feature": {
+        "zero": {
+          "$type": "number",
+          "$value": 0,
+          "$description": "Keep the default slashed glyph. The alternate zero feature stays off.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D68"
+            }
+          }
+        }
+      },
+      "micro-range": {
+        "min": {
+          "$type": "dimension",
+          "$value": {
+            "value": 10,
+            "unit": "px"
+          },
+          "$description": "Boundary of the product UI micro text range.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D69"
+            }
+          }
+        },
+        "max": {
+          "$type": "dimension",
+          "$value": {
+            "value": 11,
+            "unit": "px"
+          },
+          "$description": "Boundary of the product UI micro text range.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D69"
             }
           }
         }
@@ -1295,6 +1469,64 @@
               "status": "canon",
               "decision": "D44",
               "note": "Minimum thumb height."
+            }
+          }
+        }
+      },
+      "avatar": {
+        "xl": {
+          "$type": "dimension",
+          "$value": {
+            "value": 48,
+            "unit": "px"
+          },
+          "$description": "Agent avatar in the approved header composition.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
+            }
+          }
+        },
+        "xxl": {
+          "$type": "dimension",
+          "$value": {
+            "value": 54,
+            "unit": "px"
+          },
+          "$description": "Agent avatar in the approved header composition.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
+            }
+          }
+        },
+        "small-group": {
+          "$type": "dimension",
+          "$value": {
+            "value": 40,
+            "unit": "px"
+          },
+          "$description": "Agent avatar in the approved header composition.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
+            }
+          }
+        },
+        "large-group": {
+          "$type": "dimension",
+          "$value": {
+            "value": 32,
+            "unit": "px"
+          },
+          "$description": "Agent avatar in the approved header composition.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D61"
             }
           }
         }
@@ -1708,6 +1940,256 @@
             }
           }
         }
+      },
+      "arrival": {
+        "field-delay": {
+          "$type": "duration",
+          "$value": {
+            "value": 60,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "field-duration": {
+          "$type": "duration",
+          "$value": {
+            "value": 1800,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "eyebrow-delay": {
+          "$type": "duration",
+          "$value": {
+            "value": 160,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "text-duration": {
+          "$type": "duration",
+          "$value": {
+            "value": 900,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "heading-delay": {
+          "$type": "duration",
+          "$value": {
+            "value": 260,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "heading-duration": {
+          "$type": "duration",
+          "$value": {
+            "value": 1000,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "secondary-delay": {
+          "$type": "duration",
+          "$value": {
+            "value": 520,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "final-delay": {
+          "$type": "duration",
+          "$value": {
+            "value": 720,
+            "unit": "ms"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "eyebrow-blur": {
+          "$type": "dimension",
+          "$value": {
+            "value": 6,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "eyebrow-rise": {
+          "$type": "dimension",
+          "$value": {
+            "value": 8,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "heading-blur": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "heading-rise": {
+          "$type": "dimension",
+          "$value": {
+            "value": 16,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "secondary-rise": {
+          "$type": "dimension",
+          "$value": {
+            "value": 12,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "final-blur": {
+          "$type": "dimension",
+          "$value": {
+            "value": 8,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "final-rise": {
+          "$type": "dimension",
+          "$value": {
+            "value": 14,
+            "unit": "px"
+          },
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "field-alpha": {
+          "$type": "number",
+          "$value": 0.55,
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "field-scale": {
+          "$type": "number",
+          "$value": 1.045,
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        },
+        "curve": {
+          "$type": "cubicBezier",
+          "$value": [
+            0.22,
+            1,
+            0.36,
+            1
+          ],
+          "$description": "Measured landing entrance reference for new conversations. Product element assignment awaits visual review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "decision": "D36"
+            }
+          }
+        }
       }
     },
     "opacity": {
@@ -1741,6 +2223,17 @@
           "app.caelos": {
             "status": "canon",
             "decision": "D30"
+          }
+        }
+      },
+      "material-text": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Panel and menu foreground stays fully opaque.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D29"
           }
         }
       }
@@ -1960,6 +2453,20 @@
             "status": "canon",
             "decision": "D64",
             "note": "Stacked answers, both sides."
+          }
+        }
+      },
+      "editor-cushion-increase-max": {
+        "$type": "dimension",
+        "$value": {
+          "value": 5,
+          "unit": "px"
+        },
+        "$description": "Maximum increase to the expanded editor right inset.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "D75"
           }
         }
       }

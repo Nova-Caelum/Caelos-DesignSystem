@@ -1,0 +1,5 @@
+set -eu
+snapshot=$(mktemp -d)
+trap 'rm -rf "$snapshot"' EXIT
+git checkout-index --all --prefix="$snapshot/"
+(cd "$snapshot" && node --test)
