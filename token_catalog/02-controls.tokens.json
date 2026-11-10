@@ -8,7 +8,7 @@
           {
             "item": "button and chip values",
             "ref": "D50, D81, G04, G05",
-            "why": "Button and chip padding, height, timing and focus remain open, as does chip radius. The shared button radius is decided."
+            "why": "Button and chip padding, height and timing remain open, as do chip radius and focus. Tonal and text button hover, pressed and focus treatments await review."
           }
         ]
       }
@@ -147,7 +147,11 @@
               "size": "md"
             },
             "states": [
+              "default",
               "hover",
+              "pressed",
+              "success",
+              "focus",
               "disabled"
             ],
             "modes": [
@@ -161,7 +165,72 @@
               "D82",
               "D25"
             ],
-            "note": "The approved button radius applies across variants, sizes and states. Draft padding used the rejected second scale (D01)."
+            "note": "The approved medium radius applies across variants, sizes and states. Paint roles below describe the existing Figma masters in both motion modes. Draft padding used the rejected second scale (D01).",
+            "statePaints": {
+              "primary": {
+                "default": {
+                  "fill": "bed",
+                  "tintInk": "default",
+                  "tintOpacity": "tint",
+                  "foreground": "foreground"
+                },
+                "hover": {
+                  "fill": "bed",
+                  "tintInk": "hover",
+                  "tintOpacity": "tint",
+                  "foreground": "foreground"
+                },
+                "pressed": {
+                  "fill": "bed",
+                  "tintInk": "pressed",
+                  "tintOpacity": "tint",
+                  "foreground": "foreground"
+                },
+                "success": {
+                  "fill": "bed",
+                  "tintInk": "success",
+                  "tintOpacity": "tint",
+                  "foreground": "foreground"
+                },
+                "focus": {
+                  "fill": "bed",
+                  "foreground": "focus-foreground",
+                  "glowInk": "focus-glow-ink",
+                  "glowBlur": "focus-glow-blur",
+                  "glowOpacity": "focus-glow-opacity",
+                  "glowOffset": "glow-offset"
+                },
+                "disabled": {
+                  "fill": "disabled-bed",
+                  "foreground": "disabled-foreground"
+                }
+              },
+              "tonal": {
+                "default": {
+                  "fill": "tonal-fill",
+                  "foreground": "text-inverse"
+                },
+                "success": {
+                  "fill": "tonal-active",
+                  "foreground": "text-inverse"
+                },
+                "disabled": {
+                  "fill": "disabled",
+                  "foreground": "text-disabled"
+                }
+              },
+              "text": {
+                "default": {
+                  "foreground": "text-inverse"
+                },
+                "success": {
+                  "foreground": "text-inverse"
+                },
+                "disabled": {
+                  "foreground": "text-disabled"
+                }
+              }
+            }
           }
         },
         "radius": {
@@ -172,6 +241,183 @@
               "status": "canon",
               "figmaName": "button/radius",
               "note": "Medium corners approved in the Tier 2 Controls review against fused staging."
+            }
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.default}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "focus-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.foreground}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "disabled-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.dim}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{primitives.shared.surface.button.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "bed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.bed}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "default": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.default}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "hover": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.hover}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "pressed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.pressed}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "success": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.success}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "focus-glow-blur": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.recipes-focus.glow-blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "focus-glow-ink": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.glow-ink}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D25"
+            }
+          }
+        },
+        "focus-glow-opacity": {
+          "$type": "number",
+          "$value": "{primitives.shared.recipes-focus.glow-opacity}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "glow-offset": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.surface.button.glow-offset}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "disabled-bed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.disabled-bed}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional"
+            }
+          }
+        },
+        "tonal-fill": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "button/tonal-fill"
+            }
+          }
+        },
+        "tonal-active": {
+          "$type": "color",
+          "$value": "{sys.color.structural-violet}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "button/tonal-active"
+            }
+          }
+        },
+        "disabled": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "button/disabled"
+            }
+          }
+        },
+        "text-inverse": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "button/text-inverse"
+            }
+          }
+        },
+        "text-disabled": {
+          "$type": "color",
+          "$value": "{sys.color.text-tertiary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "button/text-disabled"
             }
           }
         }
@@ -257,7 +503,7 @@
         },
         "surface": {
           "$type": "color",
-          "$value": "{primitives.shared.surface.layer.elevated}",
+          "$value": "{primitives.shared.cloud.body}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -266,7 +512,7 @@
         },
         "hover-surface": {
           "$type": "color",
-          "$value": "{primitives.shared.surface.layer.elevated-2}",
+          "$value": "{primitives.shared.cloud.body}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
@@ -434,6 +680,188 @@
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
+            }
+          }
+        },
+        "cloud": {
+          "body-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.body-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "rest-start-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.rest-start-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "rest-end-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.rest-end-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-start-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.wash-start-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-end-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.wash-end-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-rest": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.wash-rest}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-hover": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.wash-hover}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-focus": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.wash-focus}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "disabled-alpha": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.disabled-alpha}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "body": {
+            "$type": "color",
+            "$value": "{primitives.shared.cloud.body}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "rest-start": {
+            "$type": "color",
+            "$value": "{primitives.shared.cloud.rest-start}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "rest-end": {
+            "$type": "color",
+            "$value": "{primitives.shared.cloud.rest-end}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-start": {
+            "$type": "color",
+            "$value": "{primitives.shared.cloud.wash-start}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "wash-end": {
+            "$type": "color",
+            "$value": "{primitives.shared.cloud.wash-end}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "angle": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.angle}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": "{primitives.shared.cloud.duration}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "ease": {
+            "$type": "cubicBezier",
+            "$value": "{primitives.shared.cloud.ease}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "reduced-duration": {
+            "$type": "duration",
+            "$value": "{primitives.shared.cloud.reduced-duration}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "inset": {
+            "$type": "dimension",
+            "$value": "{primitives.shared.cloud.inset}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
+            }
+          },
+          "underlay": {
+            "$type": "number",
+            "$value": "{primitives.shared.cloud.underlay}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional"
+              }
             }
           }
         }

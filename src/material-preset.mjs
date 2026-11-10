@@ -5,21 +5,26 @@ import primitives from '../token_catalog/01-primitives.tokens.json' with { type:
 
 const { glass, graph, surface } = primitives.primitives.shared;
 const auto = surface.$extensions['app.caelos'].autoTexture;
-const ref = (name) => `var(--caelos-material-${name})`;
+export const ref = (name) => `var(--caelos-material-${name})`;
 
-function themeVars(semantic) {
-  const roots = { ...foundations, ...semantic };
+export function tokenWriter(semantic) {
+  const roots = { ...foundations, ...semantic, ...primitives };
   function resolve(token) {
     const v = token.$value;
     if (typeof v === 'string') return resolve(v.slice(1, -1).split('.').reduce((node, part) => node[part], roots));
     if (token.$type === 'color') return v.hex;
-    return token.$type === 'dimension' ? `${v.value}${v.unit}` : v;
+    if (token.$type === 'cubicBezier') return 'cubic-bezier(' + v.join(',') + ')';
+    return ['dimension', 'duration'].includes(token.$type) ? `${v.value}${v.unit}` : v;
   }
   const values = {};
   function add(name, token, percentage = false) {
     const v = resolve(token);
     values['--caelos-material-' + name] = percentage ? (v * 100) + '%' : String(v);
   }
+  return {values, add, resolve};
+}
+function themeVars(semantic) {
+  const {values, add, resolve} = tokenWriter(semantic);
   for (const name of ['body', 'foreground', 'tint-ink', 'sage', 'sage-blur', 'overlap-clear', 'overlap-covered', 'saturation-neutral']) add(name, glass[name]);
   add('sage-opacity', glass['sage-opacity'], true);
   add('falloff-at', glass['falloff-at'], true);
@@ -34,9 +39,17 @@ function themeVars(semantic) {
     // Only ground has an approved light layer; use the light material body for open layers.
     add('layer-' + name, semantic.sys.color[name] ? token : glass.body);
   }
+  if (semantic === dark) writeCloudVars('cloud', primitives.primitives.shared.cloud, {values, add});
   return values;
 }
 
+export function writeCloudVars(group, tokens, {values, add}) {
+  for (const [name, token] of Object.entries(tokens)) {
+    if (name.startsWith('$')) continue;
+    add(group + '-' + name, token, ['body-alpha', 'rest-start-alpha', 'rest-end-alpha', 'wash-start-alpha', 'wash-end-alpha'].includes(name));
+    if (name === 'angle') values['--caelos-material-' + group + '-angle'] += 'deg';
+  }
+}
 const mix = (ink, amount) => `color-mix(in srgb, ${ink} ${amount}, transparent)`;
 const layerInk = 'var(--caelos-surface-layer)';
 const plain = { backgroundColor: layerInk, backgroundImage: 'none', backdropFilter: 'none' };
@@ -64,6 +77,26 @@ function glassStyle(kind) {
     '@supports not (backdrop-filter: none)': fallback,
   };
 }
+// The body stays still. Only the separate wash fades in behind the editable content.
+export function cloudStyle(group, focused = {}) {
+  const role = name => ref(group + '-' + name);
+  const ramp = kind => 'linear-gradient(' + role('angle') + ', ' +
+    ['start', 'end'].map(end => mix(role(kind + '-' + end), role(kind + '-' + end + '-alpha'))).join(', ') + ')';
+  const wash = state => ({ '&::before': { opacity: role('wash-' + state) } });
+  return {
+    position: 'relative', isolation: 'isolate',
+    backgroundColor: mix(role('body'), role('body-alpha')), backgroundImage: ramp('rest'),
+    '&::before': {
+      content: '""', position: 'absolute', inset: role('inset'), zIndex: role('underlay'),
+      borderRadius: 'inherit', pointerEvents: 'none', backgroundImage: ramp('wash'), opacity: role('wash-rest'),
+      transitionProperty: 'opacity', transitionDuration: role('duration'), transitionTimingFunction: role('ease'),
+      '@media (prefers-reduced-motion: reduce)': { transitionDuration: role('reduced-duration') },
+    },
+    '&:hover:not(:focus-within, :disabled, [data-disabled=true], :has(:disabled))': wash('hover'),
+    '&:focus-within:not(:disabled, [data-disabled=true], :has(:disabled))': { ...wash('focus'), ...focused },
+    '&:is(:disabled, [data-disabled=true], :has(:disabled))': { ...wash('rest'), opacity: role('disabled-alpha') },
+  };
+}
 const panel = glassStyle('panel');
 const autoProps = {backgroundColor: 'fill', backgroundImage: 'image', backgroundSize: 'size', backdropFilter: 'filter'};
 function autoVars(style) {
@@ -80,7 +113,7 @@ export const materialRecipe = {
     }])),
     texture: {
       auto: Object.fromEntries(Object.entries(autoProps).map(([property, name]) => [property, 'var(--caelos-auto-' + name + ')'])),
-      plain, graph: grid, glass: panel, portal: glassStyle('menu'), sage: glassStyle('sage'),
+      plain, cloud: cloudStyle('cloud'), graph: grid, glass: panel, portal: glassStyle('menu'), sage: glassStyle('sage'),
     },
   },
   defaultVariants: surface.$extensions['app.caelos'].defaultVariants,
