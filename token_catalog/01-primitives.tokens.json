@@ -1270,6 +1270,33 @@
                   "glyph": "ListFilter",
                   "action": "Filter and sort",
                   "meaning": "Open filtering and sorting options."
+                },
+                {
+                  "glyph": "GripVertical",
+                  "action": "Drag and drop",
+                  "meaning": "Drag to reorder or move an item."
+                },
+                {
+                  "glyph": "GraphStar",
+                  "action": "Task Graph views",
+                  "meaning": "Identify Task Graph interface views.",
+                  "version": "1.71.0",
+                  "source": "https://github.com/lucide-icons/lucide/blob/1.71.0/icons/graph-star.svg"
+                },
+                {
+                  "glyph": "Dot",
+                  "action": "Status bullet",
+                  "meaning": "Mark a status, including project and task status."
+                },
+                {
+                  "glyph": "Ellipsis",
+                  "action": "More options",
+                  "meaning": "Open a menu of additional actions or information."
+                },
+                {
+                  "glyph": "Bell",
+                  "action": "Notifications",
+                  "meaning": "Open notifications."
                 }
               ],
               "harnesses": [

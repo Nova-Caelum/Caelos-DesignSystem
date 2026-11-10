@@ -167,6 +167,11 @@ test('the icon glossary preserves activity, workspace and composer actions', () 
   assert.equal(workspace.Activity, 'RotateCcwClock');
   assert.equal(glossary.workspace.find(row => row.action === 'Activity').reactExport, 'History');
   assert.equal(workspace['Filter and sort'], 'ListFilter');
+  assert.equal(workspace['Drag and drop'], 'GripVertical');
+  assert.equal(workspace['Task Graph views'], 'GraphStar');
+  assert.equal(workspace['Status bullet'], 'Dot');
+  assert.equal(workspace['More options'], 'Ellipsis');
+  assert.equal(workspace['Notifications'], 'Bell');
   assert.equal(composer['Model settings'], 'Atom');
   assert.ok(glossary.unassignedGlyphs.includes('Zap'));
   for (const rows of [glossary.conversation, glossary.workspace, glossary.composer]) {
