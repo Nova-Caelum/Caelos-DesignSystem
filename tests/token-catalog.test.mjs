@@ -216,3 +216,20 @@ test('each recovered primitive has a unique inventory name across shared and cha
   assert.ok(names.every(name => typeof name === 'string' && name.trim()));
   assert.equal(new Set(names).size, names.length);
 });
+
+test('field label and help gaps follow the field-interior role independently of padding', () => {
+  const field = load('02-controls.tokens.json').controls.shared.input;
+  for (const key of ['label-gap', 'description-gap']) {
+    assert.equal(field[key].$value, '{sys.space.field-interior}');
+  }
+  for (const key of ['block-inset', 'control-inset']) {
+    assert.notEqual(field[key].$value, '{sys.space.field-interior}');
+  }
+});
+
+test('field focus follows the shared focus primitive for ink, blur and opacity', () => {
+  const field = load('02-controls.tokens.json').controls.shared.input;
+  for (const role of ['foreground', 'glow-ink', 'glow-blur', 'glow-opacity']) {
+    assert.equal(field['focus-' + role].$value, '{primitives.shared.recipes-focus.' + role + '}');
+  }
+});
