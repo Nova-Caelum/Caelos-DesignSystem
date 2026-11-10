@@ -1076,6 +1076,18 @@
                   "meaning": "Context pill remove control."
                 }
               ],
+              "workspace": [
+                {
+                  "glyph": "Settings",
+                  "action": "Settings",
+                  "meaning": "Open general settings."
+                },
+                {
+                  "glyph": "TrendingUp",
+                  "action": "Promote to module",
+                  "meaning": "Promote the selected item to a module."
+                }
+              ],
               "harnesses": [
                 {
                   "glyph": "Hermes",
