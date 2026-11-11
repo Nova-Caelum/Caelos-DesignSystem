@@ -1297,6 +1297,13 @@
                   "glyph": "Bell",
                   "action": "Notifications",
                   "meaning": "Open notifications."
+                },
+                {
+                  "glyph": "Star",
+                  "action": "Favorites",
+                  "meaning": "Save or remove an item from Favorites; model favorites identify the model and provider pair.",
+                  "version": "0.577.0",
+                  "source": "https://github.com/lucide-icons/lucide/blob/0.577.0/icons/star.svg"
                 }
               ],
               "harnesses": [
