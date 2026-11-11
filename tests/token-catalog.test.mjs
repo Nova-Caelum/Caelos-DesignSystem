@@ -209,11 +209,15 @@ test('provider and framework glyphs resolve to their own monochrome artwork', ()
   }
 });
 
-test('Aelpha uses the harness monogram size from the foundation scale', () => {
+test('Aelpha uses standalone alpha artwork and the shared icon size', () => {
   const icon = load('01-primitives.tokens.json').primitives.shared.icon;
   const monogram = icon.$extensions[EXT].glossary.harnesses.find(row => row.glyph === 'Aelpha');
-  assert.equal(monogram.sizeToken, 'primitives.shared.icon.harness-monogram-size');
-  assert.equal(icon['harness-monogram-size'].$value, '{base.space.px-30}');
+  assert.equal(monogram.sizeToken, 'primitives.shared.icon.size');
+  assert.equal(icon.size.$value, '{base.size.px-20}');
+  assert.equal(monogram.brandAsset, 'alpha_only_logo.svg');
+  const svg = readFileSync(path.join(DIR, '..', monogram.source), 'utf8');
+  assert.match(svg, /fill="currentColor"/);
+  assert.doesNotMatch(svg, /(?:fill|stroke)="#/);
 });
 
 test('both scrollbar themes use Structural Violet through the shared thumb role', () => {
