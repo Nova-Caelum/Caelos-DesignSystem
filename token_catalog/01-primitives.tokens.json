@@ -1321,10 +1321,11 @@
                 {
                   "glyph": "Aelpha",
                   "action": "Aelpha",
-                  "artwork": "Monochrome adaptation of Ae Logo v3",
-                  "brandAsset": "Ae_Logo_v3.svg",
-                  "sizeToken": "primitives.shared.icon.harness-monogram-size",
-                  "artworkFit": "Center the visible monogram and fit its width to the square, preserving its proportions."
+                  "artwork": "Original standalone alpha",
+                  "brandAsset": "alpha_only_logo.svg",
+                  "sizeToken": "primitives.shared.icon.size",
+                  "artworkFit": "Preserve the supplied square viewBox and proportions; center in the shared icon-size box, aligned with Claude Code. Use shared icon ink.",
+                  "source": "assets/harnesses/aelpha.svg"
                 }
               ],
               "statusReferences": [
