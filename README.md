@@ -10,9 +10,9 @@ Copyright 2026 Nova Caelum & Co. All rights reserved. See [LICENSE](LICENSE).
 
 ## Use the Tier 1 materials
 
-Add `materialPreset` from [src/material-preset.mjs](src/material-preset.mjs) to the Panda configuration's presets. Use the generated `material({ layer: 'ground', texture: 'auto' })` recipe. Auto selects graph or glass by layer. Choose plain, graph, glass, portal, or sage for an explicit finish. Set `data-theme="light"` on a containing element for the light theme. Reduced transparency uses a solid fill for each glass finish.
+Add `materialPreset` from [src/material-preset.mjs](src/material-preset.mjs) to the Panda configuration's presets. Use the generated `material({ layer: 'ground', texture: 'auto' })` recipe. Auto selects graph or glass by layer. Choose plain, cloud, graph, glass, or sage for an explicit finish. Set `data-theme="light"` on a containing element for the light theme. Reduced transparency uses a solid fill for each glass finish.
 
-For panel and portal glass, the host sets `--sys-glass-auto-blur` **on the material element** to the measured fraction of content behind it. Clear, partial and full overlap interpolate between no filtering and the finish’s catalog blur and saturation. Unmeasured surfaces keep full filtering. Body opacity and tint stay fixed; reduced transparency stays opaque. Each nested material starts with its own default.
+For shared glass, the host sets `--sys-glass-auto-blur` **on the material element** to the measured fraction of content behind it. Clear, partial and full overlap interpolate between no filtering and the finish’s catalog blur and saturation. Unmeasured surfaces keep full filtering. Body opacity and tint stay fixed; reduced transparency stays opaque. Each nested material starts with its own default. Glass uses 125% background saturation. Former `portal` consumers now use `glass`; former `panel-*` and `menu-*` material CSS variables are unified as `glass-*`.
 
 ## Palette check
 
