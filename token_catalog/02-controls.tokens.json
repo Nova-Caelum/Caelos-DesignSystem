@@ -111,7 +111,7 @@
               "overlapClear": "{primitives.shared.glass.overlap-clear}",
               "overlapCovered": "{primitives.shared.glass.overlap-covered}",
               "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
-              "foreground": "{primitives.shared.typography.tone.default}"
+              "foreground": "{sys.color.ready}"
             },
             "cloud-success": {
               "fill": "{primitives.shared.cloud.body}",
@@ -134,11 +134,7 @@
               "glowOffset": "{primitives.shared.surface.button.glow-offset}"
             },
             "ink-pressed": {
-              "foreground": "{primitives.shared.typography.tone.default}",
-              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+              "foreground": "{sys.color.ready}"
             },
             "ink-success": {
               "foreground": "{sys.color.success}"
@@ -217,7 +213,7 @@
             "constructionPolicy": "Construction and state appearances select shared definitions. Those definitions reference lower-tier tokens directly. Remaining button leaves are runtime compatibility exports, not extra visual parameters.",
             "feedbackPolicy": {
               "principle": "Every user action must provide visual feedback.",
-              "pressed": "Immediate acknowledgement while a control is being activated; never waits for an operation result.",
+              "pressed": "Immediate acknowledgement while a control is being activated; never waits for an operation result. Tonal and Text use Ready Blue without glow; Text adds an underline. The same visible feedback applies with reduced motion. Primary is unchanged.",
               "success": "Optional confirmation after an operation actually succeeds and its result is not immediately visible, such as saving, sending, or generating a script in the background. Never infer success from a click or a timer.",
               "visibleOutcome": "Opening a menu, dialog, or destination page is already visual feedback and does not require a Success button state.",
               "hoverAndFocus": "Share the same appearance; retain separate pointer-hover and keyboard-focus behavior. Pressed remains distinct during activation.",
@@ -253,11 +249,11 @@
             },
             "tonalSurfacePolicy": {
               "pressedRecipe": "material({ texture: glass })",
-              "description": "Default/Hover/Focus use the Cloud body and violet/sage wash. Pressed composes the complete unified glass finish, including 125% saturation, overlap input and opaque fallback. Success uses sage-green text over the translucent body with a quiet sage wash. Disabled uses the shared opaque disabled bed. No hard border.",
+              "description": "Default/Hover/Focus use the Cloud body and violet/sage wash. Pressed uses Ready Blue foreground without glow and composes the complete unified glass finish, including 125% saturation, overlap input and opaque fallback. Success uses sage-green text over the translucent body with a quiet sage wash. Disabled uses the shared opaque disabled bed. No hard border.",
               "reference": "Caelos_staging packages/ui/src/recipes.ts at be3aec0ccf597141020bea35e6f4cbb3b982a012: tonal violet/sage gradient; the current-token glass pressed state follows Daniel’s request, not a claimed deployed-console match.",
               "figmaLimit": "Gradient alpha/geometry are sync-derived. Figma background blur previews glass; CSS saturation, overlap response and reduced-transparency fallback require runtime verification."
             },
-            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow using the existing 50% opacity token; Pressed restores cream while retaining the glow. Success is ✓ Success in sage green, with no fill. Same real-result/reset contract as Primary.",
+            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow using the existing 50% opacity token; Pressed uses Ready Blue with an underline and no glow. Success is ✓ Success in sage green, with no fill. Same real-result/reset contract as Primary.",
             "recipeExports": {
               "primary": "primaryButtonInk",
               "tonal": "tonalButtonInk",
@@ -358,6 +354,11 @@
               "danger": [
                 true
               ]
+            },
+            "stateDecorations": {
+              "text": {
+                "pressed": "underline"
+              }
             }
           }
         },
@@ -985,7 +986,7 @@
               "D81",
               "D24"
             ],
-            "note": "Interactive only. Filter-menu opens options; toggle changes one value directly. Pressed acknowledges activation or an open menu, not successful completion. No Success state. Applied filter summary is host-owned and distinct from menu-open state. Dark v1; static Figma review, runtime menu/keyboard wiring remains open.",
+            "note": "Interactive only. Filter-menu opens options; toggle changes one value directly. Pressed acknowledges activation or an open menu, not successful completion. No Success state. Applied filter summary is host-owned and distinct from menu-open state. Dark v1; static Figma review, runtime menu/keyboard wiring remains open. Pressed uses Ready Blue on the shared glass surface without glow, including reduced motion.",
             "historicalInventory": {
               "variants": {
                 "variant": [

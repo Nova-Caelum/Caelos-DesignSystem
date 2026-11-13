@@ -111,7 +111,7 @@ test('secondary success uses semantic green and text engagement consumes its own
   }
   assert.equal(get('text-hover-glowOpacity'), '50%');
   assert.equal(get('text-focus-glowOpacity'), '50%');
-  assert.equal(get('text-pressed-glowOpacity'), '23%');
+  assert.equal(get('text-pressed-glowOpacity'), undefined);
   const text = controlPreset.theme.extend.recipes.textButtonInk.base;
   const hover = text['&:is(:hover, :focus-visible):not(:active, :disabled, [data-state=success])'];
   for (const key of ['glowOffset','glowBlur','glowInk','glowOpacity'])
@@ -134,4 +134,21 @@ test('field hover is blue and typing focus is primary, preserving Cloud wash and
   assert.equal(hover['&::before'].opacity, 'var(--caelos-material-field-wash-hover)');
   assert.equal(recipe['&:is(:disabled, [data-disabled=true], :has(:disabled))']['&::before'].opacity, 'var(--caelos-material-field-wash-rest)');
   assert.equal(get('field-foreground'), '#9B958B');
+});
+
+
+test('secondary pressed feedback uses Ready Blue without glow in all motion preferences', () => {
+  const recipes = controlPreset.theme.extend.recipes;
+  const selector = '&:active:not(:disabled, [data-state=success])';
+  for (const style of ['tonal','text']) {
+    const pressed = recipes[style + 'ButtonInk'].base[selector];
+    assert.equal(get(style + '-pressed-foreground'), '#8E96CC');
+    assert.notEqual(get(style + '-pressed-foreground'), get(style + '-hover-foreground'));
+    assert.notEqual(get(style + '-pressed-foreground'), get(style + '-default-foreground'));
+    assert.equal(pressed[style === 'text' ? 'textShadow' : 'boxShadow'], 'none');
+    // The visual feedback is unconditional, not hidden in a motion media query.
+    assert.equal(pressed.color, 'var(--caelos-material-' + style + '-pressed-foreground)');
+  }
+  assert.equal(recipes.textButtonInk.base[selector].textDecorationLine, 'underline');
+  assert.ok(!('textDecorationLine' in recipes.tonalButtonInk.base[selector]));
 });

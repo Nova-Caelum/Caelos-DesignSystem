@@ -83,6 +83,9 @@ async function refreshButtonConstruction(manifest) {
       }
       const boundNames=new Set(bound.map(line=>line.split(' · ')[0]));
       const lines=[...bound,...[...derived.values()].filter(line=>!boundNames.has(line.split(' · ')[0]))].sort();
+      const decoration=manifest.buttonStateDecorations[style]?.[state];
+      if(decoration){requireMatch(label.textDecoration===decoration.toUpperCase(),style+'/'+state+'/decoration');lines.push('Text decoration · '+decoration+' · recipe behavior');}
+      if(['tonal','text'].includes(style)&&state==='pressed')requireMatch(![root,label].some(n=>n.effects.some(e=>e.type==='DROP_SHADOW')),style+'/pressed/no glow');
       const runtime=style==='tonal'&&state==='pressed' ? '\nRuntime only · glass saturation and adaptive overlap; not demonstrated by this static Figma specimen.' : '';
       planned.push([annotation,'State construction\n'+lines.join('\n')+runtime]);
       audit.push({id:specimen.id,style,state,bound:bound.length,derived:derived.size});
