@@ -2,7 +2,7 @@
 // Product geometry and paints are resolved exclusively from catalog ingredients.
 async function createCompactControls(figma, manifest, updateBadges = false) {
   const page = await figma.getNodeByIdAsync(manifest.pageId);
-  await figma.setCurrentPageAsync(page);
+  if(figma.currentPage.id!==page.id) await figma.setCurrentPageAsync(page);
   const archive = await figma.getNodeByIdAsync('412:998');
   const template = await figma.getNodeByIdAsync('377:6440');
   const variables = await figma.variables.getLocalVariablesAsync();
@@ -17,8 +17,10 @@ async function createCompactControls(figma, manifest, updateBadges = false) {
   // Fail before creating assets when a catalog ingredient has not reached Figma.
   const validate = x => { if (x?.path) lookup(x); else if (x && typeof x === 'object') Object.values(x).forEach(validate); };
   validate(data);
+  const fonts=new Map();
   for (const t of page.findAllWithCriteria({types:['TEXT']}))
-    for (const s of t.getStyledTextSegments(['fontName'])) await figma.loadFontAsync(s.fontName);
+    for (const s of t.getStyledTextSegments(['fontName'])) fonts.set(JSON.stringify(s.fontName),s.fontName);
+  await Promise.all([...fonts.values()].map(font=>figma.loadFontAsync(font)));
   const bind = (node, property, ingredient) => node.setBoundVariable(property, lookup(ingredient));
   const value = (item, node) => lookup(item).resolveForConsumer(node).value;
   const resolveTokenColor = (item, node) => { const {r,g,b} = value(item,node); return {r,g,b}; };
@@ -51,7 +53,12 @@ async function createCompactControls(figma, manifest, updateBadges = false) {
       component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[1,0,0],[0,1,0]],gradientStops:[0,1].map(i=>({position:i*paint.falloffAt.value,color:{...resolveTokenColor(paint.tintInk,component),a:v('tintOpacity')/100*(i?paint.falloffStrength.value:1)}}))},...component.fills];
       component.effects=[figma.variables.setBoundVariableForEffect({type:'BACKGROUND_BLUR',visible:true,radius:v('blur')},'radius',lookup(paint.blur))];
     }
-    if(paint.glowInk) component.effects=[figma.variables.setBoundVariableForEffect({type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...resolveTokenColor(paint.glowInk,component),a:v('glowOpacity')/100},offset:{x:v('glowOffset'),y:v('glowOffset')},radius:v('glowBlur'),spread:0,showShadowBehindNode:false},'radius',lookup(paint.glowBlur))];
+    if(paint.glowInk) {
+      let glow={type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...resolveTokenColor(paint.glowInk,component),a:v('glowOpacity')/100},offset:{x:v('glowOffset'),y:v('glowOffset')},radius:v('glowBlur'),spread:paint.glowSpread?v('glowSpread'):0,showShadowBehindNode:false};
+      for(const [field,key] of [['radius','glowBlur'],['offsetX','glowOffset'],['offsetY','glowOffset'],['spread','glowSpread']])
+        if(paint[key]) glow=figma.variables.setBoundVariableForEffect(glow,field,lookup(paint[key]));
+      component.effects=[...component.effects,glow];
+    }
   }
   for (const kind of (updateBadges ? ['badge'] : ['chip','badge'])) {
     const setName='Draft / '+(kind==='chip'?'Interactive chip':'Passive badge');
@@ -59,20 +66,22 @@ async function createCompactControls(figma, manifest, updateBadges = false) {
     if(updateBadges && !existingSet) throw Error('Missing badge source set');
     if(!updateBadges && existingSet) throw Error('Inspect existing source before rerunning: '+setName);
     const components=[];
-    const states=kind==='chip'?['Default','Hover','Focus','Pressed','Disabled']:['Neutral','Info','Success','Danger'];
+    const states=kind==='chip'?['Default','Hover','Focus','Pressed','Disabled']:Object.keys(data.badgeTones);
+    const toneName=key=>key.split('-').map(word=>word[0].toUpperCase()+word.slice(1)).join(' ');
+    const legacyTones={neutral:'Neutral','peach-gold':'Info',sage:'Success','danger-red':'Danger'};
     for(const shape of ['rounded','pill','circle']) for(const state of states) {
-      const name=`Shape=${shape}, ${kind==='chip'?'State':'Tone'}=${state}`;
-      const component=updateBadges ? existingSet.children.find(n=>n.name===name) : template.clone();
+      const name=`Shape=${shape}, ${kind==='chip'?'State':'Tone'}=${kind==='chip'?state:toneName(state)}`;
+      const component=updateBadges ? existingSet.children.find(n=>n.name===name || n.name===`Shape=${shape}, Tone=${legacyTones[state]}`) : template.clone();
       if(!component) throw Error('Missing variant '+name);
       if(!updateBadges) archive.appendChild(component);
       component.name=name;
       const label=component.children.find(n=>n.type==='TEXT');
-      label.characters=kind==='chip'?(shape==='circle'?'1':'Filter & sort'):(shape==='circle'?'3':{Neutral:'Planning',Info:'In progress',Success:'Complete',Danger:'Blocked'}[state]);
+      label.characters=kind==='chip'?(shape==='circle'?'1':'Filter & sort'):(shape==='circle'?'3':data.badgeExamples[state]);
       geometry(component,label,data[kind+'Geometry'],shape,data[kind+'Shapes']);
       if(kind==='chip')chipPaint(component,label,data.chipPaints[state.toLowerCase()]);
       else {
         const tone=data.badgeTones[state.toLowerCase()];
-        chipPaint(component,label,{...data.badgeMaterial,foreground:tone,washStart:tone});
+        chipPaint(component,label,{...data.badgeMaterial,foreground:tone,washStart:tone,glowInk:tone});
       }
       await component.setReactionsAsync([]);
       component.description=manifest.categories.find(c=>c.key===kind+'s').studies[0].note+'\n'+component.name;
