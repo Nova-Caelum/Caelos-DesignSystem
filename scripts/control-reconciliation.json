@@ -1,0 +1,318 @@
+{
+  "pageId": "377:6179",
+  "addedPaths": [
+    "controls.shared.button.type-size",
+    "controls.shared.button.type-line",
+    "controls.shared.button.type-family",
+    "controls.shared.button.type-weight",
+    "controls.shared.chip.type-size",
+    "controls.shared.chip.type-line",
+    "controls.shared.chip.type-family",
+    "controls.shared.chip.type-weight",
+    "controls.shared.tabTrigger.type-size",
+    "controls.shared.tabTrigger.type-line",
+    "controls.shared.tabTrigger.type-family",
+    "controls.shared.tabTrigger.type-weight",
+    "controls.shared.button.pad-x",
+    "controls.shared.button.pad-y",
+    "controls.shared.button.gap",
+    "controls.shared.button.height",
+    "controls.shared.button.press-height",
+    "controls.shared.chip.pad-x",
+    "controls.shared.chip.pad-y",
+    "controls.shared.chip.gap",
+    "controls.shared.chip.radius",
+    "controls.shared.chip.height",
+    "controls.shared.chip.fill",
+    "controls.shared.chip.selected",
+    "controls.shared.chip.text",
+    "controls.shared.chip.disabled",
+    "controls.shared.chip.text-disabled",
+    "controls.shared.tabTrigger.pad-x",
+    "controls.shared.tabTrigger.pad-y",
+    "controls.shared.tabTrigger.height",
+    "controls.shared.tabTrigger.radius",
+    "controls.shared.tabTrigger.underline",
+    "controls.shared.avatar.size.sm",
+    "controls.shared.avatar.square-radius.sm",
+    "controls.shared.avatar.status-size.sm",
+    "controls.shared.avatar.size.md",
+    "controls.shared.avatar.square-radius.md",
+    "controls.shared.avatar.status-size.md",
+    "controls.shared.avatar.size.lg",
+    "controls.shared.avatar.square-radius.lg",
+    "controls.shared.avatar.status-size.lg",
+    "controls.shared.avatar.size.xl",
+    "controls.shared.avatar.square-radius.xl",
+    "controls.shared.avatar.status-size.xl",
+    "controls.shared.avatar.size.xxl",
+    "controls.shared.avatar.square-radius.xxl",
+    "controls.shared.avatar.status-size.xxl"
+  ],
+  "mappings": [
+    {
+      "collection": "01 Semantic",
+      "name": "space/2xs",
+      "target": "base.space.px-2",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "space/xs",
+      "target": "base.space.px-4",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "space/lg",
+      "target": "base.space.px-15",
+      "expected": 16,
+      "reason": "Consolidate 16px side padding to the existing 15px spacing step."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "radius/sm",
+      "target": "base.radius.sm",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "radius/md",
+      "target": "base.radius.md",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "radius/lg",
+      "target": "base.radius.lg",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "type/size/label",
+      "target": "primitives.shared.typography.size.label",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "type/line/label",
+      "target": "primitives.shared.typography.line.label",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "type/family/ui",
+      "target": "primitives.shared.typography.family.ui",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "size/control",
+      "target": "base.size.px-44",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "space/step-08",
+      "target": "base.space.px-24",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "space/step-04",
+      "target": "base.space.px-12",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "space/step-03",
+      "target": "base.space.px-9",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "shape/radius/27",
+      "target": "base.radius.px-27",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "shape/radius/12",
+      "target": "base.radius.md",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "01 Semantic",
+      "name": "size/control/34",
+      "target": "base.size.px-34",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/pad-x",
+      "target": "base.space.px-15",
+      "expected": 16,
+      "reason": "Consolidate 16px side padding to the existing 15px spacing step."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/pad-y",
+      "target": "base.space.px-8",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/gap",
+      "target": "base.space.px-8",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/height",
+      "target": "base.size.px-44",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/press-height",
+      "target": "base.size.px-42",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/type-size",
+      "target": "primitives.shared.typography.size.label",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/type-line",
+      "target": "primitives.shared.typography.line.label",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/type-family",
+      "target": "primitives.shared.typography.family.ui",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "button/type-weight",
+      "target": "base.type.weight.medium",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/pad-x",
+      "target": "base.space.px-12",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/pad-y",
+      "target": "base.space.px-4",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/radius",
+      "target": "base.radius.lg",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/height",
+      "target": "base.size.px-42",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/fill",
+      "target": "sys.color.elevated-2",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/selected",
+      "target": "sys.color.structural-violet",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/text",
+      "target": "sys.color.text-primary",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/disabled",
+      "target": "sys.color.elevated",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    },
+    {
+      "collection": "02 Control recipes",
+      "name": "chip/text-disabled",
+      "target": "sys.color.text-tertiary",
+      "expected": null,
+      "reason": "Exact existing lower-tier token."
+    }
+  ],
+  "approximations": [
+    {
+      "consumers": [
+        "button horizontal padding",
+        "tab horizontal padding"
+      ],
+      "from": 16,
+      "to": "base.space.px-15",
+      "deltaPxPerSide": -1
+    }
+  ],
+  "newFoundationRecommendations": [],
+  "scopedMappings": [
+    {
+      "category": "avatars",
+      "nodeType": "ELLIPSE",
+      "properties": [
+        "width",
+        "height"
+      ],
+      "collection": "02 Control recipes",
+      "name": "primitives/shared/typography/size/label",
+      "target": "base.space.px-14",
+      "reason": "Status badge dimensions use an existing spatial token, not a font-size token; exact 14px match."
+    }
+  ]
+}
