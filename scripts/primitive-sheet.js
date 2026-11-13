@@ -145,7 +145,13 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
       const names=[...new Set([...bindings].map(id=>{const v=all.find(v=>v.id===id);return v?constructionBindingLabel(v,manifest,collections):id;}))].sort();
       badge(c,category.key==='icon'?'catalog glossary':'study · visual review required');
       text(c,'Figma · '+(category.key==='recipes-focus'?group.name:source.name)+'\nSource · '+master.id,260,12,'text-supporting');
-      const stateNames=names.filter(name=>!sharedLabels.has(name));
+      // Sync-derived gradient alpha/stops cannot all bind in Figma. Name their
+      // actual lower-tier ingredients alongside the live geometry bindings.
+      const compact = manifest.compactControls;
+      if (compact && category.key === 'chips') {
+        for (const item of Object.values(compact.chipPaints[master.variantProperties.State.toLowerCase()])) names.push(constructionTokenLabel(item));
+      }
+      const stateNames=[...new Set(names)].filter(name=>!sharedLabels.has(name));
       text(c,(group.sharedConstruction?'State construction':'Construction')+'\n'+(stateNames.join('\n')||(group.sharedConstruction?'Shared construction only':'No variable binding found')),260,12,'text-supporting');
       const glyph=label.replace(/^.*=\s*/,'').trim();
       if(category.key==='icon')text(c,'Used by\n'+(manifest.meanings[glyph]?.join('\n')||'Available glyph · no specific use recorded'),260,12,'text-supporting');

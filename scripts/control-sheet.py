@@ -48,7 +48,8 @@ def manifest():
         ('buttons', 'Buttons', 'Action emphasis and state comparison. Medium radius is approved; geometry and some state treatments remain draft.'),
         ('fields', 'Fields', 'Text, search and multiline controls. Cloud wash, hover-blue focus and the approved field interior are traced to lower-tier tokens.'),
         ('tabs', 'Tabs', 'Individual tab triggers. Appearance, selection and interaction state are independent; the coordinated container remains Tier 4.'),
-        ('chips', 'Chips and badges', 'Compact selection and status labels. Recovered variants are inventory, not newly approved values.'),
+        ('chips', 'Chips', 'Interactive filter menus and direct toggles. Cloud at rest, glass when pressed; no Success state.'),
+        ('badges', 'Badges', 'Passive status, counts and category labels. Shape and tone vary; no interactive states.'),
         ('avatars', 'Avatars', 'Identity fallback and status. Circle and square are grouped by size; XL and XXL retain their distinct type tokens.'),
         ('indicators', 'Indicators', 'Loading and connection inventory. Entries without a specimen remain explicitly open.'),
         ('triggers', 'Triggers and links', 'Quiet actions and shared control contracts whose complete recipes still need review.'),
@@ -73,7 +74,8 @@ def manifest():
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
-    study('chips','Filter chip','377:6439',['Motion'],'Partial recipe · controls.shared.chip\nGeometry and Off/On/Disabled paints are mapped to existing lower-tier tokens. No complete Panda export.')
+    study('chips','Chip','474:1024',['Shape'],'Partial recipe · controls.shared.chip\nDefault / Hover / Focus / Pressed / Disabled. Hover = Focus. Menu-open or toggle selection may retain Pressed; applied filter summary is separate. No Success.\nShared cloud / glass primitives; 125% saturation is runtime-only in Figma. Static state specimens; keyboard and menu wiring remain open.\nRounded / pill: filter-menu example. Circle: direct-toggle example; accessible name required.')
+    study('badges','Badge','474:1049',['Shape'],'Partial recipe · controls.shared.badgeVariants\nPassive information: neutral / info / success / danger. Success is a status, not an action response. No hover, focus, pressed or tab stop. Circle shows a count.\nExisting lower-tier values only. Static review; complete component export remains open.')
     study('avatars','Avatar','377:6793',['Shape','Size'],'Partial recipe · controls.shared.avatar\nInitials, frame sizes, square radii and status sizes are mapped. Complete recipe remains open. No complete Panda export.')
     for node in range(6482,6498):
         study('composer','Action reference','377:'+str(node),[], 'Cross-tier reference · Tier 5 composer\nExisting instance preserved; not promoted to a Tier 2 recipe.')
@@ -105,16 +107,20 @@ def manifest():
     for (category,name),items in families.items():
         categories[category]['rows'].append(dict(name='Shared construction' if category == 'tabs' else name, items=items, countUnit='parameters' if category == 'tabs' else 'variants'))
     categories['tabs']['studies'][0]['sharedConstructionPaths'] = [i['construction']['path'] for r in categories['tabs']['rows'] for i in r['items']]
-    group_map={'button':'buttons','buttonVariants':'buttons','controlSkin':'buttons','IconButton':'buttons','RefreshButton':'buttons','input':'fields','tabTrigger':'tabs','chip':'chips','badgeVariants':'chips','DeliveryChip':'chips','avatar':'avatars','rippleLoader':'indicators','NovaLoader':'indicators','Loading':'indicators','ConnectionIndicator':'indicators','quietTrigger':'triggers','recipes-control':'triggers','sidebar-recipe-control':'triggers','Link':'triggers'}
+    group_map={'button':'buttons','buttonVariants':'buttons','controlSkin':'buttons','IconButton':'buttons','RefreshButton':'buttons','input':'fields','tabTrigger':'tabs','chip':'chips','badgeVariants':'badges','DeliveryChip':'badges','avatar':'avatars','rippleLoader':'indicators','NovaLoader':'indicators','Loading':'indicators','ConnectionIndicator':'indicators','quietTrigger':'triggers','recipes-control':'triggers','sidebar-recipe-control':'triggers','Link':'triggers'}
     for scope,group in source['controls'].items():
         if scope.startswith('$'): continue
         for name,entry in group.items():
-            if name.startswith('$') or name == 'tabTrigger': continue  # Tab identity and status are already on its study.
+            if name.startswith('$') or name in ['tabTrigger','chip','badgeVariants']: continue  # Tab identity and status are already on its study.
             meta=entry['$extensions']['app.caelos']
             categories[group_map[name]]['pending'].append(dict(path=f'controls.{scope}.{name}',name=name,status=meta['status'],description=entry.get('$description',''),variants=meta.get('variants',{}),states=meta.get('states',[]),note=meta.get('note',''),recipe=recipes.get(name)))
     covered=[i['path'] for c in categories.values() for r in c['rows'] for i in r['items']]
     expected=[p for p,_ in leaves(source)]
     if len(covered)!=len(set(covered)) or set(covered)!=set(expected): raise ValueError('Every control token must appear exactly once')
-    return dict(tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered),constructionTokens=construction_tokens, buttonStatePaints={style: {state: {key: ingredient(value[1:-1]) for key,value in paint.items()} for state,paint in states.items()} for style,states in source['controls']['shared']['button']['$extensions']['app.caelos']['statePaints'].items()})
+    chip_meta = source['controls']['shared']['chip']['$extensions']['app.caelos']
+    badge_meta = source['controls']['shared']['badgeVariants']['$extensions']['app.caelos']
+    reference_map = lambda data: {key: ingredient(value[1:-1]) for key,value in data.items()}
+    compact_controls = dict(chipGeometry={k: ingredient(v['$value'][1:-1]) for k,v in source['controls']['shared']['chip'].items() if not k.startswith('$')}, chipShapes=reference_map(chip_meta['shapeRadii']), chipPaints={state:reference_map(paint) for state,paint in chip_meta['statePaints'].items()}, badgeGeometry=reference_map(badge_meta['construction']), badgeShapes=reference_map(badge_meta['shapeRadii']), badgeTones=reference_map(badge_meta['tonePaints']))
+    return dict(compactControls=compact_controls,tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered),constructionTokens=construction_tokens, buttonStatePaints={style: {state: {key: ingredient(value[1:-1]) for key,value in paint.items()} for state,paint in states.items()} for style,states in source['controls']['shared']['button']['$extensions']['app.caelos']['statePaints'].items()})
 
 if __name__=='__main__': print(json.dumps(manifest(),separators=(',',':')))

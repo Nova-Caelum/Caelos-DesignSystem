@@ -307,3 +307,32 @@ test('each button state directly references lower-tier ingredients and text butt
     }
   }
 });
+
+
+test('chips are interactive without Success; badges remain passive', () => {
+  const shared = load('02-controls.tokens.json').controls.shared;
+  const chip = shared.chip.$extensions[EXT], badge = shared.badgeVariants.$extensions[EXT];
+  assert.deepEqual(chip.states, ['default', 'hover', 'focus', 'pressed', 'disabled']);
+  assert.deepEqual(Object.keys(chip.statePaints).sort(), [...chip.states].sort());
+  assert.deepEqual(chip.statePaints.hover, chip.statePaints.focus);
+  assert.deepEqual(chip.variants.purpose, ['filter-menu', 'toggle']);
+  assert.deepEqual(badge.states, []);
+  assert.deepEqual(Object.keys(badge.variants).sort(), ['shape', 'tone']);
+  assert.deepEqual(Object.keys(badge.tonePaints).sort(), [...badge.variants.tone].sort());
+  assert.notDeepEqual(chip.statePaints.default, chip.statePaints.pressed);
+});
+
+test('chip and badge construction metadata references only existing lower-tier tokens', () => {
+  const shared = load('02-controls.tokens.json').controls.shared;
+  const chip = shared.chip.$extensions[EXT], badge = shared.badgeVariants.$extensions[EXT];
+  const maps = [chip.shapeRadii, ...Object.values(chip.statePaints), badge.construction, badge.shapeRadii, badge.tonePaints];
+  for (const mode of ['dark', 'light']) {
+    const lower = new Map([...catalog]
+      .filter(([file]) => rank(file) < rank('02-controls.tokens.json') && (mode === 'light' || !file.includes('.light.')))
+      .flatMap(([, entries]) => [...entries]));
+    for (const map of maps) for (const reference of Object.values(map)) {
+      const target = ALIAS.exec(reference)?.[1];
+      assert.ok(target && lower.has(target), mode + ': missing or non-lower-tier ' + reference);
+    }
+  }
+});
