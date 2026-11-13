@@ -19,7 +19,7 @@ async function refreshButtonConstruction(manifest) {
   };
   const near = (a,b) => Math.abs(a-b) < 0.0001;
   const scalar = item => typeof item.value === 'object' ? item.value.value : item.value;
-  const rgb = (color,item) => {
+  const matchesCatalogColor = (color,item) => {
     const hex = item.value.hex.slice(1);
     return ['r','g','b'].every((key,i) => near(color[key],parseInt(hex.slice(i*2,i*2+2),16)/255));
   };
@@ -45,7 +45,7 @@ async function refreshButtonConstruction(manifest) {
       const paint = manifest.buttonStatePaints[style][state];
       const root = specimen.children[0];
       const label = nodes.find(n => n.type === 'TEXT' && n.name === 'Label');
-      requireMatch(rgb(label.fills[0].color,paint.foreground), style+'/'+state+'/foreground');
+      requireMatch(matchesCatalogColor(label.fills[0].color,paint.foreground), style+'/'+state+'/foreground');
       const derived = new Map();
       const add = item => derived.set(item.path, constructionTokenLabel(item) + ' · sync-derived');
       const wash = style === 'primary' ? nodes.find(n => n.name === 'Cloud color wash') : root;
@@ -57,7 +57,7 @@ async function refreshButtonConstruction(manifest) {
         const startAlpha = glass ? paint.tintOpacity : style === 'primary' ? cloud('wash-start-alpha') : paint.washStartAlpha;
         const endAlpha = glass ? null : style === 'primary' ? cloud('wash-end-alpha') : paint.washEndAlpha;
         const stops = gradient.gradientStops;
-        requireMatch(rgb(stops[0].color,start) && rgb(stops[1].color,end),style+'/'+state+'/wash colors');
+        requireMatch(matchesCatalogColor(stops[0].color,start) && matchesCatalogColor(stops[1].color,end),style+'/'+state+'/wash colors');
         requireMatch(near(stops[0].color.a,scalar(startAlpha)),style+'/'+state+'/wash alpha');
         requireMatch(near(stops[1].color.a,glass ? scalar(startAlpha)*scalar(paint.falloffStrength) : scalar(endAlpha)),style+'/'+state+'/wash end alpha');
         [start,end,startAlpha,...(glass?[paint.falloffAt,paint.falloffStrength]:[endAlpha])].forEach(add);
@@ -72,12 +72,12 @@ async function refreshButtonConstruction(manifest) {
       }
       if (style==='tonal' && state!=='disabled') {
         const solid=root.fills.find(p=>p.type==='SOLID');
-        requireMatch(rgb(solid.color,paint.fill)&&near(solid.opacity,scalar(paint.fillOpacity)),style+'/'+state+'/body');
+        requireMatch(matchesCatalogColor(solid.color,paint.fill)&&near(solid.opacity,scalar(paint.fillOpacity)),style+'/'+state+'/body');
         add(paint.fill); add(paint.fillOpacity);
       }
       if (paint.glowInk && style!=='primary') {
         const effect=(style==='text'?label:root).effects.find(e=>e.type==='DROP_SHADOW');
-        requireMatch(effect && rgb(effect.color,paint.glowInk) && near(effect.color.a,scalar(paint.glowOpacity)),style+'/'+state+'/glow');
+        requireMatch(effect && matchesCatalogColor(effect.color,paint.glowInk) && near(effect.color.a,scalar(paint.glowOpacity)),style+'/'+state+'/glow');
         requireMatch(near(effect.offset.x,scalar(paint.glowOffset))&&near(effect.offset.y,scalar(paint.glowOffset)),style+'/'+state+'/glow offset');
         [paint.glowInk,paint.glowOpacity,paint.glowOffset].forEach(add);
       }
