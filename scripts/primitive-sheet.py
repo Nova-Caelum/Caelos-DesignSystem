@@ -107,6 +107,7 @@ def manifest():
                     meanings.setdefault(entry['glyph'], []).append(entry.get('action', entry.get('meaning', '')))
     return dict(pageId='362:4233', sourcePageId='187:5380', templatePageId='234:6889',
                 categories=result, pending=pending, meanings=meanings,
+                glyphFit=runpy.run_path(str(ROOT / 'scripts/glyph-fit-plan.py'))['glyph_plan'](),
                 tokenCount=sum(len(r['items']) for c in result for r in c['rows']))
 
 if __name__ == '__main__':

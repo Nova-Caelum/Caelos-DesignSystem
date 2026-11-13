@@ -20,7 +20,7 @@ Dark mode is the v1 review scope. Different light values are reference-only. Liv
 | Category | Catalog parameters | Existing specimens |
 | --- | ---: | ---: |
 | Typography | 17 | 20 |
-| Icons | 4 | 70 |
+| Icons | 5 | 70 |
 | Layout | 8 | 8 |
 | Surfaces | 14 | 5 |
 | Materials | 44 | 17 |
@@ -28,7 +28,7 @@ Dark mode is the v1 review scope. Different light values are reference-only. Liv
 | Separators | 2 | 2 |
 | Focus | 4 | 2 |
 | Open inventory | 0 | 0; 102 historical entries |
-| Total | 101 | 127 |
+| Total | 102 | 127 |
 
 In the 2026-11-12 rendering, all 101 Tier 1 variable aliases matched the catalog target roles. Comparing those variables and their recursive dependencies across available modes produced 238 exact matches and zero mismatches, using the existing catalog compiler’s float conversion. These are point-in-time checks, not a claim that a new continuous check was deployed.
 
@@ -42,7 +42,7 @@ For routine corrections, update only affected labels and bindings on the existin
 
 1. Inspect the live page before editing; preserve manual review edits and original masters. The renderer rejects existing categories and guides. These scripts generate a new review layout; they do not safely update an already edited one in place.
 2. Run `python3 scripts/primitive-sheet.py` to compile the manifest in memory. It rejects missing or duplicate catalog leaves. Resolved values are not a new token source.
-3. Through a connected Figma Plugin API session, load `scripts/primitive-sheet.js` and call `renderPrimitiveCategory(category, manifest)` for each category. Supply its zero-based `column` and optional `y` placement. Send only that category plus `pageId` and `meanings` in the manifest argument to stay within tool limits. Source IDs are specific to this file and declared in the compiler; verify them before reconstruction.
+3. Through a connected Figma Plugin API session, load `scripts/glyph-fit.js` followed by `scripts/primitive-sheet.js` and call `renderPrimitiveCategory(category, manifest)` for each category. Supply its zero-based `column` and optional `y` placement. Send only that category plus `pageId`, `meanings` and `glyphFit` in the manifest argument to stay within tool limits. Source IDs are specific to this file and declared in the compiler; verify them before reconstruction.
 4. Load `scripts/primitive-sheet-guide.js` and call `finishPrimitiveSheet(slimManifest)`. The slim manifest needs `pageId`, `tokenCount`, `pending`, and each category’s `title` and `rows[].items[]` containing `path` and `css`. It adds the guide and open inventory, annotates exports and arranges four columns. Do not send the full manifest in one tool call.
 5. Read back coverage, bindings and bounds; inspect rendered rows at readable scale. Refresh catalog-generated labels when changing tokens. Preserve returned node IDs as execution evidence.
 
@@ -52,7 +52,8 @@ For example, capture the Python command's JSON output into the tool caller’s `
 const category = { ...manifest.categories[0], column: 0 };
 return await renderPrimitiveCategory(category, {
   pageId: manifest.pageId,
-  meanings: manifest.meanings
+  meanings: manifest.meanings,
+  glyphFit: manifest.glyphFit
 });
 ```
 
@@ -81,3 +82,5 @@ The material preset exports CSS custom properties; a general Panda token export 
 ## Visual review
 
 Daniel should review category membership, family grouping, visible values, foundation chains and specimen fidelity. Record corrections against the relevant card or node ID. Record approval explicitly in the project worklog; catalog status alone does not approve this new presentation.
+
+The icon count includes the subsequently added artwork-coverage alias. See [Glyph sizing](GLYPH-SIZING.md) for its foundation chain, fitting workflow, measured gallery record and verification limits.
