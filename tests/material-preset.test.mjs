@@ -39,3 +39,25 @@ test('adaptive filtering is shared by panel, portal and auto glass, isolated per
   assert.equal(materialRecipe.variants.layer.elevated['--caelos-auto-filter'], materialRecipe.variants.texture.glass.backdropFilter);
   assert.ok(!materialRecipe.variants.texture.sage.backdropFilter.includes(input));
 });
+
+
+test('graph uses foundation-sized dots in both themes and automatic graph layers', () => {
+  const graph = catalog.primitives.shared.graph;
+  assert.equal(graph['dot-size'].$value, '{base.space.px-2}');
+  assert.ok(!('line' in graph));
+  const texture = materialRecipe.variants.texture.graph;
+  assert.match(texture.backgroundImage, /^radial-gradient\(circle,/);
+  assert.ok(!texture.backgroundImage.includes('linear-gradient'));
+  for (const vars of Object.values(materialPreset.globalCss)) {
+    const diameter = base.base.space['px-2'].$value;
+    assert.equal(vars['--caelos-material-graph-dot-size'], `${diameter.value}${diameter.unit}`);
+    assert.equal(vars['--caelos-material-graph-dot-radius'], `${diameter.value / 2}${diameter.unit}`);
+    assert.equal(vars['--caelos-material-graph-pitch'], '27px');
+    assert.equal(parseFloat(vars['--caelos-material-graph-opacity']), base.base.opacity['fraction-0-07'].$value * 100);
+    assert.ok(!('--caelos-material-graph-line' in vars));
+  }
+  for (const layer of ['chrome', 'ground']) {
+    assert.equal(materialRecipe.variants.layer[layer]['--caelos-auto-image'], texture.backgroundImage);
+    assert.equal(materialRecipe.variants.layer[layer]['--caelos-auto-size'], texture.backgroundSize);
+  }
+});

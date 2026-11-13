@@ -1650,7 +1650,7 @@
         }
       },
       "graph": {
-        "$description": "Provide the graph surface material.",
+        "$description": "Provide a quiet dot-grid surface material. Continuous graph-paper lines were replaced with dots for legibility.",
         "$extensions": {
           "app.caelos": {
             "status": "partial",
@@ -1683,12 +1683,13 @@
             }
           }
         },
-        "line": {
+        "dot-size": {
           "$type": "dimension",
-          "$value": "{base.border.px-1}",
+          "$value": "{base.space.px-2}",
           "$extensions": {
             "app.caelos": {
-              "status": "canon"
+              "status": "provisional",
+              "note": "Dot-grid direction requested by Daniel, 2026-11-13. Diameter is 2px from the foundation scale; visual tuning awaits review."
             }
           }
         },
