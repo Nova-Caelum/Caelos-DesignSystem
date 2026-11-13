@@ -92,10 +92,10 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
     if(item.uses.length)text(c,'Used by\n'+item.uses.join('\n'),260,12,'text-supporting');
     specimens.push({id:v.id,path:item.path,variableId:variable.id});
   }
-  function row(root,name,count,construction) {
+  function row(root,name,count,construction,countUnit='variants') {
     const r=frame(root,'Family / '+name,1656,'HORIZONTAL');r.itemSpacing=24;
     const identity=frame(r,'Identity and construction',252);text(identity,name,252,21,'text-primary','Medium');
-    text(identity,count+' variants\n'+construction,252,13,'text-supporting');
+    text(identity,count+' '+countUnit+'\n'+construction,252,13,'text-supporting');
     return frame(r,'Variants · maximum five per line',1380);
   }
   const root=existingRoot || frame(page,'Category / '+category.title,1728);
@@ -110,7 +110,7 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
     const source=await figma.getNodeByIdAsync(group.id);if(!source)throw Error('Missing source '+group.id);
     const children=source.type==='COMPONENT_SET'?source.children:[source];
     const split = group.splitAxes || ['typography','spacing'].includes(category.key) || (category.key==='materials' && group.name!=='Cloud states');
-    if(split){const buckets=new Map();for(const child of children){const parts=child.name.split(',').map(p=>p.trim());const key=group.splitAxes?parts.filter(p=>group.splitAxes.includes(p.split('=')[0])).join(', '):parts[0];if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(child);}for(const [name,items]of buckets)groups.push({...group,name:group.name+' / '+(group.splitAxes?name:name.split('=').at(-1)),source,children:items});}
+    if(split){const buckets=new Map();for(const child of children){const parts=child.name.split(',').map(p=>p.trim());const key=group.splitAxes?parts.filter(p=>group.splitAxes.includes(p.split('=')[0])).join(', '):parts[0];if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(child);}for(const [name,items]of buckets)groups.push({...group,name:group.name+' / '+(group.lineAxis?name.split('=').at(-1):group.splitAxes?name:name.split('=').at(-1)),source,children:items});}
     else groups.push({...group,source,children});
   }
   if(!appendMissingTokens && category.key==='recipes-focus')groups.splice(0,groups.length,{name:'Interaction states',source:groups[0].source,children:groups.flatMap(g=>g.children)});
@@ -121,11 +121,15 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
   }
   for(const group of groups){
     const {source,children}=group;
-    const vs=row(root,group.name,children.length,group.note??(category.key==='materials'?'Recipe · material({ texture, layer })\nDark v1 · static study; behavior unverified':'Existing component specimens\nFoundation bindings retained\nPanda token export · not implemented'));
-    let line;
+    const vs=row(root,group.name,group.summary??children.length,group.note??(category.key==='materials'?'Recipe · material({ texture, layer })\nDark v1 · static study; behavior unverified':'Existing component specimens\nFoundation bindings retained\nPanda token export · not implemented'),group.summary?'':'variants');
+    const sharedLabels=new Set((group.sharedConstructionPaths??[]).map(path=>Object.values(manifest.constructionTokens).find(t=>t.path===path)).filter(Boolean).map(constructionTokenLabel));
+    let line, previousSection;
     for(let i=0;i<children.length;i++){
-      if(i%5===0){line=frame(vs,'Variant line '+(1+Math.floor(i/5)),1380,'HORIZONTAL');line.itemSpacing=20;}
-      const master=children[i], label=master.name;
+      const master=children[i];
+      const section=group.lineAxis?master.variantProperties[group.lineAxis]:null;
+      if(group.lineAxis && section!==previousSection){text(vs,section,1380,16,'text-primary','Medium');line=null;previousSection=section;}
+      if(!line || line.children.length>=5){line=frame(vs,section||'Variant line '+(1+Math.floor(i/5)),1380,'HORIZONTAL');line.itemSpacing=20;}
+      const label=group.lineAxis?master.name.split(',').map(p=>p.trim()).filter(p=>!group.splitAxes.includes(p.split('=')[0]) && p.split('=')[0]!==group.lineAxis).map(p=>p.split('=').at(-1)).join(' · '):master.name;
       const sampleText=category.key==='typography'?master.findAllWithCriteria({types:['TEXT']})[0]:null;
       const value=sampleText?sampleText.fontSize+' px / '+(sampleText.lineHeight.value ?? 'auto')+' px\n'+sampleText.fontName.family:Math.round(master.width*100)/100+' × '+Math.round(master.height*100)/100+' px';
       const c=card(line,label,value);
@@ -141,7 +145,8 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
       const names=[...new Set([...bindings].map(id=>{const v=all.find(v=>v.id===id);return v?constructionBindingLabel(v,manifest,collections):id;}))].sort();
       badge(c,category.key==='icon'?'catalog glossary':'study · visual review required');
       text(c,'Figma · '+(category.key==='recipes-focus'?group.name:source.name)+'\nSource · '+master.id,260,12,'text-supporting');
-      text(c,'Construction\n'+(names.join('\n')||'No variable binding found'),260,12,'text-supporting');
+      const stateNames=names.filter(name=>!sharedLabels.has(name));
+      text(c,(group.sharedConstruction?'State construction':'Construction')+'\n'+(stateNames.join('\n')||(group.sharedConstruction?'Shared construction only':'No variable binding found')),260,12,'text-supporting');
       const glyph=label.replace(/^.*=\s*/,'').trim();
       if(category.key==='icon')text(c,'Used by\n'+(manifest.meanings[glyph]?.join('\n')||'Available glyph · no specific use recorded'),260,12,'text-supporting');
       if(category.key==='materials')text(c,'Static study. Gradient geometry and unsupported filter parameters are not live variable bindings; see construction parameters below. Overlap behavior requires runtime review.',260,12,'text-supporting');
@@ -151,15 +156,16 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
     }
   }
   for(const group of category.rows){
+    const parameterNote='Tier '+(manifest.tier??1)+' parameters → lower tiers\nPanda · see individual cards'+(category.key==='tabs'?'\nRadius · Filled only\nUnderline thickness · Underline only':'');
     const family = appendMissingTokens && root.children.find(n => n.name === 'Family / '+group.name && n.findAllWithCriteria({types:['TEXT']}).some(t => t.characters.includes('Catalog · ')));
-    const vs=family ? family.children.find(n => n.name === 'Variants · maximum five per line') : row(root,group.name,group.items.length,'Tier '+(manifest.tier??1)+' parameters → lower tiers\nPanda · see individual cards');
+    const vs=family ? family.children.find(n => n.name === 'Variants · maximum five per line') : row(root,group.name,group.items.length,parameterNote,group.countUnit??'variants');
     const recorded = new Set(vs.findAllWithCriteria({types:['TEXT']}).filter(t=>t.characters.includes('\nCatalog · ')).map(t=>t.characters.split('\nCatalog · ')[1]));
     for(const item of group.items.filter(i=>!recorded.has(i.path))) {
       let line=vs.children.at(-1);
       if(!line || line.children.length>=5){line=frame(vs,'Variant line '+(vs.children.length+1),1380,'HORIZONTAL');line.itemSpacing=20;}
       tokenCard(line,item);
     }
-    if(family){const count=family.children[0].children.find(n=>n.type==='TEXT' && n.characters.includes(' variants\n'));const label=group.items.length+' variants\nTier '+manifest.tier+' parameters → lower tiers\nPanda · see individual cards';if(count && count.characters!==label){count.characters=label;mutatedNodeIds.push(count.id);}}
+    if(family){const count=family.children[0].children.find(n=>n.type==='TEXT' && n.characters.includes(' '+(group.countUnit??'variants')+'\n'));const label=group.items.length+' '+(group.countUnit??'variants')+'\n'+parameterNote;if(count && count.characters!==label){count.characters=label;mutatedNodeIds.push(count.id);}}
   }
   for(const entry of appendMissingTokens ? [] : category.pending??[]) {
     const vs=row(root,entry.name,1,'Catalog inventory · '+entry.status+'\nNo complete recipe implied');

@@ -1613,8 +1613,7 @@
             "inventoryName": "tabTrigger",
             "variants": {
               "appearance": [
-                "standard",
-                "tonal",
+                "filled",
                 "underline"
               ],
               "selection": [
@@ -1632,7 +1631,7 @@
               "dark"
             ],
             "figmaSpecimen": "377:6625",
-            "note": "Existing geometry and typography are recorded; horizontal padding consolidates 16px to space/px-15. State specimens remain review evidence; complete recipe and keyboard navigation remain open."
+            "note": "Two appearances: Filled (formerly Standard) and Underline. Tonal consolidates into Filled, preserving selection and interaction state. Shared geometry and typography use lower-tier tokens; horizontal padding uses space/px-15. Radius applies to Filled; underline thickness applies to Underline. State specimens remain review evidence; complete recipe and keyboard navigation remain open."
           }
         },
         "type-size": {
