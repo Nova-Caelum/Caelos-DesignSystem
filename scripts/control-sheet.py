@@ -26,6 +26,20 @@ def manifest():
             path = value[1:-1]
         raise ValueError('Alias cycle: ' + path)
 
+    def ingredient(path):
+        token = tables['dark'][path]
+        name = token['$extensions']['app.caelos'].get('figmaName', path.replace('.', '/'))
+        value, _ = resolve(path, 'dark')
+        light, _ = resolve(path, 'light')
+        collection = '00 Base' if path.startswith('base.') else '01 Semantic' if path.startswith('sys.') else '02 Control recipes'
+        return dict(path=path, name=name, collection=collection, type=token['$type'], value=value, light=light if light != value else None)
+
+    construction_tokens = {}
+    for path, token in tables['dark'].items():
+        own = ingredient(path)
+        target = token['$value'][1:-1] if path.startswith('controls.') else path
+        construction_tokens[own['collection'] + '/' + own['name']] = ingredient(target)
+
     # These names are emitted by src/tier-3/control-preset.mjs, not guessed aliases.
     button_css = {'foreground', 'focus-foreground', 'disabled-foreground', 'bed', 'default', 'hover', 'pressed', 'success', 'disabled-bed', 'tint', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
     field_css = {'foreground', 'focus-foreground', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
@@ -73,6 +87,7 @@ def manifest():
         if token['$type']=='color':
             label=(tables['dark'][chain[-1]].get('$extensions',{}).get('app.caelos',{}).get('displayName','')+' · '+suffix).strip(' ·')
         item=dict(path=path,name=meta.get('figmaName',path.replace('.','/')),type=token['$type'],value=value,label=label,status=meta['status'],evidence=meta.get('decision',', '.join(meta.get('decisions',[])) or 'No decision reference recorded'),uses=uses.get(path,[]),chain=chain[1:],light=light if light!=value else None,lightChain=light_chain[1:] if light!=value else [],description=token.get('$description',''),css='--caelos-material-'+css if css else None)
+        item['construction'] = ingredient(chain[1])
         family=' / '.join(path.split('.')[2:-1])
         families.setdefault((category,family),[]).append(item)
     for (category,name),items in families.items(): categories[category]['rows'].append(dict(name=name,items=items))
@@ -86,6 +101,6 @@ def manifest():
     covered=[i['path'] for c in categories.values() for r in c['rows'] for i in r['items']]
     expected=[p for p,_ in leaves(source)]
     if len(covered)!=len(set(covered)) or set(covered)!=set(expected): raise ValueError('Every control token must appear exactly once')
-    return dict(tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered))
+    return dict(tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered),constructionTokens=construction_tokens)
 
 if __name__=='__main__': print(json.dumps(manifest(),separators=(',',':')))
