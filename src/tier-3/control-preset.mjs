@@ -31,7 +31,8 @@ const restingGlow = [finish('glow-offset'), finish('glow-offset'), finish('glow-
   'color-mix(in srgb, ' + finish('glow-ink') + ' ' + finish('glow-opacity') + ', transparent)'].join(' ');
 export const fieldSurfaceRecipe = { className: 'caelos-field-surface', base: {
   color: ref('field-foreground'),
-  ...cloudStyle(fieldGroup, { color: ref('field-focus-foreground'), boxShadow: glow(fieldGroup) }),
+  ...cloudStyle(fieldGroup, { color: ref('field-focus-foreground'), boxShadow: glow(fieldGroup) },
+    { color: ref('field-focus-foreground') }),
 } };
 const buttonFill = state => 'color-mix(in srgb, ' + ref('button-' + state) + ' ' + ref('button-tint') + ', ' + ref('button-bed') + ')';
 export const primaryButtonInkRecipe = { className: 'caelos-primary-button-ink', base: {
