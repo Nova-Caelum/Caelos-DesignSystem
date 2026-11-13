@@ -341,3 +341,20 @@ test('chip and badge construction metadata references only existing lower-tier t
     }
   }
 });
+
+test('badge examples share reusable tones and the existing centred glow', () => {
+  const badge = resolveControlCatalog(load('02-controls.tokens.json')).controls.shared.badge.$extensions[EXT];
+  assert.deepEqual(badge.tonePaints, {
+    neutral: '{sys.color.text-supporting}',
+    'peach-gold': '{sys.color.peach-gold}',
+    sage: '{sys.color.success}',
+    'danger-red': '{sys.color.danger}',
+  });
+  assert.deepEqual(badge.toneExamples, {neutral: 'Planning', 'peach-gold': 'In progress', sage: 'Complete', 'danger-red': 'Blocked'});
+  assert.equal(badge.basePaint.glowBlur, '{primitives.shared.recipes-focus.glow-blur}');
+  assert.equal(badge.basePaint.glowOpacity, '{primitives.shared.recipes-focus.glow-opacity}');
+  assert.equal(badge.basePaint.glowOffset, '{base.space.px-0}');
+  assert.equal(badge.basePaint.glowSpread, '{base.space.px-0}');
+  assert.equal(badge.basePaint.blur, '{primitives.shared.glass.blur}');
+  assert.deepEqual(badge.states, []);
+});

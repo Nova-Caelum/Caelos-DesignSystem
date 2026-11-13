@@ -1626,9 +1626,9 @@
               ],
               "tone": [
                 "neutral",
-                "info",
-                "success",
-                "danger"
+                "peach-gold",
+                "sage",
+                "danger-red"
               ]
             },
             "defaultVariants": {
@@ -1661,7 +1661,7 @@
               ],
               "name": "badgeVariants"
             },
-            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed or tab stop. Success is a communicated status, never a clickable state. Avatars retain their identity-specific recipe while badges share their tinted-wash visual language. Dark v1 review; runtime component export remains open.",
+            "note": "One passive information recipe with independent shape and reusable colour choices. Planning, In progress, Complete and Blocked are example content, not separate recipes or interaction states. No hover, focus, pressed or tab stop. Former noninteractive status/count/category chips belong here. Avatars retain their identity-specific recipe while badges share their tinted-wash visual language. Dark v1 review; runtime component export remains open.",
             "construction": {
               "height": "height/32px",
               "pad-x": "spacing/12px",
@@ -1679,9 +1679,9 @@
             },
             "tonePaints": {
               "neutral": "{sys.color.text-supporting}",
-              "info": "{sys.color.action-blue-hover}",
-              "success": "{sys.color.success}",
-              "danger": "{sys.color.danger}"
+              "peach-gold": "{sys.color.peach-gold}",
+              "sage": "{sys.color.success}",
+              "danger-red": "{sys.color.danger}"
             },
             "basePaint": {
               "fill": "{primitives.shared.glass.body}",
@@ -1698,7 +1698,11 @@
               "angle": "{primitives.shared.cloud.angle}",
               "washEnd": "{sys.color.structural-violet}",
               "washStartAlpha": "{base.opacity.fraction-0-23}",
-              "washEndAlpha": "{base.opacity.fraction-0-07}"
+              "washEndAlpha": "{base.opacity.fraction-0-07}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{base.space.px-0}",
+              "glowSpread": "{base.space.px-0}"
             },
             "useCases": {
               "delivery-status": {
@@ -1709,12 +1713,20 @@
                 "note": "State-to-label/tone mapping and host wiring remain to be audited. No interactive states."
               }
             },
-            "materialConstruction": "Shared glass body, tint and blur with a diagonal wash from the selected tone to Structural Violet. tonePaints selects both label ink and washStart. No stroke or hard outline. Background saturation is 125% in the shared material contract; Figma cannot preview saturation or adaptive overlap. Reduced-transparency fallback and host behavior await runtime implementation.",
+            "materialConstruction": "Shared glass body, tint and blur with a diagonal wash from the selected tone to Structural Violet. tonePaints selects label ink, washStart and glowInk together. All shapes use the existing soft glow blur and opacity with zero offset and spread. No stroke or hard outline. Background saturation is 125% in the shared material contract; Figma cannot preview saturation or adaptive overlap. Gradient and glow colour alpha are catalog-derived; resync after token changes. Reduced-transparency fallback and host behavior await runtime implementation.",
             "evidence": [
               "Daniel badge review: increase breathing room and reflect the avatar/permission/question material language; visual approval pending.",
               "Caelos_staging packages/ui/src/alert-recipe.ts: permission tonal wash; question shared glass. Visual reference only; reconstruction uses current Tier 0/1 ingredients.",
-              "Caelos_staging packages/ui/src/recipes.ts: avatar identity wash; Figma Avatar source 377:6793. Identity-specific behavior remains separate."
-            ]
+              "Caelos_staging packages/ui/src/recipes.ts: avatar identity wash; Figma Avatar source 377:6793. Identity-specific behavior remains separate.",
+              "Daniel badge direction: soft matching-tone glow on every shape; progress uses yellow/gold, complete sage and blocked red. New rendering awaits visual review.",
+              "Caelos_staging novacaelum-caelos-fusion: lib/taskgraph/presentation.ts maps in-progress to progress and done/completed to done; packages/ui/src/recipes.ts and tokens.ts resolve progress to product Peach Gold. Current sys.color.peach-gold describes attention/progress; sys.color.golden-sand describes marketing/identity."
+            ],
+            "toneExamples": {
+              "neutral": "Planning",
+              "peach-gold": "In progress",
+              "sage": "Complete",
+              "danger-red": "Blocked"
+            }
           }
         }
       }

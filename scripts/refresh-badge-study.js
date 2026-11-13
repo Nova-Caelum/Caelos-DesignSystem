@@ -1,7 +1,7 @@
 // Evaluate primitive-sheet.js before this targeted refresh of the existing clean sheet.
-async function refreshBadgeStudy(figma, manifest) {
+async function refreshBadgeStudy(figma, manifest, badgesOnly = false) {
   const page=await figma.getNodeByIdAsync(manifest.pageId);
-  await figma.setCurrentPageAsync(page);
+  if(figma.currentPage.id!==page.id) await figma.setCurrentPageAsync(page);
   const changed=new Set(), evidence=[];
   const fonts=new Map();
   for(const t of page.findAllWithCriteria({types:['TEXT']}))
@@ -11,32 +11,35 @@ async function refreshBadgeStudy(figma, manifest) {
   const shared=manifest.categories.find(c=>c.key==='shared-controls');
   const root=page.children.find(n=>n.name==='Category / '+shared.title);
   const archive=await figma.getNodeByIdAsync('412:998');
-  // Preserve retired review cards in the archive; never remove their foundations.
-  for(const group of shared.rows) {
-    const family=root.children.find(n=>n.name==='Family / '+group.name);
-    for(const t of family.findAllWithCriteria({types:['TEXT']}).filter(t=>t.characters.includes('\nCatalog · '))) {
-      const path=t.characters.split('\nCatalog · ')[1];
-      const item=group.items.find(i=>i.path===path), card=t.parent;
-      if(!item) {
-        changed.add(card.parent.id); archive.appendChild(card);card.x=0;card.y=12000;
-        changed.add(card.id);changed.add(archive.id);
-      } else {
-        const uses=card.children.find(n=>n.type==='TEXT'&&n.characters.startsWith('Used by\n'));
-        if(uses) setText(uses,'Used by\n'+item.uses.join('\n'));
+  let appended={createdNodeIds:[],mutatedNodeIds:[]};
+  if(!badgesOnly) {
+    // Preserve retired review cards in the archive; never remove their foundations.
+    for(const group of shared.rows) {
+      const family=root.children.find(n=>n.name==='Family / '+group.name);
+      for(const t of family.findAllWithCriteria({types:['TEXT']}).filter(t=>t.characters.includes('\nCatalog · '))) {
+        const path=t.characters.split('\nCatalog · ')[1];
+        const item=group.items.find(i=>i.path===path), card=t.parent;
+        if(!item) {
+          changed.add(card.parent.id); archive.appendChild(card);card.x=0;card.y=12000;
+          changed.add(card.id);changed.add(archive.id);
+        } else {
+          const uses=card.children.find(n=>n.type==='TEXT'&&n.characters.startsWith('Used by\n'));
+          if(uses) setText(uses,'Used by\n'+item.uses.join('\n'));
+        }
       }
     }
-  }
-  const appended=await renderPrimitiveCategory(shared,manifest,true);
-  for(const id of appended.mutatedNodeIds)changed.add(id);
-  for(const group of shared.rows) {
-    const family=root.children.find(n=>n.name==='Family / '+group.name);
-    const wrapper=family.children.find(n=>n.name==='Variants · maximum five per line');
-    const cards=wrapper.children.flatMap(line=>[...line.children]);
-    for(let i=0;i<group.items.length;i++) {
-      const card=cards.find(c=>c.findAllWithCriteria({types:['TEXT']}).some(t=>t.characters.endsWith('\nCatalog · '+group.items[i].path)));
-      const line=wrapper.children[Math.floor(i/5)];
-      if(line.children[i%5]!==card) {
-        line.insertChild(i%5,card);changed.add(line.id);changed.add(card.id);
+    appended=await renderPrimitiveCategory(shared,manifest,true);
+    for(const id of appended.mutatedNodeIds)changed.add(id);
+    for(const group of shared.rows) {
+      const family=root.children.find(n=>n.name==='Family / '+group.name);
+      const wrapper=family.children.find(n=>n.name==='Variants · maximum five per line');
+      const cards=wrapper.children.flatMap(line=>[...line.children]);
+      for(let i=0;i<group.items.length;i++) {
+        const card=cards.find(c=>c.findAllWithCriteria({types:['TEXT']}).some(t=>t.characters.endsWith('\nCatalog · '+group.items[i].path)));
+        const line=wrapper.children[Math.floor(i/5)];
+        if(line.children[i%5]!==card) {
+          line.insertChild(i%5,card);changed.add(line.id);changed.add(card.id);
+        }
       }
     }
   }
@@ -48,7 +51,9 @@ async function refreshBadgeStudy(figma, manifest) {
     setText(note,'4 variants\n'+study.note);
     for(const instance of family.findAllWithCriteria({types:['INSTANCE']})) {
       const master=await instance.getMainComponentAsync();
-      const card=instance.parent.parent, shape=master.variantProperties.Shape, tone=master.variantProperties.Tone.toLowerCase();
+      const card=instance.parent.parent, shape=master.variantProperties.Shape, tone=master.variantProperties.Tone.toLowerCase().replaceAll(' ','-');
+      const title=card.children.find(n=>n.type==='TEXT'&&n.characters.startsWith('Shape='));
+      setText(title,master.name);
       const size=card.children.find(n=>n.type==='TEXT'&&/ × .* px$/.test(n.characters));
       setText(size,instance.width+' × '+instance.height+' px');
       const ingredients=[data.badgeShapes[shape],data.badgeTones[tone],...Object.values(data.badgeMaterial)];
@@ -61,7 +66,7 @@ async function refreshBadgeStudy(figma, manifest) {
     }
   }
   // Only move category containers to accommodate their expanded annotations.
-  const columns=[['Buttons','Fields','Composer references'],['Chips','Tabs','Triggers and links'],['Badges','Avatars','Indicators']];
+  const columns=badgesOnly ? [['Badges','Avatars','Indicators']] : [['Buttons','Fields','Composer references'],['Chips','Tabs','Triggers and links'],['Badges','Avatars','Indicators']];
   for(const column of columns) {
     let y=root.y+root.height+100;
     for(const title of column) {
