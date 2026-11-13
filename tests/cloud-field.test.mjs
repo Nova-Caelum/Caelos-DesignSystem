@@ -86,7 +86,7 @@ test('tonal pressed inherits the complete glass material including accessibility
   assert.equal(get('tonal-pressed-falloffAt'), '72%');
 });
 
-test('tonal wash preserves cream and blue contrast on the approved dark bed', () => {
+test('tonal wash preserves cream, blue and success-green contrast on the approved dark bed', () => {
   const blend=(ink,bed,alpha)=>ink.map((v,i)=>v*alpha+bed[i]*(1-alpha));
   for(const state of ['default','hover','focus','success']) {
     const role=key=>get('tonal-'+state+'-'+key);
@@ -99,4 +99,19 @@ test('tonal wash preserves cream and blue contrast on the approved dark bed', ()
       assert.ok((lum(channels(role('foreground')))+.05)/(lum(blend(color,base,alpha))+.05)>=4.5,state+' at '+step+'%');
     }
   }
+});
+
+test('secondary success uses semantic green and text engagement consumes its own glow tokens', () => {
+  const paints = controls.controls.shared.button.$extensions['app.caelos'].statePaints;
+  for (const style of ['tonal','text']) {
+    assert.equal(paints[style].success.foreground, '{sys.color.success}');
+    assert.equal(get(style + '-success-foreground'), get('button-success'));
+  }
+  assert.equal(get('text-hover-glowOpacity'), '50%');
+  assert.equal(get('text-focus-glowOpacity'), '50%');
+  assert.equal(get('text-pressed-glowOpacity'), '23%');
+  const text = controlPreset.theme.extend.recipes.textButtonInk.base;
+  const hover = text['&:is(:hover, :focus-visible):not(:active, :disabled, [data-state=success])'];
+  for (const key of ['glowOffset','glowBlur','glowInk','glowOpacity'])
+    assert.ok(hover.textShadow.includes('--caelos-material-text-hover-' + key));
 });

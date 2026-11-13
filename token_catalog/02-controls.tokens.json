@@ -249,7 +249,7 @@
                 "success": {
                   "fill": "{primitives.shared.cloud.body}",
                   "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                  "foreground": "{primitives.shared.typography.tone.default}",
+                  "foreground": "{sys.color.success}",
                   "angle": "{primitives.shared.cloud.angle}",
                   "washStart": "{primitives.shared.cloud.wash-end}",
                   "washEnd": "{primitives.shared.cloud.wash-end}",
@@ -283,7 +283,7 @@
                   "foreground": "{primitives.shared.recipes-focus.foreground}",
                   "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
                   "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOpacity": "{base.opacity.fraction-0-5}",
                   "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "pressed": {
@@ -294,13 +294,13 @@
                   "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "success": {
-                  "foreground": "{primitives.shared.typography.tone.default}"
+                  "foreground": "{sys.color.success}"
                 },
                 "focus": {
                   "foreground": "{primitives.shared.recipes-focus.foreground}",
                   "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
                   "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOpacity": "{base.opacity.fraction-0-5}",
                   "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "disabled": {
@@ -347,11 +347,11 @@
             },
             "tonalSurfacePolicy": {
               "pressedRecipe": "material({ texture: glass })",
-              "description": "Default/Hover/Focus use the Cloud body and violet/sage wash. Pressed composes the complete unified glass finish, including 125% saturation, overlap input and opaque fallback. Success retains the translucent body with a quiet sage wash. Disabled uses the shared opaque disabled bed. No hard border.",
+              "description": "Default/Hover/Focus use the Cloud body and violet/sage wash. Pressed composes the complete unified glass finish, including 125% saturation, overlap input and opaque fallback. Success uses sage-green text over the translucent body with a quiet sage wash. Disabled uses the shared opaque disabled bed. No hard border.",
               "reference": "Caelos_staging packages/ui/src/recipes.ts at be3aec0ccf597141020bea35e6f4cbb3b982a012: tonal violet/sage gradient; the current-token glass pressed state follows Daniel’s request, not a claimed deployed-console match.",
               "figmaLimit": "Gradient alpha/geometry are sync-derived. Figma background blur previews glass; CSS saturation, overlap response and reduced-transparency fallback require runtime verification."
             },
-            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow; Pressed restores cream while retaining the glow. Success is ✓ Success in cream, with no fill. Same real-result/reset contract as Primary.",
+            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow using the existing 50% opacity token; Pressed restores cream while retaining the glow. Success is ✓ Success in sage green, with no fill. Same real-result/reset contract as Primary.",
             "recipeExports": {
               "primary": "primaryButtonInk",
               "tonal": "tonalButtonInk",
