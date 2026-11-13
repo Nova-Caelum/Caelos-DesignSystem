@@ -27,11 +27,11 @@ async function completeSecondaryButtonStates(figma, manifest) {
           return matches[0];
         };
         const value = key => variable(key).resolveForConsumer(component).value;
-        const rgb = key => {const {r,g,b}=value(key);return {r,g,b};};
+        const tokenColor = key => {const {r,g,b}=value(key);return {r,g,b};};
         // Figma color bindings replace alpha; translucent paints are derived on sync.
         const solid = (key,opacity=1) => opacity === 1
-          ? figma.variables.setBoundVariableForPaint({type:'SOLID',color:rgb(key)},'color',variable(key))
-          : {type:'SOLID',color:rgb(key),opacity};
+          ? figma.variables.setBoundVariableForPaint({type:'SOLID',color:tokenColor(key)},'color',variable(key))
+          : {type:'SOLID',color:tokenColor(key),opacity};
         const label=component.children.find(n=>n.type==='TEXT');
         label.characters=state==='Success'?'✓ Success':style==='Tonal'?'Save changes':'Save';
         label.fills=[solid('foreground')];label.effects=[];
@@ -45,16 +45,16 @@ async function completeSecondaryButtonStates(figma, manifest) {
             const angle=value('angle')*Math.PI/180, dx=Math.sin(angle),dy=-Math.cos(angle);
             const length=Math.abs(component.width*dx)+Math.abs(component.height*dy);
             const ax=component.width*dx/length,ay=component.height*dy/length;
-            const gradient={type:'GRADIENT_LINEAR',gradientTransform:[[ax,ay,(1-ax-ay)/2],[-ay,ax,(1+ay-ax)/2]],gradientStops:['Start','End'].map((end,i)=>({position:i,color:{...rgb('wash'+end),a:value('wash'+end+'Alpha')/100}}))};
+            const gradient={type:'GRADIENT_LINEAR',gradientTransform:[[ax,ay,(1-ax-ay)/2],[-ay,ax,(1+ay-ax)/2]],gradientStops:['Start','End'].map((end,i)=>({position:i,color:{...tokenColor('wash'+end),a:value('wash'+end+'Alpha')/100}}))};
             component.fills=[gradient,...component.fills];
           }
           if(state==='Pressed') {
-            component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[1,0,0],[0,1,0]],gradientStops:['start','end'].map((end,index)=>({position:index*paint.falloffAt.value,color:{...rgb('tintInk'),a:value('tintOpacity')/100*(end==='start'?1:paint.falloffStrength.value)}}))},...component.fills];
+            component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[1,0,0],[0,1,0]],gradientStops:['start','end'].map((end,index)=>({position:index*paint.falloffAt.value,color:{...tokenColor('tintInk'),a:value('tintOpacity')/100*(end==='start'?1:paint.falloffStrength.value)}}))},...component.fills];
             component.effects=[figma.variables.setBoundVariableForEffect({type:'BACKGROUND_BLUR',visible:true,radius:value('blur')},'radius',variable('blur'))];
           }
         }
         if(paint.glowInk) {
-          let effect={type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...rgb('glowInk'),a:value('glowOpacity')/100},offset:{x:value('glowOffset'),y:value('glowOffset')},radius:value('glowBlur'),spread:0,showShadowBehindNode:false};
+          let effect={type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...tokenColor('glowInk'),a:value('glowOpacity')/100},offset:{x:value('glowOffset'),y:value('glowOffset')},radius:value('glowBlur'),spread:0,showShadowBehindNode:false};
           // Alpha is sync-derived; binding the color would replace it with opaque ink.
           effect=figma.variables.setBoundVariableForEffect(effect,'radius',variable('glowBlur'));
           (style==='Text'?label:component).effects=[effect];
