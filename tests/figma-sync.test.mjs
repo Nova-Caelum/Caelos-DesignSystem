@@ -61,3 +61,25 @@ assert number('base.position.fraction-0-72', 0.72) == number('unscaled', 0.72)
 `], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
+
+
+test('catalog compilation preserves shared compatibility aliases across theme modes', () => {
+  const result = spawnSync('python3', ['-c', `
+import json, runpy
+from pathlib import Path
+compile_catalog = runpy.run_path('scripts/figma-catalog.py')['compile_catalog']
+root = Path('token_catalog')
+def read_snapshot(*args):
+    if args[0] == 'ls-tree':
+        return '\\n'.join(sorted(p.name for p in root.glob('*.tokens.json')))
+    return (root / args[-1].split('/')[-1]).read_text()
+compile_catalog.__globals__['git'] = read_snapshot
+plan = compile_catalog('working')
+semantic = next(c for c in plan if c['name'] == '01 Semantic')
+for role in ['base-alpha', 'blur', 'saturation', 'tint']:
+    row = next(v for v in semantic['variables'] if v['name'] == '_compat/sys/material/menu/' + role)
+    assert row['hidden']
+    assert row['values'] == {mode: {'alias': '01 Semantic/sys/material/glass/' + role} for mode in ['Dark', 'Light']}
+`], {encoding:'utf8'});
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});

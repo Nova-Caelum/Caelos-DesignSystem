@@ -97,11 +97,14 @@ def compile_catalog(revision):
                 # retain their bindings. There is only one raw foundation value.
                 for old in previous[1:]:
                     legacy = "_compat/" + old
-                    if legacy in rows[group]:
-                        raise ValueError("Duplicate compatibility name " + legacy)
-                    rows[group][legacy] = {"name":legacy, "type":vt,
-                        "migrateFrom":[old], "hidden":True,
-                        "values":{mode:{"alias":GROUPS[group] + "/" + name}}}
+                    alias = {"alias":GROUPS[group] + "/" + name}
+                    compat = rows[group].setdefault(legacy, {"name":legacy, "type":vt,
+                        "migrateFrom":[old], "hidden":True, "values":{}})
+                    if (not compat.get("hidden") or compat["type"] != vt
+                            or mode in compat["values"]
+                            or any(value != alias for value in compat["values"].values())):
+                        raise ValueError("Conflicting compatibility name " + legacy)
+                    compat["values"][mode] = alias
     return [dict(name=name, modes=modes, variables=sorted(group.values(), key=lambda x:x["name"]))
             for name, modes, group in zip(GROUPS, MODES, rows)]
 
