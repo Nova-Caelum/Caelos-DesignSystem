@@ -21,10 +21,10 @@ async function createCompactControls(figma, manifest) {
     for (const s of t.getStyledTextSegments(['fontName'])) await figma.loadFontAsync(s.fontName);
   const bind = (node, property, ingredient) => node.setBoundVariable(property, lookup(ingredient));
   const value = (item, node) => lookup(item).resolveForConsumer(node).value;
-  const rgb = (item, node) => { const {r,g,b} = value(item,node); return {r,g,b}; };
+  const resolveTokenColor = (item, node) => { const {r,g,b} = value(item,node); return {r,g,b}; };
   const solid = (item,node,alpha=1) => alpha === 1
-    ? figma.variables.setBoundVariableForPaint({type:'SOLID',color:rgb(item,node)},'color',lookup(item))
-    : {type:'SOLID',color:rgb(item,node),opacity:alpha};
+    ? figma.variables.setBoundVariableForPaint({type:'SOLID',color:resolveTokenColor(item,node)},'color',lookup(item))
+    : {type:'SOLID',color:resolveTokenColor(item,node),opacity:alpha};
   function geometry(component,label,g,shape,radii) {
     for (const [property,key] of Object.entries({paddingLeft:'pad-x',paddingRight:'pad-x',paddingTop:'pad-y',paddingBottom:'pad-y',itemSpacing:'gap',minHeight:'height',height:'height'})) bind(component,property,g[key]);
     for (const edge of ['topLeftRadius','topRightRadius','bottomLeftRadius','bottomRightRadius']) bind(component,edge,radii[shape]);
@@ -45,13 +45,13 @@ async function createCompactControls(figma, manifest) {
       const angle=v('angle')*Math.PI/180, dx=Math.sin(angle),dy=-Math.cos(angle);
       const length=Math.abs(component.width*dx)+Math.abs(component.height*dy);
       const ax=component.width*dx/length,ay=component.height*dy/length;
-      component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[ax,ay,(1-ax-ay)/2],[-ay,ax,(1+ay-ax)/2]],gradientStops:['Start','End'].map((end,i)=>({position:i,color:{...rgb(paint['wash'+end],component),a:v('wash'+end+'Alpha')/100}}))},...component.fills];
+      component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[ax,ay,(1-ax-ay)/2],[-ay,ax,(1+ay-ax)/2]],gradientStops:['Start','End'].map((end,i)=>({position:i,color:{...resolveTokenColor(paint['wash'+end],component),a:v('wash'+end+'Alpha')/100}}))},...component.fills];
     }
     if(paint.tintInk) {
-      component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[1,0,0],[0,1,0]],gradientStops:[0,1].map(i=>({position:i*paint.falloffAt.value,color:{...rgb(paint.tintInk,component),a:v('tintOpacity')/100*(i?paint.falloffStrength.value:1)}}))},...component.fills];
+      component.fills=[{type:'GRADIENT_LINEAR',gradientTransform:[[1,0,0],[0,1,0]],gradientStops:[0,1].map(i=>({position:i*paint.falloffAt.value,color:{...resolveTokenColor(paint.tintInk,component),a:v('tintOpacity')/100*(i?paint.falloffStrength.value:1)}}))},...component.fills];
       component.effects=[figma.variables.setBoundVariableForEffect({type:'BACKGROUND_BLUR',visible:true,radius:v('blur')},'radius',lookup(paint.blur))];
     }
-    if(paint.glowInk) component.effects=[figma.variables.setBoundVariableForEffect({type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...rgb(paint.glowInk,component),a:v('glowOpacity')/100},offset:{x:v('glowOffset'),y:v('glowOffset')},radius:v('glowBlur'),spread:0,showShadowBehindNode:false},'radius',lookup(paint.glowBlur))];
+    if(paint.glowInk) component.effects=[figma.variables.setBoundVariableForEffect({type:'DROP_SHADOW',visible:true,blendMode:'NORMAL',color:{...resolveTokenColor(paint.glowInk,component),a:v('glowOpacity')/100},offset:{x:v('glowOffset'),y:v('glowOffset')},radius:v('glowBlur'),spread:0,showShadowBehindNode:false},'radius',lookup(paint.glowBlur))];
   }
   for (const kind of ['chip','badge']) {
     const setName='Draft / '+(kind==='chip'?'Interactive chip':'Passive badge');
