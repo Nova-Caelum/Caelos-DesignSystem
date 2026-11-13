@@ -57,12 +57,12 @@ def manifest():
 
     # These names are emitted by src/tier-3/control-preset.mjs, not guessed aliases.
     button_css = {'foreground', 'focus-foreground', 'disabled-foreground', 'bed', 'default', 'hover', 'pressed', 'success', 'disabled-bed', 'tint', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
-    field_css = {'foreground', 'hover-foreground', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
+    field_css = {'foreground', 'hover-foreground', 'focus-foreground', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
     recipes = {'button': 'primaryButtonInk() · paint only; complete component wiring remains open', 'input': 'fieldSurface() · cloud, hover and focus surface only; complete input recipe remains open'}
     definitions = [
         ('shared-controls', 'Shared control construction', 'One set of lower-tier ingredients for Buttons, Chips and Badges. Choices name their values. Components select them; these are not extra foundation tokens or coordinated size profiles.'),
         ('buttons', 'Buttons', 'Action emphasis and state comparison. Medium radius is approved; geometry and some state treatments remain draft.'),
-        ('fields', 'Fields', 'Text, search and multiline controls. Muted resting/focused field text, dim supporting copy and blue hover text. Cloud wash and field spacing use lower-tier tokens.'),
+        ('fields', 'Fields', 'Text, search and multiline controls. Muted resting text, primary entered text on focus, dim supporting copy and blue hover text. Cloud wash and field spacing use lower-tier tokens.'),
         ('tabs', 'Tabs', 'Individual tab triggers. Appearance, selection and interaction state are independent; the coordinated container remains Tier 4.'),
         ('chips', 'Chips', 'Interactive filter menus and direct toggles. Cloud at rest, glass when pressed; no Success state.'),
         ('badges', 'Badges', 'Passive status, counts and category labels. Shape and tone vary; no interactive states.'),
@@ -87,7 +87,7 @@ def manifest():
             ('\nTranslucent violet/sage wash. Pressed: shared glass, 125% saturation in CSS. Success: sage-green label over quiet sage wash. Figma gradients are sync-derived; saturation/overlap and opaque fallback require runtime review.' if name == 'Tonal' else
              '\nUnfilled in every state. Hover/Focus: blue glyph glow at opacity/0.5. Pressed: cream text with blue glyph glow. Success: sage-green check and label.') +
             '\nLower-tier geometry; side padding 15px. State previews; pointer/keyboard prototype wiring unverified. Dark v1; visual approval pending.')
-    study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nRest and typing focus · muted / dim. Hover · blue field text.\nText example: Aurora is an entered value, not a placeholder. Name your project… is the empty-field hint. Focus means ready for typing, reached by click, tap or keyboard.\nDark v1. Prototype links retained; behavior not retested.')
+    study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nRest · muted entered text. Hover · blue. Focus · primary entered text. Labels · muted; placeholder and supporting copy · dim.\nText example: Aurora is an entered value, not a placeholder. Name your project… is the empty-field hint. Focus means ready for typing, reached by click, tap or keyboard.\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
     study('chips','Chip','474:1024',['Shape'],'Partial recipe · controls.shared.chip\nDefault / Hover / Focus / Pressed / Disabled. Hover = Focus. Menu-open or toggle selection may retain Pressed; applied filter summary is separate. No Success.\nShared cloud / glass primitives; 125% saturation is runtime-only in Figma. Static state specimens; keyboard and menu wiring remain open.\nRounded / pill: filter-menu example. Circle: direct-toggle example; accessible name required.')

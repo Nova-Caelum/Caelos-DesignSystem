@@ -119,14 +119,16 @@ test('secondary success uses semantic green and text engagement consumes its own
 });
 
 
-test('field hover is blue and typing focus is muted, preserving Cloud wash and disabled exclusion', () => {
+test('field hover is blue and typing focus is primary, preserving Cloud wash and disabled exclusion', () => {
   const input = controls.controls.shared.input;
   assert.equal(input.foreground.$value, '{primitives.shared.typography.tone.muted}');
   assert.equal(input['supporting-ink'].$value, '{primitives.shared.typography.tone.dim}');
   const recipe = controlPreset.theme.extend.recipes.fieldSurface.base;
   const hover = recipe['&:hover:not(:focus-within, :disabled, [data-disabled=true], :has(:disabled))'];
   const focus = recipe['&:focus-within:not(:disabled, [data-disabled=true], :has(:disabled))'];
-  assert.equal(focus.color, 'var(--caelos-material-field-foreground)');
+  assert.equal(focus.color, 'var(--caelos-material-field-focus-foreground)');
+  assert.notEqual(focus.color, recipe.color);
+  assert.equal(get('field-focus-foreground'), '#EDE3CF');
   assert.notEqual(hover.color, focus.color);
   assert.equal(hover.color, 'var(--caelos-material-field-hover-foreground)');
   assert.equal(hover['&::before'].opacity, 'var(--caelos-material-field-wash-hover)');

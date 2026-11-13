@@ -543,7 +543,7 @@
               "requiredError": "empty required text field",
               "multilineResize": "vertical",
               "note": "Current role selections for geometry, surfaces and typography are pending visual review.",
-              "textHierarchy": "Rest and typing focus: muted label and field text; dim supporting and placeholder text. Hover: editable field text uses hover-foreground blue. Focus retains its Cloud wash and soft glow. Disabled and error treatments remain distinct."
+              "textHierarchy": "Rest: muted label and entered field text; dim supporting and placeholder text. Hover: editable field text uses hover-foreground blue. Focus: entered text uses the primary text role across text, search and multiline inputs; labels and supporting copy keep their own roles. Focus retains its Cloud wash and soft glow. Disabled and error treatments remain distinct."
             }
           }
         },
@@ -620,13 +620,10 @@
           "$extensions": {
             "app.caelos": {
               "status": "canon",
-              "decision": "D25",
-              "figmaPreviousNames": [
-                "controls/shared/input/focus-foreground"
-              ]
+              "decision": "D25"
             }
           },
-          "$description": "Blue editable text on pointer hover. Active typing focus uses the muted foreground role."
+          "$description": "Blue editable text on pointer hover. Active entered text uses focus-foreground, the primary text role."
         },
         "focus-glow-ink": {
           "$type": "color",
@@ -936,6 +933,17 @@
               }
             }
           }
+        },
+        "focus-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.default}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "evidence": "Daniel: focused, entered input text uses the primary text token universally; live Tier 2 Clean text/search/multiline edits reviewed 2026-11-13."
+            }
+          },
+          "$description": "Primary text for entered content in every focused input. Placeholder hints and supporting copy keep their dim role; labels keep their muted role."
         }
       },
       "chip": {
