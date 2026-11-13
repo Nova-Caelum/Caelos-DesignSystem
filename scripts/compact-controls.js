@@ -78,15 +78,6 @@ async function createCompactControls(figma, manifest) {
     set.resize(states.length*220+48,348);set.x=0;set.y=kind==='chip'?10500:11000;
     sources[kind]=set.id;
   }
-  // Existing recipe variables retain their identities and now alias approved ingredients.
-  const chipRows=manifest.categories.find(c=>c.key==='chips').rows.flatMap(r=>r.items);
-  for(const key of ['radius','fill','selected']) {
-    const row=chipRows.find(i=>i.path==='controls.shared.chip.'+key);
-    const target=lookup(row.construction);
-    const own=lookup({name:row.name,collection:'02 Control recipes',path:row.path});
-    const coll=collections.find(c=>c.id===own.variableCollectionId);
-    for(const mode of coll.modes)own.setValueForMode(mode.modeId,{type:'VARIABLE_ALIAS',id:target.id});
-  }
   changed.push(archive.id);
   return {sources,createdNodeIds:made,mutatedNodeIds:changed,counts:{chips:15,badges:12},prototype:'Static specimens; no simulated menu or success'};
 }

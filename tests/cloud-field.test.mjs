@@ -1,6 +1,8 @@
+import catalog from '../token_catalog/02-controls.tokens.json' with { type: 'json' };
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import controls from '../token_catalog/02-controls.tokens.json' with {type:'json'};
+import {resolveControlCatalog} from '../src/tier-2/control-catalog.mjs';
+const controls = resolveControlCatalog(catalog);
 import {controlPreset} from '../src/tier-3/control-preset.mjs';
 const vars = controlPreset.globalCss[':root, [data-theme="dark"]'];
 const get = name => vars['--caelos-material-' + name];

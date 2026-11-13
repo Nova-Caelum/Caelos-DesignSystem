@@ -10,157 +10,147 @@
             "ref": "D50, D81, G04, G05",
             "why": "Geometry and typography use existing lower-tier tokens. Buttons, interactive Chips and passive Badges are separated for dark-v1 visual review. Complete runtime recipes, timing and interaction wiring remain open."
           }
-        ]
-      }
-    },
-    "shared": {
-      "badgeVariants": {
-        "$description": "Passive status, count and category information; shape and semantic tone are independent.",
-        "$extensions": {
-          "app.caelos": {
-            "status": "partial",
-            "inventoryName": "badgeVariants",
-            "recipeInStaging": true,
-            "variants": {
-              "shape": [
-                "rounded",
-                "pill",
-                "circle"
-              ],
-              "tone": [
-                "neutral",
-                "info",
-                "success",
-                "danger"
-              ]
+        ],
+        "sharedConstruction": {
+          "status": "partial",
+          "description": "Shared construction choices for Buttons, Chips and Badges. Choices name actual values, never component types. These are recipe selectors, not new token aliases; expansion yields direct Tier 0/1 references. No coordinated size profiles have been approved.",
+          "parameters": {
+            "font-family": {
+              "ui": "{primitives.shared.typography.family.ui}"
             },
-            "defaultVariants": {
-              "shape": "rounded",
-              "tone": "neutral"
+            "font-size": {
+              "14px": "{primitives.shared.typography.size.label}"
             },
-            "states": [],
-            "modes": [
-              "dark",
-              "light",
-              "reduced-motion",
-              "reduced-transparency"
-            ],
-            "historicalInventory": {
-              "variants": {
-                "variant": [
-                  "default",
-                  "secondary",
-                  "destructive",
-                  "outline",
-                  "ghost",
-                  "link"
-                ]
-              },
-              "states": [
-                "hover",
-                "focus-visible",
-                "focus",
-                "error"
-              ]
+            "line-height": {
+              "20px": "{primitives.shared.typography.line.label}"
             },
-            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed, success interaction or tab stop. Success is a communicated status, never a clickable state. Avatar cards remain separate. Dark v1 review; runtime component export remains open.",
-            "construction": {
-              "height": "{base.size.px-28}",
-              "pad-x": "{base.space.px-8}",
-              "pad-y": "{base.space.px-4}",
-              "gap": "{base.space.px-4}",
-              "type-size": "{primitives.shared.typography.size.label}",
-              "type-line": "{primitives.shared.typography.line.label}",
-              "type-family": "{primitives.shared.typography.family.ui}",
-              "type-weight": "{base.type.weight.medium}",
-              "fill": "{sys.color.elevated-2}"
+            "font-weight": {
+              "500": "{base.type.weight.medium}"
             },
-            "shapeRadii": {
-              "rounded": "{base.radius.sm}",
-              "pill": "{base.radius.px-22}",
-              "circle": "{base.radius.px-22}"
+            "spacing": {
+              "4px": "{base.space.px-4}",
+              "8px": "{base.space.px-8}",
+              "12px": "{base.space.px-12}",
+              "15px": "{base.space.px-15}"
             },
-            "tonePaints": {
-              "neutral": "{sys.color.text-supporting}",
-              "info": "{sys.color.action-blue-hover}",
-              "success": "{sys.color.success}",
-              "danger": "{sys.color.danger}"
+            "height": {
+              "28px": "{base.size.px-28}",
+              "42px": "{base.size.px-42}",
+              "44px": "{base.size.px-44}"
+            },
+            "radius": {
+              "6px": "{base.radius.sm}",
+              "12px": "{base.radius.md}",
+              "22px": "{base.radius.px-22}"
+            }
+          },
+          "paints": {
+            "accent-rest": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.default}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "accent-engaged": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "accent-pressed": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.pressed}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "accent-success": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.success}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "surface-disabled": {
+              "fill": "{primitives.shared.surface.button.disabled-bed}",
+              "foreground": "{primitives.shared.typography.tone.dim}"
+            },
+            "cloud-rest": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{primitives.shared.typography.tone.default}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-start}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+            },
+            "cloud-engaged": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-start}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "glass-pressed": {
+              "fill": "{primitives.shared.glass.body}",
+              "fillOpacity": "{primitives.shared.glass.base-alpha}",
+              "tintInk": "{primitives.shared.glass.tint-ink}",
+              "tintOpacity": "{primitives.shared.glass.tint}",
+              "falloffAt": "{primitives.shared.glass.falloff-at}",
+              "falloffStrength": "{primitives.shared.glass.falloff-strength}",
+              "blur": "{primitives.shared.glass.blur}",
+              "saturation": "{primitives.shared.glass.saturation}",
+              "overlapClear": "{primitives.shared.glass.overlap-clear}",
+              "overlapCovered": "{primitives.shared.glass.overlap-covered}",
+              "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "cloud-success": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{sys.color.success}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-end}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+            },
+            "ink-rest": {
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "ink-engaged": {
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{base.opacity.fraction-0-5}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "ink-pressed": {
+              "foreground": "{primitives.shared.typography.tone.default}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "ink-success": {
+              "foreground": "{sys.color.success}"
+            },
+            "ink-disabled": {
+              "foreground": "{primitives.shared.typography.tone.dim}"
             }
           }
         }
-      },
-      "buttonVariants": {
-        "$description": "Set host button size and action emphasis.",
-        "$extensions": {
-          "app.caelos": {
-            "status": "open",
-            "inventoryName": "buttonVariants",
-            "recipeInStaging": true,
-            "variants": {
-              "variant": [
-                "default",
-                "outline",
-                "secondary",
-                "ghost",
-                "destructive",
-                "link"
-              ],
-              "size": [
-                "default",
-                "xs",
-                "sm",
-                "lg",
-                "icon",
-                "icon-xs",
-                "icon-sm",
-                "icon-lg"
-              ]
-            },
-            "defaultVariants": {
-              "variant": "default",
-              "size": "default"
-            },
-            "modes": [
-              "dark",
-              "light",
-              "reduced-motion",
-              "reduced-transparency"
-            ],
-            "decisions": [
-              "D50"
-            ]
-          }
-        }
-      },
-      "controlSkin": {
-        "$description": "Express destructive and non-destructive control emphasis.",
-        "$extensions": {
-          "app.caelos": {
-            "status": "open",
-            "inventoryName": "controlSkin",
-            "recipeInStaging": true,
-            "variants": {
-              "kind": [
-                "danger",
-                "glass"
-              ]
-            },
-            "defaultVariants": {
-              "kind": "danger"
-            },
-            "states": [
-              "hover",
-              "disabled"
-            ],
-            "modes": [
-              "dark",
-              "light",
-              "reduced-motion",
-              "reduced-transparency"
-            ]
-          }
-        }
-      },
+      }
+    },
+    "shared": {
       "button": {
         "$description": "Express shared action emphasis, size and button states.",
         "$extensions": {
@@ -173,18 +163,10 @@
                 "primary",
                 "tonal",
                 "text"
-              ],
-              "size": [
-                "sm",
-                "md"
-              ],
-              "danger": [
-                true
               ]
             },
             "defaultVariants": {
-              "variant": "tonal",
-              "size": "md"
+              "variant": "tonal"
             },
             "states": [
               "default",
@@ -208,147 +190,31 @@
             "note": "All three emphasis styles expose Default, Hover, Pressed, Success, Focus and Disabled. Hover and Focus share blue foreground and soft glow. Tonal uses a translucent violet/sage wash, then the shared glass material when pressed. Text stays unfilled and glows around its glyphs. Geometry uses lower-tier tokens; full component and production host wiring remain open.",
             "statePaints": {
               "primary": {
-                "default": {
-                  "fill": "{primitives.shared.surface.button.bed}",
-                  "tintInk": "{primitives.shared.surface.button.default}",
-                  "tintOpacity": "{primitives.shared.surface.button.tint}",
-                  "foreground": "{primitives.shared.typography.tone.default}"
-                },
-                "hover": {
-                  "fill": "{primitives.shared.surface.button.bed}",
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "pressed": {
-                  "fill": "{primitives.shared.surface.button.bed}",
-                  "tintInk": "{primitives.shared.surface.button.pressed}",
-                  "tintOpacity": "{primitives.shared.surface.button.tint}",
-                  "foreground": "{primitives.shared.typography.tone.default}"
-                },
-                "success": {
-                  "fill": "{primitives.shared.surface.button.bed}",
-                  "tintInk": "{primitives.shared.surface.button.success}",
-                  "tintOpacity": "{primitives.shared.surface.button.tint}",
-                  "foreground": "{primitives.shared.typography.tone.default}"
-                },
-                "focus": {
-                  "fill": "{primitives.shared.surface.button.bed}",
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "disabled": {
-                  "fill": "{primitives.shared.surface.button.disabled-bed}",
-                  "foreground": "{primitives.shared.typography.tone.dim}"
-                }
+                "default": "accent-rest",
+                "hover": "accent-engaged",
+                "pressed": "accent-pressed",
+                "success": "accent-success",
+                "focus": "accent-engaged",
+                "disabled": "surface-disabled"
               },
               "tonal": {
-                "default": {
-                  "fill": "{primitives.shared.cloud.body}",
-                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                  "foreground": "{primitives.shared.typography.tone.default}",
-                  "angle": "{primitives.shared.cloud.angle}",
-                  "washStart": "{primitives.shared.cloud.wash-start}",
-                  "washEnd": "{primitives.shared.cloud.wash-end}",
-                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
-                },
-                "hover": {
-                  "fill": "{primitives.shared.cloud.body}",
-                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "angle": "{primitives.shared.cloud.angle}",
-                  "washStart": "{primitives.shared.cloud.wash-start}",
-                  "washEnd": "{primitives.shared.cloud.wash-end}",
-                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "pressed": {
-                  "fill": "{primitives.shared.glass.body}",
-                  "fillOpacity": "{primitives.shared.glass.base-alpha}",
-                  "tintInk": "{primitives.shared.glass.tint-ink}",
-                  "tintOpacity": "{primitives.shared.glass.tint}",
-                  "falloffAt": "{primitives.shared.glass.falloff-at}",
-                  "falloffStrength": "{primitives.shared.glass.falloff-strength}",
-                  "blur": "{primitives.shared.glass.blur}",
-                  "saturation": "{primitives.shared.glass.saturation}",
-                  "overlapClear": "{primitives.shared.glass.overlap-clear}",
-                  "overlapCovered": "{primitives.shared.glass.overlap-covered}",
-                  "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
-                  "foreground": "{primitives.shared.typography.tone.default}"
-                },
-                "success": {
-                  "fill": "{primitives.shared.cloud.body}",
-                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                  "foreground": "{sys.color.success}",
-                  "angle": "{primitives.shared.cloud.angle}",
-                  "washStart": "{primitives.shared.cloud.wash-end}",
-                  "washEnd": "{primitives.shared.cloud.wash-end}",
-                  "washStartAlpha": "{primitives.shared.cloud.wash-end-alpha}",
-                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
-                },
-                "focus": {
-                  "fill": "{primitives.shared.cloud.body}",
-                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "angle": "{primitives.shared.cloud.angle}",
-                  "washStart": "{primitives.shared.cloud.wash-start}",
-                  "washEnd": "{primitives.shared.cloud.wash-end}",
-                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "disabled": {
-                  "fill": "{primitives.shared.surface.button.disabled-bed}",
-                  "foreground": "{primitives.shared.typography.tone.dim}"
-                }
+                "default": "cloud-rest",
+                "hover": "cloud-engaged",
+                "pressed": "glass-pressed",
+                "success": "cloud-success",
+                "focus": "cloud-engaged",
+                "disabled": "surface-disabled"
               },
               "text": {
-                "default": {
-                  "foreground": "{primitives.shared.typography.tone.default}"
-                },
-                "hover": {
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{base.opacity.fraction-0-5}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "pressed": {
-                  "foreground": "{primitives.shared.typography.tone.default}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "success": {
-                  "foreground": "{sys.color.success}"
-                },
-                "focus": {
-                  "foreground": "{primitives.shared.recipes-focus.foreground}",
-                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                  "glowOpacity": "{base.opacity.fraction-0-5}",
-                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-                },
-                "disabled": {
-                  "foreground": "{primitives.shared.typography.tone.dim}"
-                }
+                "default": "ink-rest",
+                "hover": "ink-engaged",
+                "pressed": "ink-pressed",
+                "success": "ink-success",
+                "focus": "ink-engaged",
+                "disabled": "ink-disabled"
               }
             },
-            "constructionPolicy": "State construction references lower-tier tokens directly. Button token leaves remain compatibility exports; they are not additional ingredients.",
+            "constructionPolicy": "Construction and state appearances select shared definitions. Those definitions reference lower-tier tokens directly. Remaining button leaves are runtime compatibility exports, not extra visual parameters.",
             "feedbackPolicy": {
               "principle": "Every user action must provide visual feedback.",
               "pressed": "Immediate acknowledgement while a control is being activated; never waits for an operation result.",
@@ -396,17 +262,102 @@
               "primary": "primaryButtonInk",
               "tonal": "tonalButtonInk",
               "text": "textButtonInk"
-            }
-          }
-        },
-        "radius": {
-          "$type": "dimension",
-          "$value": "{base.radius.md}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "figmaName": "button/radius",
-              "note": "Medium corners approved in the Tier 2 Controls review against fused staging."
+            },
+            "construction": {
+              "type-size": "font-size/14px",
+              "type-line": "line-height/20px",
+              "type-family": "font-family/ui",
+              "type-weight": "font-weight/500",
+              "pad-x": "spacing/15px",
+              "pad-y": "spacing/8px",
+              "gap": "spacing/8px",
+              "height": "height/44px",
+              "radius": "radius/12px",
+              "press-height": "height/42px"
+            },
+            "historicalInventory": {
+              "buttonVariants": {
+                "$description": "Set host button size and action emphasis.",
+                "$extensions": {
+                  "app.caelos": {
+                    "status": "open",
+                    "inventoryName": "buttonVariants",
+                    "recipeInStaging": true,
+                    "variants": {
+                      "variant": [
+                        "default",
+                        "outline",
+                        "secondary",
+                        "ghost",
+                        "destructive",
+                        "link"
+                      ],
+                      "size": [
+                        "default",
+                        "xs",
+                        "sm",
+                        "lg",
+                        "icon",
+                        "icon-xs",
+                        "icon-sm",
+                        "icon-lg"
+                      ]
+                    },
+                    "defaultVariants": {
+                      "variant": "default",
+                      "size": "default"
+                    },
+                    "modes": [
+                      "dark",
+                      "light",
+                      "reduced-motion",
+                      "reduced-transparency"
+                    ],
+                    "decisions": [
+                      "D50"
+                    ]
+                  }
+                }
+              },
+              "controlSkin": {
+                "$description": "Express destructive and non-destructive control emphasis.",
+                "$extensions": {
+                  "app.caelos": {
+                    "status": "open",
+                    "inventoryName": "controlSkin",
+                    "recipeInStaging": true,
+                    "variants": {
+                      "kind": [
+                        "danger",
+                        "glass"
+                      ]
+                    },
+                    "defaultVariants": {
+                      "kind": "danger"
+                    },
+                    "states": [
+                      "hover",
+                      "disabled"
+                    ],
+                    "modes": [
+                      "dark",
+                      "light",
+                      "reduced-motion",
+                      "reduced-transparency"
+                    ]
+                  }
+                }
+              }
+            },
+            "openRequirements": "Historical buttonVariants host sizes and controlSkin destructive emphasis remain unmapped. No coordinated sm/md/lg profiles are approved by this consolidation.",
+            "unmappedVariants": {
+              "size": [
+                "sm",
+                "md"
+              ],
+              "danger": [
+                true
+              ]
             }
           }
         },
@@ -534,155 +485,6 @@
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
-            }
-          }
-        },
-        "tonal-fill": {
-          "$type": "color",
-          "$value": "{sys.color.elevated-2}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "button/tonal-fill"
-            }
-          }
-        },
-        "tonal-active": {
-          "$type": "color",
-          "$value": "{sys.color.structural-violet}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "button/tonal-active"
-            }
-          }
-        },
-        "disabled": {
-          "$type": "color",
-          "$value": "{sys.color.elevated-2}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "button/disabled"
-            }
-          }
-        },
-        "text-inverse": {
-          "$type": "color",
-          "$value": "{sys.color.text-primary}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "button/text-inverse"
-            }
-          }
-        },
-        "text-disabled": {
-          "$type": "color",
-          "$value": "{sys.color.text-tertiary}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "button/text-disabled"
-            }
-          }
-        },
-        "type-size": {
-          "$type": "dimension",
-          "$value": "{primitives.shared.typography.size.label}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/type-size",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-line": {
-          "$type": "dimension",
-          "$value": "{primitives.shared.typography.line.label}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/type-line",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-family": {
-          "$type": "fontFamily",
-          "$value": "{primitives.shared.typography.family.ui}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/type-family",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-weight": {
-          "$type": "fontWeight",
-          "$value": "{base.type.weight.medium}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/type-weight",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "pad-x": {
-          "$type": "dimension",
-          "$value": "{base.space.px-15}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/pad-x",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "pad-y": {
-          "$type": "dimension",
-          "$value": "{base.space.px-8}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/pad-y",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "gap": {
-          "$type": "dimension",
-          "$value": "{base.space.px-8}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/gap",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "height": {
-          "$type": "dimension",
-          "$value": "{base.size.px-44}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/height",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "press-height": {
-          "$type": "dimension",
-          "$value": "{base.size.px-42}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/button/press-height",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
             }
           }
         }
@@ -1197,67 +999,16 @@
               ]
             },
             "statePaints": {
-              "default": {
-                "fill": "{primitives.shared.cloud.body}",
-                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                "foreground": "{primitives.shared.typography.tone.default}",
-                "angle": "{primitives.shared.cloud.angle}",
-                "washStart": "{primitives.shared.cloud.wash-start}",
-                "washEnd": "{primitives.shared.cloud.wash-end}",
-                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
-              },
-              "hover": {
-                "fill": "{primitives.shared.cloud.body}",
-                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                "foreground": "{primitives.shared.recipes-focus.foreground}",
-                "angle": "{primitives.shared.cloud.angle}",
-                "washStart": "{primitives.shared.cloud.wash-start}",
-                "washEnd": "{primitives.shared.cloud.wash-end}",
-                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
-                "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-              },
-              "pressed": {
-                "fill": "{primitives.shared.glass.body}",
-                "fillOpacity": "{primitives.shared.glass.base-alpha}",
-                "tintInk": "{primitives.shared.glass.tint-ink}",
-                "tintOpacity": "{primitives.shared.glass.tint}",
-                "falloffAt": "{primitives.shared.glass.falloff-at}",
-                "falloffStrength": "{primitives.shared.glass.falloff-strength}",
-                "blur": "{primitives.shared.glass.blur}",
-                "saturation": "{primitives.shared.glass.saturation}",
-                "overlapClear": "{primitives.shared.glass.overlap-clear}",
-                "overlapCovered": "{primitives.shared.glass.overlap-covered}",
-                "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
-                "foreground": "{primitives.shared.typography.tone.default}"
-              },
-              "focus": {
-                "fill": "{primitives.shared.cloud.body}",
-                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
-                "foreground": "{primitives.shared.recipes-focus.foreground}",
-                "angle": "{primitives.shared.cloud.angle}",
-                "washStart": "{primitives.shared.cloud.wash-start}",
-                "washEnd": "{primitives.shared.cloud.wash-end}",
-                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
-                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
-                "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
-                "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
-                "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
-                "glowOffset": "{primitives.shared.surface.button.glow-offset}"
-              },
-              "disabled": {
-                "fill": "{primitives.shared.surface.button.disabled-bed}",
-                "foreground": "{primitives.shared.typography.tone.dim}"
-              }
+              "default": "cloud-rest",
+              "hover": "cloud-engaged",
+              "pressed": "glass-pressed",
+              "focus": "cloud-engaged",
+              "disabled": "surface-disabled"
             },
             "shapeRadii": {
-              "rounded": "{base.radius.md}",
-              "pill": "{base.radius.px-22}",
-              "circle": "{base.radius.px-22}"
+              "rounded": "radius/12px",
+              "pill": "radius/22px",
+              "circle": "radius/22px"
             },
             "reference": {
               "repository": "Nova-Caelum/Caelos_staging",
@@ -1265,162 +1016,17 @@
               "trigger": "packages/ui/src/filter-sort-menu.tsx",
               "surface": "packages/ui/src/recipes.ts",
               "finding": "Filter & sort uses the small tonal Button. The chip class is the requested design-system classification; its cloud and glass parameters reuse current primitives rather than historical raw values."
-            }
-          }
-        },
-        "type-size": {
-          "$type": "dimension",
-          "$value": "{primitives.shared.typography.size.label}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/type-size",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-line": {
-          "$type": "dimension",
-          "$value": "{primitives.shared.typography.line.label}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/type-line",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-family": {
-          "$type": "fontFamily",
-          "$value": "{primitives.shared.typography.family.ui}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/type-family",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "type-weight": {
-          "$type": "fontWeight",
-          "$value": "{base.type.weight.medium}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/type-weight",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "pad-x": {
-          "$type": "dimension",
-          "$value": "{base.space.px-12}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/pad-x",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "pad-y": {
-          "$type": "dimension",
-          "$value": "{base.space.px-4}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/pad-y",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "gap": {
-          "$type": "dimension",
-          "$value": "{base.space.px-8}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/gap",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "radius": {
-          "$type": "dimension",
-          "$value": "{base.radius.md}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/radius",
-              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
-            }
-          }
-        },
-        "height": {
-          "$type": "dimension",
-          "$value": "{base.size.px-42}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/height",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "fill": {
-          "$type": "color",
-          "$value": "{primitives.shared.cloud.body}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/fill",
-              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
-            }
-          },
-          "$description": "Cloud body ink; use the full default statePaints recipe including alpha and wash."
-        },
-        "selected": {
-          "$type": "color",
-          "$value": "{primitives.shared.glass.body}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/selected",
-              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
-            }
-          },
-          "$description": "Pressed glass body ink; use the full pressed statePaints recipe including alpha, tint and blur."
-        },
-        "text": {
-          "$type": "color",
-          "$value": "{sys.color.text-primary}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/text",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "disabled": {
-          "$type": "color",
-          "$value": "{sys.color.elevated}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/disabled",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
-            }
-          }
-        },
-        "text-disabled": {
-          "$type": "color",
-          "$value": "{sys.color.text-tertiary}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "provisional",
-              "figmaName": "controls/shared/chip/text-disabled",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            },
+            "construction": {
+              "type-size": "font-size/14px",
+              "type-line": "line-height/20px",
+              "type-family": "font-family/ui",
+              "type-weight": "font-weight/500",
+              "pad-x": "spacing/12px",
+              "pad-y": "spacing/4px",
+              "gap": "spacing/8px",
+              "height": "height/42px",
+              "radius": "radius/12px"
             }
           }
         }
@@ -1990,6 +1596,93 @@
             }
           }
         }
+      },
+      "badge": {
+        "$description": "Passive status, count and category information; shape and semantic tone are independent.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "partial",
+            "inventoryName": "badge",
+            "recipeInStaging": true,
+            "variants": {
+              "shape": [
+                "rounded",
+                "pill",
+                "circle"
+              ],
+              "tone": [
+                "neutral",
+                "info",
+                "success",
+                "danger"
+              ]
+            },
+            "defaultVariants": {
+              "shape": "rounded",
+              "tone": "neutral"
+            },
+            "states": [],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "historicalInventory": {
+              "variants": {
+                "variant": [
+                  "default",
+                  "secondary",
+                  "destructive",
+                  "outline",
+                  "ghost",
+                  "link"
+                ]
+              },
+              "states": [
+                "hover",
+                "focus-visible",
+                "focus",
+                "error"
+              ],
+              "name": "badgeVariants"
+            },
+            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed, success interaction or tab stop. Success is a communicated status, never a clickable state. Avatar cards remain separate. Dark v1 review; runtime component export remains open.",
+            "construction": {
+              "height": "height/28px",
+              "pad-x": "spacing/8px",
+              "pad-y": "spacing/4px",
+              "gap": "spacing/4px",
+              "type-size": "font-size/14px",
+              "type-line": "line-height/20px",
+              "type-family": "font-family/ui",
+              "type-weight": "font-weight/500"
+            },
+            "shapeRadii": {
+              "rounded": "radius/6px",
+              "pill": "radius/22px",
+              "circle": "radius/22px"
+            },
+            "tonePaints": {
+              "neutral": "{sys.color.text-supporting}",
+              "info": "{sys.color.action-blue-hover}",
+              "success": "{sys.color.success}",
+              "danger": "{sys.color.danger}"
+            },
+            "basePaint": {
+              "fill": "{sys.color.elevated-2}"
+            },
+            "useCases": {
+              "delivery-status": {
+                "label": "Delivery status badge",
+                "description": "Passive chat delivery information; uses the badge tone and shape choices, not a separate control family.",
+                "source": "Caelos_staging components/chat/delivery-chip.tsx",
+                "status": "partial",
+                "note": "State-to-label/tone mapping and host wiring remain to be audited. No interactive states."
+              }
+            }
+          }
+        }
       }
     },
     "dashboard": {
@@ -2021,22 +1714,6 @@
           "app.caelos": {
             "status": "open",
             "inventoryName": "components.chat.connection-indicator.ConnectionIndicator",
-            "recipeInStaging": false,
-            "modes": [
-              "dark",
-              "light",
-              "reduced-motion",
-              "reduced-transparency"
-            ]
-          }
-        }
-      },
-      "DeliveryChip": {
-        "$description": "Specify delivery chip control affordances and interaction states if retained; single control or control indicator.",
-        "$extensions": {
-          "app.caelos": {
-            "status": "open",
-            "inventoryName": "components.chat.delivery-chip.DeliveryChip",
             "recipeInStaging": false,
             "modes": [
               "dark",
