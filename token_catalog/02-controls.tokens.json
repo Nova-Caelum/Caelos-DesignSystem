@@ -1178,6 +1178,37 @@
             ]
           }
         }
+      },
+      "tabTrigger": {
+        "$description": "Select an individual tab. Coordinated tab list, content and navigation remain Tier 4 patterns.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "tabTrigger",
+            "variants": {
+              "appearance": [
+                "standard",
+                "tonal",
+                "underline"
+              ],
+              "selection": [
+                "unselected",
+                "selected"
+              ]
+            },
+            "states": [
+              "rest",
+              "hover",
+              "focus",
+              "disabled"
+            ],
+            "modes": [
+              "dark"
+            ],
+            "figmaSpecimen": "377:6625",
+            "note": "Existing Figma specimens are review evidence, not a complete admitted recipe. No new values or approval inferred from their appearance."
+          }
+        }
       }
     },
     "dashboard": {

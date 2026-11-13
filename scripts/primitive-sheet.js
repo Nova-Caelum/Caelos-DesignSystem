@@ -1,10 +1,10 @@
-// Figma Plugin API renderer for the catalog-derived Tier 1 review sheet.
+// Figma Plugin API renderer shared by the catalog-derived primitive and control sheets.
 // Evaluate glyph-fit.js first; icon generation includes fitting and measured labels.
 // Page furniture follows foundation-sheet.js. Furniture dimensions are not product tokens.
 async function renderPrimitiveCategory(category, manifest) {
   if (category.key === 'icon' && (typeof fitGlyphGallery !== 'function' || typeof updateGlyphLabels !== 'function' || !manifest.glyphFit)) throw Error('Load glyph-fit.js and the current manifest before rendering icons');
   const page = await figma.getNodeByIdAsync(manifest.pageId);
-  await figma.setCurrentPageAsync(page);
+  if(figma.currentPage.id!==page.id)await figma.setCurrentPageAsync(page);
   if (page.children.some(n => n.name === 'Category / ' + category.title)) throw Error('Category already exists; inspect before replacing');
   const fonts = [{family:'Caelum Sans',style:'Regular'},{family:'Caelum Sans',style:'Medium'},{family:'Caelum Sans',style:'SemiBold'}];
   for (const t of page.findAllWithCriteria({types:['TEXT']})) fonts.push(...t.getStyledTextSegments(['fontName']).map(s=>s.fontName));
@@ -39,7 +39,7 @@ async function renderPrimitiveCategory(category, manifest) {
   function badge(card,status) {text(card,status.toUpperCase(),260,12,status==='canon'?'success':'peach-gold','SemiBold');}
   function card(parent,label,value) {
     const n=frame(parent,'Variant / '+label,260);
-    const l=text(n,label,260,14,'text-primary','Medium');l.resize(260,48);l.textAutoResize='NONE';
+    const l=text(n,label,260,14,'text-primary','Medium');l.resize(260,manifest.tier===2?72:48);l.textAutoResize='NONE';
     const v=text(n,value,260,22,'text-primary','Medium');v.resize(260,60);v.textAutoResize='NONE';
     return n;
   }
@@ -86,19 +86,24 @@ async function renderPrimitiveCategory(category, manifest) {
   root.x=100+category.column*1836;root.y=category.y??100;root.paddingLeft=root.paddingRight=root.paddingTop=root.paddingBottom=36;
   root.itemSpacing=28;root.fills=[paint('color/elevated')];root.cornerRadius=18;root.setExplicitVariableModeForCollection(semantic,dark.modeId);
   text(root,category.title,1656,32,'text-primary','SemiBold');text(root,category.purpose,1656,16,'text-supporting');
-  text(root,'TIER 1 · Foundation aliases • catalog status retained • clean grouping awaits visual approval',1656,12,'text-supporting');
+  text(root,'TIER '+(manifest.tier??1)+' · Lower-tier aliases • catalog status retained • clean grouping awaits visual approval',1656,12,'text-supporting');
   const groups=[];
   for(const group of category.studies){
     const source=await figma.getNodeByIdAsync(group.id);if(!source)throw Error('Missing source '+group.id);
     const children=source.type==='COMPONENT_SET'?source.children:[source];
-    const split = ['typography','spacing'].includes(category.key) || (category.key==='materials' && group.name!=='Cloud states');
-    if(split){const buckets=new Map();for(const child of children){const key=child.name.split(',')[0];if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(child);}for(const [name,items]of buckets)groups.push({name:group.name+' / '+name.split('=').at(-1),source,children:items});}
+    const split = group.splitAxes || ['typography','spacing'].includes(category.key) || (category.key==='materials' && group.name!=='Cloud states');
+    if(split){const buckets=new Map();for(const child of children){const parts=child.name.split(',').map(p=>p.trim());const key=group.splitAxes?parts.filter(p=>group.splitAxes.includes(p.split('=')[0])).join(', '):parts[0];if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(child);}for(const [name,items]of buckets)groups.push({...group,name:group.name+' / '+(group.splitAxes?name:name.split('=').at(-1)),source,children:items});}
     else groups.push({...group,source,children});
   }
   if(category.key==='recipes-focus')groups.splice(0,groups.length,{name:'Interaction states',source:groups[0].source,children:groups.flatMap(g=>g.children)});
+  if(category.key==='composer'){
+    const buckets=new Map();
+    for(const group of groups){const key=group.source.name.split(' / ').at(-1);if(!buckets.has(key))buckets.set(key,{...group,name:key,children:[]});buckets.get(key).children.push(...group.children);}
+    groups.splice(0,groups.length,...buckets.values());
+  }
   for(const group of groups){
     const {source,children}=group;
-    const vs=row(root,group.name,children.length,category.key==='materials'?'Recipe · material({ texture, layer })\nDark v1 · static study; behavior unverified':'Existing component specimens\nFoundation bindings retained\nPanda token export · not implemented');
+    const vs=row(root,group.name,children.length,group.note??(category.key==='materials'?'Recipe · material({ texture, layer })\nDark v1 · static study; behavior unverified':'Existing component specimens\nFoundation bindings retained\nPanda token export · not implemented'));
     let line;
     for(let i=0;i<children.length;i++){
       if(i%5===0){line=frame(vs,'Variant line '+(1+Math.floor(i/5)),1380,'HORIZONTAL');line.itemSpacing=20;}
@@ -128,8 +133,15 @@ async function renderPrimitiveCategory(category, manifest) {
     }
   }
   for(const group of category.rows){
-    const vs=row(root,group.name,group.items.length,'Tier 1 parameters → Tier 0\nPanda · see individual cards');
+    const vs=row(root,group.name,group.items.length,'Tier '+(manifest.tier??1)+' parameters → lower tiers\nPanda · see individual cards');
     for(let start=0;start<group.items.length;start+=5){const line=frame(vs,'Variant line '+(1+start/5),1380,'HORIZONTAL');line.itemSpacing=20;for(const item of group.items.slice(start,start+5))tokenCard(line,item);}
+  }
+  for(const entry of category.pending??[]) {
+    const vs=row(root,entry.name,1,'Catalog inventory · '+entry.status+'\nNo complete recipe implied');
+    const c=card(vs,entry.path,entry.status.toUpperCase());
+    badge(c,entry.status);text(c,entry.description,260,14);
+    text(c,'Variants and states\n'+Object.entries(entry.variants).map(([axis,values])=>axis+' · '+(Array.isArray(values)?values.join(', '):String(values))).join('\n')+'\n'+entry.states.join(', '),260,12,'text-supporting');
+    text(c,'Construction · '+(entry.note||'Lower-tier recipe mapping is still open.')+'\nPanda · '+(entry.recipe||'No complete recipe export'),260,12,'text-supporting');
   }
   let glyphFit = null;
   const mutatedNodeIds = [];
