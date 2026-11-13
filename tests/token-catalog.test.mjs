@@ -249,10 +249,13 @@ test('field label and help gaps follow the field-interior role independently of 
   }
 });
 
-test('field hover ink and focus glow use shared primitives while typing ink stays muted', () => {
+test('field hover, primary typing ink and glow reuse lower-tier primitives', () => {
   const field = load('02-controls.tokens.json').controls.shared.input;
   assert.equal(field['hover-foreground'].$value, '{primitives.shared.recipes-focus.foreground}');
   assert.equal(field.foreground.$value, '{primitives.shared.typography.tone.muted}');
+  assert.equal(field['focus-foreground'].$value, '{primitives.shared.typography.tone.default}');
+  assert.equal(field['supporting-ink'].$value, '{primitives.shared.typography.tone.dim}');
+  assert.equal(field['hover-foreground'].$extensions['app.caelos'].figmaPreviousNames, undefined);
   for (const role of ['glow-ink', 'glow-blur', 'glow-opacity']) {
     assert.equal(field['focus-' + role].$value, '{primitives.shared.recipes-focus.' + role + '}');
   }
