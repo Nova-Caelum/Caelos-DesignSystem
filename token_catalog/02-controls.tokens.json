@@ -165,7 +165,7 @@
               "D82",
               "D25"
             ],
-            "note": "Medium radius is approved. Geometry and typography now reference existing foundations/primitives. Side padding consolidates 16px to space/px-15. Tonal/text hover, pressed and focus remain open; complete Panda recipe is not implemented.",
+            "note": "Medium radius is approved. Geometry and typography now reference existing foundations/primitives. Side padding consolidates 16px to space/px-15. Tonal/text hover, pressed and focus remain open; complete Panda recipe is not implemented. Primary hover and focus share the blue foreground and soft surface-edge glow. Pressed acknowledges activation; Success is optional confirmed-result feedback, never an automatic click stage.",
             "statePaints": {
               "primary": {
                 "default": {
@@ -176,9 +176,11 @@
                 },
                 "hover": {
                   "fill": "{primitives.shared.surface.button.bed}",
-                  "tintInk": "{primitives.shared.surface.button.hover}",
-                  "tintOpacity": "{primitives.shared.surface.button.tint}",
-                  "foreground": "{primitives.shared.typography.tone.default}"
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "pressed": {
                   "fill": "{primitives.shared.surface.button.bed}",
@@ -231,7 +233,14 @@
                 }
               }
             },
-            "constructionPolicy": "State construction references lower-tier tokens directly. Button token leaves remain compatibility exports; they are not additional ingredients."
+            "constructionPolicy": "State construction references lower-tier tokens directly. Button token leaves remain compatibility exports; they are not additional ingredients.",
+            "feedbackPolicy": {
+              "principle": "Every user action must provide visual feedback.",
+              "pressed": "Immediate acknowledgement while a control is being activated; never waits for an operation result.",
+              "success": "Optional confirmation after an operation actually succeeds and its result is not immediately visible, such as saving, sending, or generating a script in the background. Never infer success from a click or a timer.",
+              "visibleOutcome": "Opening a menu, dialog, or destination page is already visual feedback and does not require a Success button state.",
+              "hoverAndFocus": "Share the same appearance; retain separate pointer-hover and keyboard-focus behavior. Pressed remains distinct during activation."
+            }
           }
         },
         "radius": {
