@@ -575,7 +575,6 @@
                 "plain",
                 "graph",
                 "glass",
-                "portal",
                 "sage",
                 "cloud"
               ]
@@ -604,8 +603,7 @@
             "backdropOverlap": {
               "input": "--sys-glass-auto-blur",
               "finishes": [
-                "glass",
-                "portal"
+                "glass"
               ],
               "clearToken": "primitives.shared.glass.overlap-clear",
               "coveredToken": "primitives.shared.glass.overlap-covered",
@@ -1718,84 +1716,9 @@
             ],
             "decisions": [
               "D29",
-              "D31"
+              "D31",
+              "Daniel · 2026-11-13 · unified glass"
             ]
-          }
-        },
-        "panel": {
-          "base-alpha": {
-            "$type": "number",
-            "$value": "{sys.material.panel.base-alpha}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "blur": {
-            "$type": "dimension",
-            "$value": "{sys.material.panel.blur}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "tint": {
-            "$type": "number",
-            "$value": "{sys.material.panel.tint}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "saturation": {
-            "$type": "number",
-            "$value": "{sys.material.panel.saturation}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          }
-        },
-        "menu": {
-          "base-alpha": {
-            "$type": "number",
-            "$value": "{sys.material.menu.base-alpha}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "blur": {
-            "$type": "dimension",
-            "$value": "{sys.material.menu.blur}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "tint": {
-            "$type": "number",
-            "$value": "{sys.material.menu.tint}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
-          },
-          "saturation": {
-            "$type": "number",
-            "$value": "{sys.material.menu.saturation}",
-            "$extensions": {
-              "app.caelos": {
-                "status": "canon"
-              }
-            }
           }
         },
         "body": {
@@ -1906,6 +1829,62 @@
             "app.caelos": {
               "status": "canon",
               "decision": "D31"
+            }
+          }
+        },
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{sys.material.glass.base-alpha}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel · 2026-11-13 · unified glass",
+              "figmaPreviousNames": [
+                "primitives/shared/glass/panel/base-alpha",
+                "primitives/shared/glass/menu/base-alpha"
+              ]
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{sys.material.glass.blur}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel · 2026-11-13 · unified glass",
+              "figmaPreviousNames": [
+                "primitives/shared/glass/panel/blur",
+                "primitives/shared/glass/menu/blur"
+              ]
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{sys.material.glass.tint}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel · 2026-11-13 · unified glass",
+              "figmaPreviousNames": [
+                "primitives/shared/glass/panel/tint",
+                "primitives/shared/glass/menu/tint"
+              ]
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{sys.material.glass.saturation}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel · 2026-11-13 · unified glass",
+              "figmaPreviousNames": [
+                "primitives/shared/glass/panel/saturation",
+                "primitives/shared/glass/menu/saturation"
+              ]
             }
           }
         }

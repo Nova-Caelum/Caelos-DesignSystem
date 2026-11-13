@@ -5384,68 +5384,6 @@
       }
     },
     "saturation": {
-      "factor-1-2": {
-        "$type": "number",
-        "$value": 1.2,
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "D29",
-            "note": "120%.",
-            "formerPaths": [
-              "base.material.saturation.panel"
-            ],
-            "figmaPreviousNames": [
-              "base/material/saturation/panel"
-            ],
-            "figmaName": "saturation/factor-1-2",
-            "family": "base.saturation",
-            "provenance": [
-              {
-                "path": "base.material.saturation.panel",
-                "description": "",
-                "record": {
-                  "status": "canon",
-                  "decision": "D29",
-                  "note": "120%."
-                }
-              }
-            ]
-          }
-        },
-        "$description": "Reusable saturation value. Original applications and evidence are retained in provenance."
-      },
-      "factor-1-35": {
-        "$type": "number",
-        "$value": 1.35,
-        "$extensions": {
-          "app.caelos": {
-            "status": "canon",
-            "decision": "D29",
-            "note": "135%, portal menus.",
-            "formerPaths": [
-              "base.material.saturation.menu"
-            ],
-            "figmaPreviousNames": [
-              "base/material/saturation/menu"
-            ],
-            "figmaName": "saturation/factor-1-35",
-            "family": "base.saturation",
-            "provenance": [
-              {
-                "path": "base.material.saturation.menu",
-                "description": "",
-                "record": {
-                  "status": "canon",
-                  "decision": "D29",
-                  "note": "135%, portal menus."
-                }
-              }
-            ]
-          }
-        },
-        "$description": "Reusable saturation value. Original applications and evidence are retained in provenance."
-      },
       "factor-1": {
         "$type": "number",
         "$value": 1,
@@ -5470,6 +5408,52 @@
                   "status": "canon",
                   "decision": "D31",
                   "note": "Unfiltered backdrop saturation."
+                }
+              }
+            ]
+          }
+        },
+        "$description": "Reusable saturation value. Original applications and evidence are retained in provenance."
+      },
+      "factor-1-25": {
+        "$type": "number",
+        "$value": 1.25,
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "Daniel \u00b7 2026-11-13 \u00b7 unified glass",
+            "note": "125% background saturation; one shared glass material replaces panel and portal.",
+            "formerPaths": [
+              "base.material.saturation.panel",
+              "base.material.saturation.menu",
+              "base.saturation.factor-1-2",
+              "base.saturation.factor-1-35"
+            ],
+            "figmaPreviousNames": [
+              "base/material/saturation/panel",
+              "base/material/saturation/menu",
+              "saturation/factor-1-2",
+              "saturation/factor-1-35"
+            ],
+            "figmaName": "saturation/factor-1-25",
+            "family": "base.saturation",
+            "provenance": [
+              {
+                "path": "base.material.saturation.panel",
+                "description": "",
+                "record": {
+                  "status": "canon",
+                  "decision": "D29",
+                  "note": "120%."
+                }
+              },
+              {
+                "path": "base.material.saturation.menu",
+                "description": "",
+                "record": {
+                  "status": "canon",
+                  "decision": "D29",
+                  "note": "135%, portal menus."
                 }
               }
             ]

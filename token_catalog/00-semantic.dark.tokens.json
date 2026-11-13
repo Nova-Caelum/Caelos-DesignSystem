@@ -584,90 +584,6 @@
       }
     },
     "material": {
-      "panel": {
-        "base-alpha": {
-          "$type": "number",
-          "$value": "{base.opacity.fraction-0-23}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "blur": {
-          "$type": "dimension",
-          "$value": "{base.blur.px-19}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "tint": {
-          "$type": "number",
-          "$value": "{base.opacity.fraction-0-15}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "saturation": {
-          "$type": "number",
-          "$value": "{base.saturation.factor-1-2}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        }
-      },
-      "menu": {
-        "base-alpha": {
-          "$type": "number",
-          "$value": "{base.opacity.fraction-0-23}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "blur": {
-          "$type": "dimension",
-          "$value": "{base.blur.px-19}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "tint": {
-          "$type": "number",
-          "$value": "{base.opacity.fraction-0-15}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        },
-        "saturation": {
-          "$type": "number",
-          "$value": "{base.saturation.factor-1-35}",
-          "$extensions": {
-            "app.caelos": {
-              "status": "canon",
-              "decision": "D29"
-            }
-          }
-        }
-      },
       "glass-blur": {
         "$type": "dimension",
         "$value": "{base.blur.px-19}",
@@ -675,7 +591,7 @@
           "app.caelos": {
             "status": "provisional",
             "decision": "D31",
-            "note": "D31 decides one role for content behind glass; its value is assumed equal to the panel blur (D29)."
+            "note": "D31 decides one role for content behind glass; its value follows the shared glass blur."
           }
         }
       },
@@ -721,6 +637,64 @@
         "$extensions": {
           "app.caelos": {
             "status": "provisional"
+          }
+        }
+      },
+      "glass": {
+        "base-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.fraction-0-23}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "figmaPreviousNames": [
+                "sys/material/panel/base-alpha",
+                "sys/material/menu/base-alpha"
+              ]
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.blur.px-19}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "figmaPreviousNames": [
+                "sys/material/panel/blur",
+                "sys/material/menu/blur"
+              ]
+            }
+          }
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{base.opacity.fraction-0-15}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "D29",
+              "figmaPreviousNames": [
+                "sys/material/panel/tint",
+                "sys/material/menu/tint"
+              ]
+            }
+          }
+        },
+        "saturation": {
+          "$type": "number",
+          "$value": "{base.saturation.factor-1-25}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel · 2026-11-13 · unified glass",
+              "figmaPreviousNames": [
+                "sys/material/panel/saturation",
+                "sys/material/menu/saturation"
+              ]
+            }
           }
         }
       }

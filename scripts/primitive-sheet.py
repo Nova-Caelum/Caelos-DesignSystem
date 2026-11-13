@@ -73,8 +73,8 @@ def manifest():
                 css = suffix.replace('.', '-')
             elif suffix.startswith('surface.layer.'):
                 css = suffix.removeprefix('surface.').replace('.', '-')
-            elif suffix.startswith(('glass.panel.', 'glass.menu.')):
-                css = suffix.removeprefix('glass.').replace('.', '-')
+            elif suffix in ['glass.' + n for n in ['base-alpha', 'blur', 'tint', 'saturation']]:
+                css = suffix.replace('.', '-')
             elif suffix in ['glass.' + n for n in ['body', 'foreground', 'tint-ink', 'sage', 'sage-blur', 'overlap-clear', 'overlap-covered', 'saturation-neutral', 'sage-opacity', 'falloff-at']]:
                 css = suffix.removeprefix('glass.')
             item['css'] = '--caelos-material-' + css if css else None

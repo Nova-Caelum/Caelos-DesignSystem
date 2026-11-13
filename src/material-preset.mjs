@@ -28,12 +28,10 @@ function themeVars(semantic) {
   for (const name of ['body', 'foreground', 'tint-ink', 'sage', 'sage-blur', 'overlap-clear', 'overlap-covered', 'saturation-neutral']) add(name, glass[name]);
   add('sage-opacity', glass['sage-opacity'], true);
   add('falloff-at', glass['falloff-at'], true);
-  for (const kind of ['panel', 'menu']) {
-    for (const [prop, token] of Object.entries(glass[kind])) {
-      add(kind + '-' + prop, token, prop === 'base-alpha' || prop === 'tint');
-    }
-    values['--caelos-material-' + kind + '-end'] = (resolve(glass[kind].tint) * resolve(glass['falloff-strength']) * 100) + '%';
+  for (const prop of ['base-alpha', 'blur', 'tint', 'saturation']) {
+    add('glass-' + prop, glass[prop], prop === 'base-alpha' || prop === 'tint');
   }
+  values['--caelos-material-glass-end'] = (resolve(glass.tint) * resolve(glass['falloff-strength']) * 100) + '%';
   for (const name of ['ink', 'dot-size', 'pitch', 'opacity']) add('graph-' + name, graph[name], name === 'opacity');
   // A circle's CSS radius is derived from the catalog diameter, never authored independently.
   values['--caelos-material-graph-dot-radius'] = resolve(graph['dot-size']).replace(/[\d.]+/, diameter => Number(diameter) / 2);
@@ -99,7 +97,7 @@ export function cloudStyle(group, focused = {}) {
     '&:is(:disabled, [data-disabled=true], :has(:disabled))': { ...wash('rest'), opacity: role('disabled-alpha') },
   };
 }
-const panel = glassStyle('panel');
+const glassFinish = glassStyle('glass');
 const autoProps = {backgroundColor: 'fill', backgroundImage: 'image', backgroundSize: 'size', backdropFilter: 'filter'};
 function autoVars(style) {
   return Object.fromEntries(Object.entries(style).map(([key, value]) =>
@@ -111,11 +109,11 @@ export const materialRecipe = {
   variants: {
     layer: Object.fromEntries(Object.entries(auto).map(([name, finish]) => [name, {
       '--caelos-surface-layer': ref('layer-' + name),
-      ...autoVars(finish === 'graph' ? grid : { backgroundSize: 'auto', ...panel }),
+      ...autoVars(finish === 'graph' ? grid : { backgroundSize: 'auto', ...glassFinish }),
     }])),
     texture: {
       auto: Object.fromEntries(Object.entries(autoProps).map(([property, name]) => [property, 'var(--caelos-auto-' + name + ')'])),
-      plain, cloud: cloudStyle('cloud'), graph: grid, glass: panel, portal: glassStyle('menu'), sage: glassStyle('sage'),
+      plain, cloud: cloudStyle('cloud'), graph: grid, glass: glassFinish, sage: glassStyle('sage'),
     },
   },
   defaultVariants: surface.$extensions['app.caelos'].defaultVariants,

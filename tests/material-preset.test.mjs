@@ -4,16 +4,19 @@ import { materialPreset, materialRecipe } from '../src/material-preset.mjs';
 import catalog from '../token_catalog/01-primitives.tokens.json' with { type: 'json' };
 import base from '../token_catalog/00-foundations.tokens.json' with { type: 'json' };
 
-test('panel and portal consume their own saturation roles in both themes', () => {
-  for (const [finish, role] of [['glass', 'panel'], ['portal', 'menu']]) {
-    assert.equal(catalog.primitives.shared.glass[role].saturation.$value, '{sys.material.' + role + '.saturation}');
-    const style = materialRecipe.variants.texture[finish];
-    assert.ok(style.backdropFilter.includes('--caelos-material-' + role + '-saturation'));
-    for (const vars of Object.values(materialPreset.globalCss)) {
-      assert.equal(Number(vars['--caelos-material-' + role + '-saturation']), base.base.saturation[role === 'panel' ? 'factor-1-2' : 'factor-1-35'].$value);
-    }
-    assert.equal(style['@media (prefers-reduced-transparency: reduce)'].backdropFilter, 'none');
+test('one glass material consumes the approved saturation in both themes', () => {
+  const glass = catalog.primitives.shared.glass;
+  assert.equal(glass.saturation.$value, '{sys.material.glass.saturation}');
+  assert.equal(base.base.saturation['factor-1-25'].$value, 1.25);
+  assert.ok(!('panel' in glass) && !('menu' in glass));
+  assert.ok(!('portal' in materialRecipe.variants.texture));
+  const style = materialRecipe.variants.texture.glass;
+  assert.ok(style.backdropFilter.includes('--caelos-material-glass-saturation'));
+  for (const vars of Object.values(materialPreset.globalCss)) {
+    assert.equal(Number(vars['--caelos-material-glass-saturation']), base.base.saturation['factor-1-25'].$value);
+    assert.ok(!Object.keys(vars).some(key => /material-(panel|menu)-/.test(key)));
   }
+  assert.equal(style['@media (prefers-reduced-transparency: reduce)'].backdropFilter, 'none');
 });
 test('registered finishes and automatic layers agree with the ledger', () => {
   const surface = catalog.primitives.shared.surface.$extensions['app.caelos'];
@@ -23,18 +26,16 @@ test('registered finishes and automatic layers agree with the ledger', () => {
   }
 });
 
-test('adaptive filtering is shared by panel, portal and auto glass, isolated per surface', () => {
+test('adaptive filtering is shared by explicit and automatic glass, isolated per surface', () => {
   const input = catalog.primitives.shared.surface.$extensions['app.caelos'].backdropOverlap.input;
   assert.equal(input, '--sys-glass-auto-blur');
   assert.equal(materialRecipe.base[input], 'var(--caelos-material-overlap-covered)');
-  for (const key of ['glass', 'portal']) {
-    const style = materialRecipe.variants.texture[key];
-    assert.ok(style.backdropFilter.includes('clamp(var(--caelos-material-overlap-clear), var(' + input + '), var(--caelos-material-overlap-covered))'));
-    assert.ok(!style.backgroundColor.includes(input) && !style.backgroundImage.includes(input));
-    for (const fallback of Object.keys(style).filter(k => k.startsWith('@'))) {
-      assert.equal(style[fallback].backdropFilter, 'none');
-      assert.equal(style[fallback].backgroundColor, 'var(--caelos-material-body)');
-    }
+  const style = materialRecipe.variants.texture.glass;
+  assert.ok(style.backdropFilter.includes('clamp(var(--caelos-material-overlap-clear), var(' + input + '), var(--caelos-material-overlap-covered))'));
+  assert.ok(!style.backgroundColor.includes(input) && !style.backgroundImage.includes(input));
+  for (const fallback of Object.keys(style).filter(k => k.startsWith('@'))) {
+    assert.equal(style[fallback].backdropFilter, 'none');
+    assert.equal(style[fallback].backgroundColor, 'var(--caelos-material-body)');
   }
   assert.equal(materialRecipe.variants.layer.elevated['--caelos-auto-filter'], materialRecipe.variants.texture.glass.backdropFilter);
   assert.ok(!materialRecipe.variants.texture.sage.backdropFilter.includes(input));

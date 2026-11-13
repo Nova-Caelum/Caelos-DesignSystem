@@ -56,7 +56,7 @@ assert number('base.size.px-6', {'value': 6, 'unit': 'px'}) == 6
 for mode in ['light', 'dark']:
     for field in ['base-alpha','tint']:
         assert number('base.material.' + mode + '.' + field, 0.5) == 50
-assert number('base.saturation.factor-1-2', 1.2) == number('unscaled', 1.2)
+assert number('base.saturation.factor-1-25', 1.25) == number('unscaled', 1.25)
 assert number('base.position.fraction-0-72', 0.72) == number('unscaled', 0.72)
 `], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
