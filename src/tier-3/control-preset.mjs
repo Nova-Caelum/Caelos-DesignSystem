@@ -16,9 +16,10 @@ const glow = group => {
     'color-mix(in srgb, ' + role('focus-glow-ink') + ' ' + role('focus-glow-opacity') + ', transparent)'].join(' ');
 };
 for (const [group, tokens] of [[fieldGroup,input],['button',button]]) {
-  for (const key of ['focus-glow-blur','focus-glow-ink','focus-glow-opacity','focus-foreground','foreground'])
+  for (const key of ['focus-glow-blur','focus-glow-ink','focus-glow-opacity','foreground'])
     writer.add(group + '-' + key, tokens[key], key === 'focus-glow-opacity');
 }
+writer.add('field-hover-foreground', input['hover-foreground']);
 writer.add('button-inset', button['glow-offset']);
 for (const [key, value] of Object.entries(surface)) {
   writer.add('button-surface-' + key, {$value:value}, key.endsWith('-alpha') || key === 'glow-opacity');
@@ -31,8 +32,8 @@ const restingGlow = [finish('glow-offset'), finish('glow-offset'), finish('glow-
   'color-mix(in srgb, ' + finish('glow-ink') + ' ' + finish('glow-opacity') + ', transparent)'].join(' ');
 export const fieldSurfaceRecipe = { className: 'caelos-field-surface', base: {
   color: ref('field-foreground'),
-  ...cloudStyle(fieldGroup, { color: ref('field-focus-foreground'), boxShadow: glow(fieldGroup) },
-    { color: ref('field-focus-foreground') }),
+  ...cloudStyle(fieldGroup, { color: ref('field-foreground'), boxShadow: glow(fieldGroup) },
+    { color: ref('field-hover-foreground') }),
 } };
 const buttonFill = state => 'color-mix(in srgb, ' + ref('button-' + state) + ' ' + ref('button-tint') + ', ' + ref('button-bed') + ')';
 export const primaryButtonInkRecipe = { className: 'caelos-primary-button-ink', base: {

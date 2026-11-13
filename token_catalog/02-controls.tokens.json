@@ -543,7 +543,7 @@
               "requiredError": "empty required text field",
               "multilineResize": "vertical",
               "note": "Current role selections for geometry, surfaces and typography are pending visual review.",
-              "textHierarchy": "Rest: muted label and field text; dim supporting and placeholder text. Hover and focus: editable field text uses the existing focus-foreground. Disabled and error treatments remain distinct."
+              "textHierarchy": "Rest and typing focus: muted label and field text; dim supporting and placeholder text. Hover: editable field text uses hover-foreground blue. Focus retains its Cloud wash and soft glow. Disabled and error treatments remain distinct."
             }
           }
         },
@@ -614,15 +614,19 @@
             }
           }
         },
-        "focus-foreground": {
+        "hover-foreground": {
           "$type": "color",
           "$value": "{primitives.shared.recipes-focus.foreground}",
           "$extensions": {
             "app.caelos": {
               "status": "canon",
-              "decision": "D25"
+              "decision": "D25",
+              "figmaPreviousNames": [
+                "controls/shared/input/focus-foreground"
+              ]
             }
-          }
+          },
+          "$description": "Blue editable text on pointer hover. Active typing focus uses the muted foreground role."
         },
         "focus-glow-ink": {
           "$type": "color",
