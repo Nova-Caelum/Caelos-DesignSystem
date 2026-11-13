@@ -60,7 +60,8 @@ def manifest():
     for name,node in [('Primary','377:6244'),('Tonal','377:6413'),('Text','377:6426')]:
         study('buttons',name,node,['Motion'],'Partial recipe · controls.shared.button\nPanda · '+(recipes['button'] if name=='Primary' else 'No tonal/text recipe export; primaryButtonInk() covers primary paint only')+'\nGeometry is mapped to existing lower-tier tokens; side padding uses 15px. Timing remains provisional. Prototype links retained; behavior not retested.')
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
-    study('tabs','Tab trigger','377:6625',['Appearance','Selection'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nExisting state specimens; keyboard navigation remains unverified.')
+    study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
+    categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
     study('chips','Filter chip','377:6439',['Motion'],'Partial recipe · controls.shared.chip\nGeometry and Off/On/Disabled paints are mapped to existing lower-tier tokens. No complete Panda export.')
     study('avatars','Avatar','377:6793',['Shape','Size'],'Partial recipe · controls.shared.avatar\nInitials, frame sizes, square radii and status sizes are mapped. Complete recipe remains open. No complete Panda export.')
     for node in range(6482,6498):
@@ -90,12 +91,14 @@ def manifest():
         item['construction'] = ingredient(chain[1])
         family=' / '.join(path.split('.')[2:-1])
         families.setdefault((category,family),[]).append(item)
-    for (category,name),items in families.items(): categories[category]['rows'].append(dict(name=name,items=items))
+    for (category,name),items in families.items():
+        categories[category]['rows'].append(dict(name='Shared construction' if category == 'tabs' else name, items=items, countUnit='parameters' if category == 'tabs' else 'variants'))
+    categories['tabs']['studies'][0]['sharedConstructionPaths'] = [i['construction']['path'] for r in categories['tabs']['rows'] for i in r['items']]
     group_map={'button':'buttons','buttonVariants':'buttons','controlSkin':'buttons','IconButton':'buttons','RefreshButton':'buttons','input':'fields','tabTrigger':'tabs','chip':'chips','badgeVariants':'chips','DeliveryChip':'chips','avatar':'avatars','rippleLoader':'indicators','NovaLoader':'indicators','Loading':'indicators','ConnectionIndicator':'indicators','quietTrigger':'triggers','recipes-control':'triggers','sidebar-recipe-control':'triggers','Link':'triggers'}
     for scope,group in source['controls'].items():
         if scope.startswith('$'): continue
         for name,entry in group.items():
-            if name.startswith('$'): continue
+            if name.startswith('$') or name == 'tabTrigger': continue  # Tab identity and status are already on its study.
             meta=entry['$extensions']['app.caelos']
             categories[group_map[name]]['pending'].append(dict(path=f'controls.{scope}.{name}',name=name,status=meta['status'],description=entry.get('$description',''),variants=meta.get('variants',{}),states=meta.get('states',[]),note=meta.get('note',''),recipe=recipes.get(name)))
     covered=[i['path'] for c in categories.values() for r in c['rows'] for i in r['items']]
