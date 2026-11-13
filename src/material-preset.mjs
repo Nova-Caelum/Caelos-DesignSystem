@@ -78,7 +78,7 @@ function glassStyle(kind) {
   };
 }
 // The body stays still. Only the separate wash fades in behind the editable content.
-export function cloudStyle(group, focused = {}) {
+export function cloudStyle(group, focused = {}, hovered = {}) {
   const role = name => ref(group + '-' + name);
   const ramp = kind => 'linear-gradient(' + role('angle') + ', ' +
     ['start', 'end'].map(end => mix(role(kind + '-' + end), role(kind + '-' + end + '-alpha'))).join(', ') + ')';
@@ -92,7 +92,7 @@ export function cloudStyle(group, focused = {}) {
       transitionProperty: 'opacity', transitionDuration: role('duration'), transitionTimingFunction: role('ease'),
       '@media (prefers-reduced-motion: reduce)': { transitionDuration: role('reduced-duration') },
     },
-    '&:hover:not(:focus-within, :disabled, [data-disabled=true], :has(:disabled))': wash('hover'),
+    '&:hover:not(:focus-within, :disabled, [data-disabled=true], :has(:disabled))': { ...wash('hover'), ...hovered },
     '&:focus-within:not(:disabled, [data-disabled=true], :has(:disabled))': { ...wash('focus'), ...focused },
     '&:is(:disabled, [data-disabled=true], :has(:disabled))': { ...wash('rest'), opacity: role('disabled-alpha') },
   };
