@@ -82,7 +82,7 @@ def manifest():
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
     study('chips','Chip','474:1024',['Shape'],'Partial recipe · controls.shared.chip\nDefault / Hover / Focus / Pressed / Disabled. Hover = Focus. Menu-open or toggle selection may retain Pressed; applied filter summary is separate. No Success.\nShared cloud / glass primitives; 125% saturation is runtime-only in Figma. Static state specimens; keyboard and menu wiring remain open.\nRounded / pill: filter-menu example. Circle: direct-toggle example; accessible name required.')
-    study('badges','Badge','474:1049',['Shape'],'Partial recipe · controls.shared.badge\nPassive information: neutral / info / success / danger. Success is a status, not an action response. No hover, focus, pressed or tab stop. Circle shows a count.\nExisting lower-tier values only. Static review; complete component export remains open.')
+    study('badges','Badge','474:1049',['Shape'],'Partial recipe · controls.shared.badge\nPassive information: neutral / info / success / danger. Success is a status, not an action response. No hover, focus, pressed or tab stop. Circle shows a count.\nShared glass + diagonal tone-to-violet wash. 125% background saturation and adaptive overlap are runtime-only. Gradient geometry/alpha are catalog-derived; sync required after token changes. No hard outline. Static review; complete component export remains open.')
     study('avatars','Avatar','377:6793',['Shape','Size'],'Partial recipe · controls.shared.avatar\nInitials, frame sizes, square radii and status sizes are mapped. Complete recipe remains open. No complete Panda export.')
     for node in range(6482,6498):
         study('composer','Action reference','377:'+str(node),[], 'Cross-tier reference · Tier 5 composer\nExisting instance preserved; not promoted to a Tier 2 recipe.')
@@ -132,7 +132,7 @@ def manifest():
     chip_meta = expanded['controls']['shared']['chip']['$extensions']['app.caelos']
     badge_meta = expanded['controls']['shared']['badge']['$extensions']['app.caelos']
     reference_map = lambda data: {key: ingredient(value[1:-1]) for key,value in data.items()}
-    compact_controls = dict(chipGeometry=reference_map(chip_meta['construction']), chipShapes=reference_map(chip_meta['shapeRadii']), chipPaints={state:reference_map(paint) for state,paint in chip_meta['statePaints'].items()}, badgeGeometry=reference_map({**badge_meta['construction'], **badge_meta['basePaint']}), badgeShapes=reference_map(badge_meta['shapeRadii']), badgeTones=reference_map(badge_meta['tonePaints']))
+    compact_controls = dict(chipGeometry=reference_map(chip_meta['construction']), chipShapes=reference_map(chip_meta['shapeRadii']), chipPaints={state:reference_map(paint) for state,paint in chip_meta['statePaints'].items()}, badgeGeometry=reference_map(badge_meta['construction']), badgeMaterial=reference_map(badge_meta['basePaint']), badgeShapes=reference_map(badge_meta['shapeRadii']), badgeTones=reference_map(badge_meta['tonePaints']))
     parameter_uses = {}
     for family in ['button', 'chip', 'badge']:
         meta = source['controls']['shared'][family]['$extensions']['app.caelos']

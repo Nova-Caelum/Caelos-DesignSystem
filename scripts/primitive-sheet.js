@@ -151,8 +151,11 @@ async function renderPrimitiveCategory(category, manifest, appendMissingTokens =
       if (compact && category.key === 'chips') {
         for (const item of Object.values(compact.chipPaints[master.variantProperties.State.toLowerCase()])) names.push(constructionTokenLabel(item));
       }
+      if (compact && category.key === 'badges') {
+        for (const item of Object.values(compact.badgeMaterial)) names.push(constructionTokenLabel(item));
+      }
       const stateNames=[...new Set(names)].filter(name=>!sharedLabels.has(name));
-      text(c,(group.sharedConstruction?'State construction':'Construction')+'\n'+(stateNames.join('\n')||(group.sharedConstruction?'Shared construction only':'No variable binding found')),260,12,'text-supporting');
+      text(c,(group.sharedConstruction?(category.key==='badges'?'Tone construction':'State construction'):'Construction')+'\n'+(stateNames.join('\n')||(group.sharedConstruction?'Shared construction only':'No variable binding found')),260,12,'text-supporting');
       const glyph=label.replace(/^.*=\s*/,'').trim();
       if(category.key==='icon')text(c,'Used by\n'+(manifest.meanings[glyph]?.join('\n')||'Available glyph · no specific use recorded'),260,12,'text-supporting');
       if(category.key==='materials')text(c,'Static study. Gradient geometry and unsupported filter parameters are not live variable bindings; see construction parameters below. Overlap behavior requires runtime review.',260,12,'text-supporting');
