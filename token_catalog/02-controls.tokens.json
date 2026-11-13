@@ -29,17 +29,17 @@
             },
             "spacing": {
               "4px": "{base.space.px-4}",
+              "6px": "{base.space.px-6}",
               "8px": "{base.space.px-8}",
               "12px": "{base.space.px-12}",
               "15px": "{base.space.px-15}"
             },
             "height": {
-              "28px": "{base.size.px-28}",
+              "32px": "{base.size.px-32}",
               "42px": "{base.size.px-42}",
               "44px": "{base.size.px-44}"
             },
             "radius": {
-              "6px": "{base.radius.sm}",
               "12px": "{base.radius.md}",
               "22px": "{base.radius.px-22}"
             }
@@ -1647,11 +1647,11 @@
               ],
               "name": "badgeVariants"
             },
-            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed, success interaction or tab stop. Success is a communicated status, never a clickable state. Avatar cards remain separate. Dark v1 review; runtime component export remains open.",
+            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed or tab stop. Success is a communicated status, never a clickable state. Avatars retain their identity-specific recipe while badges share their tinted-wash visual language. Dark v1 review; runtime component export remains open.",
             "construction": {
-              "height": "height/28px",
-              "pad-x": "spacing/8px",
-              "pad-y": "spacing/4px",
+              "height": "height/32px",
+              "pad-x": "spacing/12px",
+              "pad-y": "spacing/6px",
               "gap": "spacing/4px",
               "type-size": "font-size/14px",
               "type-line": "line-height/20px",
@@ -1659,7 +1659,7 @@
               "type-weight": "font-weight/500"
             },
             "shapeRadii": {
-              "rounded": "radius/6px",
+              "rounded": "radius/12px",
               "pill": "radius/22px",
               "circle": "radius/22px"
             },
@@ -1670,7 +1670,21 @@
               "danger": "{sys.color.danger}"
             },
             "basePaint": {
-              "fill": "{sys.color.elevated-2}"
+              "fill": "{primitives.shared.glass.body}",
+              "fillOpacity": "{primitives.shared.glass.base-alpha}",
+              "tintInk": "{primitives.shared.glass.tint-ink}",
+              "tintOpacity": "{primitives.shared.glass.tint}",
+              "falloffAt": "{primitives.shared.glass.falloff-at}",
+              "falloffStrength": "{primitives.shared.glass.falloff-strength}",
+              "blur": "{primitives.shared.glass.blur}",
+              "saturation": "{primitives.shared.glass.saturation}",
+              "overlapClear": "{primitives.shared.glass.overlap-clear}",
+              "overlapCovered": "{primitives.shared.glass.overlap-covered}",
+              "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washEnd": "{sys.color.structural-violet}",
+              "washStartAlpha": "{base.opacity.fraction-0-23}",
+              "washEndAlpha": "{base.opacity.fraction-0-07}"
             },
             "useCases": {
               "delivery-status": {
@@ -1680,7 +1694,13 @@
                 "status": "partial",
                 "note": "State-to-label/tone mapping and host wiring remain to be audited. No interactive states."
               }
-            }
+            },
+            "materialConstruction": "Shared glass body, tint and blur with a diagonal wash from the selected tone to Structural Violet. tonePaints selects both label ink and washStart. No stroke or hard outline. Background saturation is 125% in the shared material contract; Figma cannot preview saturation or adaptive overlap. Reduced-transparency fallback and host behavior await runtime implementation.",
+            "evidence": [
+              "Daniel badge review: increase breathing room and reflect the avatar/permission/question material language; visual approval pending.",
+              "Caelos_staging packages/ui/src/alert-recipe.ts: permission tonal wash; question shared glass. Visual reference only; reconstruction uses current Tier 0/1 ingredients.",
+              "Caelos_staging packages/ui/src/recipes.ts: avatar identity wash; Figma Avatar source 377:6793. Identity-specific behavior remains separate."
+            ]
           }
         }
       }
