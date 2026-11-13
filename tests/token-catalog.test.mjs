@@ -279,9 +279,12 @@ test('the shared Figma button radius follows the medium foundation', () => {
   assert.equal(radius.$extensions[EXT].figmaName, 'button/radius');
 });
 
-test('each button state names existing paint roles and text buttons have no surface', () => {
+test('each button state directly references lower-tier ingredients and text buttons have no surface', () => {
   const button = load('02-controls.tokens.json').controls.shared.button;
   const paints = button.$extensions[EXT].statePaints;
+  const lowerByMode = ['dark', 'light'].map(mode => new Map([...catalog]
+    .filter(([file]) => rank(file) < rank('02-controls.tokens.json') && (mode === 'light' || !file.includes('.light.')))
+    .flatMap(([, entries]) => [...entries])));
   const allStates = ['default', 'hover', 'pressed', 'success', 'focus', 'disabled'];
   const tonalAndTextStates = ['default', 'success', 'disabled'];
   assert.deepEqual(Object.keys(paints).sort(), ['primary', 'text', 'tonal']);
@@ -291,8 +294,15 @@ test('each button state names existing paint roles and text buttons have no surf
     for (const [state, slots] of Object.entries(states)) {
       assert.ok(slots.foreground, variant + ' ' + state);
       assert.equal(Object.hasOwn(slots, 'fill'), variant !== 'text');
-      for (const role of Object.values(slots)) {
-        assert.ok(button[role]?.$value, variant + ' ' + state + ' references missing ' + role);
+      for (const [slot, role] of Object.entries(slots)) {
+        const target = role.match(ALIAS)?.[1];
+        assert.ok(target, variant + ' ' + state + ' must name a token reference');
+        for (const lower of lowerByMode) {
+          const token = lower.get(target);
+          assert.ok(token, variant + ' ' + state + ' references missing or non-lower-tier ' + role);
+          const expectedType = /Opacity$/.test(slot) ? 'number' : /Blur$|Offset$/.test(slot) ? 'dimension' : 'color';
+          assert.equal(token.$type, expectedType);
+        }
       }
     }
   }

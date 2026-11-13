@@ -1,3 +1,17 @@
+// A construction card names its immediate lower-tier ingredient, not an alias trail.
+function constructionTokenLabel(item) {
+  const v = item.value;
+  const value = v && typeof v === 'object' && !Array.isArray(v)
+    ? (v.hex ? v.hex.toUpperCase() : v.value + ' ' + v.unit)
+    : Array.isArray(v) ? v.join(', ') : String(v);
+  const tier = item.path.startsWith('base.') || item.path.startsWith('sys.') ? 'T0' : 'T1';
+  return item.name + ' · ' + value + ' · ' + tier;
+}
+function constructionBindingLabel(variable, manifest, collections) {
+  const collection = collections.find(c => c.id === variable.variableCollectionId);
+  const item = manifest.constructionTokens?.[collection?.name + '/' + variable.name];
+  return item ? constructionTokenLabel(item) : variable.name + (manifest.tier === 2 ? ' · NOT IN CATALOG' : '');
+}
 // Figma Plugin API renderer shared by the catalog-derived primitive and control sheets.
 // Evaluate glyph-fit.js first; icon generation includes fitting and measured labels.
 // Page furniture follows foundation-sheet.js. Furniture dimensions are not product tokens.
@@ -68,7 +82,7 @@ async function renderPrimitiveCategory(category, manifest) {
     } else text(v,item.type==='duration'||item.type==='cubicBezier'?'Static parameter\nInteraction review required':'Parameter\nSee exact value above',236,13,'text-supporting');
     badge(c,item.status);
     text(c,'Figma · '+item.name+'\nCatalog · '+item.path,260,12,'text-supporting');
-    text(c,'Construction\n'+item.chain.join('\n↓ '),260,12,'text-supporting');
+    text(c,'Construction\n'+(item.construction ? constructionTokenLabel(item.construction) : item.chain[0]),260,12,'text-supporting');
     text(c,'Panda · '+(item.css?'var('+item.css+')':'No standalone token export'),260,12,'text-supporting');
     if(item.light!==null)text(c,'Light mode · '+display(item,item.light)+'\nRetained for reference; v1 review is dark',260,12,'text-supporting');
     text(c,'Evidence · '+item.evidence,260,12,'text-supporting');
@@ -120,7 +134,7 @@ async function renderPrimitiveCategory(category, manifest) {
       const bindings=new Set();
       function collect(x){if(!x||typeof x!=='object')return;if(x.type==='VARIABLE_ALIAS')bindings.add(x.id);else for(const value of Object.values(x))collect(value);}
       for(const n of nodes){if('boundVariables'in n)collect(n.boundVariables);if('fills'in n&&Array.isArray(n.fills))for(const fill of n.fills)collect(fill.boundVariables);if('effects'in n)for(const e of n.effects)collect(e.boundVariables);}
-      const names=[...bindings].map(id=>all.find(v=>v.id===id)?.name||id).sort();
+      const names=[...new Set([...bindings].map(id=>{const v=all.find(v=>v.id===id);return v?constructionBindingLabel(v,manifest,collections):id;}))].sort();
       badge(c,category.key==='icon'?'catalog glossary':'study · visual review required');
       text(c,'Figma · '+(category.key==='recipes-focus'?group.name:source.name)+'\nSource · '+master.id,260,12,'text-supporting');
       text(c,'Construction\n'+(names.join('\n')||'No variable binding found'),260,12,'text-supporting');

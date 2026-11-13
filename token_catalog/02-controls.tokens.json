@@ -169,68 +169,69 @@
             "statePaints": {
               "primary": {
                 "default": {
-                  "fill": "bed",
-                  "tintInk": "default",
-                  "tintOpacity": "tint",
-                  "foreground": "foreground"
+                  "fill": "{primitives.shared.surface.button.bed}",
+                  "tintInk": "{primitives.shared.surface.button.default}",
+                  "tintOpacity": "{primitives.shared.surface.button.tint}",
+                  "foreground": "{primitives.shared.typography.tone.default}"
                 },
                 "hover": {
-                  "fill": "bed",
-                  "tintInk": "hover",
-                  "tintOpacity": "tint",
-                  "foreground": "foreground"
+                  "fill": "{primitives.shared.surface.button.bed}",
+                  "tintInk": "{primitives.shared.surface.button.hover}",
+                  "tintOpacity": "{primitives.shared.surface.button.tint}",
+                  "foreground": "{primitives.shared.typography.tone.default}"
                 },
                 "pressed": {
-                  "fill": "bed",
-                  "tintInk": "pressed",
-                  "tintOpacity": "tint",
-                  "foreground": "foreground"
+                  "fill": "{primitives.shared.surface.button.bed}",
+                  "tintInk": "{primitives.shared.surface.button.pressed}",
+                  "tintOpacity": "{primitives.shared.surface.button.tint}",
+                  "foreground": "{primitives.shared.typography.tone.default}"
                 },
                 "success": {
-                  "fill": "bed",
-                  "tintInk": "success",
-                  "tintOpacity": "tint",
-                  "foreground": "foreground"
+                  "fill": "{primitives.shared.surface.button.bed}",
+                  "tintInk": "{primitives.shared.surface.button.success}",
+                  "tintOpacity": "{primitives.shared.surface.button.tint}",
+                  "foreground": "{primitives.shared.typography.tone.default}"
                 },
                 "focus": {
-                  "fill": "bed",
-                  "foreground": "focus-foreground",
-                  "glowInk": "focus-glow-ink",
-                  "glowBlur": "focus-glow-blur",
-                  "glowOpacity": "focus-glow-opacity",
-                  "glowOffset": "glow-offset"
+                  "fill": "{primitives.shared.surface.button.bed}",
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "disabled": {
-                  "fill": "disabled-bed",
-                  "foreground": "disabled-foreground"
+                  "fill": "{primitives.shared.surface.button.disabled-bed}",
+                  "foreground": "{primitives.shared.typography.tone.dim}"
                 }
               },
               "tonal": {
                 "default": {
-                  "fill": "tonal-fill",
-                  "foreground": "text-inverse"
+                  "fill": "{sys.color.elevated-2}",
+                  "foreground": "{sys.color.text-primary}"
                 },
                 "success": {
-                  "fill": "tonal-active",
-                  "foreground": "text-inverse"
+                  "fill": "{sys.color.structural-violet}",
+                  "foreground": "{sys.color.text-primary}"
                 },
                 "disabled": {
-                  "fill": "disabled",
-                  "foreground": "text-disabled"
+                  "fill": "{sys.color.elevated-2}",
+                  "foreground": "{sys.color.text-tertiary}"
                 }
               },
               "text": {
                 "default": {
-                  "foreground": "text-inverse"
+                  "foreground": "{sys.color.text-primary}"
                 },
                 "success": {
-                  "foreground": "text-inverse"
+                  "foreground": "{sys.color.text-primary}"
                 },
                 "disabled": {
-                  "foreground": "text-disabled"
+                  "foreground": "{sys.color.text-tertiary}"
                 }
               }
-            }
+            },
+            "constructionPolicy": "State construction references lower-tier tokens directly. Button token leaves remain compatibility exports; they are not additional ingredients."
           }
         },
         "radius": {
