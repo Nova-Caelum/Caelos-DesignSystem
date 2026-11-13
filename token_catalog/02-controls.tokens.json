@@ -165,7 +165,7 @@
               "D82",
               "D25"
             ],
-            "note": "Medium radius is approved. Geometry and typography now reference existing foundations/primitives. Side padding consolidates 16px to space/px-15. Tonal/text hover, pressed and focus remain open; complete Panda recipe is not implemented. Primary hover and focus share the blue foreground and soft surface-edge glow. Pressed acknowledges activation; Success is optional confirmed-result feedback, never an automatic click stage.",
+            "note": "All three emphasis styles expose Default, Hover, Pressed, Success, Focus and Disabled. Hover and Focus share blue foreground and soft glow. Tonal uses a translucent violet/sage wash, then the shared glass material when pressed. Text stays unfilled and glows around its glyphs. Geometry uses lower-tier tokens; full component and production host wiring remain open.",
             "statePaints": {
               "primary": {
                 "default": {
@@ -209,27 +209,102 @@
               },
               "tonal": {
                 "default": {
-                  "fill": "{sys.color.elevated-2}",
-                  "foreground": "{sys.color.text-primary}"
+                  "fill": "{primitives.shared.cloud.body}",
+                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                  "foreground": "{primitives.shared.typography.tone.default}",
+                  "angle": "{primitives.shared.cloud.angle}",
+                  "washStart": "{primitives.shared.cloud.wash-start}",
+                  "washEnd": "{primitives.shared.cloud.wash-end}",
+                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+                },
+                "hover": {
+                  "fill": "{primitives.shared.cloud.body}",
+                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "angle": "{primitives.shared.cloud.angle}",
+                  "washStart": "{primitives.shared.cloud.wash-start}",
+                  "washEnd": "{primitives.shared.cloud.wash-end}",
+                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+                },
+                "pressed": {
+                  "fill": "{primitives.shared.glass.body}",
+                  "fillOpacity": "{primitives.shared.glass.base-alpha}",
+                  "tintInk": "{primitives.shared.glass.tint-ink}",
+                  "tintOpacity": "{primitives.shared.glass.tint}",
+                  "falloffAt": "{primitives.shared.glass.falloff-at}",
+                  "falloffStrength": "{primitives.shared.glass.falloff-strength}",
+                  "blur": "{primitives.shared.glass.blur}",
+                  "saturation": "{primitives.shared.glass.saturation}",
+                  "overlapClear": "{primitives.shared.glass.overlap-clear}",
+                  "overlapCovered": "{primitives.shared.glass.overlap-covered}",
+                  "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
+                  "foreground": "{primitives.shared.typography.tone.default}"
                 },
                 "success": {
-                  "fill": "{sys.color.structural-violet}",
-                  "foreground": "{sys.color.text-primary}"
+                  "fill": "{primitives.shared.cloud.body}",
+                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                  "foreground": "{primitives.shared.typography.tone.default}",
+                  "angle": "{primitives.shared.cloud.angle}",
+                  "washStart": "{primitives.shared.cloud.wash-end}",
+                  "washEnd": "{primitives.shared.cloud.wash-end}",
+                  "washStartAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+                },
+                "focus": {
+                  "fill": "{primitives.shared.cloud.body}",
+                  "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "angle": "{primitives.shared.cloud.angle}",
+                  "washStart": "{primitives.shared.cloud.wash-start}",
+                  "washEnd": "{primitives.shared.cloud.wash-end}",
+                  "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                  "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "disabled": {
-                  "fill": "{sys.color.elevated-2}",
-                  "foreground": "{sys.color.text-tertiary}"
+                  "fill": "{primitives.shared.surface.button.disabled-bed}",
+                  "foreground": "{primitives.shared.typography.tone.dim}"
                 }
               },
               "text": {
                 "default": {
-                  "foreground": "{sys.color.text-primary}"
+                  "foreground": "{primitives.shared.typography.tone.default}"
+                },
+                "hover": {
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+                },
+                "pressed": {
+                  "foreground": "{primitives.shared.typography.tone.default}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "success": {
-                  "foreground": "{sys.color.text-primary}"
+                  "foreground": "{primitives.shared.typography.tone.default}"
+                },
+                "focus": {
+                  "foreground": "{primitives.shared.recipes-focus.foreground}",
+                  "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                  "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                  "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                  "glowOffset": "{primitives.shared.surface.button.glow-offset}"
                 },
                 "disabled": {
-                  "foreground": "{sys.color.text-tertiary}"
+                  "foreground": "{primitives.shared.typography.tone.dim}"
                 }
               }
             },
@@ -240,7 +315,7 @@
               "success": "Optional confirmation after an operation actually succeeds and its result is not immediately visible, such as saving, sending, or generating a script in the background. Never infer success from a click or a timer.",
               "visibleOutcome": "Opening a menu, dialog, or destination page is already visual feedback and does not require a Success button state.",
               "hoverAndFocus": "Share the same appearance; retain separate pointer-hover and keyboard-focus behavior. Pressed remains distinct during activation.",
-              "successLabel": "\u2713 Success",
+              "successLabel": "✓ Success",
               "reset": "Return to default when the next edit or next eligible action is reported by the host; never reset on a timer or by clicking Success.",
               "pending": "Wait for the real operation result. A stale completion must not mark newer edits as saved.",
               "failure": "Show an error with retry; never show Success after failure.",
@@ -269,6 +344,18 @@
                 "disabled"
               ],
               "description": "135-degree ready/sage wash and centered soft glow. Reuses the Cloud ingredients; all layers follow the host medium radius. Success keeps the plain sage tint to preserve cream-text contrast. No hard border. This is a current-token adaptation of the recovered surface, not a verified match to the deployed console."
+            },
+            "tonalSurfacePolicy": {
+              "pressedRecipe": "material({ texture: glass })",
+              "description": "Default/Hover/Focus use the Cloud body and violet/sage wash. Pressed composes the complete unified glass finish, including 125% saturation, overlap input and opaque fallback. Success retains the translucent body with a quiet sage wash. Disabled uses the shared opaque disabled bed. No hard border.",
+              "reference": "Caelos_staging packages/ui/src/recipes.ts at be3aec0ccf597141020bea35e6f4cbb3b982a012: tonal violet/sage gradient; the current-token glass pressed state follows Daniel’s request, not a claimed deployed-console match.",
+              "figmaLimit": "Gradient alpha/geometry are sync-derived. Figma background blur previews glass; CSS saturation, overlap response and reduced-transparency fallback require runtime verification."
+            },
+            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow; Pressed restores cream while retaining the glow. Success is ✓ Success in cream, with no fill. Same real-result/reset contract as Primary.",
+            "recipeExports": {
+              "primary": "primaryButtonInk",
+              "tonal": "tonalButtonInk",
+              "text": "textButtonInk"
             }
           }
         },
