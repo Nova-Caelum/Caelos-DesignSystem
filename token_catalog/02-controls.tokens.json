@@ -8,44 +8,84 @@
           {
             "item": "button and chip values",
             "ref": "D50, D81, G04, G05",
-            "why": "Geometry and typography are recorded against existing lower-tier tokens. Complete runtime recipes, timing and interaction behavior remain open. Tonal/text hover, pressed and focus treatments await review."
+            "why": "Geometry and typography use existing lower-tier tokens. Buttons, interactive Chips and passive Badges are separated for dark-v1 visual review. Complete runtime recipes, timing and interaction wiring remain open."
           }
         ]
       }
     },
     "shared": {
       "badgeVariants": {
-        "$description": "Set badge emphasis and status treatments.",
+        "$description": "Passive status, count and category information; shape and semantic tone are independent.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "badgeVariants",
             "recipeInStaging": true,
             "variants": {
-              "variant": [
-                "default",
-                "secondary",
-                "destructive",
-                "outline",
-                "ghost",
-                "link"
+              "shape": [
+                "rounded",
+                "pill",
+                "circle"
+              ],
+              "tone": [
+                "neutral",
+                "info",
+                "success",
+                "danger"
               ]
             },
             "defaultVariants": {
-              "variant": "default"
+              "shape": "rounded",
+              "tone": "neutral"
             },
-            "states": [
-              "hover",
-              "focus-visible",
-              "focus",
-              "error"
-            ],
+            "states": [],
             "modes": [
               "dark",
               "light",
               "reduced-motion",
               "reduced-transparency"
-            ]
+            ],
+            "historicalInventory": {
+              "variants": {
+                "variant": [
+                  "default",
+                  "secondary",
+                  "destructive",
+                  "outline",
+                  "ghost",
+                  "link"
+                ]
+              },
+              "states": [
+                "hover",
+                "focus-visible",
+                "focus",
+                "error"
+              ]
+            },
+            "note": "Passive information only. Former noninteractive status/count/category chips belong here. No hover, focus, pressed, success interaction or tab stop. Success is a communicated status, never a clickable state. Avatar cards remain separate. Dark v1 review; runtime component export remains open.",
+            "construction": {
+              "height": "{base.size.px-28}",
+              "pad-x": "{base.space.px-8}",
+              "pad-y": "{base.space.px-4}",
+              "gap": "{base.space.px-4}",
+              "type-size": "{primitives.shared.typography.size.label}",
+              "type-line": "{primitives.shared.typography.line.label}",
+              "type-family": "{primitives.shared.typography.family.ui}",
+              "type-weight": "{base.type.weight.medium}",
+              "fill": "{sys.color.elevated-2}"
+            },
+            "shapeRadii": {
+              "rounded": "{base.radius.sm}",
+              "pill": "{base.radius.px-22}",
+              "circle": "{base.radius.px-22}"
+            },
+            "tonePaints": {
+              "neutral": "{sys.color.text-supporting}",
+              "info": "{sys.color.action-blue-hover}",
+              "success": "{sys.color.success}",
+              "danger": "{sys.color.danger}"
+            }
           }
         }
       },
@@ -1092,37 +1132,32 @@
         }
       },
       "chip": {
-        "$description": "Present compact labels and selectable chip states.",
+        "$description": "Compact interactive filter/menu and toggle controls. Passive labels belong to badges.",
         "$extensions": {
           "app.caelos": {
             "status": "partial",
             "inventoryName": "chip",
             "recipeInStaging": true,
             "variants": {
-              "variant": [
-                "filter",
-                "status",
-                "count",
-                "category"
+              "purpose": [
+                "filter-menu",
+                "toggle"
               ],
-              "tone": [
-                "neutral",
-                "ready",
-                "progress",
-                "done",
-                "sage",
-                "danger",
-                "atmospheric",
-                "structural"
+              "shape": [
+                "rounded",
+                "pill",
+                "circle"
               ]
             },
             "defaultVariants": {
-              "variant": "filter",
-              "tone": "neutral"
+              "purpose": "filter-menu",
+              "shape": "rounded"
             },
             "states": [
+              "default",
               "hover",
-              "active",
+              "focus",
+              "pressed",
               "disabled"
             ],
             "modes": [
@@ -1135,7 +1170,102 @@
               "D81",
               "D24"
             ],
-            "note": "Filter-chip geometry, typography and Off/On/Disabled paints are recorded from the clean-sheet specimens using existing lower-tier tokens. Other inventory variants and interaction behavior remain open."
+            "note": "Interactive only. Filter-menu opens options; toggle changes one value directly. Pressed acknowledges activation or an open menu, not successful completion. No Success state. Applied filter summary is host-owned and distinct from menu-open state. Dark v1; static Figma review, runtime menu/keyboard wiring remains open.",
+            "historicalInventory": {
+              "variants": {
+                "variant": [
+                  "filter",
+                  "status",
+                  "count",
+                  "category"
+                ],
+                "tone": [
+                  "neutral",
+                  "ready",
+                  "progress",
+                  "done",
+                  "sage",
+                  "danger",
+                  "atmospheric",
+                  "structural"
+                ]
+              },
+              "states": [
+                "hover",
+                "active",
+                "disabled"
+              ]
+            },
+            "statePaints": {
+              "default": {
+                "fill": "{primitives.shared.cloud.body}",
+                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                "foreground": "{primitives.shared.typography.tone.default}",
+                "angle": "{primitives.shared.cloud.angle}",
+                "washStart": "{primitives.shared.cloud.wash-start}",
+                "washEnd": "{primitives.shared.cloud.wash-end}",
+                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+              },
+              "hover": {
+                "fill": "{primitives.shared.cloud.body}",
+                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                "foreground": "{primitives.shared.recipes-focus.foreground}",
+                "angle": "{primitives.shared.cloud.angle}",
+                "washStart": "{primitives.shared.cloud.wash-start}",
+                "washEnd": "{primitives.shared.cloud.wash-end}",
+                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+                "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+              },
+              "pressed": {
+                "fill": "{primitives.shared.glass.body}",
+                "fillOpacity": "{primitives.shared.glass.base-alpha}",
+                "tintInk": "{primitives.shared.glass.tint-ink}",
+                "tintOpacity": "{primitives.shared.glass.tint}",
+                "falloffAt": "{primitives.shared.glass.falloff-at}",
+                "falloffStrength": "{primitives.shared.glass.falloff-strength}",
+                "blur": "{primitives.shared.glass.blur}",
+                "saturation": "{primitives.shared.glass.saturation}",
+                "overlapClear": "{primitives.shared.glass.overlap-clear}",
+                "overlapCovered": "{primitives.shared.glass.overlap-covered}",
+                "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
+                "foreground": "{primitives.shared.typography.tone.default}"
+              },
+              "focus": {
+                "fill": "{primitives.shared.cloud.body}",
+                "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+                "foreground": "{primitives.shared.recipes-focus.foreground}",
+                "angle": "{primitives.shared.cloud.angle}",
+                "washStart": "{primitives.shared.cloud.wash-start}",
+                "washEnd": "{primitives.shared.cloud.wash-end}",
+                "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+                "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+                "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+                "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+                "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+                "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+              },
+              "disabled": {
+                "fill": "{primitives.shared.surface.button.disabled-bed}",
+                "foreground": "{primitives.shared.typography.tone.dim}"
+              }
+            },
+            "shapeRadii": {
+              "rounded": "{base.radius.md}",
+              "pill": "{base.radius.px-22}",
+              "circle": "{base.radius.px-22}"
+            },
+            "reference": {
+              "repository": "Nova-Caelum/Caelos_staging",
+              "revision": "be3aec0ccf597141020bea35e6f4cbb3b982a012",
+              "trigger": "packages/ui/src/filter-sort-menu.tsx",
+              "surface": "packages/ui/src/recipes.ts",
+              "finding": "Filter & sort uses the small tonal Button. The chip class is the requested design-system classification; its cloud and glass parameters reuse current primitives rather than historical raw values."
+            }
           }
         },
         "type-size": {
@@ -1217,12 +1347,12 @@
         },
         "radius": {
           "$type": "dimension",
-          "$value": "{base.radius.lg}",
+          "$value": "{base.radius.md}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional",
               "figmaName": "controls/shared/chip/radius",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
             }
           }
         },
@@ -1239,25 +1369,27 @@
         },
         "fill": {
           "$type": "color",
-          "$value": "{sys.color.elevated-2}",
+          "$value": "{primitives.shared.cloud.body}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional",
               "figmaName": "controls/shared/chip/fill",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
             }
-          }
+          },
+          "$description": "Cloud body ink; use the full default statePaints recipe including alpha and wash."
         },
         "selected": {
           "$type": "color",
-          "$value": "{sys.color.structural-violet}",
+          "$value": "{primitives.shared.glass.body}",
           "$extensions": {
             "app.caelos": {
               "status": "provisional",
               "figmaName": "controls/shared/chip/selected",
-              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              "evidence": "Buttons / Chips / Badges review: existing lower-tier material and geometry reuse; visual approval pending."
             }
-          }
+          },
+          "$description": "Pressed glass body ink; use the full pressed statePaints recipe including alpha, tint and blur."
         },
         "text": {
           "$type": "color",
