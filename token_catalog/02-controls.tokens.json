@@ -8,7 +8,7 @@
           {
             "item": "button and chip values",
             "ref": "D50, D81, G04, G05",
-            "why": "Button and chip padding, height and timing remain open, as do chip radius and focus. Tonal and text button hover, pressed and focus treatments await review."
+            "why": "Geometry and typography are recorded against existing lower-tier tokens. Complete runtime recipes, timing and interaction behavior remain open. Tonal/text hover, pressed and focus treatments await review."
           }
         ]
       }
@@ -165,7 +165,7 @@
               "D82",
               "D25"
             ],
-            "note": "The approved medium radius applies across variants, sizes and states. Paint roles below describe the existing Figma masters in both motion modes. Draft padding used the rejected second scale (D01).",
+            "note": "Medium radius is approved. Geometry and typography now reference existing foundations/primitives. Side padding consolidates 16px to space/px-15. Tonal/text hover, pressed and focus remain open; complete Panda recipe is not implemented.",
             "statePaints": {
               "primary": {
                 "default": {
@@ -419,6 +419,105 @@
             "app.caelos": {
               "status": "provisional",
               "figmaName": "button/text-disabled"
+            }
+          }
+        },
+        "type-size": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.size.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/type-size",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-line": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.line.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/type-line",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-family": {
+          "$type": "fontFamily",
+          "$value": "{primitives.shared.typography.family.ui}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/type-family",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-weight": {
+          "$type": "fontWeight",
+          "$value": "{base.type.weight.medium}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/type-weight",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-x": {
+          "$type": "dimension",
+          "$value": "{base.space.px-15}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/pad-x",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-y": {
+          "$type": "dimension",
+          "$value": "{base.space.px-8}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/pad-y",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "gap": {
+          "$type": "dimension",
+          "$value": "{base.space.px-8}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/gap",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "height": {
+          "$type": "dimension",
+          "$value": "{base.size.px-44}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/height",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "press-height": {
+          "$type": "dimension",
+          "$value": "{base.size.px-42}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/button/press-height",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
             }
           }
         }
@@ -871,7 +970,7 @@
         "$description": "Present compact labels and selectable chip states.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "chip",
             "recipeInStaging": true,
             "variants": {
@@ -911,7 +1010,161 @@
               "D81",
               "D24"
             ],
-            "note": "The Figma draft's 9 chip tokens are not admitted: padding on the rejected second scale, 20px radius (D21)."
+            "note": "Filter-chip geometry, typography and Off/On/Disabled paints are recorded from the clean-sheet specimens using existing lower-tier tokens. Other inventory variants and interaction behavior remain open."
+          }
+        },
+        "type-size": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.size.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/type-size",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-line": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.line.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/type-line",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-family": {
+          "$type": "fontFamily",
+          "$value": "{primitives.shared.typography.family.ui}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/type-family",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-weight": {
+          "$type": "fontWeight",
+          "$value": "{base.type.weight.medium}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/type-weight",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-x": {
+          "$type": "dimension",
+          "$value": "{base.space.px-12}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/pad-x",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-y": {
+          "$type": "dimension",
+          "$value": "{base.space.px-4}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/pad-y",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "gap": {
+          "$type": "dimension",
+          "$value": "{base.space.px-8}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/gap",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.lg}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/radius",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "height": {
+          "$type": "dimension",
+          "$value": "{base.size.px-42}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/height",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{sys.color.elevated-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/fill",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "selected": {
+          "$type": "color",
+          "$value": "{sys.color.structural-violet}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/selected",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/text",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "disabled": {
+          "$type": "color",
+          "$value": "{sys.color.elevated}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/disabled",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "text-disabled": {
+          "$type": "color",
+          "$value": "{sys.color.text-tertiary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/chip/text-disabled",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
           }
         }
       },
@@ -919,7 +1172,7 @@
         "$description": "Present identity images, fallbacks and status indicators.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "avatar",
             "recipeInStaging": true,
             "slots": [
@@ -959,7 +1212,8 @@
               "light",
               "reduced-motion",
               "reduced-transparency"
-            ]
+            ],
+            "note": "Frame sizes, square radii, status sizes and initials reference lower-tier tokens. Space dimensions are reused for 24px frames and 9/12/14px status marks; no duplicate size foundations added. Complete recipe and behavior remain open."
           }
         },
         "initials-size": {
@@ -1006,6 +1260,177 @@
             "$extensions": {
               "app.caelos": {
                 "status": "provisional"
+              }
+            }
+          }
+        },
+        "size": {
+          "sm": {
+            "$type": "dimension",
+            "$value": "{base.space.px-24}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/size/sm",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "md": {
+            "$type": "dimension",
+            "$value": "{base.size.px-32}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/size/md",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "lg": {
+            "$type": "dimension",
+            "$value": "{base.size.px-40}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/size/lg",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xl": {
+            "$type": "dimension",
+            "$value": "{base.size.px-48}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/size/xl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xxl": {
+            "$type": "dimension",
+            "$value": "{base.size.px-54}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/size/xxl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          }
+        },
+        "square-radius": {
+          "sm": {
+            "$type": "dimension",
+            "$value": "{base.radius.sm}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/square-radius/sm",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "md": {
+            "$type": "dimension",
+            "$value": "{base.radius.md}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/square-radius/md",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "lg": {
+            "$type": "dimension",
+            "$value": "{base.radius.md}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/square-radius/lg",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xl": {
+            "$type": "dimension",
+            "$value": "{base.radius.lg}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/square-radius/xl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xxl": {
+            "$type": "dimension",
+            "$value": "{base.radius.lg}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/square-radius/xxl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          }
+        },
+        "status-size": {
+          "sm": {
+            "$type": "dimension",
+            "$value": "{base.space.px-9}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/status-size/sm",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "md": {
+            "$type": "dimension",
+            "$value": "{base.space.px-9}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/status-size/md",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "lg": {
+            "$type": "dimension",
+            "$value": "{base.space.px-12}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/status-size/lg",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xl": {
+            "$type": "dimension",
+            "$value": "{base.space.px-12}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/status-size/xl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+              }
+            }
+          },
+          "xxl": {
+            "$type": "dimension",
+            "$value": "{base.space.px-14}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "controls/shared/avatar/status-size/xxl",
+                "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
               }
             }
           }
@@ -1184,7 +1609,7 @@
         "$description": "Select an individual tab. Coordinated tab list, content and navigation remain Tier 4 patterns.",
         "$extensions": {
           "app.caelos": {
-            "status": "open",
+            "status": "partial",
             "inventoryName": "tabTrigger",
             "variants": {
               "appearance": [
@@ -1207,7 +1632,106 @@
               "dark"
             ],
             "figmaSpecimen": "377:6625",
-            "note": "Existing Figma specimens are review evidence, not a complete admitted recipe. No new values or approval inferred from their appearance."
+            "note": "Existing geometry and typography are recorded; horizontal padding consolidates 16px to space/px-15. State specimens remain review evidence; complete recipe and keyboard navigation remain open."
+          }
+        },
+        "type-size": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.size.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/type-size",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-line": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.typography.line.label}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/type-line",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-family": {
+          "$type": "fontFamily",
+          "$value": "{primitives.shared.typography.family.ui}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/type-family",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "type-weight": {
+          "$type": "fontWeight",
+          "$value": "{base.type.weight.medium}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/type-weight",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-x": {
+          "$type": "dimension",
+          "$value": "{base.space.px-15}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/pad-x",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "pad-y": {
+          "$type": "dimension",
+          "$value": "{base.space.px-4}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/pad-y",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "height": {
+          "$type": "dimension",
+          "$value": "{base.size.px-44}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/height",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{base.radius.px-27}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/radius",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
+          }
+        },
+        "underline": {
+          "$type": "dimension",
+          "$value": "{base.space.px-2}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "controls/shared/tabTrigger/underline",
+              "evidence": "Tier 2 Clean specimen audit; existing lower-tier token reuse. Geometry recorded, visual signoff pending."
+            }
           }
         }
       }

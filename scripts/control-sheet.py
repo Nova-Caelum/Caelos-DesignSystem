@@ -58,11 +58,11 @@ def manifest():
     def study(key, name, node, axes, note):
         categories[key]['studies'].append(dict(name=name,id=node,splitAxes=axes,note=note))
     for name,node in [('Primary','377:6244'),('Tonal','377:6413'),('Text','377:6426')]:
-        study('buttons',name,node,['Motion'],'Partial recipe · controls.shared.button\nPanda · '+(recipes['button'] if name=='Primary' else 'No tonal/text recipe export; primaryButtonInk() covers primary paint only')+'\nTiming and padding remain provisional. Prototype links retained; behavior not retested.')
+        study('buttons',name,node,['Motion'],'Partial recipe · controls.shared.button\nPanda · '+(recipes['button'] if name=='Primary' else 'No tonal/text recipe export; primaryButtonInk() covers primary paint only')+'\nGeometry is mapped to existing lower-tier tokens; side padding uses 15px. Timing remains provisional. Prototype links retained; behavior not retested.')
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
-    study('tabs','Tab trigger','377:6625',['Appearance','Selection'],'Open recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nExisting state specimens; keyboard navigation remains unverified.')
-    study('chips','Filter chip','377:6439',['Motion'],'Open recipe · controls.shared.chip\nDraft chip geometry is not admitted to the catalog. No complete Panda export.')
-    study('avatars','Avatar','377:6793',['Shape','Size'],'Open recipe · controls.shared.avatar\nInitials aliases exist; complete geometry/status recipe remains open. No complete Panda export.')
+    study('tabs','Tab trigger','377:6625',['Appearance','Selection'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nExisting state specimens; keyboard navigation remains unverified.')
+    study('chips','Filter chip','377:6439',['Motion'],'Partial recipe · controls.shared.chip\nGeometry and Off/On/Disabled paints are mapped to existing lower-tier tokens. No complete Panda export.')
+    study('avatars','Avatar','377:6793',['Shape','Size'],'Partial recipe · controls.shared.avatar\nInitials, frame sizes, square radii and status sizes are mapped. Complete recipe remains open. No complete Panda export.')
     for node in range(6482,6498):
         study('composer','Action reference','377:'+str(node),[], 'Cross-tier reference · Tier 5 composer\nExisting instance preserved; not promoted to a Tier 2 recipe.')
 
@@ -75,7 +75,7 @@ def manifest():
     families = {}
     for path,token in leaves(source):
         owner=path.split('.')[2]
-        category={'button':'buttons','input':'fields','avatar':'avatars'}[owner]
+        category={'button':'buttons','input':'fields','avatar':'avatars','chip':'chips','tabTrigger':'tabs'}[owner]
         meta=token['$extensions']['app.caelos']
         value,chain=resolve(path,'dark');light,light_chain=resolve(path,'light')
         suffix=path.split('.')[-1]
@@ -86,7 +86,7 @@ def manifest():
         label=suffix
         if token['$type']=='color':
             label=(tables['dark'][chain[-1]].get('$extensions',{}).get('app.caelos',{}).get('displayName','')+' · '+suffix).strip(' ·')
-        item=dict(path=path,name=meta.get('figmaName',path.replace('.','/')),type=token['$type'],value=value,label=label,status=meta['status'],evidence=meta.get('decision',', '.join(meta.get('decisions',[])) or 'No decision reference recorded'),uses=uses.get(path,[]),chain=chain[1:],light=light if light!=value else None,lightChain=light_chain[1:] if light!=value else [],description=token.get('$description',''),css='--caelos-material-'+css if css else None)
+        item=dict(path=path,name=meta.get('figmaName',path.replace('.','/')),type=token['$type'],value=value,label=label,status=meta['status'],evidence=meta.get('decision', meta.get('evidence', ', '.join(meta.get('decisions',[])) or 'No decision reference recorded')),uses=uses.get(path,[]),chain=chain[1:],light=light if light!=value else None,lightChain=light_chain[1:] if light!=value else [],description=token.get('$description',''),css='--caelos-material-'+css if css else None)
         item['construction'] = ingredient(chain[1])
         family=' / '.join(path.split('.')[2:-1])
         families.setdefault((category,family),[]).append(item)

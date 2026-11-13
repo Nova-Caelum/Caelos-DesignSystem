@@ -70,6 +70,32 @@ async function updateControlConstruction(manifest) {
     const next = 'Construction\n' + label;
     if(t.characters !== next) {t.characters=next;changed.add(t.id);labelsChanged++;}
   }
+  // Keep dimensions and review notes tied to the specimens and current catalog.
+  function setText(node,value){if(node && node.characters!==value){node.characters=value;changed.add(node.id);labelsChanged++;}}
+  for(const category of manifest.categories){
+    const root=roots.find(n=>n.name==='Category / '+category.title);
+    for(const family of root.children.filter(n=>n.name.startsWith('Family / '))){
+      const identity=family.children.find(n=>n.name==='Identity and construction');
+      const note=identity?.children.find(n=>n.type==='TEXT'&&n.characters.includes(' variants\n'));
+      const name=family.name.slice('Family / '.length);
+      const study=category.studies.find(s=>name===s.name||name.startsWith(s.name+' / '));
+      if(study){const count=family.findAll(n=>n.name==='Specimen').length;setText(note,count+' variants\n'+study.note);}
+      const entry=category.pending?.find(e=>e.name===name);
+      const card=entry&&family.findAll(n=>n.name==='Variant / '+entry.path)[0];
+      if(card){
+        setText(note,'1 variants\nCatalog inventory · '+entry.status+'\nNo complete recipe implied');
+        setText(card.children[1],entry.status.toUpperCase());
+        setText(card.children[2],entry.status.toUpperCase());
+        setText(card.children.find(n=>n.type==='TEXT'&&n.characters.startsWith('Construction · ')),'Construction · '+(entry.note||'Lower-tier recipe mapping is still open.')+'\nPanda · '+(entry.recipe||'No complete recipe export'));
+      }
+    }
+    for(const specimen of root.findAll(n=>n.name==='Specimen')){
+      const card=specimen.parent;
+      if(!card.children.some(n=>n.type==='TEXT'&&n.characters.includes('\nSource · ')))continue;
+      const instance=specimen.children[0];
+      if(instance)setText(card.children[1],Math.round(instance.width*100)/100+' × '+Math.round(instance.height*100)/100+' px');
+    }
+  }
   // Keep each existing category in its column after label text reflows.
   for (const x of new Set(roots.map(n => n.x))) {
     const column = roots.filter(n => n.x === x).sort((a,b) => a.y-b.y);
