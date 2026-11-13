@@ -14,25 +14,29 @@ async function refreshFieldText(figma, manifest) {
   const gallery = page.children.find(n => n.name === 'Category / Fields');
   const items = category.rows.flatMap(r => r.items);
   const setText = (n, value) => { if (n.characters !== value) {n.characters = value; changed.add(n.id);} };
-  for (const role of ['foreground','supporting-ink']) {
+  for (const role of ['foreground','supporting-ink','hover-foreground']) {
     const item = items.find(i => i.path === 'controls.shared.input.' + role);
-    const variable = byName.get(item.name), target = byName.get(item.construction.name);
+    const oldName = role === 'hover-foreground' ? 'controls/shared/input/focus-foreground' : item.name;
+    const variable = byName.get(item.name) || byName.get(oldName), target = byName.get(item.construction.name);
     if (!variable || !target) throw Error('Missing field role: ' + role);
+    variable.name = item.name; byName.set(item.name, variable);
     for (const mode of Object.keys(variable.valuesByMode)) variable.setValueForMode(mode, figma.variables.createVariableAlias(target));
     changedVariables.push(variable.id);
-    const path = gallery.findAllWithCriteria({types:['TEXT']}).find(t => t.characters.endsWith('\nCatalog · ' + item.path));
+    const path = gallery.findAllWithCriteria({types:['TEXT']}).find(t => t.characters.endsWith('\nCatalog · ' + item.path) || (role === 'hover-foreground' && t.characters.endsWith('\nCatalog · controls.shared.input.focus-foreground')));
     const card = path.parent;
+    setText(path, 'Figma · ' + item.name + '\nCatalog · ' + item.path);
+    setText(card.children.find(t => t.type === 'TEXT' && t.characters.startsWith('Panda · ')), 'Panda · ' + (item.css ? 'var(' + item.css + ')' : 'No standalone token export'));
     setText(card.children[0], item.label);
     setText(card.children[1], item.value.hex.toUpperCase());
     setText(card.children.find(t => t.type === 'TEXT' && t.characters.startsWith('Construction\n')), 'Construction\n' + constructionTokenLabel(item.construction));
   }
   const source = await figma.getNodeByIdAsync(category.studies[0].id);
-  const blue = byName.get('controls/shared/input/focus-foreground');
+  const blue = byName.get('controls/shared/input/hover-foreground');
   const dim = byName.get('controls/shared/input/supporting-ink');
   for (const master of source.children) {
     const text = master.findAllWithCriteria({types:['TEXT']}).find(t => t.name === 'Field text');
     const state = master.variantProperties.State;
-    const target = state === 'Hover' ? blue : state === 'Rest' && master.variantProperties.Form === 'Search' ? dim : null;
+    const target = state === 'Focus' ? byName.get('controls/shared/input/foreground') : state === 'Hover' ? blue : state === 'Rest' && master.variantProperties.Form === 'Search' ? dim : null;
     if (target) {text.fills = text.fills.map(p => figma.variables.setBoundVariableForPaint(p, 'color', target)); changed.add(text.id);}
   }
   setText(gallery.children[1], category.purpose);
@@ -48,6 +52,7 @@ async function refreshFieldText(figma, manifest) {
       for (const n of [instance, ...instance.findAll(() => true)]) {
         collect(n.boundVariables);
         if ('fills' in n) collect(n.fills);
+        if ('strokes' in n) collect(n.strokes);
         if ('effects' in n) collect(n.effects);
       }
       const labels = [];

@@ -249,9 +249,11 @@ test('field label and help gaps follow the field-interior role independently of 
   }
 });
 
-test('field focus follows the shared focus primitive for ink, blur and opacity', () => {
+test('field hover ink and focus glow use shared primitives while typing ink stays muted', () => {
   const field = load('02-controls.tokens.json').controls.shared.input;
-  for (const role of ['foreground', 'glow-ink', 'glow-blur', 'glow-opacity']) {
+  assert.equal(field['hover-foreground'].$value, '{primitives.shared.recipes-focus.foreground}');
+  assert.equal(field.foreground.$value, '{primitives.shared.typography.tone.muted}');
+  for (const role of ['glow-ink', 'glow-blur', 'glow-opacity']) {
     assert.equal(field['focus-' + role].$value, '{primitives.shared.recipes-focus.' + role + '}');
   }
 });

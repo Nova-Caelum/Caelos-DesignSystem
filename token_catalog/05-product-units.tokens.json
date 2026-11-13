@@ -2704,7 +2704,8 @@
                 "glyph": "composer/glyph-size",
                 "supporting": "composer/supporting",
                 "disabled": "composer/disabled",
-                "sendFill": "composer/send-fill"
+                "sendFill": "composer/send-fill",
+                "sendForeground": "controls/shared/button/foreground"
               },
               "dock": {
                 "reserve": "composer/dock-reserve",
@@ -2751,6 +2752,10 @@
               "reduced-motion": "instant menu transitions in Figma",
               "light": "open",
               "reduced-transparency": "open"
+            },
+            "controlInks": {
+              "unavailable": "{sys.color.text-faint}",
+              "send": "{controls.shared.button.foreground}"
             }
           }
         },
