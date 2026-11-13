@@ -239,7 +239,36 @@
               "pressed": "Immediate acknowledgement while a control is being activated; never waits for an operation result.",
               "success": "Optional confirmation after an operation actually succeeds and its result is not immediately visible, such as saving, sending, or generating a script in the background. Never infer success from a click or a timer.",
               "visibleOutcome": "Opening a menu, dialog, or destination page is already visual feedback and does not require a Success button state.",
-              "hoverAndFocus": "Share the same appearance; retain separate pointer-hover and keyboard-focus behavior. Pressed remains distinct during activation."
+              "hoverAndFocus": "Share the same appearance; retain separate pointer-hover and keyboard-focus behavior. Pressed remains distinct during activation.",
+              "successLabel": "\u2713 Success",
+              "reset": "Return to default when the next edit or next eligible action is reported by the host; never reset on a timer or by clicking Success.",
+              "pending": "Wait for the real operation result. A stale completion must not mark newer edits as saved.",
+              "failure": "Show an error with retry; never show Success after failure.",
+              "implementation": "createActionFeedback() manages result and revision state; the host supplies edits, completion, eligibility, visible pending/error feedback, and accessible announcements. No production consumer is wired by this catalog change."
+            },
+            "surfaceTreatment": {
+              "angle": "{primitives.shared.cloud.angle}",
+              "wash-start": "{primitives.shared.cloud.wash-start}",
+              "wash-end": "{primitives.shared.cloud.wash-end}",
+              "wash-start-alpha": "{primitives.shared.cloud.wash-start-alpha}",
+              "wash-end-alpha": "{primitives.shared.cloud.wash-end-alpha}",
+              "glow-ink": "{primitives.shared.surface.button.default}",
+              "glow-opacity": "{base.opacity.fraction-0-07}",
+              "glow-blur": "{base.blur.px-12}",
+              "glow-offset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "surfacePolicy": {
+              "washStates": [
+                "default",
+                "hover",
+                "focus",
+                "pressed"
+              ],
+              "plainStates": [
+                "success",
+                "disabled"
+              ],
+              "description": "135-degree ready/sage wash and centered soft glow. Reuses the Cloud ingredients; all layers follow the host medium radius. Success keeps the plain sage tint to preserve cream-text contrast. No hard border. This is a current-token adaptation of the recovered surface, not a verified match to the deployed console."
             }
           }
         },

@@ -37,3 +37,24 @@ test('shared blue hover/focus ink remains readable on the dark button bed', () =
   const bed = lum(channels(get('button-bed')));
   assert.ok((ink + 0.05)/(bed + 0.05) >= 4.5);
 });
+
+test('primary wash uses existing Cloud tokens and preserves text contrast over its full ramp', () => {
+  for (const key of ['angle','wash-start','wash-end','wash-start-alpha','wash-end-alpha'])
+    assert.equal(get('button-surface-'+key),get('cloud-'+key));
+  const blend=(ink,bed,alpha)=>ink.map((v,i)=>v*alpha+bed[i]*(1-alpha));
+  const start=channels(get('button-surface-wash-start')), end=channels(get('button-surface-wash-end'));
+  const a=parseFloat(get('button-surface-wash-start-alpha'))/100, b=parseFloat(get('button-surface-wash-end-alpha'))/100;
+  for(const state of ['default','pressed','hover','focus']) {
+    const focused=['hover','focus'].includes(state), bed=channels(get('button-bed'));
+    const base=focused?bed:blend(channels(get('button-'+state)),bed,parseFloat(get('button-tint'))/100);
+    const ink=channels(get(focused?'button-focus-foreground':'button-foreground'));
+    for(let step=0;step<=100;step++) {
+      const t=step/100, alpha=a*(1-t)+b*t;
+      const color=start.map((v,i)=>(v*a*(1-t)+end[i]*b*t)/alpha);
+      assert.ok((lum(ink)+.05)/(lum(blend(color,base,alpha))+.05)>=4.5,state+' at '+step+'%');
+    }
+  }
+  const recipe=controlPreset.theme.extend.recipes.primaryButtonInk.base;
+  assert.equal(recipe['&[data-state=success]:not(:active, :disabled)'].backgroundImage,'none');
+  assert.equal(recipe['&:disabled'].boxShadow,'none');
+});

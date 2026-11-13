@@ -61,8 +61,8 @@ def manifest():
         study('buttons',name,node,['Motion'],'Partial recipe · controls.shared.button\nPanda · '+(recipes['button'] if name=='Primary' else 'No tonal/text recipe export; primaryButtonInk() covers primary paint only')+'\nGeometry is mapped to existing lower-tier tokens; side padding uses 15px. Timing remains provisional. Prototype links retained; behavior not retested.')
     categories['buttons']['studies'][0]['note'] = (
         'Partial recipe · controls.shared.button\nPanda · ' + recipes['button'] +
-        '\nHover = Focus: blue text + soft glow. Pressed: immediate feedback. Success: optional confirmed result (save/send), never menu opening.' +
-        '\nLower-tier geometry; side padding 15px. Prototype wiring partial; press/release and runtime keyboard behavior unverified. Timing provisional.')
+        '\nHover = Focus: blue text + soft glow. Pressed: immediate feedback. ✓ Success: confirmed result only; resets on the next edit/eligibility. No timer or click-to-reset.' +
+        '\nSurface: cloud/angle + wash-start/end + wash-start/end-alpha. Rest glow: opacity/0.07 + blur/12 + zero offset. Success stays plain for contrast.\nLower-tier geometry; side padding 15px. Prototype wiring partial; press/release and runtime keyboard behavior unverified. Timing provisional.')
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
