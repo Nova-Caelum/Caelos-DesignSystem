@@ -67,8 +67,8 @@ def manifest():
         entry = next(s for s in categories['buttons']['studies'] if s['name'] == name)
         entry['note'] = ('Partial recipe · controls.shared.button\nPanda · ' + name.lower() + 'ButtonInk() · surface paint; complete component wiring remains open' +
             '\n6 states. Hover = Focus: blue foreground + soft glow. ✓ Success: confirmed result only; resets on next edit/eligibility. No timer or click-to-reset.' +
-            ('\nTranslucent violet/sage wash. Pressed: shared glass, 125% saturation in CSS. Success: quiet sage wash. Figma gradients are sync-derived; saturation/overlap and opaque fallback require runtime review.' if name == 'Tonal' else
-             '\nUnfilled in every state. Hover/Focus: blue glyph glow. Pressed: cream glyph glow. Success: cream check and label.') +
+            ('\nTranslucent violet/sage wash. Pressed: shared glass, 125% saturation in CSS. Success: sage-green label over quiet sage wash. Figma gradients are sync-derived; saturation/overlap and opaque fallback require runtime review.' if name == 'Tonal' else
+             '\nUnfilled in every state. Hover/Focus: blue glyph glow at opacity/0.5. Pressed: cream glyph glow. Success: sage-green check and label.') +
             '\nLower-tier geometry; side padding 15px. State previews; pointer/keyboard prototype wiring unverified. Dark v1; visual approval pending.')
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')

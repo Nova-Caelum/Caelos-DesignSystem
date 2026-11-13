@@ -52,6 +52,11 @@ for (const style of ['tonal', 'text']) for (const [state, paint] of Object.entri
   }
 }
 const stateRole = (style, state) => key => ref(style + '-' + state + '-' + key);
+function textGlow(state) {
+  const role = stateRole('text', state);
+  return [role('glowOffset'), role('glowOffset'), role('glowBlur'),
+    'color-mix(in srgb, ' + role('glowInk') + ' ' + role('glowOpacity') + ', transparent)'].join(' ');
+}
 function tonalWash(state) {
   const role = stateRole('tonal', state);
   return {
@@ -73,8 +78,8 @@ export const tonalButtonInkRecipe = { className: 'caelos-tonal-button-ink', base
 } };
 export const textButtonInkRecipe = { className: 'caelos-text-button-ink', base: {
   color: stateRole('text','default')('foreground'), background: 'transparent', boxShadow: 'none', textShadow: 'none',
-  [engaged]: {color: ref('button-focus-foreground'), textShadow: glow('button')},
-  [pressed]: {color: stateRole('text','pressed')('foreground'), textShadow: glow('button')},
+  [engaged]: {color: stateRole('text','hover')('foreground'), textShadow: textGlow('hover')},
+  [pressed]: {color: stateRole('text','pressed')('foreground'), textShadow: textGlow('pressed')},
   [succeeded]: {color: stateRole('text','success')('foreground'), textShadow: 'none'},
   '&:disabled': {color: stateRole('text','disabled')('foreground'), textShadow: 'none'},
 } };

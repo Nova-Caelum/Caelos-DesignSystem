@@ -22,7 +22,7 @@ async function completeSecondaryButtonStates(figma, manifest) {
         components[state]=component;
         const paint = manifest.buttonStatePaints[style.toLowerCase()][state.toLowerCase()];
         const variable = key => {
-          const matches=variables.filter(v=>v.name===paint[key].name);
+          const matches=variables.filter(v=>v.name===paint[key].name && collections.find(c=>c.id===v.variableCollectionId)?.name===paint[key].collection);
           if(matches.length!==1) throw Error('Missing/ambiguous variable: '+paint[key].name);
           return matches[0];
         };
