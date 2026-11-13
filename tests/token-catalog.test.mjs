@@ -286,10 +286,9 @@ test('each button state directly references lower-tier ingredients and text butt
     .filter(([file]) => rank(file) < rank('02-controls.tokens.json') && (mode === 'light' || !file.includes('.light.')))
     .flatMap(([, entries]) => [...entries])));
   const allStates = ['default', 'hover', 'pressed', 'success', 'focus', 'disabled'];
-  const tonalAndTextStates = ['default', 'success', 'disabled'];
   assert.deepEqual(Object.keys(paints).sort(), ['primary', 'text', 'tonal']);
   for (const [variant, states] of Object.entries(paints)) {
-    const expected = variant === 'primary' ? allStates : tonalAndTextStates;
+    const expected = allStates;
     assert.deepEqual(Object.keys(states).sort(), [...expected].sort());
     for (const [state, slots] of Object.entries(states)) {
       assert.ok(slots.foreground, variant + ' ' + state);
@@ -300,7 +299,8 @@ test('each button state directly references lower-tier ingredients and text butt
         for (const lower of lowerByMode) {
           const token = lower.get(target);
           assert.ok(token, variant + ' ' + state + ' references missing or non-lower-tier ' + role);
-          const expectedType = /Opacity$/.test(slot) ? 'number' : /Blur$|Offset$/.test(slot) ? 'dimension' : 'color';
+          const expectedType = /Opacity$|Alpha$|^(angle|falloffAt|falloffStrength|saturation|overlapClear|overlapCovered|saturationNeutral)$/.test(slot)
+            ? 'number' : /Blur$|Offset$|^blur$/.test(slot) ? 'dimension' : 'color';
           assert.equal(token.$type, expectedType);
         }
       }

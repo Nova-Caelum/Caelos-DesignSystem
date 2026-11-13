@@ -58,3 +58,45 @@ test('primary wash uses existing Cloud tokens and preserves text contrast over i
   assert.equal(recipe['&[data-state=success]:not(:active, :disabled)'].backgroundImage,'none');
   assert.equal(recipe['&:disabled'].boxShadow,'none');
 });
+
+test('secondary buttons share hover/focus and preserve confirmed success over pointer states', () => {
+  const paints = controls.controls.shared.button.$extensions['app.caelos'].statePaints;
+  const recipes = controlPreset.theme.extend.recipes;
+  for (const style of ['tonal','text']) {
+    assert.deepEqual(paints[style].hover, paints[style].focus);
+    const recipe = recipes[style + 'ButtonInk'].base;
+    assert.ok(recipe['&:is(:hover, :focus-visible):not(:active, :disabled, [data-state=success])']);
+    assert.ok(recipe['&:active:not(:disabled, [data-state=success])']);
+    assert.ok(recipe['&[data-state=success]:not(:disabled)']);
+    assert.equal(recipe['&:disabled'][style === 'tonal' ? 'boxShadow' : 'textShadow'], 'none');
+  }
+  const text = recipes.textButtonInk.base;
+  assert.equal(text.background, 'transparent');
+  for (const value of Object.values(text).filter(v => v && typeof v === 'object'))
+    assert.ok(!Object.keys(value).some(key => key.startsWith('background')));
+});
+
+test('tonal pressed inherits the complete glass material including accessibility fallbacks', async () => {
+  const {materialRecipe} = await import('../src/material-preset.mjs');
+  const pressed = controlPreset.theme.extend.recipes.tonalButtonInk.base['&:active:not(:disabled, [data-state=success])'];
+  for (const [key, value] of Object.entries(materialRecipe.variants.texture.glass))
+    assert.deepEqual(pressed[key], value, key);
+  assert.equal(get('tonal-pressed-fillOpacity'), '23%');
+  assert.equal(get('tonal-pressed-saturation'), '1.25');
+  assert.equal(get('tonal-pressed-falloffAt'), '72%');
+});
+
+test('tonal wash preserves cream and blue contrast on the approved dark bed', () => {
+  const blend=(ink,bed,alpha)=>ink.map((v,i)=>v*alpha+bed[i]*(1-alpha));
+  for(const state of ['default','hover','focus','success']) {
+    const role=key=>get('tonal-'+state+'-'+key);
+    const base=blend(channels(role('fill')),channels(get('button-bed')),parseFloat(role('fillOpacity'))/100);
+    const start=channels(role('washStart')),end=channels(role('washEnd'));
+    const a=parseFloat(role('washStartAlpha'))/100,b=parseFloat(role('washEndAlpha'))/100;
+    for(let step=0;step<=100;step++) {
+      const t=step/100,alpha=a*(1-t)+b*t;
+      const color=start.map((v,i)=>(v*a*(1-t)+end[i]*b*t)/alpha);
+      assert.ok((lum(channels(role('foreground')))+.05)/(lum(blend(color,base,alpha))+.05)>=4.5,state+' at '+step+'%');
+    }
+  }
+});

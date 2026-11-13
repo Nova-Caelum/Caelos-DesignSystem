@@ -43,7 +43,7 @@ def manifest():
     # These names are emitted by src/tier-3/control-preset.mjs, not guessed aliases.
     button_css = {'foreground', 'focus-foreground', 'disabled-foreground', 'bed', 'default', 'hover', 'pressed', 'success', 'disabled-bed', 'tint', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
     field_css = {'foreground', 'focus-foreground', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
-    recipes = {'button': 'primaryButtonInk() · paint only; geometry and tonal/text recipes remain open', 'input': 'fieldSurface() · cloud and focus surface only; complete input recipe remains open'}
+    recipes = {'button': 'primaryButtonInk() · paint only; complete component wiring remains open', 'input': 'fieldSurface() · cloud and focus surface only; complete input recipe remains open'}
     definitions = [
         ('buttons', 'Buttons', 'Action emphasis and state comparison. Medium radius is approved; geometry and some state treatments remain draft.'),
         ('fields', 'Fields', 'Text, search and multiline controls. Cloud wash, hover-blue focus and the approved field interior are traced to lower-tier tokens.'),
@@ -58,11 +58,18 @@ def manifest():
     def study(key, name, node, axes, note):
         categories[key]['studies'].append(dict(name=name,id=node,splitAxes=axes,note=note))
     for name,node in [('Primary','377:6244'),('Tonal','377:6413'),('Text','377:6426')]:
-        study('buttons',name,node,['Motion'],'Partial recipe · controls.shared.button\nPanda · '+(recipes['button'] if name=='Primary' else 'No tonal/text recipe export; primaryButtonInk() covers primary paint only')+'\nGeometry is mapped to existing lower-tier tokens; side padding uses 15px. Timing remains provisional. Prototype links retained; behavior not retested.')
+        study('buttons',name,node,['Motion'],'')
     categories['buttons']['studies'][0]['note'] = (
         'Partial recipe · controls.shared.button\nPanda · ' + recipes['button'] +
         '\nHover = Focus: blue text + soft glow. Pressed: immediate feedback. ✓ Success: confirmed result only; resets on the next edit/eligibility. No timer or click-to-reset.' +
         '\nSurface: cloud/angle + wash-start/end + wash-start/end-alpha. Rest glow: opacity/0.07 + blur/12 + zero offset. Success stays plain for contrast.\nLower-tier geometry; side padding 15px. Prototype wiring partial; press/release and runtime keyboard behavior unverified. Timing provisional.')
+    for name in ['Tonal', 'Text']:
+        entry = next(s for s in categories['buttons']['studies'] if s['name'] == name)
+        entry['note'] = ('Partial recipe · controls.shared.button\nPanda · ' + name.lower() + 'ButtonInk() · surface paint; complete component wiring remains open' +
+            '\n6 states. Hover = Focus: blue foreground + soft glow. ✓ Success: confirmed result only; resets on next edit/eligibility. No timer or click-to-reset.' +
+            ('\nTranslucent violet/sage wash. Pressed: shared glass, 125% saturation in CSS. Success: quiet sage wash. Figma gradients are sync-derived; saturation/overlap and opaque fallback require runtime review.' if name == 'Tonal' else
+             '\nUnfilled in every state. Hover/Focus: blue glyph glow. Pressed: cream glyph glow. Success: cream check and label.') +
+            '\nLower-tier geometry; side padding 15px. State previews; pointer/keyboard prototype wiring unverified. Dark v1; visual approval pending.')
     study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
@@ -108,6 +115,6 @@ def manifest():
     covered=[i['path'] for c in categories.values() for r in c['rows'] for i in r['items']]
     expected=[p for p,_ in leaves(source)]
     if len(covered)!=len(set(covered)) or set(covered)!=set(expected): raise ValueError('Every control token must appear exactly once')
-    return dict(tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered),constructionTokens=construction_tokens)
+    return dict(tier=2,pageId='377:6179',categories=list(categories.values()),tokenCount=len(covered),constructionTokens=construction_tokens, buttonStatePaints={style: {state: {key: ingredient(value[1:-1]) for key,value in paint.items()} for state,paint in states.items()} for style,states in source['controls']['shared']['button']['$extensions']['app.caelos']['statePaints'].items()})
 
 if __name__=='__main__': print(json.dumps(manifest(),separators=(',',':')))
