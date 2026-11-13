@@ -24,9 +24,11 @@ export const fieldSurfaceRecipe = { className: 'caelos-field-surface', base: {
 const buttonFill = state => 'color-mix(in srgb, ' + ref('button-' + state) + ' ' + ref('button-tint') + ', ' + ref('button-bed') + ')';
 export const primaryButtonInkRecipe = { className: 'caelos-primary-button-ink', base: {
   color: ref('button-foreground'), backgroundColor: buttonFill('default'),
-  '&:hover:not(:active, :focus-visible, :disabled, [data-state=success])': {backgroundColor: buttonFill('hover')}, '&:active:not(:focus-visible, :disabled, [data-state=success])': {backgroundColor: buttonFill('pressed')},
-  '&[data-state=success]:not(:focus-visible, :disabled)': {backgroundColor: buttonFill('success')},
-  '&:focus-visible': { color: ref('button-focus-foreground'), backgroundColor: ref('button-bed'), boxShadow: glow('button') },
+  '&:is(:hover, :focus-visible):not(:active, :disabled, [data-state=success])': {
+    color: ref('button-focus-foreground'), backgroundColor: ref('button-bed'), boxShadow: glow('button'),
+  },
+  '&:active:not(:disabled)': {backgroundColor: buttonFill('pressed')},
+  '&[data-state=success]:not(:active, :disabled)': {backgroundColor: buttonFill('success')},
   '&:disabled': { color: ref('button-disabled-foreground'), backgroundColor: ref('button-disabled-bed') },
 } };
 export const controlPreset = {
