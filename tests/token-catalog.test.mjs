@@ -7,6 +7,7 @@
 // - The light semantic file holds no path the dark one lacks.
 // - Every token has a $type and a status of canon, composer-derived or provisional.
 
+import { resolveControlCatalog } from '../src/tier-2/control-catalog.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -274,13 +275,12 @@ test('avatar initials use progressively larger typography roles across all five 
 });
 
 test('the shared Figma button radius follows the medium foundation', () => {
-  const { radius } = load('02-controls.tokens.json').controls.shared.button;
-  assert.equal(radius?.$value, '{base.radius.md}');
-  assert.equal(radius.$extensions[EXT].figmaName, 'button/radius');
+  const radius = resolveControlCatalog(load('02-controls.tokens.json')).controls.shared.button.$extensions[EXT].construction.radius;
+  assert.equal(radius, '{base.radius.md}');
 });
 
 test('each button state directly references lower-tier ingredients and text buttons have no surface', () => {
-  const button = load('02-controls.tokens.json').controls.shared.button;
+  const button = resolveControlCatalog(load('02-controls.tokens.json')).controls.shared.button;
   const paints = button.$extensions[EXT].statePaints;
   const lowerByMode = ['dark', 'light'].map(mode => new Map([...catalog]
     .filter(([file]) => rank(file) < rank('02-controls.tokens.json') && (mode === 'light' || !file.includes('.light.')))
@@ -310,8 +310,8 @@ test('each button state directly references lower-tier ingredients and text butt
 
 
 test('chips are interactive without Success; badges remain passive', () => {
-  const shared = load('02-controls.tokens.json').controls.shared;
-  const chip = shared.chip.$extensions[EXT], badge = shared.badgeVariants.$extensions[EXT];
+  const shared = resolveControlCatalog(load('02-controls.tokens.json')).controls.shared;
+  const chip = shared.chip.$extensions[EXT], badge = shared.badge.$extensions[EXT];
   assert.deepEqual(chip.states, ['default', 'hover', 'focus', 'pressed', 'disabled']);
   assert.deepEqual(Object.keys(chip.statePaints).sort(), [...chip.states].sort());
   assert.deepEqual(chip.statePaints.hover, chip.statePaints.focus);
@@ -323,9 +323,9 @@ test('chips are interactive without Success; badges remain passive', () => {
 });
 
 test('chip and badge construction metadata references only existing lower-tier tokens', () => {
-  const shared = load('02-controls.tokens.json').controls.shared;
-  const chip = shared.chip.$extensions[EXT], badge = shared.badgeVariants.$extensions[EXT];
-  const maps = [chip.shapeRadii, ...Object.values(chip.statePaints), badge.construction, badge.shapeRadii, badge.tonePaints];
+  const shared = resolveControlCatalog(load('02-controls.tokens.json')).controls.shared;
+  const chip = shared.chip.$extensions[EXT], badge = shared.badge.$extensions[EXT];
+  const maps = [chip.shapeRadii, ...Object.values(chip.statePaints), badge.construction, badge.basePaint, badge.shapeRadii, badge.tonePaints];
   for (const mode of ['dark', 'light']) {
     const lower = new Map([...catalog]
       .filter(([file]) => rank(file) < rank('02-controls.tokens.json') && (mode === 'light' || !file.includes('.light.')))

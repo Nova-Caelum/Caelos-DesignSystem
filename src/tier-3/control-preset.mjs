@@ -1,4 +1,6 @@
-import controls from '../../token_catalog/02-controls.tokens.json' with { type: 'json' };
+import { resolveControlCatalog } from '../tier-2/control-catalog.mjs';
+import catalog from '../../token_catalog/02-controls.tokens.json' with { type: 'json' };
+const controls = resolveControlCatalog(catalog);
 import dark from '../../token_catalog/00-semantic.dark.tokens.json' with { type: 'json' };
 import { cloudStyle, tokenWriter, ref, writeCloudVars, materialPreset, materialRecipe } from '../material-preset.mjs';
 const {input, button} = controls.controls.shared;
