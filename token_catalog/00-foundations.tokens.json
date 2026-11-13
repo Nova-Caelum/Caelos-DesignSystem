@@ -2361,6 +2361,22 @@
             ]
           }
         }
+      },
+      "fraction-0-95": {
+        "$type": "number",
+        "$value": 0.95,
+        "$description": "Reusable proportion: ninety-five percent.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "Daniel \u2014 2026-11-12: glyph artwork occupies 95% of its frame; tap target is separate.",
+            "figmaName": "ratio/fraction-0-95",
+            "family": "base.ratio",
+            "formerPaths": [
+              "base.ratio.fraction-0-95"
+            ]
+          }
+        }
       }
     },
     "radius": {

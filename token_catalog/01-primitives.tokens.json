@@ -1392,6 +1392,24 @@
               "unassignedGlyphs": [
                 "Zap"
               ]
+            },
+            "artworkSizing": {
+              "coverage": "primitives.shared.icon.artwork-coverage",
+              "bounds": "visible painted vector render bounds including stroke",
+              "alignment": "center both axes",
+              "geometry": "uniform scale; restore authored stroke weights",
+              "framePolicy": "preserve existing token-bound glyph frame size",
+              "intrinsicGlyphs": [
+                "Dot"
+              ],
+              "intrinsicPolicy": "preserve artwork size; derive tight square frame as longest rendered artwork dimension / coverage",
+              "interaction": "Glyph frames are not tap targets. Control recipes own hit area and spacing.",
+              "figmaScope": {
+                "pageId": "362:4233",
+                "componentSetId": "362:4234",
+                "galleryId": "368:1160"
+              },
+              "runtimeStatus": "Figma normalization only; production icon wrapper adoption remains separate."
             }
           }
         },
@@ -1428,6 +1446,17 @@
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
+            }
+          }
+        },
+        "artwork-coverage": {
+          "$type": "number",
+          "$value": "{base.ratio.fraction-0-95}",
+          "$description": "Longest rendered artwork dimension divided by the glyph frame dimension. Includes stroke; preserves geometry proportions and source stroke weight. Not a tap-target ratio.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "decision": "Daniel — 2026-11-12: systematic glyph fit; preserve small Dot and tighten its frame."
             }
           }
         }

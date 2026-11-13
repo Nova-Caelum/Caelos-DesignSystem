@@ -1,6 +1,8 @@
 // Figma Plugin API renderer for the catalog-derived Tier 1 review sheet.
+// Evaluate glyph-fit.js first; icon generation includes fitting and measured labels.
 // Page furniture follows foundation-sheet.js. Furniture dimensions are not product tokens.
 async function renderPrimitiveCategory(category, manifest) {
+  if (category.key === 'icon' && (typeof fitGlyphGallery !== 'function' || typeof updateGlyphLabels !== 'function' || !manifest.glyphFit)) throw Error('Load glyph-fit.js and the current manifest before rendering icons');
   const page = await figma.getNodeByIdAsync(manifest.pageId);
   await figma.setCurrentPageAsync(page);
   if (page.children.some(n => n.name === 'Category / ' + category.title)) throw Error('Category already exists; inspect before replacing');
@@ -30,6 +32,7 @@ async function renderPrimitiveCategory(category, manifest) {
   function display(item,value=item.value) {
     if (value && typeof value==='object' && !Array.isArray(value)) return value.hex?value.hex.toUpperCase():value.value+' '+value.unit;
     if(Array.isArray(value))return 'cubic-bezier\n'+value.join(', ');
+    if(item.path==='primitives.shared.icon.artwork-coverage')return Number((value*100).toFixed(4))+'%';
     if(item.chain?.some(p=>p.startsWith('base.opacity.')))return Number((value*100).toFixed(4))+'%';
     return String(value);
   }
@@ -128,5 +131,15 @@ async function renderPrimitiveCategory(category, manifest) {
     const vs=row(root,group.name,group.items.length,'Tier 1 parameters → Tier 0\nPanda · see individual cards');
     for(let start=0;start<group.items.length;start+=5){const line=frame(vs,'Variant line '+(1+start/5),1380,'HORIZONTAL');line.itemSpacing=20;for(const item of group.items.slice(start,start+5))tokenCard(line,item);}
   }
-  return {id:root.id,createdNodeIds:ids,category:category.key,width:root.width,height:root.height,specimens,gaps};
+  let glyphFit = null;
+  const mutatedNodeIds = [];
+  if (category.key === 'icon') {
+    const config = {...manifest.glyphFit, galleryId:root.id,
+      coverageVariableId:variables.get(manifest.glyphFit.primitiveName).id};
+    glyphFit = await fitGlyphGallery(figma, config, true);
+    mutatedNodeIds.push(...glyphFit.mutatedNodeIds);
+    mutatedNodeIds.push(...await updateGlyphLabels(figma, config, glyphFit.results));
+  }
+  // Return failures and all affected IDs even if a fit needs correction.
+  return {id:root.id,createdNodeIds:ids,mutatedNodeIds,glyphFit,category:category.key,width:root.width,height:root.height,specimens,gaps};
 }
