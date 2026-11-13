@@ -46,6 +46,15 @@ def manifest():
     for name, reference in json.loads((ROOT / 'scripts/shared-control-legacy-aliases.json').read_text()).items():
         construction_tokens['02 Control recipes/' + name] = ingredient(reference[1:-1])
 
+    # Composer specimens are cross-tier references, not Tier 2 recipes.
+    # Name their existing lower-tier ingredients without importing product units.
+    product_units = json.loads((ROOT / 'token_catalog/05-product-units.tokens.json').read_text())
+    for _, token in leaves(product_units):
+        name = token.get('$extensions', {}).get('app.caelos', {}).get('figmaName', '')
+        reference = token['$value']
+        if name.startswith('composer/') and isinstance(reference, str) and reference.startswith('{') and reference[1:-1] in tables['dark']:
+            construction_tokens['02 Control recipes/' + name] = ingredient(reference[1:-1])
+
     # These names are emitted by src/tier-3/control-preset.mjs, not guessed aliases.
     button_css = {'foreground', 'focus-foreground', 'disabled-foreground', 'bed', 'default', 'hover', 'pressed', 'success', 'disabled-bed', 'tint', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
     field_css = {'foreground', 'hover-foreground', 'focus-glow-blur', 'focus-glow-ink', 'focus-glow-opacity'}
@@ -76,9 +85,9 @@ def manifest():
         entry['note'] = ('Partial recipe · controls.shared.button\nPanda · ' + name.lower() + 'ButtonInk() · surface paint; complete component wiring remains open' +
             '\n6 states. Hover = Focus: blue foreground + soft glow. ✓ Success: confirmed result only; resets on next edit/eligibility. No timer or click-to-reset.' +
             ('\nTranslucent violet/sage wash. Pressed: shared glass, 125% saturation in CSS. Success: sage-green label over quiet sage wash. Figma gradients are sync-derived; saturation/overlap and opaque fallback require runtime review.' if name == 'Tonal' else
-             '\nUnfilled in every state. Hover/Focus: blue glyph glow at opacity/0.5. Pressed: cream glyph glow. Success: sage-green check and label.') +
+             '\nUnfilled in every state. Hover/Focus: blue glyph glow at opacity/0.5. Pressed: cream text with blue glyph glow. Success: sage-green check and label.') +
             '\nLower-tier geometry; side padding 15px. State previews; pointer/keyboard prototype wiring unverified. Dark v1; visual approval pending.')
-    study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nRest and typing focus · muted / dim. Hover · blue field text.\nDark v1. Prototype links retained; behavior not retested.')
+    study('fields','Field','377:6498',['Form'],'Partial recipe · controls.shared.input\nPanda · '+recipes['input']+'\nRest and typing focus · muted / dim. Hover · blue field text.\nText example: Aurora is an entered value, not a placeholder. Name your project… is the empty-field hint. Focus means ready for typing, reached by click, tap or keyboard.\nDark v1. Prototype links retained; behavior not retested.')
     study('tabs','Tab','377:6625',['Appearance'],'Partial recipe · controls.shared.tabTrigger\nPanda · no complete recipe export\nDark v1 · visual approval pending. Keyboard navigation remains unverified.')
     categories['tabs']['studies'][0].update(lineAxis='Selection', summary='2 selections · 4 states each', sharedConstruction=True)
     study('chips','Chip','474:1024',['Shape'],'Partial recipe · controls.shared.chip\nDefault / Hover / Focus / Pressed / Disabled. Hover = Focus. Menu-open or toggle selection may retain Pressed; applied filter summary is separate. No Success.\nShared cloud / glass primitives; 125% saturation is runtime-only in Figma. Static state specimens; keyboard and menu wiring remain open.\nRounded / pill: filter-menu example. Circle: direct-toggle example; accessible name required.')
