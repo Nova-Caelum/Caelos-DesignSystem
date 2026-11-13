@@ -34,7 +34,9 @@ function themeVars(semantic) {
     }
     values['--caelos-material-' + kind + '-end'] = (resolve(glass[kind].tint) * resolve(glass['falloff-strength']) * 100) + '%';
   }
-  for (const name of ['ink', 'line', 'pitch', 'opacity']) add('graph-' + name, graph[name], name === 'opacity');
+  for (const name of ['ink', 'dot-size', 'pitch', 'opacity']) add('graph-' + name, graph[name], name === 'opacity');
+  // A circle's CSS radius is derived from the catalog diameter, never authored independently.
+  values['--caelos-material-graph-dot-radius'] = resolve(graph['dot-size']).replace(/[\d.]+/, diameter => Number(diameter) / 2);
   for (const [name, token] of Object.entries(surface.layer)) {
     // Only ground has an approved light layer; use the light material body for open layers.
     add('layer-' + name, semantic.sys.color[name] ? token : glass.body);
@@ -53,10 +55,10 @@ export function writeCloudVars(group, tokens, {values, add}) {
 const mix = (ink, amount) => `color-mix(in srgb, ${ink} ${amount}, transparent)`;
 const layerInk = 'var(--caelos-surface-layer)';
 const plain = { backgroundColor: layerInk, backgroundImage: 'none', backdropFilter: 'none' };
-const lineInk = mix(ref('graph-ink'), ref('graph-opacity'));
-const rule = `${lineInk} ${ref('graph-line')}, transparent ${ref('graph-line')}`;
+const dotInk = mix(ref('graph-ink'), ref('graph-opacity'));
+const dot = `${dotInk} ${ref('graph-dot-radius')}, transparent ${ref('graph-dot-radius')}`;
 const grid = {
-  ...plain, backgroundImage: `linear-gradient(to right, ${rule}), linear-gradient(to bottom, ${rule})`,
+  ...plain, backgroundImage: `radial-gradient(circle, ${dot})`,
   backgroundSize: `${ref('graph-pitch')} ${ref('graph-pitch')}`,
 };
 const opaque = (fill) => ({ backgroundColor: fill, backgroundImage: 'none', backdropFilter: 'none' });
