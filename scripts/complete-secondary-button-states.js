@@ -35,6 +35,7 @@ async function completeSecondaryButtonStates(figma, manifest) {
         const label=component.children.find(n=>n.type==='TEXT');
         label.characters=state==='Success'?'✓ Success':style==='Tonal'?'Save changes':'Save';
         label.fills=[solid('foreground')];label.effects=[];
+        label.textDecoration=(manifest.buttonStateDecorations[style.toLowerCase()]?.[state.toLowerCase()] ?? 'none').toUpperCase();
         component.effects=[];component.strokes=[];component.fills=[];
         // Previews are intentionally static: a click cannot imply confirmed success.
         await component.setReactionsAsync([]);

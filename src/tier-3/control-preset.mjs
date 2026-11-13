@@ -84,7 +84,7 @@ export const tonalButtonInkRecipe = { className: 'caelos-tonal-button-ink', base
 export const textButtonInkRecipe = { className: 'caelos-text-button-ink', base: {
   color: stateRole('text','default')('foreground'), background: 'transparent', boxShadow: 'none', textShadow: 'none',
   [engaged]: {color: stateRole('text','hover')('foreground'), textShadow: textGlow('hover')},
-  [pressed]: {color: stateRole('text','pressed')('foreground'), textShadow: textGlow('pressed')},
+  [pressed]: {color: stateRole('text','pressed')('foreground'), textShadow: 'none', textDecorationLine: button.$extensions['app.caelos'].stateDecorations.text.pressed},
   [succeeded]: {color: stateRole('text','success')('foreground'), textShadow: 'none'},
   '&:disabled': {color: stateRole('text','disabled')('foreground'), textShadow: 'none'},
 } };
