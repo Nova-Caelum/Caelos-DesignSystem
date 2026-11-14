@@ -1,8 +1,30 @@
 # Loading selection — Tier 2
 
-Daniel selected four visual studies for the Tier 2 loading repertoire and retained Helix provisionally. This is a visual selection, not approval of production recipes or historical source values. No loader is assigned to a product action yet.
+Daniel selected **nova-horizonloader**, the single-ring Quiet Horizon, as the general-purpose spinner. Four additional visual studies remain selected and Helix remains provisional. These selections do not establish production readiness; no application consumer is wired by this change.
 
-## Active gallery
+## General-purpose spinner: nova-horizonloader
+
+On **Tier 2 · Controls (Clean)**, page `377:6179`:
+
+- [Review board](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=615-1040): static default and reduced-motion samples aligned by size.
+- [Reusable component set](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=615-1027): six variants, 16 / 24 / 40px × default / reduced motion. Native components are static design references.
+- [Adjustable live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=616-1028&autoplay-code-preview=616-1028): imported runnable study with duration, pause/play, and reset controls. Playback inside Figma still needs a signed-in reviewer to verify it.
+
+The outer contour flows around a fixed open center; the whole ring does not rotate. Geometry is preserved from the private brand-library source `quiet-horizon-loader-small-size.html`, including its 200 × 200 viewBox. The 16 / 24 / 40px sizes are frame dimensions, not visible-ink bounds; no optical normalization was applied. Reduced motion shows a still ring with adjacent loading text. Triad remains a draft, not part of this component.
+
+The catalog group is `controls.shared.nova-horizonloader`. Its configurable values reference lower tiers:
+
+| Property | Foundation or semantic reference | Resolved value |
+| --- | --- | --- |
+| Size 16px | `base.size.px-16` | 16px |
+| Size 24px | `base.space.px-24` | 24px; existing dimension reused |
+| Size 40px | `base.size.px-40` | 40px |
+| Ink | `sys.color.text-primary` | Dawn Cream, `#EDE3CF` |
+| Cycle duration | `base.motion.duration.ms-4800` | 4800ms, provisional |
+
+The duration is added to the foundation catalog as provisional, recovered from the source and adjustable in the preview. Daniel selected the loader concept and its general-purpose role; the new size samples, palette adaptation, and speed have not received rendered-review signoff. Source ink `#F0DEC8` is aligned to the approved Dawn Cream token. Size, ink, and duration aliases remain provisional pending Daniel's review. There is no published Panda recipe or generated CSS variable for this loader yet.
+
+## Additional loading studies
 
 Open [Loading · 4 selected + Helix provisional · Live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `602:405`. Start the code-layer preview to see all five studies together. Pause stops the animations; reduced-motion preference freezes them.
 
@@ -29,13 +51,19 @@ The catalog record is [02-controls.tokens.json](token_catalog/02-controls.tokens
 
 This is a selection record in [Nova-Caelum/Caelos-DesignSystem](https://github.com/Nova-Caelum/Caelos-DesignSystem), not a ready-to-build specification. Follow [AGENTS.md](AGENTS.md), [catalog conventions](token_catalog/README.md), and the approved [foundation](token_catalog/00-foundations.tokens.json) and [primitive](token_catalog/01-primitives.tokens.json) catalogs. Helix is included for comparison only; its final approval remains with Daniel.
 
-The implementing agent must ask Daniel to assign the selected animations to concrete uses, then rebuild those recipes using approved lower-tier tokens. Do not promote historical preview colors, sizes, easing, or durations into foundations automatically. Preserve the reviewed effect while making its construction explicit. Implement the composer sending variant and asynchronous loading/completion/error behavior, prevent duplicate submission where appropriate, and review reduced-motion behavior. Neither a click nor a timer proves successful completion.
+The general-purpose spinner role is assigned to nova-horizonloader. Ask Daniel to assign the additional studies and the composer send indicator to concrete uses, then rebuild the production recipes using approved lower-tier tokens. Do not promote historical preview colors, sizes, easing, or durations into foundations automatically. Preserve the reviewed effect while making its construction explicit. Implement the composer sending variant and asynchronous loading/completion/error behavior, prevent duplicate submission where appropriate, and review reduced-motion behavior. Neither a click nor a timer proves successful completion.
 
-Recipe implementation and action assignments remain a separate task; this change only curates the previews and records the decisions.
+Production recipes and consumer integration remain separate work. The catalog and native Figma references document construction; the private runnable studies are not production components.
 
 Formal Tier 2 completion still requires Daniel's rendered-tier signoff and deployed drift checks proven with clean cases and planted violations. This selection does not establish either requirement for the new loading recipes. Existing unimplemented loader inventory entries remain open rather than being silently marked complete. The existing enforcement and proof entry points are [check-tier-drift.cjs](scripts/check-tier-drift.cjs), [prove-tier-drift.mjs](scripts/prove-tier-drift.mjs), and the [pre-commit hook](.husky/pre-commit).
 
 ## Evidence and limits
+
+For nova-horizonloader, the native board was exported and visually reviewed; its six variants and Figma variable aliases were inspected. Nine checks on the exact imported script in a mocked DOM passed: changing contour with fixed center, pause, resume, duration change without a phase jump, invalid-duration rejection, reset, reduced-motion freeze even after Play, hidden-document pause, and stopping after removal. These are script checks, not browser rendering or Figma playback proof. The anonymous Figma viewer did not expose runnable playback, so **Figma playback remains unverified**. Daniel can perform that visual review in signed-in Figma: launch the preview and inspect motion at all three sizes, duration changes, pause, and reduced motion. The implementing agent should record the observed results here and in `loadingReview.quietHorizon`, with the decision posted to the Supabase worklog.
+
+Private Quiet Horizon evidence filenames: `nova-horizonloader-review.html`, `nova-horizonloader-provenance.json`, and `nova-horizonloader-figma.png`.
+
+The following evidence applies only to the five-study gallery, not to nova-horizonloader:
 
 Local Chromium checks observed changing animation in all five studies, pause behavior, reduced-motion freezing after browser style updates settled, a fitting 390px viewport, and no page errors. The local screenshot was visually reviewed. These checks do not constitute an accessibility or production audit.
 
