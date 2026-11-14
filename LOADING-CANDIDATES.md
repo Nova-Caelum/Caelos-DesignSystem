@@ -24,6 +24,18 @@ The catalog group is `controls.shared.nova-horizonloader`. Its configurable valu
 
 The duration is added to the foundation catalog as provisional, recovered from the source and adjustable in the preview. Daniel selected the loader concept and its general-purpose role; the new size samples, palette adaptation, and speed have not received rendered-review signoff. The source’s off-palette ink is replaced with the approved Dawn Cream token; the original remains documented in the source HTML. Size, ink, and duration aliases remain provisional pending Daniel's review. There is no published Panda recipe or generated CSS variable for this loader yet.
 
+## Draft comparison: three filled Horizons
+
+[Three tiny Horizons — live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=623-1028&autoplay-code-preview=623-1028) is on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `623:1028`, below the single-ring preview. This is an unapproved experiment, not a replacement for either selected loader or a new catalog recipe.
+
+The Quiet Horizon outer contour is filled with no center hole. A fixed envelope sampled across 720 contour phases normalizes the sampled contour envelope to 8px, matching the diameter of study 06's circular dots. This measures geometry before the pulse lift, not browser-rendered pixels or an analytic bound between samples. Three 8px frames use 6px edge-to-edge gaps; the visible contour gaps vary as the shapes flow and the source three-dot pulse: 1.2s ease-in-out, delays of 0 / 0.16 / 0.32s, opacity 0.23 to 1, and a 2px lift at 40%. These are recovered study settings, not newly approved foundation tokens. All three contours share the existing 4.8s Horizon flow; their pulse is staggered.
+
+The preview includes actual size, a 6× inspection view, and an original circular-dot comparison. Both comparisons use Dawn Cream to isolate the shape difference; this changes the comparison's ink from the original 06 study. Controls pause motion, disable contour flow to compare pulse alone, and request reduced motion. Operating-system reduced motion also freezes the animation and cannot be overridden by the manual control.
+
+Eleven checks of the imported script in a mocked DOM passed: shape count, filled closed paths, sampled 8px bounds, changing contour, pause, resume, contour-only freeze, system reduced-motion freeze, respecting that preference after a manual toggle, hidden-document pause, and preservation of the pulse parameters. These checks do not verify rendered appearance. Figma import and placement were read back successfully; browser rendering and **Figma playback remain unverified**. Daniel can open the runnable preview in signed-in Figma to judge the tiny shapes and their combined movement before selecting this experiment.
+
+Private evidence (request from Daniel) filename: `nova-horizon-three-dot-review.html`; SHA-256: `59cb0493a6d851d16184f1046a48810047380474a31a938f342c93df552abbf1`. The source remains private evidence rather than a production component distributed by this repository.
+
 ## Additional loading studies
 
 Open [Loading · 4 selected + Helix provisional · Live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `602:405`. Start the code-layer preview to see all five studies together. Pause stops the animations; reduced-motion preference freezes them.
