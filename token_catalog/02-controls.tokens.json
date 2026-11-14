@@ -145,7 +145,7 @@
           }
         },
         "loadingReview": {
-          "status": "recovered-unassigned",
+          "status": "unassigned",
           "inventory": "LOADING-CANDIDATES.md",
           "figmaPageId": "377:6179",
           "figmaNodeId": "555:1016",
@@ -163,11 +163,47 @@
             "particle-card-reveal-calm",
             "orbs-v1",
             "orbs-v2",
-            "orbs-v3"
+            "orbs-v3",
+            "text-loading"
           ],
           "figmaPlayback": "unverified",
           "productionReady": false,
-          "note": "Review-only recovered animations. No loader selected for a product action; no new foundational values or production recipes approved."
+          "note": "Review-only recovered animations plus a new text-loading adaptation. No loader selected for a product action; no new foundational values or production recipes approved.",
+          "supplementaryPreviews": [
+            {
+              "candidateId": "text-loading",
+              "status": "proposed-unassigned",
+              "variants": [
+                "fade",
+                "lift"
+              ],
+              "figmaNodeId": "570:1016",
+              "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=570-1016&autoplay-code-preview=570-1016",
+              "foundationRefs": {
+                "ground": "base.color.ground",
+                "surface": "base.color.elevated",
+                "text": "base.color.text-primary",
+                "muted": "base.color.text-supporting",
+                "blue": "base.color.action-blue-hover",
+                "radius": "base.radius.md",
+                "gap": "base.space.px-24",
+                "inset": "base.space.px-30",
+                "small": "base.type.size.px-14",
+                "body": "base.type.size.px-16",
+                "title": "base.type.size.px-28",
+                "label": "base.type.size.px-20",
+                "duration": "base.motion.duration.ms-1800",
+                "stagger": "base.motion.duration.ms-60",
+                "lift": "base.space.px-2",
+                "low": "base.opacity.fraction-0-55",
+                "high": "base.opacity.fraction-1"
+              },
+              "provisionalEasing": "Continuous easing from canonical Linear motion guidance; not an approved foundation token. See LOADING-CANDIDATES.md.",
+              "previewSha256": "6476b7e1f3a562b2ed017c8deb256109631ae3cc0f3c1b9a2478c94cb55b9372",
+              "figmaPlayback": "unverified",
+              "productionReady": false
+            }
+          ]
         }
       }
     },

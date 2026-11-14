@@ -1,6 +1,6 @@
 # Loading candidates — Tier 2 review
 
-These are recovered animation studies for Daniel to compare, not approved loading recipes. No candidate has been assigned to a product action. Existing loader entries stay open; the review adds no foundation tokens or production implementations.
+These are recovered and newly adapted animation studies for Daniel to compare, not approved loading recipes. No candidate has been assigned to a product action. Existing loader entries stay open; the review adds no foundation tokens or production implementations.
 
 ## Open the review
 
@@ -8,11 +8,30 @@ These are recovered animation studies for Daniel to compare, not approved loadin
 
 Start the code-layer preview in an authenticated Figma session. Choose **Compact**, **Artifacts**, or **Orbs**. Compact shows seven candidates together; Artifacts and Orbs each offer three studies, one at a time. **Stop previews** removes the running previews; **Play previews** restarts them from the beginning. Switching collections removes hidden animations. Reduced-motion preference starts the review stopped; playing is an explicit opt-in.
 
-Review appearance and interaction first. Send candidate IDs and proposed uses in the design-review conversation. For an orb sub-example, include the collection ID plus its visible tab/example label (or a screenshot). Daniel explicitly approves selections; the implementing agent then records that decision in the Supabase worklog and updates the catalog. Merely opening or playing a study is not approval. Only after selection should a separate implementation rebuild the chosen behavior from approved lower-tier tokens, cover loading/success/error and reduced motion, and verify real asynchronous completion. Historical source values in this preview are not additions to the token system.
+Review appearance and interaction first. Send candidate IDs and proposed uses to Daniel in the active design-review chat. For the text family, identify `text-loading` plus variant `fade` or `lift`. For an orb sub-example, include the collection ID plus its visible tab/example label (or a screenshot). Daniel explicitly approves selections; the implementing agent then records that decision in the Supabase worklog and updates the catalog. Merely opening or playing a study is not approval. Only after selection should a separate implementation rebuild the chosen behavior from approved lower-tier tokens, cover loading/success/error and reduced motion, and verify real asynchronous completion. Historical source values in this preview are not additions to the token system.
+
+## Text loading: fade and gentle lift
+
+[Figma: Text loading · fade and lift · not approved](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=570-1016&autoplay-code-preview=570-1016), below the original loader review on the same page. Code layer `570:1016`.
+
+Candidate `text-loading` has two side-by-side variants: `fade` passes an opacity wave through the letters; `lift` adds a gentle vertical wave. Choose **Thinking…**, **Generating…**, or **Loading…**, then use **Pause motion / Resume motion**. Reduced motion stops both automatically and displays static, fully opaque labels; it also disables the motion toggle. This differs from the older gallery's explicit opt-in behavior.
+
+This is an original adaptation inspired by the saved Text Shimmer Wave example and [Motion Primitives' Text Shimmer](https://motion-primitives.com/docs/text-shimmer), not a recovered exact animation. Only opacity and transform animate. The preview uses resolved foundation values at generation time, not live Figma variable bindings. Its private source manifest maps all 17 reused foundation references; `token_catalog/02-controls.tokens.json` → `controls.$extensions.app.caelos.loadingReview.supplementaryPreviews` mirrors that complete map.
+
+| Animation parameter | Foundation reference | Resolved value |
+| --- | --- | --- |
+| Cycle | `base.motion.duration.ms-1800` | 1800ms |
+| Letter delay | `base.motion.duration.ms-60` | 60ms |
+| Lift | `base.space.px-2` | 2px |
+| Dim / full opacity | `base.opacity.fraction-0-55` / `base.opacity.fraction-1` | 55% / 100% |
+
+Continuous easing `cubic-bezier(.645,.045,.355,1)` follows the canonical Linear motion guidance but is **provisional here**, not a new approved foundation token. The preview shell contains local layout values and is not a production recipe. Caelum Sans is requested but not bundled, so a system font may appear.
+
+Local Chromium checks passed for changing opacity and lift, pause/resume (including keyboard activation), label changes, live and startup reduced motion, restoring the operating-system motion preference, and no horizontal overflow at 390px. Animated letters are hidden from accessibility APIs and the whole label is exposed as one status. No page errors were observed. This is not a full accessibility audit. The local screenshot was visually reviewed. Figma import and placement succeeded; **Figma playback is unverified**. While signed in, start this code layer and repeat label selection, pause/resume, and reduced-motion checks before accepting its Figma behavior. On macOS, toggle System Settings → Accessibility → Display → Reduce motion while the preview runs; also reload with it enabled, then disable it to check motion resumes. Request the private evidence filenames below from Daniel; they are intentionally not public repository paths.
 
 ## Inventory
 
-There are **13 review entries**: seven compact loaders, three artifact studies, and three orb collections. Each orb collection contains further internal examples; 13 is not the count of individual animations.
+There are **14 review entries**: seven compact loaders, three artifact studies, three orb collections, and one text-loading family with two variants. Each orb collection contains further internal examples; 14 is not the count of individual animations.
 
 | Candidate ID | Visible name | Collection |
 | --- | --- | --- |
@@ -29,11 +48,12 @@ There are **13 review entries**: seven compact loaders, three artifact studies, 
 | `orbs-v1` | Particle orbs · v1 | Orbs |
 | `orbs-v2` | Particle orbs · v2 | Orbs |
 | `orbs-v3` | Particle orbs · v3 | Orbs |
+| `text-loading` | Fade / gentle lift | Text (separate code layer) |
 
 ## Recovery and verification limits
 
 - The exact three-dot typing/ripple loader remembered from v0 is still missing. The four-dot study is a separate candidate, not a substitute or a claimed match.
-- Morph, helix, double-beam outline, and text-shimmer sources were located but are not runnable entries in this review. Their dependencies and behavior still need recovery. Additional motion-registry material was inaccessible without authentication.
+- Morph, helix, and double-beam outline sources were located but are not runnable entries in this review. Their dependencies and behavior still need recovery. The saved text-shimmer example inspired the new text-loading adaptation above; its exact historical implementation has not been restored. Additional motion-registry material was inaccessible without authentication.
 - Compact entries came from an earlier loader gallery; artifact and orb entries came from recovered reference previews. Original styling and motion remain historical. Orb scripts were inlined and an obsolete comparison link was replaced with collection navigation guidance.
 - Local Chromium checks observed compact motion, stop/restart, artifact canvas and its materialize control, and v3 orb motion, pause, speed selection, and reduced-motion startup. No page errors were observed during those checks. Screenshots of the three collections were visually reviewed. This is not exhaustive verification of every study or interaction.
 - Figma import succeeded and the code layer was located. **Playback inside Figma remains unverified** because the available browser session was signed out. The next acceptance check, while signed in, is to observe compact animation, stop and restart it, switch to Artifacts and Orbs, and exercise v3 orb pause and speed selection. Also reload with reduced motion enabled and confirm previews start stopped. Record which checks actually ran and any failures; import success alone is not playback evidence.
@@ -60,3 +80,5 @@ Preview HTML SHA-256: `82df814d3bde51627ed215a16002e0a23da03778242b9031dd4c0c22f
 | `orbs-v1` | `dd71291bb44b1755efd048f465428c42c09d339abeced21defa2d75ce6f77d81` |
 | `orbs-v2` | `5ec1d20e2406e9672fa3adcd3bdbf3c756f730329e0a42119fa507eb3d6731d4` |
 | `orbs-v3` | `0932809c13a4a60ae18591f913323a2ebf76b2ca9ed50e32b550ba95192e011b` |
+
+The separate text preview is retained privately as `text-loader-review-20261113.html`, with `text-loader-review-20261113.sources.json`, `text-loader-verification.json`, and `text-loader-review.png`. Its HTML SHA-256 is `6476b7e1f3a562b2ed017c8deb256109631ae3cc0f3c1b9a2478c94cb55b9372`. The manifest records resolved foundation references, provisional easing, and the font limitation.
