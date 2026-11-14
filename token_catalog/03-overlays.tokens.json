@@ -10,7 +10,622 @@
             "ref": "D38",
             "why": "One shared role for drawer and sidebar; duration and curve undecided."
           }
-        ]
+        ],
+        "review": {
+          "version": 1,
+          "source": {
+            "repository": "Nova-Caelum/Caelos_staging",
+            "branch": "novacaelum-caelos-fusion",
+            "commit": "be3aec0ccf597141020bea35e6f4cbb3b982a012"
+          },
+          "scope": "Review catalog only; source wrappers are evidence, not approved implementation.",
+          "theme": "Dark v1; light retained as an unverified dependency.",
+          "tierSignoff": "pending Daniel rendered-page approval and live drift-prevention edge-case proof",
+          "sharedMaterial": "Unified glass uses primitives.shared.glass: saturation 125%, adaptive overlap blur/opacity. Figma cannot prove backdrop saturation or overlap behavior. Texture direction is Dots.",
+          "sharedControls": "Use lower-tier shared controls. Hover/Focus: Hover Blue with soft shape-following glow; Pressed: Ready Blue. Success only after a completed operation. Disabled controls remain visible and noninteractive.",
+          "carryForward": "Tier 2 recipes and prototype playback remain incomplete. Composer send loading is required but not implemented. Tabs remain Tier 2; FusionCards remain Tier 4; action bar remains draft.",
+          "categories": [
+            {
+              "key": "tooltip",
+              "title": "Tooltip",
+              "families": [
+                "tooltip"
+              ]
+            },
+            {
+              "key": "popover",
+              "title": "Popover",
+              "families": [
+                "popover",
+                "hover-card"
+              ]
+            },
+            {
+              "key": "menus",
+              "title": "Menus",
+              "families": [
+                "action-menu",
+                "context-menu",
+                "select-menu"
+              ]
+            },
+            {
+              "key": "dialog",
+              "title": "Dialog",
+              "families": [
+                "dialog",
+                "alert-dialog"
+              ]
+            },
+            {
+              "key": "drawer",
+              "title": "Drawer",
+              "families": [
+                "drawer"
+              ]
+            },
+            {
+              "key": "feedback",
+              "title": "Toast & Notification",
+              "families": [
+                "toast",
+                "notification"
+              ]
+            },
+            {
+              "key": "alert",
+              "title": "Alert",
+              "families": [
+                "alert"
+              ]
+            }
+          ],
+          "families": [
+            {
+              "key": "tooltip",
+              "title": "Tooltip",
+              "use": "Explain a trigger; default text and path details.",
+              "members": [
+                "overlays.shared.tooltip",
+                "overlays.shared.Tooltip",
+                "overlays.shared.TooltipTrigger",
+                "overlays.chat.Hint"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/components.tsx"
+              ],
+              "variants": [
+                "Default",
+                "Path",
+                "Open / closed",
+                "Disabled trigger",
+                "Opaque fallback"
+              ],
+              "construction": [
+                "overlays.shared.tooltip"
+              ],
+              "decisions": [
+                "D30"
+              ],
+              "openDependencies": [
+                "Text size, line-height and edge ink selection",
+                "Trigger delay and placement offset tokens",
+                "Light ink and opaque fallback mapping"
+              ],
+              "behavior": {
+                "anchoring": "Source: Radix portal, side and collision handling. Offset choices remain open.",
+                "opening": "Source: controlled open and trigger; disabled returns children.",
+                "outsideDismiss": "Dismiss policy delegated to Radix; verify pointer transitions.",
+                "escape": "D30 requires Escape dismissal.",
+                "focus": "Required: keyboard-triggered hint without a focus trap.",
+                "scrollAndClipping": "Required: collision avoidance and long-path wrapping.",
+                "reducedMotion": "D30: quiet appearance; no sheen. Motion playback unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "popover",
+              "title": "Popover",
+              "use": "Anchored interactive content with its own dismiss actions.",
+              "members": [
+                "overlays.shared.PopoverRoot",
+                "overlays.shared.popover-PopoverTrigger",
+                "overlays.shared.PopoverAnchor",
+                "overlays.shared.Popover",
+                "overlays.shared.foundation-PopoverTrigger",
+                "overlays.shared.PopoverClose"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/foundation.tsx",
+                "components/ui/popover.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Top / bottom",
+                "Start / center / end",
+                "Overflow",
+                "Disabled trigger"
+              ],
+              "construction": [
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D13",
+                "D33"
+              ],
+              "openDependencies": [
+                "Surface radius, type, padding and maximum dimensions",
+                "Anchor offsets and collision padding aliases",
+                "Modal versus nonmodal policy"
+              ],
+              "behavior": {
+                "anchoring": "Source: Radix anchor/trigger and portal. Host owns viewport placement.",
+                "opening": "Source: Root / Trigger / Close wrappers.",
+                "outsideDismiss": "Radix defaults; required runtime verification.",
+                "escape": "Radix defaults; required runtime verification.",
+                "focus": "Modal choice and return target remain open.",
+                "scrollAndClipping": "Required: collision avoidance and clipping under nested scroll.",
+                "reducedMotion": "D33 motion intent; reduced-motion alternative remains unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "hover-card",
+              "title": "HoverCard",
+              "use": "Preview related information from a hoverable trigger.",
+              "members": [
+                "overlays.shared.HoverCard",
+                "overlays.shared.HoverCardTrigger"
+              ],
+              "sourceFiles": [
+                "components/ui/hover-card.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Hover / focus",
+                "Collision flip",
+                "Long content"
+              ],
+              "construction": [],
+              "decisions": [],
+              "openDependencies": [
+                "Delay, interactive-content policy and keyboard parity",
+                "Width, padding, radius and type selections"
+              ],
+              "behavior": {
+                "anchoring": "Source: Radix HoverCard portal; aligned to trigger.",
+                "opening": "Source: Root / Trigger; delays use dependency defaults.",
+                "outsideDismiss": "Pointer-leave behavior delegated to Radix.",
+                "escape": "Dismissal behavior unverified.",
+                "focus": "Required: accessible equivalent for keyboard and touch.",
+                "scrollAndClipping": "Required: collision and viewport clipping checks.",
+                "reducedMotion": "Required: lower-tier reduced-motion treatment."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "action-menu",
+              "title": "Action Menu",
+              "use": "Execute commands; preserve action semantics.",
+              "members": [
+                "overlays.shared.menu",
+                "overlays.shared.DropdownMenu",
+                "overlays.shared.DropdownMenuPortal",
+                "overlays.shared.DropdownMenuTrigger",
+                "overlays.shared.DropdownMenuGroup",
+                "overlays.shared.DropdownMenuRadioGroup",
+                "overlays.shared.DropdownMenuSub",
+                "overlays.shared.ActionMenuRoot",
+                "overlays.shared.ActionMenuTrigger"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/components.tsx",
+                "packages/ui/src/overlays.tsx"
+              ],
+              "variants": [
+                "Open / closed",
+                "Hover / focus",
+                "Disabled",
+                "Checkbox / indeterminate",
+                "Submenu"
+              ],
+              "construction": [
+                "overlays.shared.menu",
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D33"
+              ],
+              "openDependencies": [
+                "Item geometry, type, separators and focus treatment",
+                "Placement offsets and submenu geometry",
+                "Open/close curve approval independent of Composer"
+              ],
+              "behavior": {
+                "anchoring": "Source: Dropdown portal, side/align/collision options.",
+                "opening": "Source: trigger opens; item onSelect invokes command.",
+                "outsideDismiss": "Radix defaults; runtime unverified.",
+                "escape": "Required: close active menu and return focus; unverified.",
+                "focus": "Required: roving keyboard focus, disabled skipping and return.",
+                "scrollAndClipping": "Required: nested scroll, edge collision and submenu checks.",
+                "reducedMotion": "D33: side-aware emerge/retreat; reduced-motion playback unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "context-menu",
+              "title": "Context Menu",
+              "use": "Commands for a target; pointer and keyboard invocation.",
+              "members": [
+                "overlays.shared.contextMenu",
+                "overlays.shared.TargetContextMenu",
+                "overlays.shared.ContextMenu",
+                "overlays.shared.ContextMenuTrigger"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/overlays.tsx",
+                "packages/ui/src/context-menu-recipe.ts"
+              ],
+              "variants": [
+                "Pointer / keyboard",
+                "Seven target kinds",
+                "Open / closed",
+                "Disabled",
+                "Submenu"
+              ],
+              "construction": [
+                "overlays.shared.contextMenu",
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D33"
+              ],
+              "openDependencies": [
+                "Target-specific content contracts",
+                "Item dimensions and focus treatment",
+                "Open/close curve approval independent of Composer"
+              ],
+              "behavior": {
+                "anchoring": "Source: contextual pointer origin; keyboard anchors to target bounds.",
+                "opening": "Source: ContextMenu or Shift+F10; disabled forwarded.",
+                "outsideDismiss": "Radix defaults; runtime unverified.",
+                "escape": "Required: close menu and restore target focus; unverified.",
+                "focus": "Required: roving focus and keyboard invocation parity.",
+                "scrollAndClipping": "Source: portal and collision padding; scrolling tests outstanding.",
+                "reducedMotion": "D33 motion intent; reduced-motion playback unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "select-menu",
+              "title": "Select Menu",
+              "use": "Choose a single value without shifting the page.",
+              "members": [
+                "overlays.shared.SelectMenu"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/components.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Selected radio item",
+                "Hover / focus",
+                "Disabled",
+                "Long option list"
+              ],
+              "construction": [
+                "overlays.shared.menu",
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D33",
+                "D58"
+              ],
+              "openDependencies": [
+                "Selected indicator, item geometry and field/menu composition",
+                "Placement offsets and maximum height aliases"
+              ],
+              "behavior": {
+                "anchoring": "Source: Dropdown portal anchored to boxed trigger.",
+                "opening": "Source: click toggles local open; RadioGroup onValueChange.",
+                "outsideDismiss": "Radix defaults; runtime unverified.",
+                "escape": "Required: close without changing value; unverified.",
+                "focus": "Required: selected radio focus, arrows, disabled skipping and return.",
+                "scrollAndClipping": "D58 requires no page shift; overflow and clipping unverified.",
+                "reducedMotion": "D33 motion intent; reduced-motion playback unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "dialog",
+              "title": "Dialog",
+              "use": "A focused task with a title, body and actions.",
+              "members": [
+                "overlays.shared.overlay",
+                "overlays.shared.dialog-Dialog",
+                "overlays.shared.DialogTrigger",
+                "overlays.shared.DialogPortal",
+                "overlays.shared.DialogClose",
+                "overlays.shared.overlays-Dialog"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/overlays.tsx",
+                "components/ui/dialog.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Initial focus",
+                "Long body",
+                "Nested overlay",
+                "Opaque fallback"
+              ],
+              "construction": [
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D13"
+              ],
+              "openDependencies": [
+                "Width, padding, radius, backdrop and typography",
+                "Dismiss policy for pending or destructive work",
+                "Modal stacking and z-order selections"
+              ],
+              "behavior": {
+                "anchoring": "Source: portal overlay with dialog placement.",
+                "opening": "Source: controlled open/onOpenChange and explicit close.",
+                "outsideDismiss": "Radix defaults; product-specific policy remains open.",
+                "escape": "Source: onEscapeKeyDown is forwarded.",
+                "focus": "Source: supplied initial ref, editable control or named content; supplied return ref or prior connected focus. Trap delegated to Radix; unverified.",
+                "scrollAndClipping": "Source: ScrollArea body. Nested overflow and background lock unverified.",
+                "reducedMotion": "Required: lower-tier motion and reduced-motion treatment."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "alert-dialog",
+              "title": "AlertDialog",
+              "use": "A blocking confirmation requiring an explicit decision.",
+              "members": [
+                "overlays.shared.AlertDialog",
+                "overlays.shared.AlertDialogTrigger",
+                "overlays.shared.AlertDialogPortal",
+                "overlays.shared.AlertDialogHeader",
+                "overlays.shared.AlertDialogFooter",
+                "overlays.shared.AlertDialogMedia",
+                "overlays.shared.AlertDialogDescription",
+                "overlays.shared.AlertDialogAction",
+                "overlays.shared.AlertDialogCancel"
+              ],
+              "sourceFiles": [
+                "components/ui/alert-dialog.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Action / cancel",
+                "Pending action",
+                "Disabled action",
+                "Long message"
+              ],
+              "construction": [],
+              "decisions": [],
+              "openDependencies": [
+                "Confirmation geometry and lower-tier control selection",
+                "Initial safe focus and destructive-action policy",
+                "Content, overlay and title wrapper inventory remains incomplete"
+              ],
+              "behavior": {
+                "anchoring": "Source: Radix AlertDialog portal with backdrop.",
+                "opening": "Source: Trigger, Action and Cancel wrappers.",
+                "outsideDismiss": "Required: explicit decision; default behavior must be verified.",
+                "escape": "Escape and cancellation policy require runtime verification.",
+                "focus": "Required: safe initial focus, trap and return; delegated defaults unverified.",
+                "scrollAndClipping": "Source: overflow-y content. Background lock unverified.",
+                "reducedMotion": "Required: lower-tier motion and reduced-motion treatment."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "drawer",
+              "title": "Drawer",
+              "use": "A side panel that supports a focused task.",
+              "members": [
+                "overlays.shared.Drawer",
+                "overlays.shared.Sheet",
+                "overlays.shared.SheetTrigger",
+                "overlays.shared.SheetClose",
+                "overlays.shared.SheetPortal"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/overlays.tsx",
+                "components/ui/sheet.tsx"
+              ],
+              "variants": [
+                "Closed / open",
+                "Resize",
+                "Long body",
+                "Nested overlay",
+                "Opaque fallback"
+              ],
+              "construction": [
+                "primitives.shared.glass"
+              ],
+              "decisions": [
+                "D38"
+              ],
+              "openDependencies": [
+                "Shared panel-slide duration and curve",
+                "Width, resize bounds, breakpoint, padding and radius",
+                "Sheet-side inventory versus right-side wrapper policy"
+              ],
+              "behavior": {
+                "anchoring": "Source: Drawer uses right-side OverlaySurface; Sheet remains a separate source wrapper.",
+                "opening": "Source: controlled open/onOpenChange and explicit close.",
+                "outsideDismiss": "Radix defaults; product-specific policy remains open.",
+                "escape": "Source: shared OverlaySurface Escape callback.",
+                "focus": "Source: shared Dialog initial/return focus; trap delegated, unverified.",
+                "scrollAndClipping": "Source: ScrollArea body; resize and small viewport behavior unverified.",
+                "reducedMotion": "D38 panel-slide duration/curve undecided; reduced-motion treatment open."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "toast",
+              "title": "Toast",
+              "use": "Transient feedback for an operation or event.",
+              "members": [
+                "overlays.shared.Toaster"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/foundation.tsx"
+              ],
+              "variants": [
+                "Loading",
+                "Success",
+                "Error",
+                "Action",
+                "Dismissed"
+              ],
+              "construction": [],
+              "decisions": [],
+              "openDependencies": [
+                "Placement, stacking, lifetime and pause policy",
+                "Live-region priority and focus-safe actions",
+                "Lower-tier geometry, type and motion selections"
+              ],
+              "behavior": {
+                "anchoring": "Source: Sonner Toaster; placement defaults not approved.",
+                "opening": "Source: shared toast export; loading renderer exists.",
+                "outsideDismiss": "Outside click is not a dismissal contract; policy open.",
+                "escape": "Keyboard dismissal policy open.",
+                "focus": "Required: announcements without stealing focus; action access unverified.",
+                "scrollAndClipping": "Required: queue, stacking, safe-area and viewport checks.",
+                "reducedMotion": "Required: reduced-motion entry/exit and progress alternative."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "notification",
+              "title": "Notification",
+              "use": "Persistent inbox and expandable feedback with actions.",
+              "members": [
+                "overlays.shared.notification"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/notification-recipe.ts"
+              ],
+              "variants": [
+                "Error / permission",
+                "Question / ready / attention",
+                "Collapsed / expanded",
+                "Hover / focus / touch",
+                "Inbox / floating rail"
+              ],
+              "construction": [],
+              "decisions": [],
+              "openDependencies": [
+                "Semantic palette mapping and surface geometry",
+                "Read/unread, persistence and dismiss contracts",
+                "Replace source sharp outlines through shared focus recipe"
+              ],
+              "behavior": {
+                "anchoring": "Source: inbox and fixed rail recipes; layout values are not rebuilt tokens.",
+                "opening": "Source: expanded data attribute reveals detail; state ownership not recovered.",
+                "outsideDismiss": "Outside dismissal and persistence policy open.",
+                "escape": "Escape and focus-return policy open.",
+                "focus": "Source: hover/focus-within reveal actions; touch reveals them. Runtime and announcements unverified.",
+                "scrollAndClipping": "Source: rail overflow and detail clipping styles. Runtime unverified.",
+                "reducedMotion": "Source: reduced-motion rule disables transitions and rail animation; runtime unverified."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            },
+            {
+              "key": "alert",
+              "title": "Alert",
+              "use": "Inline or stacked feedback with follow-up actions.",
+              "members": [
+                "overlays.shared.alert"
+              ],
+              "sourceFiles": [
+                "packages/ui/src/alert-recipe.ts"
+              ],
+              "variants": [
+                "Six source tones",
+                "Tonal / glass",
+                "Dismiss / actions",
+                "Stacked",
+                "Long content"
+              ],
+              "construction": [
+                "overlays.shared.alert"
+              ],
+              "decisions": [
+                "D26",
+                "D62"
+              ],
+              "openDependencies": [
+                "Padding side mapping for the recorded values",
+                "Neutral edge ink alias and tone mappings",
+                "Source edge=tone conflicts with neutral-edge direction; not approved"
+              ],
+              "behavior": {
+                "anchoring": "D62: stacked alerts; host owns placement.",
+                "opening": "Source presentation slots; dismiss/state ownership not recovered.",
+                "outsideDismiss": "Inline alert is not an outside-dismiss surface; policy by use case.",
+                "escape": "Dismiss keyboard policy remains open.",
+                "focus": "Required: announcements and reachable actions without focus theft.",
+                "scrollAndClipping": "Required: wrapping, stack overflow and action layout checks.",
+                "reducedMotion": "Required: lower-tier reduced-motion treatment."
+              },
+              "approval": "pending Daniel review",
+              "implementation": "source reference only; no complete Tier 3 package recipe",
+              "verification": "runtime unverified"
+            }
+          ],
+          "composerReferences": [
+            {
+              "id": "45:103",
+              "name": "Model"
+            },
+            {
+              "id": "45:112",
+              "name": "Reply"
+            },
+            {
+              "id": "45:128",
+              "name": "Add"
+            },
+            {
+              "id": "45:139",
+              "name": "Model agents"
+            },
+            {
+              "id": "45:153",
+              "name": "Reply agents"
+            }
+          ]
+        }
       }
     },
     "shared": {
@@ -1171,6 +1786,29 @@
               "reduced-motion",
               "reduced-transparency"
             ]
+          }
+        }
+      },
+      "SelectMenu": {
+        "$description": "Choose one value from a boxed selection menu. Recovered separately from action menus.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "open",
+            "inventoryName": "packages.ui.src.components.SelectMenu",
+            "recipeInStaging": false,
+            "states": [
+              "closed",
+              "open",
+              "selected",
+              "disabled"
+            ],
+            "modes": [
+              "dark",
+              "light",
+              "reduced-motion",
+              "reduced-transparency"
+            ],
+            "note": "Source wrapper recovered; no complete Tier 3 package recipe or visual approval implied."
           }
         }
       }
