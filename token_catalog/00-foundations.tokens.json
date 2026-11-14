@@ -4240,6 +4240,24 @@
               ]
             }
           }
+        },
+        "ms-4800": {
+          "$type": "duration",
+          "$value": {
+            "value": 4800,
+            "unit": "ms"
+          },
+          "$description": "Reusable duration recovered from the Quiet Horizon single-ring study; default cycle retained for review.",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "motion/duration/ms-4800",
+              "family": "base.motion.duration",
+              "source": "quiet-horizon-loader-small-size.html",
+              "decision": "Daniel selected single-ring Quiet Horizon as the general-purpose loader on 2026-11-14; default source timing preserved, configurable.",
+              "formerPaths": []
+            }
+          }
         }
       },
       "easing": {

@@ -292,6 +292,32 @@
             "reducedMotion": true,
             "mobileViewportFits": true,
             "pageErrors": 0
+          },
+          "defaultSpinner": "nova-horizonloader",
+          "quietHorizon": {
+            "candidateId": "nova-horizonloader",
+            "status": "selected-pending-production",
+            "triad": "draft-not-selected",
+            "source": "quiet-horizon-loader-small-size.html",
+            "figmaPlayback": "unverified",
+            "productionReady": false,
+            "paletteAlignment": "Source off-palette ink replaced by approved sys.color.text-primary (Dawn Cream); original retained in the source HTML.",
+            "sizes": "16px and 40px use base.size; 24px reuses existing base.space.px-24 dimension, avoiding a duplicate foundation.",
+            "figma": {
+              "fileKey": "Jj3Dpnc1s6H5ZjV1Kv3LTx",
+              "pageId": "377:6179",
+              "componentSetId": "615:1027",
+              "reviewFrameId": "615:1040",
+              "livePreviewId": "616:1028",
+              "variantIds": {
+                "16px/default": "615:1021",
+                "16px/reduced": "615:1022",
+                "24px/default": "615:1023",
+                "24px/reduced": "615:1024",
+                "40px/default": "615:1025",
+                "40px/reduced": "615:1026"
+              }
+            }
           }
         }
       }
@@ -1901,6 +1927,111 @@
               "peach-gold": "In progress",
               "sage": "Complete",
               "danger-red": "Blocked"
+            }
+          }
+        }
+      },
+      "nova-horizonloader": {
+        "$description": "Quiet Horizon single-ring general-purpose loading indicator. Geometry is a reusable vector asset; all configurable visual values reference lower tiers.",
+        "$extensions": {
+          "app.caelos": {
+            "tier": 2,
+            "status": "selected-pending-production",
+            "decision": "Daniel, 2026-11-14: use small-size Quiet Horizon as the go-to loader wheel; keep triad aside.",
+            "variants": {
+              "size": [
+                "16px",
+                "24px",
+                "40px"
+              ],
+              "motion": [
+                "default",
+                "reduced"
+              ]
+            },
+            "parameters": {
+              "duration": "{base.motion.duration.ms-4800}",
+              "ink": "{sys.color.text-primary}"
+            },
+            "behavior": {
+              "default": "Continuously morph the outer contour around a fixed open center. Duration controls one complete cycle.",
+              "reduced": "Static ring at source phase 0.28; retain adjacent loading text.",
+              "completion": "Stop when the actual operation finishes; no timer implies success.",
+              "pause": "Review preview can pause and resume; background tabs suspend elapsed time."
+            },
+            "geometry": {
+              "source": "quiet-horizon-loader-small-size.html",
+              "kind": "vector-contour",
+              "preservation": "Original ring() geometry, 200 by 200 viewBox; no optical normalization."
+            },
+            "productionReady": false,
+            "codeSyntax": "Not published: no production Panda recipe or generated CSS variable yet.",
+            "figma": {
+              "fileKey": "Jj3Dpnc1s6H5ZjV1Kv3LTx",
+              "pageId": "377:6179",
+              "componentSetId": "615:1027",
+              "reviewFrameId": "615:1040",
+              "livePreviewId": "616:1028",
+              "variantIds": {
+                "16px/default": "615:1021",
+                "16px/reduced": "615:1022",
+                "24px/default": "615:1023",
+                "24px/reduced": "615:1024",
+                "40px/default": "615:1025",
+                "40px/reduced": "615:1026"
+              }
+            }
+          }
+        },
+        "size": {
+          "px-16": {
+            "$type": "dimension",
+            "$value": "{base.size.px-16}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "nova-horizonloader/size/16px"
+              }
+            }
+          },
+          "px-24": {
+            "$type": "dimension",
+            "$value": "{base.space.px-24}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "nova-horizonloader/size/24px"
+              }
+            }
+          },
+          "px-40": {
+            "$type": "dimension",
+            "$value": "{base.size.px-40}",
+            "$extensions": {
+              "app.caelos": {
+                "status": "provisional",
+                "figmaName": "nova-horizonloader/size/40px"
+              }
+            }
+          }
+        },
+        "ink": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "nova-horizonloader/ink"
+            }
+          }
+        },
+        "duration": {
+          "$type": "duration",
+          "$value": "{base.motion.duration.ms-4800}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "provisional",
+              "figmaName": "nova-horizonloader/duration"
             }
           }
         }
