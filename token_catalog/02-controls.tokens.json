@@ -145,29 +145,154 @@
           }
         },
         "loadingReview": {
-          "status": "recovered-unassigned",
+          "status": "selected-pending-recipes",
           "inventory": "LOADING-CANDIDATES.md",
           "figmaPageId": "377:6179",
-          "figmaNodeId": "555:1016",
-          "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=555-1016&autoplay-code-preview=555-1016",
+          "figmaNodeId": "602:405",
+          "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405",
           "candidateIds": [
-            "compact-0",
-            "compact-3",
-            "compact-6",
-            "compact-9",
-            "compact-12",
-            "compact-15",
-            "compact-18",
-            "particle-loading-card-final",
-            "particle-card-reveal",
-            "particle-card-reveal-calm",
-            "orbs-v1",
-            "orbs-v2",
-            "orbs-v3"
+            "double-border-beam",
+            "shape-morph",
+            "helix",
+            "text-shimmer-wave",
+            "three-dot-pulse"
           ],
           "figmaPlayback": "unverified",
           "productionReady": false,
-          "note": "Review-only recovered animations. No loader selected for a product action; no new foundational values or production recipes approved."
+          "note": "Daniel selected four visual studies and retained Helix provisionally. Selection does not assign loaders to actions or approve historical values as foundation tokens. Production recipes and composer send loading remain open.",
+          "requiredApplications": [
+            {
+              "component": "composer send button",
+              "state": "loading",
+              "status": "required-not-implemented",
+              "requirement": "Show a loading variant while a message is being sent.",
+              "decisionSource": "Daniel explicitly requested this requirement in the design-review chat.",
+              "loaderSelection": "unassigned",
+              "note": "This records the required sending state only. Loader appearance, Figma variant, recipe, and production behavior remain to be implemented and reviewed."
+            }
+          ],
+          "candidates": [
+            {
+              "sourceNumber": "01",
+              "candidateId": "double-border-beam",
+              "name": "Double BorderBeam",
+              "status": "selected",
+              "sourceFigmaNodeId": "584:1099"
+            },
+            {
+              "sourceNumber": "03",
+              "candidateId": "shape-morph",
+              "name": "Shape morph",
+              "status": "selected",
+              "sourceFigmaNodeId": "584:1099"
+            },
+            {
+              "sourceNumber": "04",
+              "candidateId": "helix",
+              "name": "Helix",
+              "status": "provisional",
+              "sourceFigmaNodeId": "584:1099"
+            },
+            {
+              "sourceNumber": "05",
+              "candidateId": "text-shimmer-wave",
+              "name": "Text shimmer wave",
+              "status": "selected",
+              "sourceFigmaNodeId": "584:1099"
+            },
+            {
+              "sourceNumber": "06",
+              "candidateId": "three-dot-pulse",
+              "name": "Three-dot pulse",
+              "status": "selected",
+              "sourceFigmaNodeId": "584:1099"
+            }
+          ],
+          "archivedReviews": [
+            {
+              "figmaNodeId": "555:1016",
+              "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=555-1016&autoplay-code-preview=555-1016",
+              "candidateIds": [
+                "compact-0",
+                "compact-3",
+                "compact-6",
+                "compact-9",
+                "compact-12",
+                "compact-15",
+                "compact-18",
+                "particle-loading-card-final",
+                "particle-card-reveal",
+                "particle-card-reveal-calm",
+                "orbs-v1",
+                "orbs-v2",
+                "orbs-v3",
+                "text-loading"
+              ],
+              "figmaPageId": "160:3876",
+              "status": "archived-not-selected-except-retained-artifact-fold"
+            },
+            {
+              "candidateId": "text-loading",
+              "status": "not-selected",
+              "variants": [
+                "fade",
+                "lift"
+              ],
+              "figmaNodeId": "570:1016",
+              "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=570-1016&autoplay-code-preview=570-1016",
+              "foundationRefs": {
+                "ground": "base.color.ground",
+                "surface": "base.color.elevated",
+                "text": "base.color.text-primary",
+                "muted": "base.color.text-supporting",
+                "accent": "base.color.action-blue-hover",
+                "radius": "base.radius.md",
+                "gap": "base.space.px-24",
+                "inset": "base.space.px-30",
+                "small": "base.type.size.px-14",
+                "body": "base.type.size.px-16",
+                "title": "base.type.size.px-28",
+                "label": "base.type.size.px-20",
+                "duration": "base.motion.duration.ms-1800",
+                "stagger": "base.motion.duration.ms-60",
+                "lift": "base.space.px-2",
+                "low": "base.opacity.fraction-0-55",
+                "high": "base.opacity.fraction-1"
+              },
+              "provisionalEasing": "Continuous easing from canonical Linear motion guidance; not an approved foundation token. See LOADING-CANDIDATES.md.",
+              "previewSha256": "6476b7e1f3a562b2ed017c8deb256109631ae3cc0f3c1b9a2478c94cb55b9372",
+              "figmaPlayback": "unverified",
+              "productionReady": false,
+              "figmaPageId": "160:3876"
+            }
+          ],
+          "retainedDrafts": [
+            {
+              "candidateId": "particle-loading-card-final",
+              "name": "Artifact particle fold V4.8",
+              "figmaPageId": "160:3876",
+              "figmaNodeId": "555:1016",
+              "collection": "Artifacts",
+              "status": "retained-outside-tier-2",
+              "proposedUse": "Artifact-generation feedback; later-tier assignment pending."
+            },
+            {
+              "candidateId": "gooey-loader",
+              "name": "Gooey loader",
+              "figmaPageId": "160:3876",
+              "figmaNodeId": "580:1099",
+              "status": "draft-for-separate-customization"
+            }
+          ],
+          "previewSha256": "841f3231b090c4c5f7936fcebc21edc41dda7040121c6840c3754acd9f2e442c",
+          "localVerification": {
+            "animationCount": 5,
+            "motionChanged": true,
+            "pause": true,
+            "reducedMotion": true,
+            "mobileViewportFits": true,
+            "pageErrors": 0
+          }
         }
       }
     },
@@ -1359,7 +1484,7 @@
               "candidateIds": [
                 "compact-18"
               ],
-              "status": "recovered-unassigned"
+              "status": "not-selected"
             }
           }
         }
@@ -1476,7 +1601,7 @@
               "candidateIds": [
                 "compact-6"
               ],
-              "status": "recovered-unassigned"
+              "status": "not-selected"
             }
           }
         }
@@ -1521,21 +1646,13 @@
             "candidateReview": {
               "inventory": "LOADING-CANDIDATES.md",
               "candidateIds": [
-                "compact-0",
-                "compact-3",
-                "compact-6",
-                "compact-9",
-                "compact-12",
-                "compact-15",
-                "compact-18",
-                "particle-loading-card-final",
-                "particle-card-reveal",
-                "particle-card-reveal-calm",
-                "orbs-v1",
-                "orbs-v2",
-                "orbs-v3"
+                "double-border-beam",
+                "shape-morph",
+                "helix",
+                "text-shimmer-wave",
+                "three-dot-pulse"
               ],
-              "status": "recovered-unassigned"
+              "status": "selected-pending-recipes"
             }
           }
         }
