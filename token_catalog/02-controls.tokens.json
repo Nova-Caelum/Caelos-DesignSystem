@@ -148,18 +148,18 @@
           "status": "selected-pending-recipes",
           "inventory": "LOADING-CANDIDATES.md",
           "figmaPageId": "377:6179",
-          "figmaNodeId": "602:405",
-          "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405",
+          "figmaNodeId": "632:1028",
+          "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=632-1028&autoplay-code-preview=632-1028",
           "candidateIds": [
             "double-border-beam",
             "shape-morph",
             "helix",
             "text-shimmer-wave",
-            "three-dot-pulse"
+            "three-horizon-pulse"
           ],
           "figmaPlayback": "unverified",
           "productionReady": false,
-          "note": "Daniel selected four visual studies and retained Helix provisionally. Selection does not assign loaders to actions or approve historical values as foundation tokens. Production recipes and composer send loading remain open.",
+          "note": "Daniel approved Three Horizon Pulse with 4px gaps as the replacement for 06 Three-dot pulse. Four studies remain selected and Helix provisional. Selection does not assign consumer roles or establish production readiness; composer send loading remains open.",
           "requiredApplications": [
             {
               "component": "composer send button",
@@ -202,10 +202,36 @@
             },
             {
               "sourceNumber": "06",
-              "candidateId": "three-dot-pulse",
-              "name": "Three-dot pulse",
+              "candidateId": "three-horizon-pulse",
+              "name": "Three Horizon Pulse",
               "status": "selected",
-              "sourceFigmaNodeId": "584:1099"
+              "sourceFigmaNodeId": "626:1028",
+              "replaces": "three-dot-pulse",
+              "decision": "Daniel approved the 4px comparison and requested it replace 06.",
+              "productionReady": false,
+              "construction": {
+                "shape": "Three filled Quiet Horizon outer contours; no center hole. Fixed envelope sampled at 720 phases normalizes each contour into an 8px frame before pulse lift. All share the contour phase; pulse is staggered.",
+                "foundationRefs": {
+                  "frame": "base.space.px-8",
+                  "gap": "base.space.px-4",
+                  "ink": "sys.color.text-primary",
+                  "lift": "base.space.px-2",
+                  "restOpacity": "base.opacity.fraction-0-23",
+                  "peakOpacity": "base.opacity.fraction-1",
+                  "stagger": "base.motion.duration.ms-160",
+                  "contourDuration": "base.motion.duration.ms-4800"
+                },
+                "referenceScope": "Existing lower-tier references identify construction values; private preview CSS is not variable-bound. Contour duration remains provisional. No production recipe is published.",
+                "previewParametersPendingTokenization": {
+                  "pulseDuration": "1200ms",
+                  "pulseEasing": "ease-in-out",
+                  "pulsePeak": "40%",
+                  "secondStagger": "2 × 160ms",
+                  "reducedMotionOpacity": "0.6; static preview alternative, not separately approved"
+                },
+                "geometrySource": "nova-horizon-three-dot-gap-review.html",
+                "geometrySourceSha256": "315eedd66417ba9a9f9dd6928ae226be123d122c339b72c0e995347ebbc50357"
+              }
             }
           ],
           "archivedReviews": [
@@ -264,6 +290,21 @@
               "figmaPlayback": "unverified",
               "productionReady": false,
               "figmaPageId": "160:3876"
+            },
+            {
+              "figmaNodeId": "602:405",
+              "figmaPageId": "160:3876",
+              "status": "superseded-gallery-with-round-dot-06"
+            },
+            {
+              "figmaNodeId": "623:1028",
+              "figmaPageId": "160:3876",
+              "status": "superseded-6px-spacing-study"
+            },
+            {
+              "figmaNodeId": "626:1028",
+              "figmaPageId": "160:3876",
+              "status": "approved-4px-comparison-reference"
             }
           ],
           "retainedDrafts": [
@@ -284,14 +325,21 @@
               "status": "draft-for-separate-customization"
             }
           ],
-          "previewSha256": "841f3231b090c4c5f7936fcebc21edc41dda7040121c6840c3754acd9f2e442c",
+          "previewSha256": "43c9ca788281709eab70489bb8d75ace454ea3210f7cb7529268e78faa99db5f",
           "localVerification": {
-            "animationCount": 5,
-            "motionChanged": true,
+            "scope": "Current gallery: Three Horizon Pulse motion and controls exercised in Chromium; other four animation definitions unchanged, not freshly motion-tested.",
+            "horizonCount": 3,
+            "frameDimensions": "8px × 8px",
+            "frameGap": "4px",
+            "contourChanged": true,
+            "pulseChanged": true,
             "pause": true,
+            "resume": true,
             "reducedMotion": true,
+            "systemReducedMotionRespectedAfterManualToggle": true,
             "mobileViewportFits": true,
-            "pageErrors": 0
+            "pageErrors": 0,
+            "screenshotReviewed": true
           },
           "defaultSpinner": "nova-horizonloader",
           "quietHorizon": {
@@ -1676,7 +1724,7 @@
                 "shape-morph",
                 "helix",
                 "text-shimmer-wave",
-                "three-dot-pulse"
+                "three-horizon-pulse"
               ],
               "status": "selected-pending-recipes"
             }

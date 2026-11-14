@@ -24,29 +24,31 @@ The catalog group is `controls.shared.nova-horizonloader`. Its configurable valu
 
 The duration is added to the foundation catalog as provisional, recovered from the source and adjustable in the preview. Daniel selected the loader concept and its general-purpose role; the new size samples, palette adaptation, and speed have not received rendered-review signoff. The source’s off-palette ink is replaced with the approved Dawn Cream token; the original remains documented in the source HTML. Size, ink, and duration aliases remain provisional pending Daniel's review. There is no published Panda recipe or generated CSS variable for this loader yet.
 
-## Draft comparison: three filled Horizons
+## 06 — Three Horizon Pulse
 
-[Three tiny Horizons — live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=623-1028&autoplay-code-preview=623-1028) is on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `623:1028`, below the single-ring preview. This is an unapproved experiment, not a replacement for either selected loader or a new catalog recipe.
+Daniel approved **Three Horizon Pulse** with **4px gaps** as the replacement for the round-dot 06 study. This locks the reviewed normal-motion appearance and spacing; it does not approve the separate reduced-motion treatment or assign a consumer role. Open the [selected live gallery](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=632-1028&autoplay-code-preview=632-1028) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `632:1028`.
 
-The Quiet Horizon outer contour is filled with no center hole. A fixed envelope sampled across 720 contour phases normalizes the sampled contour envelope to 8px, matching the diameter of study 06's circular dots. This measures geometry before the pulse lift, not browser-rendered pixels or an analytic bound between samples. Three 8px frames use 6px edge-to-edge gaps; the visible contour gaps vary as the shapes flow and the source three-dot pulse: 1.2s ease-in-out, delays of 0 / 0.16 / 0.32s, opacity 0.23 to 1, and a 2px lift at 40%. These are recovered study settings, not newly approved foundation tokens. All three contours share the existing 4.8s Horizon flow; their pulse is staggered.
+Three filled Quiet Horizon contours occupy 8 × 8px frames separated by 4px. A fixed envelope sampled across 720 contour phases normalizes the geometry before pulse lift; visible edge gaps vary as the contours move inside their frames. All three share a 4.8s contour cycle. The original pulse remains: 1.2s ease-in-out, delays of 0 / 0.16 / 0.32s, opacity 0.23 to 1, and a 2px lift at 40%.
 
-The preview includes actual size, a 6× inspection view, and an original circular-dot comparison. Both comparisons use Dawn Cream to isolate the shape difference; this changes the comparison's ink from the original 06 study. Controls pause motion, disable contour flow to compare pulse alone, and request reduced motion. Operating-system reduced motion also freezes the animation and cannot be overridden by the manual control.
+| Construction | Existing reference | Value |
+| --- | --- | --- |
+| Frame | `base.space.px-8` | 8px |
+| Gap | `base.space.px-4` | 4px |
+| Ink | `sys.color.text-primary` | Dawn Cream, `#EDE3CF` |
+| Lift | `base.space.px-2` | 2px upward |
+| Rest / peak opacity | `base.opacity.fraction-0-23` / `base.opacity.fraction-1` | 0.23 / 1 |
+| Pulse stagger | `base.motion.duration.ms-160` | 160ms per position |
+| Contour duration | `base.motion.duration.ms-4800` | 4800ms; foundation remains provisional |
 
-Eleven checks of the imported script in a mocked DOM passed: shape count, filled closed paths, sampled 8px bounds, changing contour, pause, resume, contour-only freeze, system reduced-motion freeze, respecting that preference after a manual toggle, hidden-document pause, and preservation of the pulse parameters. These checks do not verify rendered appearance. Figma import and placement were read back successfully; browser rendering and **Figma playback remain unverified**. Daniel can open the runnable preview in signed-in Figma to judge the tiny shapes and their combined movement before selecting this experiment.
+These references document construction; the private preview CSS is not bound to catalog or Figma variables. The 1200ms pulse duration, ease-in-out curve, 40% peak, and derived second stagger still need a production recipe. Reduced motion freezes the preview at 0.6 opacity; that static treatment has not received separate approval. No new raw foundation tokens were introduced, and no consumer role is assigned by this selection.
 
-Private evidence (request from Daniel) filename: `nova-horizon-three-dot-review.html`; SHA-256: `59cb0493a6d851d16184f1046a48810047380474a31a938f342c93df552abbf1`. The source remains private evidence rather than a production component distributed by this repository.
+The [approved 6px/4px comparison](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=626-1028&autoplay-code-preview=626-1028), [original 6px study](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=623-1028&autoplay-code-preview=623-1028), and [superseded round-dot gallery](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405) are preserved on **Tier 67 - Drafting Bench**, page `160:3876`.
 
-### Spacing follow-up: 6px versus 4px
-
-Daniel liked the filled three-Horizon preview and requested a tighter 4px gap for comparison. [Open the spacing comparison](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=626-1028&autoplay-code-preview=626-1028) on **Tier 2 · Controls (Clean)**, code layer `626:1028`. Left: original 6px gaps. Right: proposed 4px gaps. Both show actual-size 8px frames and a 6× inspection view; gaps refer to the frames, while contour edges move inside them.
-
-The animation script is byte-for-byte unchanged from the original filled-Horizon study. Static checks verified four Horizon groups and the 6px default with a 4px override only on the right card. Figma import and placement succeeded; playback of this comparison remains unverified by the agent. The original preview is preserved. This is a spacing review, not approval of a new catalog recipe or production behavior.
-
-Private evidence filename: `nova-horizon-three-dot-gap-review.html`; SHA-256: `315eedd66417ba9a9f9dd6928ae226be123d122c339b72c0e995347ebbc50357`.
+Private geometry source: `nova-horizon-three-dot-gap-review.html`; SHA-256: `315eedd66417ba9a9f9dd6928ae226be123d122c339b72c0e995347ebbc50357`. The approved contour calculation is preserved in the current gallery.
 
 ## Additional loading studies
 
-Open [Loading · 4 selected + Helix provisional · Live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `602:405`. Start the code-layer preview to see all five studies together. Pause stops the animations; reduced-motion preference freezes them.
+Open [Selected loading gallery](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=632-1028&autoplay-code-preview=632-1028) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `632:1028`. Start the code-layer preview to see all five studies together. Pause stops the animations; reduced-motion preference freezes them.
 
 | Source number | Candidate ID | Animation | Decision |
 | --- | --- | --- | --- |
@@ -54,9 +56,9 @@ Open [Loading · 4 selected + Helix provisional · Live preview](https://www.fig
 | 03 | `shape-morph` | Shape morph | Selected |
 | 04 | `helix` | Helix | Provisional |
 | 05 | `text-shimmer-wave` | Text shimmer wave | Selected |
-| 06 | `three-dot-pulse` | Three-dot pulse | Selected |
+| 06 | `three-horizon-pulse` | Three Horizon Pulse | Selected; 4px gap approved |
 
-Numbers identify the original [six-study drafting gallery](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=584-1099&autoplay-code-preview=584-1099), retained on **Tier 67 - Drafting Bench**. Animation implementations are unchanged in the curated gallery; its labels and membership reflect the selection. Four-square morph (02) is not selected. The selected three-dot study is available; it is not claimed to be the exact historical v0 ripple Daniel previously remembered.
+Numbers identify the original [six-study drafting gallery](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=584-1099&autoplay-code-preview=584-1099), retained on **Tier 67 - Drafting Bench**. The animation definitions for 01 / 03 / 04 / 05 are unchanged. Entry 06 uses the approved Three Horizon Pulse replacement. Four-square morph (02) is not selected.
 
 ## Preserved drafts and unselected studies
 
@@ -83,19 +85,16 @@ For nova-horizonloader, the native board was exported and visually reviewed; its
 
 Private Quiet Horizon evidence filenames: `nova-horizonloader-review.html`, `nova-horizonloader-provenance.json`, and `nova-horizonloader-figma.png`.
 
-The following evidence applies only to the five-study gallery, not to nova-horizonloader:
+The current five-study gallery was rendered in local Chromium. Checks observed three 8px frames, a 4px computed gap, Dawn Cream ink, changing Horizon contour and pulse, pause/resume, reduced-motion freezing, preservation of the system reduced-motion preference after a manual toggle, a fitting 390px viewport, and no page errors. Its desktop screenshot was visually reviewed. The other four animation definitions were retained; their motion was not freshly exercised in this replacement pass. These checks do not constitute an accessibility or production audit.
 
-Local Chromium checks observed changing animation in all five studies, pause behavior, reduced-motion freezing after browser style updates settled, a fitting 390px viewport, and no page errors. The local screenshot was visually reviewed. These checks do not constitute an accessibility or production audit.
-
-Figma import and placement succeeded. **Playback inside Figma remains unverified**; the screenshot service returned a blank image rather than visible animation content. The next reviewer with signed-in Figma preview access must launch the new code layer and check all five animations, pause, and reduced motion and record the result before accepting its Figma playback. Import success alone is not playback evidence.
+Figma import and placement succeeded. **Playback inside Figma remains unverified by the agent**. Daniel approved the preceding 4px comparison; that approval is distinct from verification of the newly imported gallery. A signed-in reviewer should launch the new gallery and check animations, pause, and reduced motion.
 
 Private evidence filenames (request from Daniel; not public repository downloads):
 
-- `selected-loading-review-20261113.html`, `.png`, `-verification.json`, and `-figma.png` hold the curated preview and checks.
-- `recovered-motion-review-20261113.html` and `.sources.json` hold the original six-study gallery and recovery provenance.
-- `loader-review-20261113.html` and `.sources.json` retain the original Compact/Artifacts/Orbs sources and hashes.
-- `text-loader-review-20261113.html` and `.sources.json` retain the rejected fade/lift study and its foundation-reference map, also preserved in catalog archive metadata.
-
-`selected-loading-review-20261113.html` SHA-256: `841f3231b090c4c5f7936fcebc21edc41dda7040121c6840c3754acd9f2e442c`.
+- `selected-loading-review-horizon-20261114.html`, `.png`, and `-verification.json`: current gallery and local checks. HTML SHA-256: `43c9ca788281709eab70489bb8d75ace454ea3210f7cb7529268e78faa99db5f`.
+- `selected-loading-review-20261113.html` and accompanying captures/checks: superseded round-dot gallery; historical checks of all five original animations apply to that version only.
+- `recovered-motion-review-20261113.html` and `.sources.json`: original six-study gallery and recovery provenance.
+- `loader-review-20261113.html` and `.sources.json`: original Compact/Artifacts/Orbs sources and hashes.
+- `text-loader-review-20261113.html` and `.sources.json`: rejected fade/lift study and its foundation-reference map.
 
 The previews remain private evidence; they are not redistributed as production components in this public repository. Source fingerprints identify the reviewed files, not licensing clearance.
