@@ -184,7 +184,7 @@
                 "surface": "base.color.elevated",
                 "text": "base.color.text-primary",
                 "muted": "base.color.text-supporting",
-                "blue": "base.color.action-blue-hover",
+                "accent": "base.color.action-blue-hover",
                 "radius": "base.radius.md",
                 "gap": "base.space.px-24",
                 "inset": "base.space.px-30",
