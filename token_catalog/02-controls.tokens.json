@@ -143,6 +143,31 @@
               "foreground": "{primitives.shared.typography.tone.dim}"
             }
           }
+        },
+        "loadingReview": {
+          "status": "recovered-unassigned",
+          "inventory": "LOADING-CANDIDATES.md",
+          "figmaPageId": "377:6179",
+          "figmaNodeId": "555:1016",
+          "previewUrl": "https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=555-1016&autoplay-code-preview=555-1016",
+          "candidateIds": [
+            "compact-0",
+            "compact-3",
+            "compact-6",
+            "compact-9",
+            "compact-12",
+            "compact-15",
+            "compact-18",
+            "particle-loading-card-final",
+            "particle-card-reveal",
+            "particle-card-reveal-calm",
+            "orbs-v1",
+            "orbs-v2",
+            "orbs-v3"
+          ],
+          "figmaPlayback": "unverified",
+          "productionReady": false,
+          "note": "Review-only recovered animations. No loader selected for a product action; no new foundational values or production recipes approved."
         }
       }
     },
@@ -1328,7 +1353,14 @@
             ],
             "decisions": [
               "D39"
-            ]
+            ],
+            "candidateReview": {
+              "inventory": "LOADING-CANDIDATES.md",
+              "candidateIds": [
+                "compact-18"
+              ],
+              "status": "recovered-unassigned"
+            }
           }
         }
       },
@@ -1438,7 +1470,14 @@
               "light",
               "reduced-motion",
               "reduced-transparency"
-            ]
+            ],
+            "candidateReview": {
+              "inventory": "LOADING-CANDIDATES.md",
+              "candidateIds": [
+                "compact-6"
+              ],
+              "status": "recovered-unassigned"
+            }
           }
         }
       },
@@ -1478,7 +1517,26 @@
               "light",
               "reduced-motion",
               "reduced-transparency"
-            ]
+            ],
+            "candidateReview": {
+              "inventory": "LOADING-CANDIDATES.md",
+              "candidateIds": [
+                "compact-0",
+                "compact-3",
+                "compact-6",
+                "compact-9",
+                "compact-12",
+                "compact-15",
+                "compact-18",
+                "particle-loading-card-final",
+                "particle-card-reveal",
+                "particle-card-reveal-calm",
+                "orbs-v1",
+                "orbs-v2",
+                "orbs-v3"
+              ],
+              "status": "recovered-unassigned"
+            }
           }
         }
       },
