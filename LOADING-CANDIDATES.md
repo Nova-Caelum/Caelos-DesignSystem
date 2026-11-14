@@ -36,6 +36,14 @@ Eleven checks of the imported script in a mocked DOM passed: shape count, filled
 
 Private evidence (request from Daniel) filename: `nova-horizon-three-dot-review.html`; SHA-256: `59cb0493a6d851d16184f1046a48810047380474a31a938f342c93df552abbf1`. The source remains private evidence rather than a production component distributed by this repository.
 
+### Spacing follow-up: 6px versus 4px
+
+Daniel liked the filled three-Horizon preview and requested a tighter 4px gap for comparison. [Open the spacing comparison](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=626-1028&autoplay-code-preview=626-1028) on **Tier 2 · Controls (Clean)**, code layer `626:1028`. Left: original 6px gaps. Right: proposed 4px gaps. Both show actual-size 8px frames and a 6× inspection view; gaps refer to the frames, while contour edges move inside them.
+
+The animation script is byte-for-byte unchanged from the original filled-Horizon study. Static checks verified four Horizon groups and the 6px default with a 4px override only on the right card. Figma import and placement succeeded; playback of this comparison remains unverified by the agent. The original preview is preserved. This is a spacing review, not approval of a new catalog recipe or production behavior.
+
+Private evidence filename: `nova-horizon-three-dot-gap-review.html`; SHA-256: `315eedd66417ba9a9f9dd6928ae226be123d122c339b72c0e995347ebbc50357`.
+
 ## Additional loading studies
 
 Open [Loading · 4 selected + Helix provisional · Live preview](https://www.figma.com/design/Jj3Dpnc1s6H5ZjV1Kv3LTx?node-id=602-405&autoplay-code-preview=602-405) on **Tier 2 · Controls (Clean)**, page `377:6179`, code layer `602:405`. Start the code-layer preview to see all five studies together. Pause stops the animations; reduced-motion preference freezes them.
