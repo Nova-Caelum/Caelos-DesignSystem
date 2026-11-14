@@ -203,6 +203,17 @@
               "figmaPlayback": "unverified",
               "productionReady": false
             }
+          ],
+          "requiredApplications": [
+            {
+              "component": "composer send button",
+              "state": "loading",
+              "status": "required-not-implemented",
+              "requirement": "Show a loading variant while a message is being sent.",
+              "decisionSource": "Daniel explicitly requested this requirement in the design-review chat.",
+              "loaderSelection": "unassigned",
+              "note": "This records the required sending state only. Loader appearance, Figma variant, recipe, and production behavior remain to be implemented and reviewed."
+            }
           ]
         }
       }
