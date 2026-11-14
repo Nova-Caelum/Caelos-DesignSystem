@@ -22,7 +22,7 @@ The catalog group is `controls.shared.nova-horizonloader`. Its configurable valu
 | Ink | `sys.color.text-primary` | Dawn Cream, `#EDE3CF` |
 | Cycle duration | `base.motion.duration.ms-4800` | 4800ms, provisional |
 
-The duration is added to the foundation catalog as provisional, recovered from the source and adjustable in the preview. Daniel selected the loader concept and its general-purpose role; the new size samples, palette adaptation, and speed have not received rendered-review signoff. Source ink `#F0DEC8` is aligned to the approved Dawn Cream token. Size, ink, and duration aliases remain provisional pending Daniel's review. There is no published Panda recipe or generated CSS variable for this loader yet.
+The duration is added to the foundation catalog as provisional, recovered from the source and adjustable in the preview. Daniel selected the loader concept and its general-purpose role; the new size samples, palette adaptation, and speed have not received rendered-review signoff. The source’s off-palette ink is replaced with the approved Dawn Cream token; the original remains documented in the source HTML. Size, ink, and duration aliases remain provisional pending Daniel's review. There is no published Panda recipe or generated CSS variable for this loader yet.
 
 ## Additional loading studies
 

@@ -301,7 +301,7 @@
             "source": "quiet-horizon-loader-small-size.html",
             "figmaPlayback": "unverified",
             "productionReady": false,
-            "paletteAlignment": "Source #F0DEC8 replaced by approved sys.color.text-primary (#EDE3CF).",
+            "paletteAlignment": "Source off-palette ink replaced by approved sys.color.text-primary (Dawn Cream); original retained in the source HTML.",
             "sizes": "16px and 40px use base.size; 24px reuses existing base.space.px-24 dimension, avoiding a duplicate foundation.",
             "figma": {
               "fileKey": "Jj3Dpnc1s6H5ZjV1Kv3LTx",
