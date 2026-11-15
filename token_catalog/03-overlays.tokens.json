@@ -22,7 +22,7 @@
           "theme": "Approved rendered dark and light examples; runtime theme, motion and reduced-transparency behavior remain unverified.",
           "tierSignoff": "Visual sign-off for Selection Menus, Action Menus and Popovers only. Whole-tier completion still requires remaining classes and live drift-prevention edge-case proof.",
           "sharedMaterial": "Unified glass uses primitives.shared.glass: saturation 125%, adaptive overlap blur/opacity. Figma cannot prove backdrop saturation or overlap behavior. Texture direction is Dots.",
-          "sharedControls": "Complete Tier 2 Text button Layout=Menu, Action Button and focused Field instances. Menu Hover/Focus share blue text/icons and the feathered gradient; Pressed removes highlight. Selected check appears only for selected choices.",
+          "sharedControls": "Source components use complete Tier 2 Text button Layout=Menu, Action Button and focused Field instances. Daniel’s corrected Rename Project review specimens contain detached action frames with glow, bed, tint, wash and label children; shared-instance reconciliation remains outstanding. Menu Hover/Focus share blue text/icons and the feathered gradient; Pressed removes highlight. Selected check appears only for selected choices.",
           "carryForward": "Tier 2 visually signed off; animation cleanup remains. Runtime implementation and live edge-case proof are separate from this visual catalog approval.",
           "categories": [
             {
@@ -675,7 +675,45 @@
               "action": "667:2079",
               "popover": "667:3103"
             },
-            "sourceComponents": 22
+            "sourceComponents": 22,
+            "controlsPopoverCorrection": {
+              "date": "2026-11-15",
+              "correctedBy": "Daniel",
+              "sourceComponent": "665:1259",
+              "sourceAction": "665:1283",
+              "sourceActionMainComponent": "377:6245",
+              "dark": {
+                "popover": "722:30653",
+                "footer": "722:30690",
+                "action": "722:30684",
+                "layers": [
+                  "722:30685",
+                  "722:30686",
+                  "722:30687",
+                  "722:30688",
+                  "722:30689"
+                ]
+              },
+              "light": {
+                "popover": "722:30691",
+                "footer": "722:30728",
+                "action": "722:30722",
+                "layers": [
+                  "722:30723",
+                  "722:30724",
+                  "722:30725",
+                  "722:30726",
+                  "722:30727"
+                ]
+              },
+              "specimenTypes": {
+                "popover": "FRAME",
+                "footer": "COMPONENT",
+                "action": "FRAME"
+              },
+              "status": "Daniel’s visible correction preserved. Live structure and full dark/light review screenshot inspected, including the actual button layers. Detached review specimens do not inherit the shared Action Button; reconciliation remains outstanding.",
+              "scope": "Scoped geometry and binding inspection only. Earlier binding audit retains its original date and scope; no renewed whole-library token or runtime verification claim."
+            }
           },
           "approvedConstruction": {
             "surface": "primitives.shared.glass",
@@ -694,6 +732,14 @@
               "detailIndent": "{base.space.px-8}",
               "footerInlineInset": "{base.space.px-16}",
               "actionSizing": "Fill available footer width; centered within card; complete shared Action Button with hugging height."
+            },
+            "controlsPopover": {
+              "contentPadding": "{base.space.px-16}",
+              "sectionGap": "{base.space.px-12}",
+              "footerInlineInset": "{base.space.px-16}",
+              "footerBlockInset": "{base.space.px-0}",
+              "actionSizing": "Fill available inset footer width; centered within the card with hugging height, matching the Information popover action. Glow, bed, tint and wash span the action; label is centered.",
+              "constructionStatus": "The source retains the shared Action Button instance. The corrected visible dark/light specimens are detached frames; do not treat them as proof of shared-component inheritance."
             }
           },
           "bindingAudit": {
