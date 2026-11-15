@@ -1302,6 +1302,22 @@
                   "meaning": "Save or remove an item from Favorites; model favorites identify the model and provider pair.",
                   "version": "0.577.0",
                   "source": "https://github.com/lucide-icons/lucide/blob/0.577.0/icons/star.svg"
+                },
+                {
+                  "glyph": "StickyNotePlus",
+                  "action": "Add to cycle",
+                  "meaning": "Add to cycle for the selected item.",
+                  "figmaComponent": "690:855",
+                  "approval": "Daniel visual approval 2026-11-14",
+                  "construction": "Shared icon geometry and semantic interaction ink; no consumer-local artwork."
+                },
+                {
+                  "glyph": "Archive",
+                  "action": "Archive",
+                  "meaning": "Archive for the selected item.",
+                  "figmaComponent": "690:861",
+                  "approval": "Daniel visual approval 2026-11-14",
+                  "construction": "Shared icon geometry and semantic interaction ink; no consumer-local artwork."
                 }
               ],
               "harnesses": [
@@ -2324,6 +2340,71 @@
           "$extensions": {
             "app.caelos": {
               "status": "provisional"
+            }
+          }
+        }
+      },
+      "menuFeather": {
+        "$description": "Shared soft menu highlight; consumed by the complete Text button Menu layout.",
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "figmaComponent": "677:863",
+            "figmaLimit": "Gradient stop alpha and angle are derived from these aliases; native Figma gradient colors bind semantic variables 677:856 and 677:858. No per-row paint overrides.",
+            "inventoryName": "menuFeather"
+          }
+        },
+        "start": {
+          "$type": "color",
+          "$value": "{sys.color.action-blue-hover}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "end": {
+          "$type": "color",
+          "$value": "{sys.color.ready}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "start-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.fraction-59-of-255}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "end-alpha": {
+          "$type": "number",
+          "$value": "{base.opacity.fraction-36-of-255}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "blur": {
+          "$type": "dimension",
+          "$value": "{base.blur.px-6}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
+            }
+          }
+        },
+        "angle": {
+          "$type": "number",
+          "$value": "{base.angle.degrees-100}",
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon"
             }
           }
         }

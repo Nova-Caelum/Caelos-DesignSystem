@@ -477,7 +477,7 @@
               "reference": "Caelos_staging packages/ui/src/recipes.ts at be3aec0ccf597141020bea35e6f4cbb3b982a012: tonal violet/sage gradient; the current-token glass pressed state follows Daniel’s request, not a claimed deployed-console match.",
               "figmaLimit": "Gradient alpha/geometry are sync-derived. Figma background blur previews glass; CSS saturation, overlap response and reduced-transparency fallback require runtime verification."
             },
-            "textSurfacePolicy": "No surface fill in any state. Hover and Focus use blue glyphs and a soft glyph glow using the existing 50% opacity token; Pressed uses Ready Blue with an underline and no glow. Success is ✓ Success in sage green, with no fill. Same real-result/reset contract as Primary.",
+            "textSurfacePolicy": "Default Text layout: no surface fill; Hover/Focus blue glyph glow, Pressed Ready Blue with underline and no glow. Menu layout uses the named menuLayout policy. Success/reset behavior is shared.",
             "recipeExports": {
               "primary": "primaryButtonInk",
               "tonal": "tonalButtonInk",
@@ -583,6 +583,35 @@
               "text": {
                 "pressed": "underline"
               }
+            },
+            "menuLayout": {
+              "approval": "Daniel visual approval 2026-11-14",
+              "implementation": "Figma component layout; runtime recipe export not yet implemented",
+              "construction": "Reuse the complete Tier 2 Text button, Layout=Menu. Leading icon, label/supporting text and conditional selected check remain shared children.",
+              "figmaVariants": [
+                "685:3433",
+                "685:3682",
+                "685:3689",
+                "685:3696",
+                "685:3703",
+                "685:3710",
+                "685:3717"
+              ],
+              "highlight": "primitives.shared.menuFeather",
+              "geometry": {
+                "padding": "{base.space.px-12}",
+                "gap": "{base.space.px-12}",
+                "minimumHeight": "{base.size.px-44}"
+              },
+              "states": {
+                "default": "Default semantic ink; no highlight; no selection check unless selected.",
+                "hover": "Blue text and icon; feathered gradient highlight.",
+                "focus": "Same appearance as Hover; keyboard focus remains a distinct interaction.",
+                "selected": "Blue text, icon and visible check; feathered gradient highlight.",
+                "pressed": "Blue text and selected check; no highlight, glow or underline.",
+                "disabled": "Shared disabled ink; remains visible and noninteractive."
+              },
+              "actionMenu": "Every row has a leading icon and text. A selection check represents selection, not command execution."
             }
           }
         },

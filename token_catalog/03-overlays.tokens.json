@@ -12,18 +12,18 @@
           }
         ],
         "review": {
-          "version": 1,
+          "version": 2,
           "source": {
             "repository": "Nova-Caelum/Caelos_staging",
             "branch": "novacaelum-caelos-fusion",
             "commit": "be3aec0ccf597141020bea35e6f4cbb3b982a012"
           },
-          "scope": "Review catalog only; source wrappers are evidence, not approved implementation.",
-          "theme": "Dark v1; light retained as an unverified dependency.",
-          "tierSignoff": "pending Daniel rendered-page approval and live drift-prevention edge-case proof",
+          "scope": "Three rendered visual classes approved by Daniel on 2026-11-14. Legacy source/API inventory is retained separately; approval does not cover every source wrapper or runtime behavior.",
+          "theme": "Approved rendered dark and light examples; runtime theme, motion and reduced-transparency behavior remain unverified.",
+          "tierSignoff": "Visual sign-off for Selection Menus, Action Menus and Popovers only. Whole-tier completion still requires remaining classes and live drift-prevention edge-case proof.",
           "sharedMaterial": "Unified glass uses primitives.shared.glass: saturation 125%, adaptive overlap blur/opacity. Figma cannot prove backdrop saturation or overlap behavior. Texture direction is Dots.",
-          "sharedControls": "Use lower-tier shared controls. Hover/Focus: Hover Blue with soft shape-following glow; Pressed: Ready Blue. Success only after a completed operation. Disabled controls remain visible and noninteractive.",
-          "carryForward": "Tier 2 recipes and prototype playback remain incomplete. Composer send loading is required but not implemented. Tabs remain Tier 2; FusionCards remain Tier 4; action bar remains draft.",
+          "sharedControls": "Complete Tier 2 Text button Layout=Menu, Action Button and focused Field instances. Menu Hover/Focus share blue text/icons and the feathered gradient; Pressed removes highlight. Selected check appears only for selected choices.",
+          "carryForward": "Tier 2 visually signed off; animation cleanup remains. Runtime implementation and live edge-case proof are separate from this visual catalog approval.",
           "categories": [
             {
               "key": "tooltip",
@@ -156,9 +156,9 @@
                 "D33"
               ],
               "openDependencies": [
-                "Surface radius, type, padding and maximum dimensions",
                 "Anchor offsets and collision padding aliases",
-                "Modal versus nonmodal policy"
+                "Modal versus nonmodal policy",
+                "Maximum dimensions and overflow behavior beyond the approved examples"
               ],
               "behavior": {
                 "anchoring": "Source: Radix anchor/trigger and portal. Host owns viewport placement.",
@@ -169,7 +169,7 @@
                 "scrollAndClipping": "Required: collision avoidance and clipping under nested scroll.",
                 "reducedMotion": "D33 motion intent; reduced-motion alternative remains unverified."
               },
-              "approval": "pending Daniel review",
+              "approval": "Daniel approved the corresponding rendered visual class 2026-11-14; source/API variants and runtime behavior remain unverified",
               "implementation": "source reference only; no complete Tier 3 package recipe",
               "verification": "runtime unverified"
             },
@@ -243,7 +243,6 @@
                 "D33"
               ],
               "openDependencies": [
-                "Item geometry, type, separators and focus treatment",
                 "Placement offsets and submenu geometry",
                 "Open/close curve approval independent of Composer"
               ],
@@ -256,7 +255,7 @@
                 "scrollAndClipping": "Required: nested scroll, edge collision and submenu checks.",
                 "reducedMotion": "D33: side-aware emerge/retreat; reduced-motion playback unverified."
               },
-              "approval": "pending Daniel review",
+              "approval": "Daniel approved the corresponding rendered visual class 2026-11-14; source/API variants and runtime behavior remain unverified",
               "implementation": "source reference only; no complete Tier 3 package recipe",
               "verification": "runtime unverified"
             },
@@ -290,7 +289,6 @@
               ],
               "openDependencies": [
                 "Target-specific content contracts",
-                "Item dimensions and focus treatment",
                 "Open/close curve approval independent of Composer"
               ],
               "behavior": {
@@ -302,7 +300,7 @@
                 "scrollAndClipping": "Source: portal and collision padding; scrolling tests outstanding.",
                 "reducedMotion": "D33 motion intent; reduced-motion playback unverified."
               },
-              "approval": "pending Daniel review",
+              "approval": "Daniel approved the corresponding rendered visual class 2026-11-14; source/API variants and runtime behavior remain unverified",
               "implementation": "source reference only; no complete Tier 3 package recipe",
               "verification": "runtime unverified"
             },
@@ -332,7 +330,6 @@
                 "D58"
               ],
               "openDependencies": [
-                "Selected indicator, item geometry and field/menu composition",
                 "Placement offsets and maximum height aliases"
               ],
               "behavior": {
@@ -344,7 +341,7 @@
                 "scrollAndClipping": "D58 requires no page shift; overflow and clipping unverified.",
                 "reducedMotion": "D33 motion intent; reduced-motion playback unverified."
               },
-              "approval": "pending Daniel review",
+              "approval": "Daniel approved the corresponding rendered visual class 2026-11-14; source/API variants and runtime behavior remain unverified",
               "implementation": "source reference only; no complete Tier 3 package recipe",
               "verification": "runtime unverified"
             },
@@ -624,7 +621,94 @@
               "id": "45:153",
               "name": "Reply agents"
             }
-          ]
+          ],
+          "categoryPurpose": "Legacy source/API inventory grouping, not the current visual review outline.",
+          "visualClasses": [
+            {
+              "name": "Selection Menus",
+              "approval": "Daniel visually approved 2026-11-14"
+            },
+            {
+              "name": "Action Menus",
+              "approval": "Daniel visually approved 2026-11-14"
+            },
+            {
+              "name": "Popovers",
+              "approval": "Daniel visually approved 2026-11-14"
+            },
+            {
+              "name": "Shelves / Drawers",
+              "approval": "not started in this review"
+            },
+            {
+              "name": "Dialogs / Modals",
+              "approval": "not started in this review"
+            },
+            {
+              "name": "Permission Cards",
+              "approval": "not started in this review"
+            },
+            {
+              "name": "Question Cards",
+              "approval": "not started in this review"
+            },
+            {
+              "name": "Alerts and Notifications",
+              "approval": "not started in this review"
+            },
+            {
+              "name": "Tooltips",
+              "approval": "not started in this review"
+            }
+          ],
+          "figma": {
+            "fileKey": "Jj3Dpnc1s6H5ZjV1Kv3LTx",
+            "page": "665:404",
+            "supersedesPage": "613:404",
+            "sets": {
+              "selection": "665:765",
+              "action": "665:1251",
+              "popover": "665:1285"
+            },
+            "reviewFrames": {
+              "selection": "667:1259",
+              "action": "667:2079",
+              "popover": "667:3103"
+            },
+            "sourceComponents": 22
+          },
+          "approvedConstruction": {
+            "surface": "primitives.shared.glass",
+            "row": "controls.shared.button menuLayout",
+            "action": "controls.shared.button",
+            "field": "controls.shared.input",
+            "width": "{base.size.px-280}",
+            "radius": "{base.radius.px-22}",
+            "outerPadding": "{base.space.px-8}",
+            "emptySpacing": "{base.space.px-0}",
+            "nativeTracking": "{base.type.tracking.none}",
+            "informationPopover": {
+              "contentPadding": "{base.space.px-16}",
+              "sectionGap": "{base.space.px-16}",
+              "bodyGap": "{base.space.px-12}",
+              "detailIndent": "{base.space.px-8}",
+              "footerInlineInset": "{base.space.px-16}",
+              "actionSizing": "Fill available footer width; centered within card; complete shared Action Button with hugging height."
+            }
+          },
+          "bindingAudit": {
+            "date": "2026-11-14",
+            "scope": "Native nodes of 22 source components; shared instances retain lower-tier ownership. Review-sheet presentation and full lower-tier library are not a global raw-value audit.",
+            "nativeNodes": 101,
+            "nativeTextNodes": 24,
+            "directSharedInstances": 115,
+            "missingNativeTypographyOrAutoLayoutBindings": 0,
+            "corrections": "Bound weight and tracking on 24 native texts and 14 shared Menu text children; bound eleven zero spacing properties on three information-popover wrappers; cleared four source and two review-instance pressed highlight overrides.",
+            "runtimeVerified": false,
+            "liveGateEdgeCasesVerified": false,
+            "sharedMenuTextNodesChecked": 14,
+            "pressedHighlightOverridesCleared": 6
+          }
         }
       }
     },
