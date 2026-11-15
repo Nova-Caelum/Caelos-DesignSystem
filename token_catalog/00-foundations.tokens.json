@@ -1656,6 +1656,23 @@
           }
         },
         "$description": "Reusable space value. Original applications and evidence are retained in provenance."
+      },
+      "px-16": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "figmaName": "space/px-16",
+            "figmaId": "3:28",
+            "decision": "Existing Figma foundation used by approved popover",
+            "family": "base.space",
+            "formerPaths": []
+          }
+        }
       }
     },
     "size": {
@@ -3442,6 +3459,20 @@
             }
           },
           "$description": "Reusable type tracking value. Original applications and evidence are retained in provenance."
+        },
+        "none": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "app.caelos": {
+              "status": "canon",
+              "figmaName": "type/tracking/none",
+              "figmaId": "708:3888",
+              "decision": "Daniel visual approval 2026-11-14",
+              "family": "base.type.tracking",
+              "formerPaths": []
+            }
+          }
         }
       },
       "word-spacing": {
@@ -5399,6 +5430,32 @@
           }
         },
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance."
+      },
+      "fraction-59-of-255": {
+        "$type": "number",
+        "$value": 0.23137254901960785,
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "Approved shared menu feather gradient stop alpha",
+            "family": "base.opacity",
+            "figmaName": "opacity/fraction-59-of-255",
+            "formerPaths": []
+          }
+        }
+      },
+      "fraction-36-of-255": {
+        "$type": "number",
+        "$value": 0.1411764705882353,
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "decision": "Approved shared menu feather gradient stop alpha",
+            "family": "base.opacity",
+            "figmaName": "opacity/fraction-36-of-255",
+            "formerPaths": []
+          }
+        }
       }
     },
     "saturation": {
@@ -5605,6 +5662,20 @@
           }
         },
         "$description": "Reusable angle value. Original applications and evidence are retained in provenance."
+      },
+      "degrees-100": {
+        "$type": "number",
+        "$value": 100,
+        "$extensions": {
+          "app.caelos": {
+            "status": "canon",
+            "figmaId": "677:861",
+            "decision": "Approved shared menu feather",
+            "family": "base.angle",
+            "figmaName": "angle/degrees-100",
+            "formerPaths": []
+          }
+        }
       }
     },
     "stack": {
