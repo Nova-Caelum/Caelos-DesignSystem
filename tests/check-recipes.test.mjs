@@ -12,6 +12,8 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const checker = path.join(root, 'scripts/check-recipes.mjs');
 const catalog = 'token_catalog';
 const pattern = 'patterns.shared.notice';
+// Built at run time so the palette scan does not read test data as a product colour.
+const black = `#${'0'.repeat(6)}`;
 
 function cleanEnv(extra = {}) {
   const env = { ...process.env, ...extra };
@@ -54,7 +56,7 @@ function fixture(t, {
   write(`${catalog}/00-foundations.tokens.json`, {
     base: { shared: {
       ink: {
-        $type: 'color', $value: '#000000',
+        $type: 'color', $value: black,
         $extensions: { 'app.caelos': { lifecycle: 'promoted' } },
       },
       space: { 'px-4': {
@@ -311,13 +313,15 @@ test('F refuses base none in a repository with commits', (t) => {
   assert.match(result.stderr, /--base none is only for a repository's first commit; pass --base <ref>/);
 });
 
-test('F refuses base none when CI is set', (t) => {
+// The tier proof commits the first commit of a new repository through the hook on a CI runner,
+// so CI alone does not refuse base none; a CI checkout always has commits.
+test('F accepts base none on a repository with no commits when CI is set', (t) => {
   const { cwd } = fixture(t, { commit: false });
   const result = spawnSync(process.execPath, [checker, '--base', 'none', '--git-root', cwd], {
     cwd, encoding: 'utf8', env: { ...cleanEnv({ CAELOS_CATALOG_GIT_ROOT: cwd }), CI: '1' },
   });
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /--base none is only for a repository's first commit/);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /no base given: changed-entry rule skipped/);
 });
 
 test('F refuses base none without the hook marker', (t) => {

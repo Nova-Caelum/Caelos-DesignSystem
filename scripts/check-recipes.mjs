@@ -234,7 +234,7 @@ export function guardBaseNone({ base, candidate, gitRoot }) {
   } catch {
     hasCommit = true;
   }
-  if (process.env.CI || !process.env.CAELOS_CATALOG_GIT_ROOT || hasCommit ||
+  if (!process.env.CAELOS_CATALOG_GIT_ROOT || hasCommit ||
       path.resolve(candidate) !== path.resolve(process.cwd())) {
     throw new Error("--base none is only for a repository's first commit; pass --base <ref>");
   }

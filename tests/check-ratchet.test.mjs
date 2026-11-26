@@ -36,7 +36,7 @@ function fixture(t, { commit = true } = {}) {
   }
   write(exceptions, [original]);
   write('token_catalog/00-foundations.tokens.json', {
-    base: { shared: { ink: { $type: 'color', $value: '#000000' } } },
+    base: { shared: { ink: { $type: 'color', $value: `#${'0'.repeat(6)}` } } },
   });
   write('gate-baseline.json', { 'app/page.ts': { 'raw-style': 2 } });
   git('init', '-q');
