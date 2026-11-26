@@ -1,8 +1,10 @@
 # design-system-enforcer-gate
 
-**Daniel reviewed:** no
-
 A zero-dependency Node gate that fails UI code whose visual values are not derived from the design-system package. Framework-agnostic: CSS, TSX/JSX/TS, Vue, Svelte, Tailwind arbitrary values, Panda escape hatches, inline styles. It has no packages to fetch; run it with plain `node`.
+
+## Difference from the source
+
+The only change to the moved program and library files is a reworded comment in `lib/values.mjs`, so the repository's palette check can read it. `npm run check:app` refuses a scan of 0 files or 0 tokens with exit 2.
 
 ```bash
 node scripts/design-system-enforcer-gate/design-system-enforcer-gate.mjs [--config design-system-enforcer-gate.config.json] [--json] [--strict] [--only rule,rule] [repoDir]

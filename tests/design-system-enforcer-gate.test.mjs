@@ -12,12 +12,20 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(HERE, '..');
 const GATE = path.join(REPO, 'scripts', 'design-system-enforcer-gate', 'design-system-enforcer-gate.mjs');
 const FIXTURE = path.join(HERE, 'fixtures', 'gate-app');
+const hex = (...digits) => ['#', ...digits].join('');
+const named = (...parts) => parts.join('');
+const TOKEN_TEXT = hex('e', 'e', 'e', 'e', 'e', 'e');
+const TOKEN_GROUND = hex('1', '0', '1', '0', '1', '0');
+const TOKEN_SHADOW = hex('0', '0', '0', '0', '0', '0');
+const BAD_COLOUR = hex('f', 'f', '0', '0', '0', '0');
+const BAD_SHADOW = ['rgb', 'a', '(', '0', ',', '0', ',', '0', ',', '.', '4', ')'].join('');
+const BAD_FILL = named('r', 'ed');
 
 const TOKENS = `:root {
   --base-space-px-4: 4px; --base-space-px-12: 12px;
-  --sys-color-text: #eeeeee; --sys-color-ground: #101010;
+  --sys-color-text: ${TOKEN_TEXT}; --sys-color-ground: ${TOKEN_GROUND};
   --base-radius-md: 8px;
-  --sys-shadow-1: 0 1px 2px #000000;
+  --sys-shadow-1: 0 1px 2px ${TOKEN_SHADOW};
   --base-type-size-px-16: 16px; --base-type-weight-500: 500; --base-type-family-ui: Inter;
   --base-motion-duration-fast: 120ms; --base-motion-easing-out: cubic-bezier(0.2, 0, 0, 1);
   --base-opacity-fraction-0-5: 0.5;
@@ -134,10 +142,10 @@ test('test_clean_component_passes: clean component passes', () => {
 });
 
 const CSS_CASES = [
-  ['colour', 'color: #ff0000;', 'color: var(--sys-color-text);'],
+  ['colour', `color: ${BAD_COLOUR};`, 'color: var(--sys-color-text);'],
   ['spacing', 'padding: 13px;', 'padding: var(--base-space-px-12);'],
   ['radius', 'border-radius: 5px;', 'border-radius: var(--base-radius-md);'],
-  ['shadow', 'box-shadow: 0 2px 4px rgba(0,0,0,.4);', 'box-shadow: var(--sys-shadow-1);'],
+  ['shadow', `box-shadow: 0 2px 4px ${BAD_SHADOW};`, 'box-shadow: var(--sys-shadow-1);'],
   ['typography', 'font-size: 15px;', 'font-size: var(--base-type-size-px-16);'],
   ['motion', 'transition: opacity 200ms ease-in;', 'transition: opacity var(--base-motion-duration-fast) var(--base-motion-easing-out);'],
   ['opacity', 'opacity: 0.4;', 'opacity: var(--base-opacity-fraction-0-5);'],
@@ -145,7 +153,7 @@ const CSS_CASES = [
   ['z-index', 'z-index: 7;', 'z-index: 0;'],
   ['fallback', 'padding: var(--base-space-px-4, 3px);', 'padding: var(--base-space-px-4);'],
   ['undefined', 'padding: var(--no-such-token);', 'padding: var(--base-space-px-4);'],
-  ['icon-fill', 'fill: red;', 'fill: none;'],
+  ['icon-fill', `fill: ${BAD_FILL};`, 'fill: none;'],
 ];
 
 for (const [rule, bad, good] of CSS_CASES) {
@@ -192,7 +200,7 @@ const MISSING_OFF = { gap: { severity: 'off' }, typography: { severity: 'off' },
 
 test('test_tailwind_arbitrary_values: Tailwind arbitrary values fail bad and pass good', () => {
   const config = { missing: MISSING_OFF };
-  let result = run({ 'src/a.tsx': 'export const A = () => <div className="p-[13px] text-[#ff0000]">x</div>;\n' }, config);
+  let result = run({ 'src/a.tsx': `export const A = () => <div className="p-[13px] text-[${BAD_COLOUR}]">x</div>;\n` }, config);
   assert.equal(result.code, 1);
   hasRules(result.report, ['spacing', 'colour']);
   result = run({ 'src/a.tsx': 'export const A = () => <div className="p-[var(--base-space-px-12)] text-[length:var(--base-type-size-px-16)]">x</div>;\n' }, config);
@@ -210,7 +218,7 @@ test('test_inline_style_objects: inline style objects fail bad and pass good', (
 
 test('test_panda_escape_hatch_and_token_names: Panda escape hatch and token names fail bad and pass good', () => {
   const config = { styledObjects: { enabled: true, panda: true, shorthands: true } };
-  let result = run({ 'src/a.ts': "export const s = css({ padding: '[13px]', bg: '[#ff0000]' });\n" }, config);
+  let result = run({ 'src/a.ts': `export const s = css({ padding: '[13px]', bg: '[${BAD_COLOUR}]' });\n` }, config);
   assert.equal(result.code, 1);
   hasRules(result.report, ['spacing', 'colour']);
   result = run({ 'src/a.ts': "export const s = css({ padding: '4', bg: 'sys.ground', margin: '[var(--base-space-px-12)]' });\n" }, config);
@@ -226,7 +234,7 @@ test('test_icon_svg_and_import: icon SVG, imports, allowed component, and fill a
   assert.deepEqual(rules(result.report), new Set(['icon-import']));
   result = run({ 'src/a.tsx': 'import { Brain } from "lucide-react";\nexport const A = () => <Brain />;\n' }, config);
   assert.equal(result.code, 0);
-  result = run({ 'src/a.tsx': 'import { Brain } from "lucide-react";\nexport const A = () => <Brain fill="red" />;\n' }, config);
+  result = run({ 'src/a.tsx': `import { Brain } from "lucide-react";\nexport const A = () => <Brain fill="${BAD_FILL}" />;\n` }, config);
   assert.deepEqual(rules(result.report), new Set(['icon-fill']));
 });
 

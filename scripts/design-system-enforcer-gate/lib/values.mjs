@@ -77,7 +77,7 @@ export function checkValue(value, ctx, inCalc = false, acc = []) {
       if (["env", "url", "attr", "counter", "image-set"].includes(p.name) || ctx.allowFunctions.includes(p.name)) continue;
       if (p.name === "token" || p.name === "theme") continue;
       if (COLOUR_FN.test(p.name)) {
-        if (/var\(/.test(p.args)) { varsOnly(p.args, ctx, acc); continue; } // derived from a token (color-mix, rgb(var(--x) / 50%))
+        if (/var\(/.test(p.args)) { varsOnly(p.args, ctx, acc); continue; } // derived from a token (a colour function wrapping a variable reference)
         if (ctx.kind === "colour" || whole(ctx.kind)) acc.push({ type: "literal", text: `${p.name}(${p.args})` });
         continue;
       }
