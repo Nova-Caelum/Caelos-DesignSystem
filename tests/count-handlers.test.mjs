@@ -125,6 +125,20 @@ test("A5: a focus step does not cover a keyboard handler", async () => {
   assert.match(result.stderr, /onKeyDown/);
 });
 
+test("A5b: focus or type steps do not cover a click handler", async () => {
+  const source = "export function S(){const save=()=>{};return <button onClick={save}>Save</button>;}";
+  for (const kind of ["focus", "type"]) {
+    const step = { do: kind, role: "button", name: "Save" };
+    if (kind === "type") step.value = "x";
+    const files = await writeCase(source, list([line("save", "save", [step])]));
+    const result = runCounter(files.listFile);
+    assert.equal(result.status, 1, `${kind}: ${result.stderr}`);
+    assert.match(result.stderr, /onClick at 1:\d+ on button/);
+  }
+  const clicked = await writeCase(source, list([line("save", "save", [{ do: "click", role: "button", name: "Save" }])]));
+  assert.equal(runCounter(clicked.listFile).status, 0);
+});
+
 test("A6: componentRoles ties custom components to steps", async () => {
   const source = "export function S(){const save=()=>{};return <Button onClick={save}>Save</Button>;}";
   const lines = [line("save", "save", [{ do: "click", role: "button", name: "Save" }])];
