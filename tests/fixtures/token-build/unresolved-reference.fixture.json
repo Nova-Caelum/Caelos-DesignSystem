@@ -1,5 +1,8 @@
 {
   "base": {
-    "bad": { "$type": "dimension", "$value": "{base.missing}" }
+    "bad": { "$type": "dimension", "$value": "{base.missing}" },
+    "space": {
+      "a": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }
+    }
   }
 }
