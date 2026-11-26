@@ -76,6 +76,39 @@ function generatedBaseValue(leaf) {
   if (leaf.type === 'duration') return value.unit === 'ms' ? decimalSeconds(value.value) + 's' : String(value.value) + 's';
   if (leaf.type === 'cubicBezier') return 'cubic-bezier(' + value.join(', ') + ')';
 }
+// generated/tokens.css must have exactly the generator's shape: one :root block of `--name: value;`
+// declarations and nothing else. This one parse decides both what the file holds and what is verified.
+// Only CSS whitespace separates tokens: `\s` would also accept characters CSS reads as part of a name.
+const generatedReference = /^var\([ \t\n\r\f]*--[a-z0-9-]+[ \t\n\r\f]*\)$/;
+function parseGenerated(text) {
+  const shapeError = (pos, reason) => ({ error: { pos, reason } });
+  const solid = (from, to = text.length) => from + text.slice(from, to).search(/[^ \t\n\r\f]|$/);
+  const open = /^[ \t\n\r\f]*:root[ \t\n\r\f]*\{/.exec(text);
+  if (!open) return shapeError(solid(0), 'expected the file to be one :root { } block');
+  const start = open[0].length;
+  const end = text.indexOf('}', start);
+  const nested = text.indexOf('{', start);
+  if (nested >= 0 && (end < 0 || nested < end)) return shapeError(nested, 'a block inside :root');
+  if (end < 0) return shapeError(solid(0), ':root block is not closed');
+  if (solid(end + 1) < text.length) return shapeError(solid(end + 1), 'text after the :root block');
+  const declaration = /^[ \t\n\r\f]*(--[a-z0-9-]+)[ \t\n\r\f]*:[ \t\n\r\f]*([^ \t\n\r\f][\s\S]*?)[ \t\n\r\f]*$/;
+  const entries = [];
+  const seen = new Set();
+  const pieces = text.slice(start, end).split(';');
+  let offset = start;
+  for (const [i, piece] of pieces.entries()) {
+    const pos = solid(offset, offset + piece.length);
+    offset += piece.length + 1;
+    const last = i === pieces.length - 1;
+    if (last && pos === offset - 1) return { entries };
+    const m = declaration.exec(piece);
+    if (!m) return shapeError(pos, 'expected a --name: value declaration with a lower-case name');
+    if (last) return shapeError(pos, 'declaration without a terminating semicolon');
+    if (seen.has(m[1])) return shapeError(pos, 'duplicate declaration ' + m[1]);
+    seen.add(m[1]);
+    entries.push({ key: m[1], raw: m[2], pos });
+  }
+}
 for (const leaf of catalogLeaves) {
   if (leaf.name.startsWith('base.') && leaf.tier === 0) continue;
   const target = typeof leaf.value === 'string' && leaf.value.match(/^\{([^{}]+)\}$/)?.[1];
@@ -115,9 +148,8 @@ async function main() {
       }).replace(/\{([\w.-]+)\}/g, (_, key) => { reference(key, tokens, pos); return 'TOKEN'; });
       if (numeric.test(withoutVars) || scanText('a { color: ' + withoutVars + '; }', {allowed: new Set()}).length) report(pos, 'raw style value');
     }
-    function declarations(text, pos, generated = false) {
+    function declarations(text, pos) {
       for (const m of text.matchAll(/(?:^|[;{(\s])([\w-]+)\s*:\s*([^;{}"']+)/g)) {
-        if (generated && m[1].startsWith('--base-') && !/^var\(\s*--[\w-]+\s*\)$/.test(m[2].trim())) continue;
         if (property(m[1]) || /^(min|max)-(width|height)$/.test(m[1])) value(m[2], pos+m.index, m[1]);
       }
     }
@@ -132,19 +164,22 @@ async function main() {
       for (const m of source.matchAll(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g)) if (suppress.test(m[0])) report(m.index, 'suppression comment');
       const cssSource = source.replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length));
       if (name === generatedTokensFile) {
-        for (const m of cssSource.matchAll(/(?:^|[;{\s])(--base-[\w-]+)\s*:\s*([^;{}]+)(?:;|(?=\s*}))/g)) {
-          const raw = m[2].trim();
-          if (/^var\(\s*--[\w-]+\s*\)$/.test(raw)) continue;
-          const leaf = baseLeaves.get(m[1]);
-          if (!leaf) report(m.index, 'unknown base token ' + m[1]);
+        const { error, entries } = parseGenerated(cssSource);
+        if (error) report(error.pos, 'not in generated shape: ' + error.reason + '; regenerate with npm run build:tokens');
+        else for (const { key, raw, pos } of entries) {
+          const leaf = baseLeaves.get(key);
+          if (generatedReference.test(raw)) value(raw, pos, key);
+          else if (!key.startsWith('--base-')) report(pos, 'raw style value');
+          else if (!leaf) report(pos, 'unknown base token ' + key);
           else {
             const expected = generatedBaseValue(leaf);
-            if (expected === undefined) report(m.index, m[1] + ' unsupported base value type ' + leaf.type);
-            else if (raw !== expected) report(m.index, m[1] + ' generated base value ' + raw + ' does not equal catalog value ' + expected + '; generated base values must equal their catalog tokens; regenerate with npm run build:tokens, or fix the catalog');
+            if (expected === undefined) report(pos, key + ' unsupported base value type ' + leaf.type);
+            else if (raw !== expected) report(pos, key + ' generated base value ' + raw + ' does not equal catalog value ' + expected + '; generated base values must equal their catalog tokens; regenerate with npm run build:tokens, or fix the catalog');
           }
         }
+        continue;
       }
-      declarations(cssSource, 0, name === generatedTokensFile);
+      declarations(cssSource, 0);
       for (const m of source.matchAll(/\bstyle\s*=\s*(["'])([\s\S]*?)\1/gi)) declarations(m[2],m.index);
       for (const m of source.matchAll(/\bclass(?:Name)?=["']([^"']+)["']/g)) if (arbitrary.test(m[1])) report(m.index,'arbitrary utility');
       for (const m of source.matchAll(/@(?:import|use|forward)\s+(?:url\()?["']([^"']+)/g)) importPath(m[1], m.index);
