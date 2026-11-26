@@ -28,6 +28,7 @@
         "$description": "Present live activity and expandable work groups inside a conversation.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "activity",
             "recipeInStaging": true,
@@ -84,6 +85,7 @@
         "$description": "Present agent-authored message content and its metadata.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "agentMessage",
             "recipeInStaging": true,
@@ -110,6 +112,7 @@
         "$description": "Present inline artifact previews with a shared card and content surface.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "artifactPreview",
             "recipeInStaging": true,
@@ -145,6 +148,7 @@
         "$description": "Present chat status labels and contextual status indicators.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "chatStatus",
             "recipeInStaging": true,
@@ -182,6 +186,7 @@
         "$description": "Arrange conversation message content and associated actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "conversationMessage",
             "recipeInStaging": true,
@@ -227,6 +232,7 @@
         "$description": "Present a chat error and its recovery actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "errorMessage",
             "recipeInStaging": true,
@@ -255,6 +261,7 @@
         "$description": "Present file identity, metadata and file actions in a card.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "fileCard",
             "recipeInStaging": true,
@@ -287,6 +294,7 @@
         "$description": "Present a source citation inline with conversation content.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "inlineSource",
             "recipeInStaging": true,
@@ -308,6 +316,7 @@
         "$description": "Present retry, jump-to-latest and compact error recovery controls.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "recovery",
             "recipeInStaging": true,
@@ -334,6 +343,7 @@
         "$description": "Present user-authored message content and its associated metadata.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "userMessage",
             "recipeInStaging": true,
@@ -364,6 +374,7 @@
         "$description": "Present the composer shell, selection menus, attachments and action controls.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "composerCss",
             "recipeInStaging": true,
@@ -393,6 +404,7 @@
         "$description": "Position the responsive conversation review pane.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "ResponsiveConversationPreview.style",
             "recipeInStaging": true,
@@ -409,6 +421,7 @@
         "$description": "Position a docked selection surface relative to its trigger and available viewport.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "composer-internal.style",
             "recipeInStaging": true,
@@ -425,6 +438,7 @@
         "$description": "Specify token span chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.TokenSpan",
             "recipeInStaging": false,
@@ -441,6 +455,7 @@
         "$description": "Specify line span chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.LineSpan",
             "recipeInStaging": false,
@@ -462,6 +477,7 @@
         "$description": "Specify code block body chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockBody",
             "recipeInStaging": false,
@@ -483,6 +499,7 @@
         "$description": "Specify code block container chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockContainer",
             "recipeInStaging": false,
@@ -499,6 +516,7 @@
         "$description": "Specify code block header chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockHeader",
             "recipeInStaging": false,
@@ -515,6 +533,7 @@
         "$description": "Specify code block title chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockTitle",
             "recipeInStaging": false,
@@ -531,6 +550,7 @@
         "$description": "Specify code block filename chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockFilename",
             "recipeInStaging": false,
@@ -547,6 +567,7 @@
         "$description": "Specify code block actions chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockActions",
             "recipeInStaging": false,
@@ -563,6 +584,7 @@
         "$description": "Specify code block content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockContent",
             "recipeInStaging": false,
@@ -584,6 +606,7 @@
         "$description": "Specify code block chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlock",
             "recipeInStaging": false,
@@ -605,6 +628,7 @@
         "$description": "Specify code block copy button chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockCopyButton",
             "recipeInStaging": false,
@@ -624,6 +648,7 @@
         "$description": "Specify code block language selector chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelector",
             "recipeInStaging": false,
@@ -640,6 +665,7 @@
         "$description": "Specify code block language selector trigger chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorTrigger",
             "recipeInStaging": false,
@@ -656,6 +682,7 @@
         "$description": "Specify code block language selector value chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorValue",
             "recipeInStaging": false,
@@ -672,6 +699,7 @@
         "$description": "Specify code block language selector content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorContent",
             "recipeInStaging": false,
@@ -688,6 +716,7 @@
         "$description": "Specify code block language selector item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.code-block.CodeBlockLanguageSelectorItem",
             "recipeInStaging": false,
@@ -704,6 +733,7 @@
         "$description": "Specify conversation chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.conversation.Conversation",
             "recipeInStaging": false,
@@ -720,6 +750,7 @@
         "$description": "Specify conversation content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.conversation.ConversationContent",
             "recipeInStaging": false,
@@ -736,6 +767,7 @@
         "$description": "Specify conversation empty state chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.conversation.ConversationEmptyState",
             "recipeInStaging": false,
@@ -752,6 +784,7 @@
         "$description": "Specify conversation scroll button chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.conversation.ConversationScrollButton",
             "recipeInStaging": false,
@@ -771,6 +804,7 @@
         "$description": "Specify conversation download chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.conversation.ConversationDownload",
             "recipeInStaging": false,
@@ -790,6 +824,7 @@
         "$description": "Specify message branch previous chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.message.MessageBranchPrevious",
             "recipeInStaging": false,
@@ -809,6 +844,7 @@
         "$description": "Specify message branch next chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.message.MessageBranchNext",
             "recipeInStaging": false,
@@ -828,6 +864,7 @@
         "$description": "Specify model selector coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelector",
             "recipeInStaging": false,
@@ -845,6 +882,7 @@
         "$description": "Specify model selector trigger coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorTrigger",
             "recipeInStaging": false,
@@ -862,6 +900,7 @@
         "$description": "Specify model selector content coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorContent",
             "recipeInStaging": false,
@@ -879,6 +918,7 @@
         "$description": "Specify model selector input coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorInput",
             "recipeInStaging": false,
@@ -896,6 +936,7 @@
         "$description": "Specify model selector list coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorList",
             "recipeInStaging": false,
@@ -913,6 +954,7 @@
         "$description": "Specify model selector empty coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorEmpty",
             "recipeInStaging": false,
@@ -930,6 +972,7 @@
         "$description": "Specify model selector group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorGroup",
             "recipeInStaging": false,
@@ -947,6 +990,7 @@
         "$description": "Specify model selector item coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorItem",
             "recipeInStaging": false,
@@ -964,6 +1008,7 @@
         "$description": "Specify model selector shortcut coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorShortcut",
             "recipeInStaging": false,
@@ -981,6 +1026,7 @@
         "$description": "Specify model selector separator coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorSeparator",
             "recipeInStaging": false,
@@ -998,6 +1044,7 @@
         "$description": "Specify model selector logo coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorLogo",
             "recipeInStaging": false,
@@ -1015,6 +1062,7 @@
         "$description": "Specify model selector logo group coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorLogoGroup",
             "recipeInStaging": false,
@@ -1032,6 +1080,7 @@
         "$description": "Specify model selector name coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.model-selector.ModelSelectorName",
             "recipeInStaging": false,
@@ -1049,6 +1098,7 @@
         "$description": "Specify prompt input action add attachments chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputActionAddAttachments",
             "recipeInStaging": false,
@@ -1068,6 +1118,7 @@
         "$description": "Specify prompt input chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInput",
             "recipeInStaging": false,
@@ -1104,6 +1155,7 @@
         "$description": "Specify prompt input body chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputBody",
             "recipeInStaging": false,
@@ -1120,6 +1172,7 @@
         "$description": "Specify prompt input textarea chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTextarea",
             "recipeInStaging": false,
@@ -1140,6 +1193,7 @@
         "$description": "Specify prompt input header chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputHeader",
             "recipeInStaging": false,
@@ -1156,6 +1210,7 @@
         "$description": "Specify prompt input footer chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputFooter",
             "recipeInStaging": false,
@@ -1172,6 +1227,7 @@
         "$description": "Specify prompt input tools chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTools",
             "recipeInStaging": false,
@@ -1188,6 +1244,7 @@
         "$description": "Specify prompt input button chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputButton",
             "recipeInStaging": false,
@@ -1204,6 +1261,7 @@
         "$description": "Specify prompt input action menu chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenu",
             "recipeInStaging": false,
@@ -1220,6 +1278,7 @@
         "$description": "Specify prompt input action menu trigger chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuTrigger",
             "recipeInStaging": false,
@@ -1236,6 +1295,7 @@
         "$description": "Specify prompt input action menu content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuContent",
             "recipeInStaging": false,
@@ -1252,6 +1312,7 @@
         "$description": "Specify prompt input action menu item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputActionMenuItem",
             "recipeInStaging": false,
@@ -1268,6 +1329,7 @@
         "$description": "Specify prompt input submit chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSubmit",
             "recipeInStaging": false,
@@ -1287,6 +1349,7 @@
         "$description": "Specify prompt input select chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSelect",
             "recipeInStaging": false,
@@ -1303,6 +1366,7 @@
         "$description": "Specify prompt input select trigger chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectTrigger",
             "recipeInStaging": false,
@@ -1323,6 +1387,7 @@
         "$description": "Specify prompt input select content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectContent",
             "recipeInStaging": false,
@@ -1339,6 +1404,7 @@
         "$description": "Specify prompt input select item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectItem",
             "recipeInStaging": false,
@@ -1355,6 +1421,7 @@
         "$description": "Specify prompt input select value chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputSelectValue",
             "recipeInStaging": false,
@@ -1371,6 +1438,7 @@
         "$description": "Specify prompt input hover card chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCard",
             "recipeInStaging": false,
@@ -1390,6 +1458,7 @@
         "$description": "Specify prompt input hover card trigger chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCardTrigger",
             "recipeInStaging": false,
@@ -1406,6 +1475,7 @@
         "$description": "Specify prompt input hover card content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputHoverCardContent",
             "recipeInStaging": false,
@@ -1422,6 +1492,7 @@
         "$description": "Specify prompt input tabs list chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTabsList",
             "recipeInStaging": false,
@@ -1438,6 +1509,7 @@
         "$description": "Specify prompt input tab chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTab",
             "recipeInStaging": false,
@@ -1454,6 +1526,7 @@
         "$description": "Specify prompt input tab label chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTabLabel",
             "recipeInStaging": false,
@@ -1470,6 +1543,7 @@
         "$description": "Specify prompt input tab body chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTabBody",
             "recipeInStaging": false,
@@ -1486,6 +1560,7 @@
         "$description": "Specify prompt input tab item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputTabItem",
             "recipeInStaging": false,
@@ -1505,6 +1580,7 @@
         "$description": "Specify prompt input command chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommand",
             "recipeInStaging": false,
@@ -1521,6 +1597,7 @@
         "$description": "Specify prompt input command input chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandInput",
             "recipeInStaging": false,
@@ -1537,6 +1614,7 @@
         "$description": "Specify prompt input command list chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandList",
             "recipeInStaging": false,
@@ -1553,6 +1631,7 @@
         "$description": "Specify prompt input command empty chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandEmpty",
             "recipeInStaging": false,
@@ -1569,6 +1648,7 @@
         "$description": "Specify prompt input command group chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandGroup",
             "recipeInStaging": false,
@@ -1585,6 +1665,7 @@
         "$description": "Specify prompt input command item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandItem",
             "recipeInStaging": false,
@@ -1601,6 +1682,7 @@
         "$description": "Specify prompt input command separator chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.prompt-input.PromptInputCommandSeparator",
             "recipeInStaging": false,
@@ -1617,6 +1699,7 @@
         "$description": "Specify reasoning trigger chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.reasoning.ReasoningTrigger",
             "recipeInStaging": false,
@@ -1637,6 +1720,7 @@
         "$description": "Specify reasoning content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.reasoning.ReasoningContent",
             "recipeInStaging": false,
@@ -1656,6 +1740,7 @@
         "$description": "Specify shimmer component coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.shimmer.ShimmerComponent",
             "recipeInStaging": false,
@@ -1673,6 +1758,7 @@
         "$description": "Specify shimmer coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.shimmer.Shimmer",
             "recipeInStaging": false,
@@ -1690,6 +1776,7 @@
         "$description": "Specify suggestions chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.suggestion.Suggestions",
             "recipeInStaging": false,
@@ -1706,6 +1793,7 @@
         "$description": "Specify suggestion chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.suggestion.Suggestion",
             "recipeInStaging": false,
@@ -1722,6 +1810,7 @@
         "$description": "Specify tool header chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.tool.ToolHeader",
             "recipeInStaging": false,
@@ -1741,6 +1830,7 @@
         "$description": "Specify tool content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.tool.ToolContent",
             "recipeInStaging": false,
@@ -1761,6 +1851,7 @@
         "$description": "Specify tool input chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.tool.ToolInput",
             "recipeInStaging": false,
@@ -1777,6 +1868,7 @@
         "$description": "Specify tool output chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.tool.ToolOutput",
             "recipeInStaging": false,
@@ -1796,6 +1888,7 @@
         "$description": "Specify output chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ai-elements.tool.Output",
             "recipeInStaging": false,
@@ -1812,6 +1905,7 @@
         "$description": "Specify add agent dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.add-agent-dialog.AddAgentDialog",
             "recipeInStaging": false,
@@ -1841,6 +1935,7 @@
         "$description": "Specify addressee field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.addressee-field.AddresseeField",
             "recipeInStaging": false,
@@ -1868,6 +1963,7 @@
         "$description": "Specify approval alert chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.approval-alert.ApprovalAlert",
             "recipeInStaging": false,
@@ -1892,6 +1988,7 @@
         "$description": "Specify attribution chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.approval-card.Attribution",
             "recipeInStaging": false,
@@ -1908,6 +2005,7 @@
         "$description": "Specify settled chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.approval-card.Settled",
             "recipeInStaging": false,
@@ -1924,6 +2022,7 @@
         "$description": "Specify settled row chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.approval-card.SettledRow",
             "recipeInStaging": false,
@@ -1946,6 +2045,7 @@
         "$description": "Specify approval card chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.approval-card.ApprovalCard",
             "recipeInStaging": false,
@@ -1975,6 +2075,7 @@
         "$description": "Specify overview choice chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.chat-overview-view.OverviewChoice",
             "recipeInStaging": false,
@@ -1994,6 +2095,7 @@
         "$description": "Specify comms composer chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.comms-composer.CommsComposer",
             "recipeInStaging": false,
@@ -2019,6 +2121,7 @@
         "$description": "Specify document preview card chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.document-preview.DocumentPreviewCard",
             "recipeInStaging": false,
@@ -2045,6 +2148,7 @@
         "$description": "Specify document preview chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.document-preview.DocumentPreview",
             "recipeInStaging": false,
@@ -2072,6 +2176,7 @@
         "$description": "Specify document content chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.document-preview.DocumentContent",
             "recipeInStaging": false,
@@ -2088,6 +2193,7 @@
         "$description": "Specify document tool result chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.document.DocumentToolResult",
             "recipeInStaging": false,
@@ -2104,6 +2210,7 @@
         "$description": "Specify document tool call chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.document.DocumentToolCall",
             "recipeInStaging": false,
@@ -2120,6 +2227,7 @@
         "$description": "Specify agent picker coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.launch.agent-picker.AgentPicker",
             "recipeInStaging": false,
@@ -2143,6 +2251,7 @@
         "$description": "Specify launch progress chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.launch.launch-progress.LaunchProgress",
             "recipeInStaging": false,
@@ -2163,6 +2272,7 @@
         "$description": "Specify new session dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.launch.launch-sheet.NewSessionDialog",
             "recipeInStaging": false,
@@ -2184,6 +2294,7 @@
         "$description": "Specify field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.launch.launch-sheet.Field",
             "recipeInStaging": false,
@@ -2204,6 +2315,7 @@
         "$description": "Specify message actions chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message-actions.MessageActions",
             "recipeInStaging": false,
@@ -2223,6 +2335,7 @@
         "$description": "Specify message reasoning chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message-reasoning.MessageReasoning",
             "recipeInStaging": false,
@@ -2248,6 +2361,7 @@
         "$description": "Specify message turn chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message-turn.MessageTurn",
             "recipeInStaging": false,
@@ -2264,6 +2378,7 @@
         "$description": "Specify thinking message chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message.ThinkingMessage",
             "recipeInStaging": false,
@@ -2284,6 +2399,7 @@
         "$description": "Specify comms actions chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message.CommsActions",
             "recipeInStaging": false,
@@ -2303,6 +2419,7 @@
         "$description": "Specify addressed chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message.Addressed",
             "recipeInStaging": false,
@@ -2319,6 +2436,7 @@
         "$description": "Specify comms message item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message.CommsMessageItem",
             "recipeInStaging": false,
@@ -2343,6 +2461,7 @@
         "$description": "Specify preview attachment chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.preview-attachment.PreviewAttachment",
             "recipeInStaging": false,
@@ -2371,6 +2490,7 @@
         "$description": "Specify side chat action chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.side-chat-action.SideChatAction",
             "recipeInStaging": false,
@@ -2397,6 +2517,7 @@
         "$description": "Specify chat item chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.sidebar-history-item.ChatItem",
             "recipeInStaging": false,
@@ -2413,6 +2534,7 @@
         "$description": "Specify comms chat row chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.sidebar-history.CommsChatRow",
             "recipeInStaging": false,
@@ -2434,6 +2556,7 @@
         "$description": "Specify sign out form coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.sign-out-form.SignOutForm",
             "recipeInStaging": false,
@@ -2451,6 +2574,7 @@
         "$description": "Specify suggested actions chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.suggested-actions.SuggestedActions",
             "recipeInStaging": false,
@@ -2470,6 +2594,7 @@
         "$description": "Specify surface switch chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.surface-switch.SurfaceSwitch",
             "recipeInStaging": false,
@@ -2492,6 +2617,7 @@
         "$description": "Specify tool chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.toolbar.Tool",
             "recipeInStaging": false,
@@ -2520,6 +2646,7 @@
         "$description": "Specify reading level selector coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.toolbar.ReadingLevelSelector",
             "recipeInStaging": false,
@@ -2546,6 +2673,7 @@
         "$description": "Specify tools chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.toolbar.Tools",
             "recipeInStaging": false,
@@ -2570,6 +2698,7 @@
         "$description": "Specify trust card chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.trust-card.TrustCard",
             "recipeInStaging": false,
@@ -2596,6 +2725,50 @@
         "$description": "Compose a thread message and coordinate context, agent settings, reply format, dictation, live conversation and send/stop actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": [
+              "base.border.px-1",
+              "base.motion.duration.ms-0",
+              "base.motion.duration.ms-160",
+              "base.motion.duration.ms-260",
+              "base.motion.easing.curve-0-16-1-0-3-1",
+              "base.motion.easing.curve-0-4-0-0-8-0-3",
+              "base.radius.md",
+              "base.radius.px-13",
+              "base.radius.px-22",
+              "base.radius.px-27",
+              "base.size.px-17",
+              "base.size.px-34",
+              "base.size.px-42",
+              "base.size.px-47",
+              "base.space.px-10",
+              "base.space.px-14",
+              "base.space.px-18",
+              "base.space.px-2",
+              "base.space.px-20",
+              "base.space.px-3",
+              "base.space.px-4",
+              "base.space.px-5",
+              "base.space.px-6",
+              "base.space.px-7",
+              "base.space.px-9",
+              "base.type.family.ui",
+              "base.type.line.px-19",
+              "base.type.line.px-20",
+              "base.type.line.px-24",
+              "base.type.size.px-12",
+              "base.type.size.px-14",
+              "base.type.weight.medium",
+              "sys.color.action-blue",
+              "sys.color.elevated",
+              "sys.color.elevated-2",
+              "sys.color.ground",
+              "sys.color.text-faint",
+              "sys.color.text-primary",
+              "sys.color.text-supporting",
+              "sys.color.text-tertiary",
+              "sys.color.top"
+            ],
             "status": "partial",
             "inventoryName": "composer.root",
             "recipeInStaging": true,
@@ -2764,6 +2937,7 @@
           "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/shell-top"
             }
@@ -2774,6 +2948,7 @@
           "$value": "{base.space.px-14}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/shell-inline"
@@ -2785,6 +2960,7 @@
           "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/shell-bottom"
@@ -2796,6 +2972,7 @@
           "$value": "{base.radius.px-27}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/shell-radius"
@@ -2807,6 +2984,7 @@
           "$value": "{base.radius.px-22}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/expanded-radius"
@@ -2818,6 +2996,7 @@
           "$value": "{base.space.px-7}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/editor-inset"
@@ -2829,6 +3008,7 @@
           "$value": "{base.type.size.px-14}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/editor-size"
@@ -2840,6 +3020,7 @@
           "$value": "{base.type.line.px-24}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/editor-line"
@@ -2851,6 +3032,7 @@
           "$value": "{base.space.px-20}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/controls-offset"
@@ -2862,6 +3044,7 @@
           "$value": "{base.space.px-5}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/control-gap"
@@ -2873,6 +3056,7 @@
           "$value": "{base.size.px-34}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/control-size"
@@ -2884,6 +3068,7 @@
           "$value": "{base.radius.md}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/control-radius"
@@ -2895,6 +3080,7 @@
           "$value": "{base.size.px-17}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/glyph-size"
             }
@@ -2905,6 +3091,7 @@
           "$value": "{base.size.px-42}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-height"
             }
@@ -2915,6 +3102,7 @@
           "$value": "{base.space.px-4}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-pad"
             }
@@ -2925,6 +3113,7 @@
           "$value": "{base.radius.px-13}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-radius"
             }
@@ -2935,6 +3124,7 @@
           "$value": "{base.space.px-2}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-gap"
             }
@@ -2945,6 +3135,7 @@
           "$value": "{base.space.px-3}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-floor"
             }
@@ -2955,6 +3146,7 @@
           "$value": "{base.size.px-47}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/dock-reserve"
             }
@@ -2965,6 +3157,7 @@
           "$value": "{base.type.size.px-12}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/model-size"
             }
@@ -2975,6 +3168,7 @@
           "$value": "{base.type.line.px-20}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/model-line"
             }
@@ -2985,6 +3179,7 @@
           "$value": "{base.type.size.px-12}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/reply-size"
             }
@@ -2995,6 +3190,7 @@
           "$value": "{base.type.line.px-19}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/reply-line"
             }
@@ -3005,6 +3201,7 @@
           "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/option-inset"
             }
@@ -3015,6 +3212,7 @@
           "$value": "{base.space.px-6}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/context-gap"
             }
@@ -3025,6 +3223,7 @@
           "$value": "{sys.color.elevated}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/fill"
             }
@@ -3035,6 +3234,7 @@
           "$value": "{sys.color.elevated-2}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/option-fill"
             }
@@ -3045,6 +3245,7 @@
           "$value": "{sys.color.top}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/selected-fill"
             }
@@ -3055,6 +3256,7 @@
           "$value": "{sys.color.text-primary}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/text"
             }
@@ -3065,6 +3267,7 @@
           "$value": "{sys.color.text-supporting}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/supporting"
             }
@@ -3075,6 +3278,7 @@
           "$value": "{sys.color.text-tertiary}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/muted"
             }
@@ -3085,6 +3289,7 @@
           "$value": "{sys.color.text-faint}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/disabled"
             }
@@ -3095,6 +3300,7 @@
           "$value": "{base.type.family.ui}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/family"
             }
@@ -3105,6 +3311,7 @@
           "$value": "{base.type.weight.medium}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "figmaName": "composer/weight"
             }
@@ -3115,6 +3322,7 @@
           "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/open-ms"
             }
@@ -3125,6 +3333,7 @@
           "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/close-ms"
             }
@@ -3135,6 +3344,7 @@
           "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/open-curve"
@@ -3146,6 +3356,7 @@
           "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "composer/close-curve"
@@ -3157,6 +3368,7 @@
           "$value": "{base.motion.duration.ms-0}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "figmaName": "composer/reduced-ms"
             }
@@ -3167,6 +3379,7 @@
           "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/hairline"
             }
@@ -3177,6 +3390,7 @@
           "$value": "{sys.color.elevated-2}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/neutral-edge"
             }
@@ -3187,6 +3401,7 @@
           "$value": "{sys.color.action-blue}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/send-fill"
             }
@@ -3197,6 +3412,7 @@
           "$value": "{sys.color.ground}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "composer/ground"
             }
@@ -3207,6 +3423,7 @@
         "$description": "Specify permission control chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.Composer.PermissionControl",
             "recipeInStaging": false,
@@ -3232,6 +3449,7 @@
         "$description": "Specify composer choice chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.Composer.ComposerChoice",
             "recipeInStaging": false,
@@ -3248,6 +3466,7 @@
         "$description": "Specify reply format chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.composer-internal.ReplyFormat",
             "recipeInStaging": false,
@@ -3268,6 +3487,7 @@
         "$description": "Specify composer choice chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.composer-internal.ComposerChoiceInternal",
             "recipeInStaging": false,
@@ -3284,6 +3504,7 @@
         "$description": "Specify permission control chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.composer-internal.PermissionControlInternal",
             "recipeInStaging": false,
@@ -3300,6 +3521,7 @@
         "$description": "Specify preview message chat content presentation and actions if retained; chat/content product unit.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.chat.message.PreviewMessage",
             "recipeInStaging": false,
@@ -3318,6 +3540,7 @@
         "$description": "Specify panel note coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "client.pages.dashboard.DashboardView.PanelNote",
             "recipeInStaging": false,
@@ -3338,6 +3561,7 @@
         "$description": "Specify health chip view coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "client.pages.dashboard.DashboardView.HealthChipView",
             "recipeInStaging": false,
@@ -3369,6 +3593,7 @@
         "$description": "Specify linkified coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "client.pages.dashboard.DashboardView.Linkified",
             "recipeInStaging": false,
@@ -3389,6 +3614,7 @@
         "$description": "Specify outline coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "client.pages.dashboard.DashboardView.Outline",
             "recipeInStaging": false,
@@ -3408,6 +3634,7 @@
         "$description": "Specify archive dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.archive-dialog.ArchiveDialog",
             "recipeInStaging": false,
@@ -3436,6 +3663,7 @@
         "$description": "Specify document row coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.document-links.DocumentRow",
             "recipeInStaging": false,
@@ -3461,6 +3689,7 @@
         "$description": "Specify document links coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.document-links.DocumentLinks",
             "recipeInStaging": false,
@@ -3482,6 +3711,7 @@
         "$description": "Specify gated coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.gated.Gated",
             "recipeInStaging": false,
@@ -3512,6 +3742,7 @@
         "$description": "Specify action field coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.graph-actions.ActionField",
             "recipeInStaging": false,
@@ -3543,6 +3774,7 @@
         "$description": "Specify graph action dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.graph-actions.GraphActionDialog",
             "recipeInStaging": false,
@@ -3565,6 +3797,7 @@
         "$description": "Specify initiative links editor coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.initiative-actions.InitiativeLinksEditor",
             "recipeInStaging": false,
@@ -3587,6 +3820,7 @@
         "$description": "Specify chat link picker coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.linked-work.chat-link-picker.ChatLinkPicker",
             "recipeInStaging": false,
@@ -3610,6 +3844,7 @@
         "$description": "Specify preview error coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.linked-work.chat-linked-work.PreviewError",
             "recipeInStaging": false,
@@ -3630,6 +3865,7 @@
         "$description": "Specify chat linked work coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.linked-work.chat-linked-work.ChatLinkedWork",
             "recipeInStaging": false,
@@ -3650,6 +3886,7 @@
         "$description": "Specify linked project coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.linked-work.chat-linked-work.LinkedProject",
             "recipeInStaging": false,
@@ -3676,6 +3913,7 @@
         "$description": "Specify linked item coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.linked-work.chat-linked-work.LinkedItem",
             "recipeInStaging": false,
@@ -3702,6 +3940,7 @@
         "$description": "Specify link row coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.initiative-page.LinkRow",
             "recipeInStaging": false,
@@ -3719,6 +3958,7 @@
         "$description": "Specify initiative card coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.overview-page.InitiativeCard",
             "recipeInStaging": false,
@@ -3739,6 +3979,7 @@
         "$description": "Specify task graph page frame coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.page-frame.TaskGraphPageFrame",
             "recipeInStaging": false,
@@ -3759,6 +4000,7 @@
         "$description": "Specify source link coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-agents.SourceLink",
             "recipeInStaging": false,
@@ -3779,6 +4021,7 @@
         "$description": "Specify profile edit coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-agents.ProfileEdit",
             "recipeInStaging": false,
@@ -3799,6 +4042,7 @@
         "$description": "Specify harness coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-agents.Harness",
             "recipeInStaging": false,
@@ -3821,6 +4065,7 @@
         "$description": "Specify loadout coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-agents.Loadout",
             "recipeInStaging": false,
@@ -3841,6 +4086,7 @@
         "$description": "Specify field list coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-drawers.FieldList",
             "recipeInStaging": false,
@@ -3858,6 +4104,7 @@
         "$description": "Specify prose coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-drawers.Prose",
             "recipeInStaging": false,
@@ -3875,6 +4122,7 @@
         "$description": "Specify acceptance criteria coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-drawers.AcceptanceCriteria",
             "recipeInStaging": false,
@@ -3892,6 +4140,7 @@
         "$description": "Specify info tab coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-page.InfoTab",
             "recipeInStaging": false,
@@ -3913,6 +4162,7 @@
         "$description": "Specify cycles tab coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.project-page.CyclesTab",
             "recipeInStaging": false,
@@ -3935,6 +4185,7 @@
         "$description": "Specify task graph loading coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.states.TaskGraphLoading",
             "recipeInStaging": false,
@@ -3955,6 +4206,7 @@
         "$description": "Specify task graph empty coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.states.TaskGraphEmpty",
             "recipeInStaging": false,
@@ -3972,6 +4224,7 @@
         "$description": "Specify task graph error coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.pages.states.TaskGraphError",
             "recipeInStaging": false,
@@ -3992,6 +4245,7 @@
         "$description": "Specify reorder control coordinated control layout and states if retained; coordinated controls or reusable pattern.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.taskgraph.reorder-control.ReorderControl",
             "recipeInStaging": false,

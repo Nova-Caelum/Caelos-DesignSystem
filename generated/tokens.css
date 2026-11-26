@@ -347,13 +347,13 @@
   --sys-space-alert-icon-gap: var(--base-space-px-9); /** Shared across colour modes. */
   --sys-space-dock-viewport-floor: var(--base-space-px-3); /** Shared across colour modes. */
   --sys-space-question-answer-label-pad: var(--base-space-px-24); /** Question answer label aligned to the title axis. */
-  --sys-material-glass-blur: var(--base-blur-px-19);
   --sys-material-body: var(--base-color-elevated);
   --sys-material-ink: var(--base-color-text-primary);
   --sys-material-tint-ink: var(--base-color-ready);
   --sys-material-grid: var(--base-color-text-supporting);
   --sys-material-sage: var(--base-color-success);
   --sys-material-glass-base-alpha: var(--base-opacity-fraction-0-23);
+  --sys-material-glass-blur: var(--base-blur-px-19);
   --sys-material-glass-tint: var(--base-opacity-fraction-0-15);
   --sys-material-glass-saturation: var(--base-saturation-factor-1-25);
   --primitives-shared-typography-tone-default: var(--sys-color-text-primary);
