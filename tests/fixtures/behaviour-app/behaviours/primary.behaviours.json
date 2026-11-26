@@ -1,5 +1,5 @@
 {
-  "screen": "PrimaryScreen.jsx",
+  "screen": "../PrimaryScreen.jsx",
   "lines": [
     {
       "id": "pass-action",
