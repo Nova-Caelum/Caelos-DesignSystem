@@ -132,6 +132,9 @@ async function main() {
     const name = path.relative(root, f);
     const tier = tierOf(name);
     const source = fs.readFileSync(f, 'utf8');
+    const cssSource = /\.(?:s?css|less|html?|vue|svelte|svg)$/i.test(f)
+      ? source.replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length))
+      : source;
     const palette = name === 'src/tokens.ts' ? parseTokens(source) : undefined;
     const report = (pos, rule) => reasons.add(name + ':' + (source.slice(0,pos).split('\n').length) + ': ' + rule);
     if (tier === undefined && name.startsWith('src/')) report(0,'unclassified source tier');
@@ -143,7 +146,7 @@ async function main() {
       if (['fontFamily','font-family'].includes(prop) && raw && !/^(?:inherit|initial|unset|revert|var\(|\{)/.test(raw)) report(pos,'raw font family');
       if (/\bvar\(\s*--[\w-]+\s*,/.test(raw)) report(pos, 'token fallback');
       const withoutVars = raw.replace(/var\(\s*(--[\w-]+)\s*\)/g, (_, key) => {
-        if (!source.includes("'" + key + "':") && !source.includes('"' + key + '":')) reference(key, cssTokens, pos);
+        if (!cssSource.includes("'" + key + "':") && !cssSource.includes('"' + key + '":')) reference(key, cssTokens, pos);
         return 'TOKEN';
       }).replace(/\{([\w.-]+)\}/g, (_, key) => { reference(key, tokens, pos); return 'TOKEN'; });
       if (numeric.test(withoutVars) || scanText('a { color: ' + withoutVars + '; }', {allowed: new Set()}).length) report(pos, 'raw style value');
@@ -162,7 +165,6 @@ async function main() {
     }
     if (/\.(?:s?css|less|html?|vue|svelte|svg)$/i.test(f)) {
       for (const m of source.matchAll(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g)) if (suppress.test(m[0])) report(m.index, 'suppression comment');
-      const cssSource = source.replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length));
       if (name === generatedTokensFile) {
         const { error, entries } = parseGenerated(cssSource);
         if (error) report(error.pos, 'not in generated shape: ' + error.reason + '; regenerate with npm run build:tokens');

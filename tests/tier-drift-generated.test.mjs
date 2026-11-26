@@ -312,3 +312,19 @@ test('(g4) a non-base name with one var() reference to a known token still passe
   assert.equal(result.status, 0, output(result));
   assert.deepEqual(findings(result), []);
 });
+
+test('(g5) a generated-file comment cannot define an unknown token', () => {
+  assertFindings(generated(":root {\n  /* '--ghost': */ --sys-x: var(--ghost);\n}\n"),
+    [`${G}:2: unknown token --ghost`]);
+});
+
+test('(g6) an ordinary tier CSS comment cannot define an unknown token', () => {
+  assertFindings(run({ 'tier-1/attack.css': ":root {\n  /* '--ghost': */ --sys-x: var(--ghost);\n}\n" }, spaces),
+    ['tier-1/attack.css:2: unknown token --ghost']);
+});
+
+test('(g7) a Vue local token entry outside a comment remains accepted', () => {
+  const result = run({ 'tier-1/local.vue': "<script>const local = { '--ghost': true };</script>\n<style>:root { --sys-x: var(--ghost); }</style>\n" }, spaces);
+  assert.equal(result.status, 0, output(result));
+  assert.deepEqual(findings(result), []);
+});
