@@ -2,10 +2,13 @@
   "name": "caelos-design-system-catalog",
   "private": true,
   "scripts": {
-    "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
     "prepare": "husky",
     "test": "node --test",
-    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs"
+    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs",
+    "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
+    "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet --",
+    "check:recipes": "node scripts/check-recipes.mjs",
+    "check:ratchet": "node scripts/check-ratchet.mjs"
   },
   "devDependencies": {
     "husky": "9.1.7",
