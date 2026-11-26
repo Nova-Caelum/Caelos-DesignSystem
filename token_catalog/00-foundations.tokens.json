@@ -115,6 +115,7 @@
         "$description": "Deep frame (palette role chrome)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/chrome",
@@ -157,6 +158,7 @@
         "$description": "Ink Indigo (palette role ground)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/ground",
@@ -199,6 +201,7 @@
         "$description": "Panels (palette role elevated)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/elevated",
@@ -241,6 +244,7 @@
         "$description": "Raised layer (palette role elevated-2)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/elevated-2",
@@ -283,6 +287,7 @@
         "$description": "Highest layer (palette role top)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/top",
@@ -325,6 +330,7 @@
         "$description": "Primary text (palette role text-primary)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/text-primary",
@@ -368,6 +374,7 @@
         "$description": "Supporting and placeholder text (palette role text-supporting)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/text-supporting",
@@ -410,6 +417,7 @@
         "$description": "Tertiary text (palette role text-tertiary)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/text-tertiary",
@@ -452,6 +460,7 @@
         "$description": "Faint text (palette role text-faint)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/text-faint",
@@ -494,6 +503,7 @@
         "$description": "Action Blue (palette role action-blue)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/action-blue",
@@ -536,6 +546,7 @@
         "$description": "Action Blue hover (palette role action-blue-hover)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/action-blue-hover",
@@ -578,6 +589,7 @@
         "$description": "Sage / Sea Green (palette role success)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/success",
@@ -620,6 +632,7 @@
         "$description": "Golden Sand (palette role golden-sand)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/golden-sand",
@@ -664,6 +677,7 @@
         "$description": "Peach Gold (palette role peach-gold)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "note": "Canon set by Daniel on 2026-11-09: one value shared by the company and product palettes. Renamed from peach; was color/peach in Figma: rename that variable so its bindings survive.",
@@ -708,6 +722,7 @@
         "$description": "Danger Red (palette role danger)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/danger",
@@ -750,6 +765,7 @@
         "$description": "Danger Red hover (palette role danger-hover)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "note": "Daniel decision pending: the chat app's dark mode uses the danger colour itself for hover, not this value.",
@@ -794,6 +810,7 @@
         "$description": "Ready Lavender (palette role ready)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/ready",
@@ -836,6 +853,7 @@
         "$description": "Dawn light ground (palette role light-ground)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/light-ground",
@@ -880,6 +898,7 @@
         "$description": "Structural Violet (palette role structural-violet)",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "product palette record",
             "figmaName": "color/structural-violet",
@@ -919,6 +938,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "figmaName": "space/px-0",
             "note": "A zero-gap reset is used in the draft. D01 approves only the ten positive spacing steps.",
@@ -953,6 +973,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-3",
@@ -986,6 +1007,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-6",
@@ -1019,6 +1041,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-9",
@@ -1052,6 +1075,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-12",
@@ -1085,6 +1109,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-15",
@@ -1118,6 +1143,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-18",
@@ -1151,6 +1177,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-21",
@@ -1184,6 +1211,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-24",
@@ -1217,6 +1245,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-27",
@@ -1250,6 +1279,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D01",
             "figmaName": "space/px-30",
@@ -1283,6 +1313,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D12",
             "note": "Off the 3px grid by decision: approved Sep 8, reaffirmed Nov 8.",
@@ -1318,6 +1349,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D54",
             "figmaName": "space/px-2",
@@ -1353,6 +1385,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D54",
             "figmaName": "space/px-4",
@@ -1388,6 +1421,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "space/px-5",
@@ -1434,6 +1468,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "space/px-7",
@@ -1470,6 +1505,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "space/px-10",
@@ -1527,6 +1563,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "space/px-14",
@@ -1563,6 +1600,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "space/px-20",
@@ -1599,6 +1637,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D30",
             "formerPaths": [
@@ -1631,6 +1670,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D64",
             "note": "Stacked answers, both sides.",
@@ -1665,6 +1705,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "figmaName": "space/px-16",
             "figmaId": "3:28",
@@ -1684,6 +1725,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D10",
             "note": "Nominal; may shrink inside a narrower container.",
@@ -1719,6 +1761,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -1751,6 +1794,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -1783,6 +1827,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -1814,6 +1859,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No product control-size matrix was decided (G07). Renamed from size/control so size/control/34 can nest.",
             "figmaName": "size/px-44",
@@ -1848,6 +1894,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No product control-size matrix was decided (G07).",
             "figmaName": "size/px-42",
@@ -1894,6 +1941,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No product control-size matrix was decided (G07).",
             "figmaName": "size/px-20",
@@ -1928,6 +1976,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D55",
             "figmaName": "size/px-17",
@@ -1963,6 +2012,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "size/px-34",
@@ -1999,6 +2049,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D54",
             "note": "Reserved below the writing surface even when closed.",
@@ -2036,6 +2087,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D44",
             "note": "Visible thumb width.",
@@ -2070,6 +2122,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D44",
             "note": "Interaction track width.",
@@ -2104,6 +2157,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D44",
             "note": "Minimum thumb height.",
@@ -2139,6 +2193,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D61",
             "formerPaths": [
@@ -2171,6 +2226,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D61",
             "formerPaths": [
@@ -2203,6 +2259,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D61",
             "formerPaths": [
@@ -2235,6 +2292,7 @@
         "$description": "Reusable size value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D61",
             "formerPaths": [
@@ -2266,6 +2324,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D62",
             "formerPaths": [
@@ -2298,6 +2357,7 @@
         "$description": "Reusable ratio value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -2327,6 +2387,7 @@
         "$description": "Reusable ratio value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -2356,6 +2417,7 @@
         "$description": "Reusable ratio value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D60",
             "formerPaths": [
@@ -2385,6 +2447,7 @@
         "$description": "Reusable proportion: ninety-five percent.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Daniel \u2014 2026-11-12: glyph artwork occupies 95% of its frame; tap target is separate.",
             "figmaName": "ratio/fraction-0-95",
@@ -2405,6 +2468,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No product radius scale was decided for sm.",
             "figmaName": "radius/sm",
@@ -2439,6 +2503,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No product radius scale was decided for md.",
             "figmaName": "radius/md",
@@ -2485,6 +2550,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D21",
             "note": "Card surfaces; the 18 and 20px call sites map here.",
@@ -2520,6 +2586,7 @@
         "$description": "Reusable radius value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D21",
             "figmaName": "radius/lg",
@@ -2552,6 +2619,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "radius/px-27",
@@ -2588,6 +2656,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "composer-derived",
             "note": "Measured from the approved Composer (D53), not written down as its own decision.",
             "figmaName": "radius/px-22",
@@ -2624,6 +2693,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D54",
             "figmaName": "radius/px-13",
@@ -2659,6 +2729,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D30",
             "formerPaths": [
@@ -2693,6 +2764,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D26",
             "figmaName": "border/px-1",
@@ -2726,6 +2798,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "No focus indicator was decided (G05).",
             "figmaName": "border/px-2",
@@ -2760,6 +2833,7 @@
           "$value": "Caelum Sans",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D17",
               "figmaName": "type/family/ui",
@@ -2790,6 +2864,7 @@
           "$value": "Caelum Mono",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D17",
               "figmaName": "type/family/mono",
@@ -2820,6 +2895,7 @@
           "$value": "Yrsa",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D17",
               "note": "Identity of a conversation, project or window only (D19).",
@@ -2852,6 +2928,7 @@
           "$value": "Caelum Sans Micro",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D69",
               "note": "UI text at 10 to 11px.",
@@ -2884,6 +2961,7 @@
           "$description": "Reusable type family value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D69",
               "formerPaths": [
@@ -2917,6 +2995,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/size/px-14",
@@ -2962,6 +3041,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/size/px-16",
@@ -2996,6 +3076,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/size/px-28",
@@ -3030,6 +3111,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "Daniel approved 12px consolidation after side-by-side reply-picker review, 2026-11-10; supersedes D55 reply size",
               "figmaName": "type/size/px-12",
@@ -3085,6 +3167,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "figmaName": "type/size/px-9",
               "formerPaths": [
@@ -3117,6 +3200,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "type/size/px-18",
               "formerPaths": [
@@ -3149,6 +3233,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "figmaName": "type/size/px-20",
               "formerPaths": [
@@ -3183,6 +3268,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/line/px-20",
@@ -3228,6 +3314,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/line/px-24",
@@ -3273,6 +3360,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/line/px-36",
@@ -3307,6 +3395,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D55",
               "figmaName": "type/line/px-19",
@@ -3339,6 +3428,7 @@
           "$value": 400,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/weight/regular",
@@ -3370,6 +3460,7 @@
           "$value": 500,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/weight/medium",
@@ -3401,6 +3492,7 @@
           "$value": 600,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "No type metric matrix was decided after the font swap (G06).",
               "figmaName": "type/weight/semibold",
@@ -3434,6 +3526,7 @@
           "$value": 0.019,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D18",
               "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06).",
@@ -3465,6 +3558,7 @@
           "$value": 0,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "figmaName": "type/tracking/none",
               "figmaId": "708:3888",
@@ -3481,6 +3575,7 @@
           "$value": 0.055,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D18",
               "note": "In em. Approved on IBM Plex; whether it holds on Caelum is unverified (G06).",
@@ -3515,6 +3610,7 @@
           "$description": "Reusable type feature value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D68",
               "formerPaths": [
@@ -3549,6 +3645,7 @@
           "$description": "Reusable type optical-threshold value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D69",
               "formerPaths": [
@@ -3581,6 +3678,7 @@
           "$description": "Reusable type optical-threshold value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D69",
               "formerPaths": [
@@ -3616,6 +3714,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "Production timings were never decided (G04).",
               "figmaName": "motion/duration/ms-120",
@@ -3650,6 +3749,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "Production timings were never decided (G04).",
               "figmaName": "motion/duration/ms-220",
@@ -3684,6 +3784,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "Production timings were never decided (G04).",
               "figmaName": "motion/duration/ms-360",
@@ -3718,6 +3819,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D40",
               "note": "Reduced-motion value only. Normal motion must never inherit it (D40).",
@@ -3753,6 +3855,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D33; D37; D36",
               "figmaName": "motion/duration/ms-260",
@@ -3806,6 +3909,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D33; D36",
               "figmaName": "motion/duration/ms-160",
@@ -3849,6 +3953,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D34",
               "note": "Per phrase of an arriving chat message.",
@@ -3883,6 +3988,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D35",
               "note": "Per newly streamed paragraph, fired once.",
@@ -3917,6 +4023,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D37",
               "formerPaths": [
@@ -3949,6 +4056,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D37",
               "formerPaths": [
@@ -3981,6 +4089,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D79; Unrecorded",
               "formerPaths": [
@@ -4022,6 +4131,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D79",
               "formerPaths": [
@@ -4054,6 +4164,7 @@
           },
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D42",
               "note": "Fill deceleration; its curve was not recorded.",
@@ -4089,6 +4200,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4121,6 +4233,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4153,6 +4266,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4185,6 +4299,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4217,6 +4332,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4249,6 +4365,7 @@
           "$description": "Reusable motion duration value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4281,6 +4398,7 @@
           "$description": "Reusable duration recovered from the Quiet Horizon single-ring study; default cycle retained for review.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "figmaName": "motion/duration/ms-4800",
               "family": "base.motion.duration",
@@ -4302,6 +4420,7 @@
           ],
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "note": "The draft's ease-out. Production timings were never decided (G04).",
               "figmaName": "motion/easing/curve-0-0-0-58-1",
@@ -4338,6 +4457,7 @@
           ],
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "motion/easing/curve-0-16-1-0-3-1",
@@ -4374,6 +4494,7 @@
           ],
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision.",
               "figmaName": "motion/easing/curve-0-4-0-0-8-0-3",
@@ -4410,6 +4531,7 @@
           ],
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D79; Unrecorded",
               "formerPaths": [
@@ -4454,6 +4576,7 @@
           "$description": "Reusable motion easing value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4484,6 +4607,7 @@
           "$value": 280,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D37",
               "formerPaths": [
@@ -4513,6 +4637,7 @@
           "$value": 34,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D37",
               "formerPaths": [
@@ -4542,6 +4667,7 @@
           "$value": 1,
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D37",
               "formerPaths": [
@@ -4577,6 +4703,7 @@
           "$description": "Reusable motion distance value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4609,6 +4736,7 @@
           "$description": "Reusable motion distance value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4641,6 +4769,7 @@
           "$description": "Reusable motion distance value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4673,6 +4802,7 @@
           "$description": "Reusable motion distance value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4704,6 +4834,7 @@
           "$description": "Reusable motion scale value. Original applications and evidence are retained in provenance.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "provisional",
               "decision": "D36",
               "formerPaths": [
@@ -4739,6 +4870,7 @@
         "$description": "Reusable blur value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D36",
             "formerPaths": [
@@ -4771,6 +4903,7 @@
         "$description": "Reusable blur value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D36",
             "formerPaths": [
@@ -4803,6 +4936,7 @@
         "$description": "Reusable blur value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D36",
             "formerPaths": [
@@ -4834,6 +4968,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D29",
             "note": "Backdrop blur.",
@@ -4868,6 +5003,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D29",
             "note": "Backdrop blur.",
@@ -4902,6 +5038,7 @@
         },
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D30",
             "formerPaths": [
@@ -4934,6 +5071,7 @@
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D36",
             "formerPaths": [
@@ -4962,6 +5100,7 @@
         "$value": 0.15,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Daniel approval \u00b7 2026-11-10 \u00b7 opacity consolidation",
             "note": "Approved shared foundation value. Historical application evidence remains in provenance; consuming recipe review status is unchanged.",
@@ -5032,6 +5171,7 @@
         "$value": 0.8,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D30",
             "formerPaths": [
@@ -5062,6 +5202,7 @@
         "$description": "Reusable opacity value. Original applications and evidence are retained in provenance.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D29; Unrecorded",
             "formerPaths": [
@@ -5099,6 +5240,7 @@
         "$value": 0.07,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "note": "Foundry graph intensity; review with the current palette.",
             "formerPaths": [
@@ -5129,6 +5271,7 @@
         "$value": 0.396078431372549,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.opacity.cloud.body-alpha"
@@ -5157,6 +5300,7 @@
         "$value": 0.043137254901960784,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.opacity.cloud.rest-start-alpha"
@@ -5185,6 +5329,7 @@
         "$value": 0.023529411764705882,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.opacity.cloud.rest-end-alpha"
@@ -5213,6 +5358,7 @@
         "$value": 0,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.opacity.cloud.wash-rest"
@@ -5241,6 +5387,7 @@
         "$value": 0.5,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.opacity.cloud.disabled-alpha",
@@ -5278,6 +5425,7 @@
         "$value": 0.76,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D29",
             "formerPaths": [
@@ -5307,6 +5455,7 @@
         "$value": 0.23,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Daniel approval \u00b7 2026-11-10 \u00b7 opacity consolidation",
             "note": "Approved shared foundation value. Historical application evidence remains in provenance; consuming recipe review status is unchanged.",
@@ -5405,6 +5554,7 @@
         "$value": 0.2,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D29",
             "note": "The tint gradient falls to 20% strength...",
@@ -5436,6 +5586,7 @@
         "$value": 0.23137254901960785,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Approved shared menu feather gradient stop alpha",
             "family": "base.opacity",
@@ -5449,6 +5600,7 @@
         "$value": 0.1411764705882353,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Approved shared menu feather gradient stop alpha",
             "family": "base.opacity",
@@ -5464,6 +5616,7 @@
         "$value": 1,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D31",
             "note": "Unfiltered backdrop saturation.",
@@ -5495,6 +5648,7 @@
         "$value": 1.25,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "Daniel \u00b7 2026-11-13 \u00b7 unified glass",
             "note": "125% background saturation; one shared glass material replaces panel and portal.",
@@ -5543,6 +5697,7 @@
         "$value": 0.72,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D29",
             "note": "...at 72%.",
@@ -5576,6 +5731,7 @@
         "$value": 0,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D31",
             "note": "No content behind the surface.",
@@ -5607,6 +5763,7 @@
         "$value": 1,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D31",
             "note": "Full overlap, or no host measurement.",
@@ -5640,6 +5797,7 @@
         "$value": 135,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.material.cloud-angle"
@@ -5668,6 +5826,7 @@
         "$value": 100,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "figmaId": "677:861",
             "decision": "Approved shared menu feather",
@@ -5684,6 +5843,7 @@
         "$value": -1,
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "formerPaths": [
               "base.material.underlay-order"

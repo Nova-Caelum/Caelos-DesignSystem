@@ -1,4 +1,5 @@
 set -eu
+git_root=$(pwd)
 snapshot=$(mktemp -d)
 trap 'rm -rf "$snapshot"' EXIT
 git checkout-index --all --prefix="$snapshot/"
@@ -9,6 +10,6 @@ repo_env=$(git rev-parse --local-env-vars)
 (
   unset $repo_env
   cd "$snapshot"
-  node scripts/check-tier-drift.cjs "$snapshot"
+  CAELOS_CATALOG_GIT_ROOT="$git_root" npm run check:catalog
   node --test
 )

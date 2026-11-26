@@ -763,6 +763,14 @@
         "$description": "Present alert content, emphasis and its dismiss or follow-up actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": [
+              "base.border.px-1",
+              "base.radius.xl",
+              "base.size.px-16",
+              "base.space.px-10",
+              "base.space.px-9"
+            ],
             "status": "partial",
             "inventoryName": "alert",
             "recipeInStaging": true,
@@ -830,6 +838,7 @@
           "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -840,6 +849,7 @@
           "$value": "{base.radius.xl}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -850,6 +860,7 @@
           "$value": "{base.size.px-16}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -860,6 +871,7 @@
           "$value": "{base.space.px-9}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -870,6 +882,7 @@
           "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D26"
             }
@@ -880,6 +893,13 @@
         "$description": "Present contextual action surfaces, items and separators.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": [
+              "base.motion.duration.ms-160",
+              "base.motion.duration.ms-260",
+              "base.motion.easing.curve-0-16-1-0-3-1",
+              "base.motion.easing.curve-0-4-0-0-8-0-3"
+            ],
             "status": "partial",
             "inventoryName": "contextMenu",
             "recipeInStaging": true,
@@ -916,6 +936,7 @@
           "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D33"
             }
@@ -926,6 +947,7 @@
           "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D33"
             }
@@ -936,6 +958,7 @@
           "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision."
             }
@@ -946,6 +969,7 @@
           "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision."
             }
@@ -956,6 +980,7 @@
         "$description": "Present notification popups, inbox items and feedback actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "notification",
             "recipeInStaging": true,
@@ -1004,6 +1029,13 @@
         "$description": "Present menu triggers, surfaces, choices and separators.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": [
+              "base.motion.duration.ms-160",
+              "base.motion.duration.ms-260",
+              "base.motion.easing.curve-0-16-1-0-3-1",
+              "base.motion.easing.curve-0-4-0-0-8-0-3"
+            ],
             "status": "partial",
             "inventoryName": "menu",
             "recipeInStaging": true,
@@ -1038,6 +1070,7 @@
           "$value": "{base.motion.duration.ms-260}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D33"
             }
@@ -1048,6 +1081,7 @@
           "$value": "{base.motion.duration.ms-160}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D33"
             }
@@ -1058,6 +1092,7 @@
           "$value": "{base.motion.easing.curve-0-16-1-0-3-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision."
             }
@@ -1068,6 +1103,7 @@
           "$value": "{base.motion.easing.curve-0-4-0-0-8-0-3}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "composer-derived",
               "note": "Measured from the approved Composer (D53), not written down as its own decision."
             }
@@ -1078,6 +1114,17 @@
         "$description": "Present contextual text attached to a trigger.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": [
+              "base.blur.px-10",
+              "base.border.px-1",
+              "base.opacity.fraction-0-8",
+              "base.radius.px-11",
+              "base.space.px-10",
+              "base.space.px-13",
+              "sys.color.success",
+              "sys.color.text-primary"
+            ],
             "status": "partial",
             "inventoryName": "tooltip",
             "recipeInStaging": true,
@@ -1110,6 +1157,7 @@
           "$value": "{sys.color.success}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30",
               "note": "Sage."
@@ -1121,6 +1169,7 @@
           "$value": "{base.opacity.fraction-0-8}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30"
             }
@@ -1131,6 +1180,7 @@
           "$value": "{base.blur.px-10}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30"
             }
@@ -1141,6 +1191,7 @@
           "$value": "{base.radius.px-11}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30"
             }
@@ -1151,6 +1202,7 @@
           "$value": "{base.space.px-10}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30"
             }
@@ -1161,6 +1213,7 @@
           "$value": "{base.space.px-13}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30"
             }
@@ -1171,6 +1224,7 @@
           "$value": "{base.border.px-1}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30",
               "note": "Uniform."
@@ -1182,6 +1236,7 @@
           "$value": "{sys.color.text-primary}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D30",
               "note": "Cream in dark mode."
@@ -1193,6 +1248,7 @@
         "$description": "Present dialog, drawer and popover surfaces with their backdrop and actions.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "overlay",
             "recipeInStaging": true,
@@ -1228,6 +1284,7 @@
         "$description": "Specify alert dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialog",
             "recipeInStaging": false,
@@ -1244,6 +1301,7 @@
         "$description": "Specify alert dialog trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogTrigger",
             "recipeInStaging": false,
@@ -1260,6 +1318,7 @@
         "$description": "Specify alert dialog portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogPortal",
             "recipeInStaging": false,
@@ -1276,6 +1335,7 @@
         "$description": "Specify alert dialog header overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogHeader",
             "recipeInStaging": false,
@@ -1292,6 +1352,7 @@
         "$description": "Specify alert dialog footer overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogFooter",
             "recipeInStaging": false,
@@ -1308,6 +1369,7 @@
         "$description": "Specify alert dialog media overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogMedia",
             "recipeInStaging": false,
@@ -1324,6 +1386,7 @@
         "$description": "Specify alert dialog description overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogDescription",
             "recipeInStaging": false,
@@ -1343,6 +1406,7 @@
         "$description": "Specify alert dialog action overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogAction",
             "recipeInStaging": false,
@@ -1359,6 +1423,7 @@
         "$description": "Specify alert dialog cancel overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.alert-dialog.AlertDialogCancel",
             "recipeInStaging": false,
@@ -1375,6 +1440,7 @@
         "$description": "Specify dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dialog.Dialog",
             "recipeInStaging": false,
@@ -1391,6 +1457,7 @@
         "$description": "Specify dialog trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dialog.DialogTrigger",
             "recipeInStaging": false,
@@ -1407,6 +1474,7 @@
         "$description": "Specify dialog portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dialog.DialogPortal",
             "recipeInStaging": false,
@@ -1423,6 +1491,7 @@
         "$description": "Specify dialog close overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dialog.DialogClose",
             "recipeInStaging": false,
@@ -1439,6 +1508,7 @@
         "$description": "Specify dropdown menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenu",
             "recipeInStaging": false,
@@ -1455,6 +1525,7 @@
         "$description": "Specify dropdown menu portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenuPortal",
             "recipeInStaging": false,
@@ -1471,6 +1542,7 @@
         "$description": "Specify dropdown menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenuTrigger",
             "recipeInStaging": false,
@@ -1487,6 +1559,7 @@
         "$description": "Specify dropdown menu group overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenuGroup",
             "recipeInStaging": false,
@@ -1503,6 +1576,7 @@
         "$description": "Specify dropdown menu radio group overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenuRadioGroup",
             "recipeInStaging": false,
@@ -1519,6 +1593,7 @@
         "$description": "Specify dropdown menu sub overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.dropdown-menu.DropdownMenuSub",
             "recipeInStaging": false,
@@ -1535,6 +1610,7 @@
         "$description": "Specify hover card overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.hover-card.HoverCard",
             "recipeInStaging": false,
@@ -1554,6 +1630,7 @@
         "$description": "Specify hover card trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.hover-card.HoverCardTrigger",
             "recipeInStaging": false,
@@ -1573,6 +1650,7 @@
         "$description": "Specify popover root overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.popover.PopoverRoot",
             "recipeInStaging": false,
@@ -1589,6 +1667,7 @@
         "$description": "Specify popover trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.popover.PopoverTrigger",
             "recipeInStaging": false,
@@ -1605,6 +1684,7 @@
         "$description": "Specify popover anchor overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.popover.PopoverAnchor",
             "recipeInStaging": false,
@@ -1621,6 +1701,7 @@
         "$description": "Specify sheet overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.sheet.Sheet",
             "recipeInStaging": false,
@@ -1637,6 +1718,7 @@
         "$description": "Specify sheet trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.sheet.SheetTrigger",
             "recipeInStaging": false,
@@ -1653,6 +1735,7 @@
         "$description": "Specify sheet close overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.sheet.SheetClose",
             "recipeInStaging": false,
@@ -1669,6 +1752,7 @@
         "$description": "Specify sheet portal overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.sheet.SheetPortal",
             "recipeInStaging": false,
@@ -1685,6 +1769,7 @@
         "$description": "Specify tooltip overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.tooltip.Tooltip",
             "recipeInStaging": false,
@@ -1701,6 +1786,7 @@
         "$description": "Specify tooltip trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "components.ui.tooltip.TooltipTrigger",
             "recipeInStaging": false,
@@ -1717,6 +1803,7 @@
         "$description": "Specify target context menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.TargetContextMenu.TargetContextMenu",
             "recipeInStaging": false,
@@ -1746,6 +1833,7 @@
         "$description": "Specify popover overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.foundation.Popover",
             "recipeInStaging": false,
@@ -1762,6 +1850,7 @@
         "$description": "Specify popover trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.foundation.PopoverTrigger",
             "recipeInStaging": false,
@@ -1778,6 +1867,7 @@
         "$description": "Specify popover close overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.foundation.PopoverClose",
             "recipeInStaging": false,
@@ -1794,6 +1884,7 @@
         "$description": "Specify toaster overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.foundation.Toaster",
             "recipeInStaging": false,
@@ -1813,6 +1904,7 @@
         "$description": "Specify dialog overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.Dialog",
             "recipeInStaging": false,
@@ -1834,6 +1926,7 @@
         "$description": "Specify drawer overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.Drawer",
             "recipeInStaging": false,
@@ -1855,6 +1948,7 @@
         "$description": "Specify context menu overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.ContextMenu",
             "recipeInStaging": false,
@@ -1871,6 +1965,7 @@
         "$description": "Specify context menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.ContextMenuTrigger",
             "recipeInStaging": false,
@@ -1891,6 +1986,7 @@
         "$description": "Specify action menu root overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.ActionMenuRoot",
             "recipeInStaging": false,
@@ -1907,6 +2003,7 @@
         "$description": "Specify action menu trigger overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.overlays.ActionMenuTrigger",
             "recipeInStaging": false,
@@ -1923,6 +2020,7 @@
         "$description": "Choose one value from a boxed selection menu. Recovered separately from action menus.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.components.SelectMenu",
             "recipeInStaging": false,
@@ -1948,6 +2046,7 @@
         "$description": "Specify hint overlay or feedback presentation if retained; overlay, menu or feedback part.",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "open",
             "inventoryName": "packages.ui.src.composer-internal.Hint",
             "recipeInStaging": false,

@@ -3,7 +3,10 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "test": "node --test"
+    "test": "node --test",
+    "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet --",
+    "check:recipes": "node scripts/check-recipes.mjs",
+    "check:ratchet": "node scripts/check-ratchet.mjs"
   },
   "devDependencies": {
     "husky": "9.1.7",

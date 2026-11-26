@@ -20,6 +20,7 @@
         "$value": "{base.color.chrome}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/chrome"
@@ -32,6 +33,7 @@
         "$value": "{base.color.ground}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/ground"
@@ -44,6 +46,7 @@
         "$value": "{base.color.elevated}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/elevated"
@@ -56,6 +59,7 @@
         "$value": "{base.color.elevated-2}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/elevated-2"
@@ -68,6 +72,7 @@
         "$value": "{base.color.top}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/top"
@@ -80,6 +85,7 @@
         "$value": "{base.color.text-primary}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/text-primary"
@@ -92,6 +98,7 @@
         "$value": "{base.color.text-supporting}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/text-supporting"
@@ -104,6 +111,7 @@
         "$value": "{base.color.text-tertiary}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/text-tertiary"
@@ -116,6 +124,7 @@
         "$value": "{base.color.text-faint}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/text-faint"
@@ -128,6 +137,7 @@
         "$value": "{base.color.action-blue}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/action-blue"
@@ -140,6 +150,7 @@
         "$value": "{base.color.action-blue-hover}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/action-blue-hover"
@@ -152,6 +163,7 @@
         "$value": "{base.color.success}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/success"
@@ -164,6 +176,7 @@
         "$value": "{base.color.golden-sand}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/golden-sand"
@@ -176,6 +189,7 @@
         "$value": "{base.color.peach-gold}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/peach-gold"
@@ -188,6 +202,7 @@
         "$value": "{base.color.danger}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/danger"
@@ -200,6 +215,7 @@
         "$value": "{base.color.danger-hover}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/danger-hover"
@@ -212,6 +228,7 @@
         "$value": "{base.color.ready}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/ready"
@@ -224,6 +241,7 @@
         "$value": "{base.color.structural-violet}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D47",
             "figmaName": "color/structural-violet"
@@ -238,6 +256,7 @@
         "$value": "{base.space.px-8}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D12",
             "figmaName": "layout/field-interior"
@@ -250,6 +269,7 @@
           "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D04",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -261,6 +281,7 @@
           "$value": "{base.space.px-21}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D04",
               "note": "Relationship name from the decision; the exact string awaits review (G03).",
@@ -273,6 +294,7 @@
           "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D04",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -286,6 +308,7 @@
           "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D07",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -297,6 +320,7 @@
           "$value": "{base.space.px-21}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D07",
               "note": "Relationship name from the decision; the exact string awaits review (G03).",
@@ -309,6 +333,7 @@
           "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D07",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -322,6 +347,7 @@
           "$value": "{base.space.px-24}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D05",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -333,6 +359,7 @@
           "$value": "{base.space.px-27}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D05",
               "note": "Relationship name from the decision; the exact string awaits review (G03).",
@@ -345,6 +372,7 @@
           "$value": "{base.space.px-30}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D05",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -358,6 +386,7 @@
           "$value": "{base.space.px-12}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D06",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -369,6 +398,7 @@
           "$value": "{base.space.px-15}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D06",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -380,6 +410,7 @@
           "$value": "{base.space.px-18}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D06",
               "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -392,6 +423,7 @@
         "$value": "{base.space.px-6}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D06",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -403,6 +435,7 @@
         "$value": "{base.space.px-9}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D08",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -414,6 +447,7 @@
         "$value": "{base.space.px-9}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D09",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -425,6 +459,7 @@
         "$value": "{base.space.px-12}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D11",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -436,6 +471,7 @@
         "$value": "{base.space.px-24}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D10",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -447,6 +483,7 @@
         "$value": "{base.size.px-240}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "canon",
             "decision": "D10",
             "note": "Relationship name from the decision; the exact string awaits review (G03)."
@@ -460,6 +497,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D60"
             }
@@ -471,6 +509,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D60"
             }
@@ -482,6 +521,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D60"
             }
@@ -493,6 +533,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D60"
             }
@@ -504,6 +545,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D61"
             }
@@ -517,6 +559,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -528,6 +571,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -539,6 +583,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -550,6 +595,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D62"
             }
@@ -563,6 +609,7 @@
           "$description": "Shared across colour modes.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D54"
             }
@@ -576,6 +623,7 @@
           "$description": "Question answer label aligned to the title axis.",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D64"
             }
@@ -589,6 +637,7 @@
         "$value": "{base.blur.px-19}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional",
             "decision": "D31",
             "note": "D31 decides one role for content behind glass; its value follows the shared glass blur."
@@ -600,6 +649,7 @@
         "$value": "{base.color.elevated}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional"
           }
         }
@@ -609,6 +659,7 @@
         "$value": "{base.color.text-primary}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional"
           }
         }
@@ -618,6 +669,7 @@
         "$value": "{base.color.ready}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional"
           }
         }
@@ -627,6 +679,7 @@
         "$value": "{base.color.text-supporting}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional"
           }
         }
@@ -636,6 +689,7 @@
         "$value": "{base.color.success}",
         "$extensions": {
           "app.caelos": {
+            "lifecycle": "promoted",
             "status": "provisional"
           }
         }
@@ -646,6 +700,7 @@
           "$value": "{base.opacity.fraction-0-23}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D29",
               "figmaPreviousNames": [
@@ -660,6 +715,7 @@
           "$value": "{base.blur.px-19}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D29",
               "figmaPreviousNames": [
@@ -674,6 +730,7 @@
           "$value": "{base.opacity.fraction-0-15}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "D29",
               "figmaPreviousNames": [
@@ -688,6 +745,7 @@
           "$value": "{base.saturation.factor-1-25}",
           "$extensions": {
             "app.caelos": {
+              "lifecycle": "promoted",
               "status": "canon",
               "decision": "Daniel · 2026-11-13 · unified glass",
               "figmaPreviousNames": [
