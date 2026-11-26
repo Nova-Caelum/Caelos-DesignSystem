@@ -431,3 +431,23 @@ test('F4 requires kind on an active recipe', (t) => {
   entry({ madeOf: ['primitives.shared.ink'] }, 'changed');
   refused(run(), 'requires kind');
 });
+
+test('refuses a madeOf name that is not a lower-tier entry', (t) => {
+  const { entry, run } = fixture(t);
+  entry({ kind: 'notice', madeOf: ['primitives.shared.missing'] }, 'changed');
+  refused(run(), 'madeOf names primitives\\.shared\\.missing, which is not a lower-tier entry');
+});
+
+test('refuses a tier file that exists at the base but not in the candidate', (t) => {
+  const { cwd, run } = fixture(t);
+  unlinkSync(path.join(cwd, catalog, '01-primitives.tokens.json'));
+  const result = run();
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stderr, /01-primitives\.tokens\.json: missing tier input; restore the catalog file/);
+});
+
+test('refuses contents on an entry that is not a tier 3 group', (t) => {
+  const { entry, run } = fixture(t);
+  entry({ kind: 'notice', madeOf: ['primitives.shared.ink'], contents: { slot: 'body' } }, 'changed');
+  refused(run(), 'contents belongs on a tier 3 shell');
+});
