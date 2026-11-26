@@ -139,6 +139,27 @@ test("A5b: focus or type steps do not cover a click handler", async () => {
   assert.equal(runCounter(clicked.listFile).status, 0);
 });
 
+test("A5c: a type step fills the field and does not cover a keyboard handler", async () => {
+  const files = await writeCase(primarySource, list([
+    line("pass", "handlePass", [{ do: "click", role: "button", name: "Pass action" }]),
+    line("flaky", "handleFlaky", [{ do: "click", role: "button", name: "Flaky action" }]),
+    line("message", "handleMessage", [{ do: "type", role: "textbox", name: "Message", value: "hello" }]),
+  ]));
+  const result = runCounter(files.listFile);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /onKeyDown at \d+:\d+ on input .* add a line with a press step/);
+});
+
+test("A5d: a checkbox change is covered by a click, not by typing", async () => {
+  const source = "export function S(){const pick=()=>{};return <input type=\"checkbox\" aria-label=\"Remember\" onChange={pick} />;}";
+  const clicked = await writeCase(source, list([line("pick", "pick", [{ do: "click", role: "checkbox", name: "Remember" }])]));
+  assert.equal(runCounter(clicked.listFile).status, 0);
+  const typed = await writeCase(source, list([line("pick", "pick", [{ do: "type", role: "checkbox", name: "Remember", value: "x" }])]));
+  const refused = runCounter(typed.listFile);
+  assert.equal(refused.status, 1, refused.stderr);
+  assert.match(refused.stderr, /onChange .* add a line with a click step/);
+});
+
 test("A6: componentRoles ties custom components to steps", async () => {
   const source = "export function S(){const save=()=>{};return <Button onClick={save}>Save</Button>;}";
   const lines = [line("save", "save", [{ do: "click", role: "button", name: "Save" }])];

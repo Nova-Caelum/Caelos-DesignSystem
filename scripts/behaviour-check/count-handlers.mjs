@@ -290,12 +290,17 @@ export function findActionHandlers(source, fileName = "screen.tsx", { componentR
   return entries;
 }
 
-function allowedSteps(prop) {
+// Only the steps whose browser action dispatches the prop's event count:
+// "type" fills the field (input events, no key events), "press" sends keys,
+// "click" sends pointer events and toggles checkable controls.
+const CHECKABLE_ROLES = new Set(["checkbox", "radio", "switch"]);
+
+function allowedSteps(prop, role) {
   const normalized = prop.endsWith("Capture") ? prop.slice(0, -"Capture".length) : prop;
-  if (CLICK_PROPS.has(normalized)) return ["click", "press"];
-  if (CHANGE_PROPS.has(normalized)) return ["type", "click", "press"];
-  if (KEY_PROPS.has(normalized)) return ["press", "type"];
-  if (normalized === "onFocus") return ["focus", "click", "press"];
+  if (CLICK_PROPS.has(normalized)) return ["click"];
+  if (CHANGE_PROPS.has(normalized)) return CHECKABLE_ROLES.has(role) ? ["click"] : ["type"];
+  if (KEY_PROPS.has(normalized)) return ["press"];
+  if (normalized === "onFocus") return ["focus", "click"];
   return [...ACTION_STEPS];
 }
 
@@ -313,7 +318,7 @@ export function compareHandlers(entries, list) {
     const exercisedByLine = new Set();
     for (const entry of entries) {
       if (!entry.tied) continue;
-      const allowed = new Set(allowedSteps(entry.prop));
+      const allowed = new Set(allowedSteps(entry.prop, entry.element.role));
       if (actions.some((step) => step.role === entry.element.role
         && step.name === entry.element.name && allowed.has(step.do))) {
         coveredEntries.add(entry);
@@ -372,7 +377,7 @@ function coverageDescription(entry) {
 }
 
 function coverageHint(entry) {
-  if (entry.tied) return `add a line with a ${allowedSteps(entry.prop).join("/")} step on ${entry.element.role} '${entry.element.name}'`;
+  if (entry.tied) return `add a line with a ${allowedSteps(entry.prop, entry.element.role).join("/")} step on ${entry.element.role} '${entry.element.name}'`;
   const declare = `declare {"prop":"${entry.prop}","at":"${entry.at}"} in the covers of the line that exercises it`;
   if (entry.reason === "spread") return `spread: the handlers it passes cannot be seen; pass them as named props, or ${declare}`;
   if (entry.reason === "ambiguous") return `ambiguous: give each element a distinct accessible name, or ${declare}`;
