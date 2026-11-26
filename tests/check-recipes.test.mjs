@@ -408,13 +408,18 @@ test('F4 refuses a missing recipe record', (t) => {
 });
 
 test('F4 follows paint through an untyped neutral alias chain', (t) => {
-  const { entry, run, write } = fixture(t);
+  const { run, write } = fixture(t);
   write(`${catalog}/02-controls.tokens.json`, { controls: { shared: { neutral: {
     $value: '{base.shared.ink}',
     $extensions: { 'app.caelos': { lifecycle: 'promoted' } },
   } } } });
-  entry({ kind: 'notice', madeOf: ['primitives.shared.ink'] }, 'changed', true, '{controls.shared.neutral}');
-  refused(run(), 'paint enters only at tiers 0 to 2');
+  // The tier 4 token has no $type and a neutral name: only the reference chain makes it paint.
+  write(`${catalog}/04-patterns.tokens.json`, { patterns: { shared: { notice: {
+    $description: 'changed',
+    $extensions: { 'app.caelos': { lifecycle: 'promoted', kind: 'notice', madeOf: ['primitives.shared.ink'] } },
+    ground: { $value: '{controls.shared.neutral}', $extensions: { 'app.caelos': { lifecycle: 'promoted' } } },
+  } } } });
+  refused(run(), 'declares paint token patterns\\.shared\\.notice\\.ground');
 });
 
 test('F4 requires kind on an active recipe', (t) => {

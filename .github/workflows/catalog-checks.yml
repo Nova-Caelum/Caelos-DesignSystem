@@ -45,6 +45,10 @@ jobs:
             base=$PUSH_BEFORE
             git cat-file -e "$base^{commit}" 2>/dev/null || { echo "push base $base is not available; re-run the check"; exit 1; }
           fi
+          # The candidate's own .gitattributes may not hide or rewrite files in the export.
+          attributes=$(git rev-parse --git-path info/attributes)
+          mkdir -p "$(dirname "$attributes")"
+          printf '* -export-ignore -export-subst\n' >> "$attributes"
           mkdir -p "$RUNNER_TEMP/candidate"
           git archive "$head" | tar -x -C "$RUNNER_TEMP/candidate"
           echo "candidate $head, base $base, checker $(git rev-parse HEAD)"
