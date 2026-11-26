@@ -1,0 +1,15 @@
+name: Called probe
+on:
+  workflow_call:
+    inputs:
+      fail:
+        type: boolean
+        default: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Return requested result
+        env:
+          SHOULD_FAIL: ${{ inputs.fail }}
+        run: if [ "$SHOULD_FAIL" = true ]; then exit 1; else exit 0; fi
