@@ -38,6 +38,7 @@ function checkBaseline(file, tree, errors) {
     throw new Error(`${file}: baseline must be inside the checkout; pass the path to the tracked baseline`);
   }
   const current = baselineCounts(readJson(relative), relative);
+  if (!tree) return;
   const previous = baselineCounts(readJson(relative, tree), `${relative} at base ${tree}`);
   for (const [fileName, counts] of Object.entries(current)) {
     if (!Object.hasOwn(previous, fileName)) {
@@ -57,12 +58,16 @@ function checkBaseline(file, tree, errors) {
 try {
   const { base, baseline } = options(process.argv.slice(2), ['--base', '--baseline']);
   const current = exceptionNames(readJson(exceptionsFile), exceptionsFile);
-  const tree = baseTree(base);
-  const previous = baseExceptions(tree);
+  const tree = base === 'none' ? undefined : baseTree(base);
   const errors = [];
-  for (const name of current) {
-    if (!previous.has(name)) {
-      errors.push(`${exceptionsFile}: ${name} was added; remove the exception and move its paint to tier 1 or 2`);
+  if (!tree) {
+    console.log('no base given: ratchet comparison skipped');
+  } else {
+    const previous = baseExceptions(tree);
+    for (const name of current) {
+      if (!previous.has(name)) {
+        errors.push(`${exceptionsFile}: ${name} was added; remove the exception and move its paint to tier 1 or 2`);
+      }
     }
   }
   if (baseline) checkBaseline(baseline, tree, errors);

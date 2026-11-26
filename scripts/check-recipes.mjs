@@ -236,13 +236,15 @@ async function checkRecipes({ base, paired }) {
   }
   const ignored = Object.keys(schema.properties).filter((key) => schema.properties[key]['x-caelos-ignore-for-change']);
   const current = readCatalog();
-  const tree = baseTree(base);
-  const previous = readCatalog(tree);
+  const hasBase = base !== 'none';
+  const tree = hasBase ? baseTree(base) : undefined;
+  const previous = tree ? readCatalog(tree) : { files: [], entries: [] };
+  if (!hasBase) console.log('no base given: changed-entry rule skipped');
   // A hook provides a checkout-index snapshot. Compare that snapshot directly
   // with the base tree so unstaged edits and alternate indexes stay out of it.
-  const changedFiles = process.env.CAELOS_CATALOG_GIT_ROOT ? null : new Set(
+  const changedFiles = hasBase && !process.env.CAELOS_CATALOG_GIT_ROOT ? new Set(
     git(['diff', '--name-only', '--no-renames', '-z', tree, '--', directory]).split('\0'),
-  );
+  ) : null;
   for (const file of previous.files) {
     if (!current.files.includes(file)) throw new Error(`${directory}/${file}: missing tier input; restore the catalog file`);
   }
@@ -265,7 +267,7 @@ async function checkRecipes({ base, paired }) {
     }
     const old = entriesAtBase.get(`${file}:${name}`);
     const changed = !changedFiles || changedFiles.has(`${directory}/${file}`);
-    const active = matches.has(name) || !old || (changed && !isDeepStrictEqual(materialRecord(old, ignored), materialRecord(node, ignored)));
+    const active = matches.has(name) || (hasBase && (!old || (changed && !isDeepStrictEqual(materialRecord(old, ignored), materialRecord(node, ignored)))));
     const required = new Set(schema.required);
     for (const [key, rule] of Object.entries(schema.properties)) {
       const recipeTier = rule['x-caelos-recipe-tier'];

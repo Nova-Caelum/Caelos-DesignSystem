@@ -45,6 +45,13 @@ test('(g) fails loudly when a required input file is missing', (t) => {
   assert.match(result.stderr, /missing\.json.*(cannot read|missing)/i);
 });
 
+test('base none announces that the ratchet comparison is skipped', (t) => {
+  const { cwd } = fixture(t);
+  const result = spawnSync(process.execPath, [checker, '--base', 'none'], { cwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /no base given: ratchet comparison skipped/);
+});
+
 test('accepts shrinking lists and rejects increases, new rules and new files', (t) => {
   const { write, run } = fixture(t);
   const file = 'gate-baseline.json';

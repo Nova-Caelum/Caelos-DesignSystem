@@ -47,11 +47,26 @@ function fixture(t, { paint = false } = {}) {
   });
   entry();
   git('init', '-q');
+  git('config', 'user.email', 'recipe-test@example.invalid');
+  git('config', 'user.name', 'Recipe test');
   git('add', '.');
   const base = git('write-tree');
-  return { cwd, entry, write, run: (...args) => spawnSync(process.execPath, [checker, '--base', base, ...args], {
-    cwd, encoding: 'utf8',
-  }) };
+  git('commit', '-qm', 'base');
+  const run = (...args) => spawnSync(process.execPath, [checker, '--base', base, ...args], { cwd, encoding: 'utf8' });
+  const runFromSnapshot = (...args) => {
+    const snapshot = mkdtempSync(path.join(tmpdir(), 'caelos-recipe-snapshot-'));
+    t.after(() => rmSync(snapshot, { recursive: true, force: true }));
+    mkdirSync(path.join(snapshot, catalog));
+    for (const file of ['recipe.schema.json', 'paint-families.json', 'tier-line.exceptions.json', '01-primitives.tokens.json', '04-patterns.tokens.json']) {
+      copyFileSync(path.join(cwd, catalog, file), path.join(snapshot, catalog, file));
+    }
+    return spawnSync(process.execPath, [checker, ...args], {
+      cwd: snapshot,
+      encoding: 'utf8',
+      env: { ...process.env, CAELOS_CATALOG_GIT_ROOT: cwd },
+    });
+  };
+  return { cwd, entry, write, run, runFromSnapshot };
 }
 
 function refused(result, rule) {
@@ -87,6 +102,21 @@ test('(f) refuses the same incomplete recipe when paired', (t) => {
   const { write, run } = fixture(t);
   write('match.json', { notice: pattern });
   refused(run('--paired', 'match.json'), 'requires madeOf');
+});
+
+test('base none announces skipped changed-entry checks while preserving the paint line', (t) => {
+  const { runFromSnapshot } = fixture(t, { paint: true });
+  const result = runFromSnapshot('--base', 'none');
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stdout, /no base given: changed-entry rule skipped/);
+  assert.match(result.stderr, /paint enters only at tiers 0 to 2/);
+});
+
+test('base HEAD is read from CAELOS_CATALOG_GIT_ROOT for a checkout snapshot', (t) => {
+  const { runFromSnapshot } = fixture(t);
+  const result = runFromSnapshot('--base', 'HEAD');
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Recipe schema and paint line passed/);
 });
 
 test('reads required fields from the template and accepts a completed recipe', (t) => {

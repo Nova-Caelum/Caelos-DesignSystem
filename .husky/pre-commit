@@ -7,9 +7,14 @@ git checkout-index --all --prefix="$snapshot/"
 # Git directory or index into those repositories.
 export NODE_PATH="$(pwd)/node_modules"
 repo_env=$(git rev-parse --local-env-vars)
+if git rev-parse --verify -q HEAD >/dev/null; then
+  catalog_base=HEAD
+else
+  catalog_base=none
+fi
 (
   unset $repo_env
   cd "$snapshot"
-  CAELOS_CATALOG_GIT_ROOT="$git_root" npm run check:catalog
+  CAELOS_CATALOG_GIT_ROOT="$git_root" npm run check:catalog -- --base "$catalog_base"
   node --test
 )

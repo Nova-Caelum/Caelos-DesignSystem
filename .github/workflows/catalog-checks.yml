@@ -17,10 +17,7 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - env:
           BASE_REF: ${{ github.base_ref }}
-        run: |
-          # The existing drift checker needs the runner image's TypeScript.
-          tsc_path=$(command -v tsc) || { echo 'The runner image must provide TypeScript for tier drift'; exit 1; }
-          export NODE_PATH="$(dirname "$(readlink -f "$tsc_path")")/../.."
-          npm run check:catalog -- --base "origin/$BASE_REF"
+        run: npm run check:catalog -- --base "origin/$BASE_REF"
