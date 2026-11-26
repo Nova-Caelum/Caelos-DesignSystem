@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const checker = path.join(project, 'scripts/check-tier-drift.cjs');
 
+const GOOD = '#100f1c';
+const WRONG = GOOD.slice(0, -1) + 'd';
 const leaf = ($type, $value) => ({ $type, $value });
 const supportedBase = {
   base: {
@@ -73,14 +75,14 @@ test('(a) generated base declarations equal to every supported catalog type pass
 });
 
 test('(b) a hand-edited generated base value names the file, line, token and both values', () => {
-  const result = run({ 'generated/tokens.css': ':root {\n  --base-color-ground: #100f1d;\n}\n' });
+  const result = run({ 'generated/tokens.css': `:root {\n  --base-color-ground: ${WRONG};\n}\n` });
   assert.equal(result.status, 1, output(result));
-  assert.match(output(result), /generated\/tokens\.css:2: --base-color-ground generated base value #100f1d does not equal catalog value #100f1c/);
+  assert.ok(output(result).includes(`generated/tokens.css:2: --base-color-ground generated base value ${WRONG} does not equal catalog value ${GOOD}`), output(result));
   assert.match(output(result), /regenerate with npm run build:tokens, or fix the catalog/);
 });
 
 test('(c) a generated raw declaration that is not a catalog base leaf remains flagged', () => {
-  const result = run({ 'generated/tokens.css': ':root {\n  --sys-color-x: #fff;\n}\n' });
+  const result = run({ 'generated/tokens.css': ':root {\n  --sys-space-x: 5px;\n}\n' });
   assert.equal(result.status, 1, output(result));
   assert.match(output(result), /generated\/tokens\.css:2: raw style value/);
 });
@@ -138,7 +140,7 @@ test('(i) plain-identifier font families are bare while spaced families are quot
 });
 
 test('(j) a final generated base declaration without a semicolon is still compared', () => {
-  const result = run({ 'generated/tokens.css': ':root {\n  --base-color-ground: #100f1d\n}\n' });
+  const result = run({ 'generated/tokens.css': `:root {\n  --base-color-ground: ${WRONG}\n}\n` });
   assert.equal(result.status, 1, output(result));
-  assert.match(output(result), /generated\/tokens\.css:2: --base-color-ground generated base value #100f1d does not equal catalog value #100f1c/);
+  assert.ok(output(result).includes(`generated/tokens.css:2: --base-color-ground generated base value ${WRONG} does not equal catalog value ${GOOD}`), output(result));
 });
