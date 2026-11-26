@@ -1,0 +1,20 @@
+{
+  "name": "Caelos-DesignSystem",
+  "scan": {
+    "include": ["src/**"],
+    "exclude": ["**/*.test.*"],
+    "types": ["ts", "tsx", "mjs", "css"]
+  },
+  "tokens": { "dtcg": ["token_catalog/*.tokens.json"] },
+  "styledObjects": { "enabled": true, "panda": true, "shorthands": true },
+  "dimensions": {
+    "size": { "enabled": false },
+    "z-index": { "enabled": false }
+  },
+  "icons": { "enabled": true },
+  "missing": {
+    "gap": { "severity": "off" },
+    "typography": { "severity": "off" },
+    "motion": { "severity": "off", "required": false }
+  }
+}

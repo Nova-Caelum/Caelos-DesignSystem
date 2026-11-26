@@ -4,6 +4,7 @@
   "scripts": {
     "prepare": "husky",
     "test": "node --test",
+    "check:app": "node scripts/design-system-enforcer-gate/design-system-enforcer-gate.mjs --json",
     "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet --",
     "check:recipes": "node scripts/check-recipes.mjs",
     "check:ratchet": "node scripts/check-ratchet.mjs"

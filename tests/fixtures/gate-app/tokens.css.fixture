@@ -1,0 +1,5 @@
+:root {
+  --base-space-px-12: 12px;
+  --base-motion-duration-fast: 120ms;
+  --base-motion-easing-out: cubic-bezier(0.2, 0, 0, 1);
+}
