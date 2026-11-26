@@ -1,0 +1,478 @@
+:root {
+  --base-color-chrome: #080817; /** Deep frame (palette role chrome) */
+  --base-color-ground: #100f1c; /** Ink Indigo (palette role ground) */
+  --base-color-elevated: #161627; /** Panels (palette role elevated) */
+  --base-color-elevated-2: #1e1e30; /** Raised layer (palette role elevated-2) */
+  --base-color-top: #262639; /** Highest layer (palette role top) */
+  --base-color-text-primary: #ede3cf; /** Primary text (palette role text-primary) */
+  --base-color-text-supporting: #9b958b; /** Supporting and placeholder text (palette role text-supporting) */
+  --base-color-text-tertiary: #717184; /** Tertiary text (palette role text-tertiary) */
+  --base-color-text-faint: #53546e; /** Faint text (palette role text-faint) */
+  --base-color-action-blue: #678bec; /** Action Blue (palette role action-blue) */
+  --base-color-action-blue-hover: #779cff; /** Action Blue hover (palette role action-blue-hover) */
+  --base-color-success: #8bb5a8; /** Sage / Sea Green (palette role success) */
+  --base-color-golden-sand: #c4ac7c; /** Golden Sand (palette role golden-sand) */
+  --base-color-peach-gold: #e8b67a; /** Peach Gold (palette role peach-gold) */
+  --base-color-danger: #c25b62; /** Danger Red (palette role danger) */
+  --base-color-danger-hover: #c98589; /** Danger Red hover (palette role danger-hover) */
+  --base-color-ready: #8e96cc; /** Ready Lavender (palette role ready) */
+  --base-color-light-ground: #f2e8d9; /** Dawn light ground (palette role light-ground) */
+  --base-color-structural-violet: #3f3d6c; /** Structural Violet (palette role structural-violet) */
+  --base-space-px-0: 0px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-3: 3px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-6: 6px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-9: 9px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-12: 12px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-15: 15px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-18: 18px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-21: 21px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-24: 24px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-27: 27px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-30: 30px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-8: 8px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-2: 2px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-4: 4px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-5: 5px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-7: 7px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-10: 10px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-14: 14px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-20: 20px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-13: 13px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-19: 19px; /** Reusable space value. Original applications and evidence are retained in provenance. */
+  --base-space-px-16: 16px;
+  --base-size-px-240: 240px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-60: 60px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-280: 280px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-460: 460px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-44: 44px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-42: 42px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-20: 20px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-17: 17px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-34: 34px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-47: 47px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-6: 6px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-22: 22px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-28: 28px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-48: 48px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-54: 54px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-40: 40px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-32: 32px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-size-px-16: 16px; /** Reusable size value. Original applications and evidence are retained in provenance. */
+  --base-ratio-fraction-0-45: 0.45; /** Reusable ratio value. Original applications and evidence are retained in provenance. */
+  --base-ratio-fraction-0-56: 0.56; /** Reusable ratio value. Original applications and evidence are retained in provenance. */
+  --base-ratio-fraction-0-1: 0.1; /** Reusable ratio value. Original applications and evidence are retained in provenance. */
+  --base-ratio-fraction-0-95: 0.95; /** Reusable proportion: ninety-five percent. */
+  --base-radius-sm: 6px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-md: 12px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-xl: 18.23px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-lg: 13.5px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-px-27: 27px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-px-22: 22px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-px-13: 13px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-radius-px-11: 11px; /** Reusable radius value. Original applications and evidence are retained in provenance. */
+  --base-border-px-1: 1px; /** Reusable border value. Original applications and evidence are retained in provenance. */
+  --base-border-px-2: 2px; /** Reusable border value. Original applications and evidence are retained in provenance. */
+  --base-type-family-ui: 'Caelum Sans'; /** Reusable type family value. Original applications and evidence are retained in provenance. */
+  --base-type-family-mono: 'Caelum Mono'; /** Reusable type family value. Original applications and evidence are retained in provenance. */
+  --base-type-family-display: Yrsa; /** Reusable type family value. Original applications and evidence are retained in provenance. */
+  --base-type-family-micro: 'Caelum Sans Micro'; /** Reusable type family value. Original applications and evidence are retained in provenance. */
+  --base-type-family-mono-micro: 'Caelum Mono Micro'; /** Reusable type family value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-14: 14px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-16: 16px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-28: 28px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-12: 12px; /** Shared 12px type size. The former 12.5px reply-picker size was consolidated after visual review; its 19px line height is unchanged. Original decisions remain in provenance. */
+  --base-type-size-px-9: 9px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-18: 18px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-size-px-20: 20px; /** Reusable type size value. Original applications and evidence are retained in provenance. */
+  --base-type-line-px-20: 20px; /** Reusable type line value. Original applications and evidence are retained in provenance. */
+  --base-type-line-px-24: 24px; /** Reusable type line value. Original applications and evidence are retained in provenance. */
+  --base-type-line-px-36: 36px; /** Reusable type line value. Original applications and evidence are retained in provenance. */
+  --base-type-line-px-19: 19px; /** Reusable type line value. Original applications and evidence are retained in provenance. */
+  --base-type-weight-regular: 400; /** Reusable type weight value. Original applications and evidence are retained in provenance. */
+  --base-type-weight-medium: 500; /** Reusable type weight value. Original applications and evidence are retained in provenance. */
+  --base-type-weight-semibold: 600; /** Reusable type weight value. Original applications and evidence are retained in provenance. */
+  --base-type-tracking-ui: 0.019; /** Reusable type tracking value. Original applications and evidence are retained in provenance. */
+  --base-type-tracking-none: 0;
+  --base-type-word-spacing-ui: 0.055; /** Reusable type word-spacing value. Original applications and evidence are retained in provenance. */
+  --base-type-feature-zero: 0; /** Reusable type feature value. Original applications and evidence are retained in provenance. */
+  --base-type-optical-threshold-px-10: 10px; /** Reusable type optical-threshold value. Original applications and evidence are retained in provenance. */
+  --base-type-optical-threshold-px-11: 11px; /** Reusable type optical-threshold value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-120: 0.12s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-220: 0.22s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-360: 0.36s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-0: 0s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-260: 0.26s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-160: 0.16s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-400: 0.4s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-650: 0.65s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-340: 0.34s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-130: 0.13s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-320: 0.32s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-380: 0.38s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-180: 0.18s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-60: 0.06s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-1800: 1.8s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-900: 0.9s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-1000: 1s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-520: 0.52s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-720: 0.72s; /** Reusable motion duration value. Original applications and evidence are retained in provenance. */
+  --base-motion-duration-ms-4800: 4.8s; /** Reusable duration recovered from the Quiet Horizon single-ring study; default cycle retained for review. */
+  --base-motion-easing-curve-0-0-0-58-1: cubic-bezier(0, 0, 0.58, 1); /** Reusable motion easing value. Original applications and evidence are retained in provenance. */
+  --base-motion-easing-curve-0-16-1-0-3-1: cubic-bezier(0.16, 1, 0.3, 1); /** Reusable motion easing value. Original applications and evidence are retained in provenance. */
+  --base-motion-easing-curve-0-4-0-0-8-0-3: cubic-bezier(0.4, 0, 0.8, 0.3); /** Reusable motion easing value. Original applications and evidence are retained in provenance. */
+  --base-motion-easing-curve-0-4-0-0-2-1: cubic-bezier(0.4, 0, 0.2, 1); /** Reusable motion easing value. Original applications and evidence are retained in provenance. */
+  --base-motion-easing-curve-0-22-1-0-36-1: cubic-bezier(0.22, 1, 0.36, 1); /** Reusable motion easing value. Original applications and evidence are retained in provenance. */
+  --base-motion-spring-stiffness: 280; /** Reusable motion spring value. Original applications and evidence are retained in provenance. */
+  --base-motion-spring-damping: 34; /** Reusable motion spring value. Original applications and evidence are retained in provenance. */
+  --base-motion-spring-mass: 1; /** Reusable motion spring value. Original applications and evidence are retained in provenance. */
+  --base-motion-distance-px-8: 8px; /** Reusable motion distance value. Original applications and evidence are retained in provenance. */
+  --base-motion-distance-px-16: 16px; /** Reusable motion distance value. Original applications and evidence are retained in provenance. */
+  --base-motion-distance-px-12: 12px; /** Reusable motion distance value. Original applications and evidence are retained in provenance. */
+  --base-motion-distance-px-14: 14px; /** Reusable motion distance value. Original applications and evidence are retained in provenance. */
+  --base-motion-scale-factor-1-045: 1.045; /** Reusable motion scale value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-6: 6px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-12: 12px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-8: 8px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-19: 19px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-2: 2px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-blur-px-10: 10px; /** Reusable blur value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-55: 0.55; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-15: 0.15; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-8: 0.8; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-1: 1; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-07: 0.07; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-396078431372549: 0.396078431372549; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-043137254901960784: 0.043137254901960784; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-023529411764705882: 0.023529411764705882; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0: 0; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-5: 0.5; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-76: 0.76; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-23: 0.23; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-0-2: 0.2; /** Reusable opacity value. Original applications and evidence are retained in provenance. */
+  --base-opacity-fraction-59-of-255: 0.23137254901960785;
+  --base-opacity-fraction-36-of-255: 0.1411764705882353;
+  --base-saturation-factor-1: 1; /** Reusable saturation value. Original applications and evidence are retained in provenance. */
+  --base-saturation-factor-1-25: 1.25; /** Reusable saturation value. Original applications and evidence are retained in provenance. */
+  --base-position-fraction-0-72: 0.72; /** Reusable position value. Original applications and evidence are retained in provenance. */
+  --base-coverage-clear: 0; /** Reusable coverage value. Original applications and evidence are retained in provenance. */
+  --base-coverage-covered: 1; /** Reusable coverage value. Original applications and evidence are retained in provenance. */
+  --base-angle-degrees-135: 135; /** Reusable angle value. Original applications and evidence are retained in provenance. */
+  --base-angle-degrees-100: 100;
+  --base-stack-below: -1; /** Reusable stack value. Original applications and evidence are retained in provenance. */
+  --primitives-shared-typography-size-label: var(--base-type-size-px-14);
+  --primitives-shared-typography-size-body: var(--base-type-size-px-16);
+  --primitives-shared-typography-size-title: var(--base-type-size-px-28);
+  --primitives-shared-typography-size-micro: var(--base-type-size-px-9);
+  --primitives-shared-typography-size-caption: var(--base-type-size-px-12);
+  --primitives-shared-typography-size-lead: var(--base-type-size-px-18);
+  --primitives-shared-typography-size-subheading: var(--base-type-size-px-20);
+  --primitives-shared-typography-line-label: var(--base-type-line-px-20);
+  --primitives-shared-typography-line-body: var(--base-type-line-px-24);
+  --primitives-shared-typography-line-title: var(--base-type-line-px-36);
+  --primitives-shared-typography-family-ui: var(--base-type-family-ui);
+  --primitives-shared-typography-family-mono: var(--base-type-family-mono);
+  --primitives-shared-typography-family-display: var(--base-type-family-display);
+  --primitives-shared-foundation-separator-thickness: var(--base-border-px-1);
+  --primitives-shared-scroll-area-thumb: var(--base-size-px-6);
+  --primitives-shared-scroll-area-track: var(--base-size-px-22);
+  --primitives-shared-scroll-area-thumb-min: var(--base-size-px-28);
+  --primitives-shared-scroll-area-opacity-rest: var(--base-opacity-fraction-0-15);
+  --primitives-shared-scroll-area-opacity-drag: var(--base-opacity-fraction-0-23);
+  --primitives-shared-scroll-area-fill-duration: var(--base-motion-duration-ms-180);
+  --primitives-shared-surface-card-radius: var(--base-radius-xl);
+  --primitives-shared-surface-button-tint: var(--base-opacity-fraction-0-5);
+  --primitives-shared-surface-button-glow-offset: var(--base-space-px-0);
+  --primitives-shared-icon-size: var(--base-size-px-20);
+  --primitives-shared-icon-picker-size: var(--base-size-px-17);
+  --primitives-shared-icon-harness-monogram-size: var(--base-space-px-30);
+  --primitives-shared-icon-artwork-coverage: var(--base-ratio-fraction-0-95); /** Longest rendered artwork dimension divided by the glyph frame dimension. Includes stroke; preserves geometry proportions and source stroke weight. Not a tap-target ratio. */
+  --primitives-shared-recipes-focus-glow-blur: var(--base-space-px-9);
+  --primitives-shared-recipes-focus-glow-opacity: var(--base-opacity-fraction-0-23);
+  --primitives-shared-graph-pitch: var(--base-space-px-27);
+  --primitives-shared-graph-dot-size: var(--base-space-px-2);
+  --primitives-shared-graph-opacity: var(--base-opacity-fraction-0-07);
+  --primitives-shared-glass-falloff-at: var(--base-position-fraction-0-72);
+  --primitives-shared-glass-falloff-strength: var(--base-opacity-fraction-0-2);
+  --primitives-shared-glass-opaque: var(--base-opacity-fraction-1);
+  --primitives-shared-glass-sage-opacity: var(--base-opacity-fraction-0-8);
+  --primitives-shared-glass-sage-blur: var(--base-blur-px-10);
+  --primitives-shared-glass-overlap-clear: var(--base-coverage-clear);
+  --primitives-shared-glass-overlap-covered: var(--base-coverage-covered);
+  --primitives-shared-glass-saturation-neutral: var(--base-saturation-factor-1);
+  --primitives-shared-cloud-body-alpha: var(--base-opacity-fraction-0-396078431372549);
+  --primitives-shared-cloud-rest-start-alpha: var(--base-opacity-fraction-0-043137254901960784);
+  --primitives-shared-cloud-rest-end-alpha: var(--base-opacity-fraction-0-023529411764705882);
+  --primitives-shared-cloud-wash-start-alpha: var(--base-opacity-fraction-0-23);
+  --primitives-shared-cloud-wash-end-alpha: var(--base-opacity-fraction-0-15);
+  --primitives-shared-cloud-wash-rest: var(--base-opacity-fraction-0);
+  --primitives-shared-cloud-wash-hover: var(--base-opacity-fraction-0-23);
+  --primitives-shared-cloud-wash-focus: var(--base-opacity-fraction-1);
+  --primitives-shared-cloud-disabled-alpha: var(--base-opacity-fraction-0-5);
+  --primitives-shared-cloud-angle: var(--base-angle-degrees-135);
+  --primitives-shared-cloud-duration: var(--base-motion-duration-ms-320);
+  --primitives-shared-cloud-ease: var(--base-motion-easing-curve-0-4-0-0-2-1);
+  --primitives-shared-cloud-reduced-duration: var(--base-motion-duration-ms-0);
+  --primitives-shared-cloud-inset: var(--base-space-px-0);
+  --primitives-shared-cloud-underlay: var(--base-stack-below);
+  --primitives-shared-menu-feather-start-alpha: var(--base-opacity-fraction-59-of-255);
+  --primitives-shared-menu-feather-end-alpha: var(--base-opacity-fraction-36-of-255);
+  --primitives-shared-menu-feather-blur: var(--base-blur-px-6);
+  --primitives-shared-menu-feather-angle: var(--base-angle-degrees-100);
+  --controls-shared-input-text-weight: var(--base-type-weight-medium);
+  --controls-shared-input-radius: var(--base-radius-md);
+  --controls-shared-input-min-height: var(--base-size-px-44);
+  --controls-shared-input-block-inset: var(--base-space-px-9);
+  --controls-shared-avatar-size-sm: var(--base-space-px-24);
+  --controls-shared-avatar-size-md: var(--base-size-px-32);
+  --controls-shared-avatar-size-lg: var(--base-size-px-40);
+  --controls-shared-avatar-size-xl: var(--base-size-px-48);
+  --controls-shared-avatar-size-xxl: var(--base-size-px-54);
+  --controls-shared-avatar-square-radius-sm: var(--base-radius-sm);
+  --controls-shared-avatar-square-radius-md: var(--base-radius-md);
+  --controls-shared-avatar-square-radius-lg: var(--base-radius-md);
+  --controls-shared-avatar-square-radius-xl: var(--base-radius-lg);
+  --controls-shared-avatar-square-radius-xxl: var(--base-radius-lg);
+  --controls-shared-avatar-status-size-sm: var(--base-space-px-9);
+  --controls-shared-avatar-status-size-md: var(--base-space-px-9);
+  --controls-shared-avatar-status-size-lg: var(--base-space-px-12);
+  --controls-shared-avatar-status-size-xl: var(--base-space-px-12);
+  --controls-shared-avatar-status-size-xxl: var(--base-space-px-14);
+  --controls-shared-tab-trigger-type-weight: var(--base-type-weight-medium);
+  --controls-shared-tab-trigger-pad-x: var(--base-space-px-15);
+  --controls-shared-tab-trigger-pad-y: var(--base-space-px-4);
+  --controls-shared-tab-trigger-height: var(--base-size-px-44);
+  --controls-shared-tab-trigger-radius: var(--base-radius-px-27);
+  --controls-shared-tab-trigger-underline: var(--base-space-px-2);
+  --controls-shared-nova-horizonloader-size-px-16: var(--base-size-px-16);
+  --controls-shared-nova-horizonloader-size-px-24: var(--base-space-px-24);
+  --controls-shared-nova-horizonloader-size-px-40: var(--base-size-px-40);
+  --controls-shared-nova-horizonloader-duration: var(--base-motion-duration-ms-4800);
+  --overlays-shared-alert-stack-gap: var(--base-space-px-10);
+  --overlays-shared-alert-radius: var(--base-radius-xl);
+  --overlays-shared-alert-icon-size: var(--base-size-px-16);
+  --overlays-shared-alert-icon-gap: var(--base-space-px-9);
+  --overlays-shared-alert-edge-width: var(--base-border-px-1);
+  --overlays-shared-context-menu-open-ms: var(--base-motion-duration-ms-260);
+  --overlays-shared-context-menu-close-ms: var(--base-motion-duration-ms-160);
+  --overlays-shared-context-menu-open-curve: var(--base-motion-easing-curve-0-16-1-0-3-1);
+  --overlays-shared-context-menu-close-curve: var(--base-motion-easing-curve-0-4-0-0-8-0-3);
+  --overlays-shared-menu-open-ms: var(--base-motion-duration-ms-260);
+  --overlays-shared-menu-close-ms: var(--base-motion-duration-ms-160);
+  --overlays-shared-menu-open-curve: var(--base-motion-easing-curve-0-16-1-0-3-1);
+  --overlays-shared-menu-close-curve: var(--base-motion-easing-curve-0-4-0-0-8-0-3);
+  --overlays-shared-tooltip-fill-opacity: var(--base-opacity-fraction-0-8);
+  --overlays-shared-tooltip-backdrop-blur: var(--base-blur-px-10);
+  --overlays-shared-tooltip-radius: var(--base-radius-px-11);
+  --overlays-shared-tooltip-padding-block: var(--base-space-px-10);
+  --overlays-shared-tooltip-padding-inline: var(--base-space-px-13);
+  --overlays-shared-tooltip-edge-width: var(--base-border-px-1);
+  --units-chat-composer-root-shell-top: var(--base-space-px-18);
+  --units-chat-composer-root-shell-inline: var(--base-space-px-14);
+  --units-chat-composer-root-shell-bottom: var(--base-space-px-10);
+  --units-chat-composer-root-shell-radius: var(--base-radius-px-27);
+  --units-chat-composer-root-expanded-radius: var(--base-radius-px-22);
+  --units-chat-composer-root-editor-inset: var(--base-space-px-7);
+  --units-chat-composer-root-editor-size: var(--base-type-size-px-14);
+  --units-chat-composer-root-editor-line: var(--base-type-line-px-24);
+  --units-chat-composer-root-controls-offset: var(--base-space-px-20);
+  --units-chat-composer-root-control-gap: var(--base-space-px-5);
+  --units-chat-composer-root-control-size: var(--base-size-px-34);
+  --units-chat-composer-root-control-radius: var(--base-radius-md);
+  --units-chat-composer-root-glyph-size: var(--base-size-px-17);
+  --units-chat-composer-root-dock-height: var(--base-size-px-42);
+  --units-chat-composer-root-dock-pad: var(--base-space-px-4);
+  --units-chat-composer-root-dock-radius: var(--base-radius-px-13);
+  --units-chat-composer-root-dock-gap: var(--base-space-px-2);
+  --units-chat-composer-root-dock-floor: var(--base-space-px-3);
+  --units-chat-composer-root-dock-reserve: var(--base-size-px-47);
+  --units-chat-composer-root-model-size: var(--base-type-size-px-12);
+  --units-chat-composer-root-model-line: var(--base-type-line-px-20);
+  --units-chat-composer-root-reply-size: var(--base-type-size-px-12);
+  --units-chat-composer-root-reply-line: var(--base-type-line-px-19);
+  --units-chat-composer-root-option-inset: var(--base-space-px-9);
+  --units-chat-composer-root-context-gap: var(--base-space-px-6);
+  --units-chat-composer-root-family: var(--base-type-family-ui);
+  --units-chat-composer-root-weight: var(--base-type-weight-medium);
+  --units-chat-composer-root-open-ms: var(--base-motion-duration-ms-260);
+  --units-chat-composer-root-close-ms: var(--base-motion-duration-ms-160);
+  --units-chat-composer-root-open-curve: var(--base-motion-easing-curve-0-16-1-0-3-1);
+  --units-chat-composer-root-close-curve: var(--base-motion-easing-curve-0-4-0-0-8-0-3);
+  --units-chat-composer-root-reduced-ms: var(--base-motion-duration-ms-0);
+  --units-chat-composer-root-hairline: var(--base-border-px-1);
+  --sys-color-chrome: var(--base-color-chrome); /** Outer application frame */
+  --sys-color-ground: var(--base-color-ground); /** Main application background */
+  --sys-color-elevated: var(--base-color-elevated); /** Panel surface */
+  --sys-color-elevated-2: var(--base-color-elevated-2); /** Raised surface above a panel */
+  --sys-color-top: var(--base-color-top); /** Highest surface layer */
+  --sys-color-text-primary: var(--base-color-text-primary); /** Primary text and composer input */
+  --sys-color-text-supporting: var(--base-color-text-supporting); /** Supporting text and placeholders */
+  --sys-color-text-tertiary: var(--base-color-text-tertiary); /** Large, nonessential text */
+  --sys-color-text-faint: var(--base-color-text-faint); /** Disabled or decorative text */
+  --sys-color-action-blue: var(--base-color-action-blue); /** Primary actions and calls to action */
+  --sys-color-action-blue-hover: var(--base-color-action-blue-hover); /** Primary action hover or focus */
+  --sys-color-success: var(--base-color-success); /** Positive, success and done states */
+  --sys-color-golden-sand: var(--base-color-golden-sand); /** Marketing and identity emphasis */
+  --sys-color-peach-gold: var(--base-color-peach-gold); /** Attention, progress and permission alerts */
+  --sys-color-danger: var(--base-color-danger); /** Errors and destructive actions */
+  --sys-color-danger-hover: var(--base-color-danger-hover); /** Destructive action hover or focus */
+  --sys-color-ready: var(--base-color-ready); /** Ready state and calm category accents */
+  --sys-color-structural-violet: var(--base-color-structural-violet); /** Scrollbar thumb in both themes, rules and connectors */
+  --sys-space-field-interior: var(--base-space-px-8);
+  --sys-space-field-group-compact: var(--base-space-px-18);
+  --sys-space-field-group-default: var(--base-space-px-21);
+  --sys-space-field-group-comfortable: var(--base-space-px-24);
+  --sys-space-inset-compact: var(--base-space-px-18);
+  --sys-space-inset-default: var(--base-space-px-21);
+  --sys-space-inset-comfortable: var(--base-space-px-24);
+  --sys-space-section-stack-compact: var(--base-space-px-24);
+  --sys-space-section-stack-default: var(--base-space-px-27);
+  --sys-space-section-stack-comfortable: var(--base-space-px-30);
+  --sys-space-section-intro-compact: var(--base-space-px-12);
+  --sys-space-section-intro-default: var(--base-space-px-15);
+  --sys-space-section-intro-comfortable: var(--base-space-px-18);
+  --sys-space-title-description: var(--base-space-px-6);
+  --sys-space-inline-cluster: var(--base-space-px-9);
+  --sys-space-action-row: var(--base-space-px-9);
+  --sys-space-stack: var(--base-space-px-12);
+  --sys-space-grid-gap: var(--base-space-px-24);
+  --sys-space-grid-column-min: var(--base-size-px-240);
+  --sys-space-header-leading-inset: var(--base-space-px-24); /** Shared across colour modes. */
+  --sys-space-header-trailing-inset: var(--base-space-px-12); /** Shared across colour modes. */
+  --sys-space-header-content-gap: var(--base-space-px-24); /** Shared across colour modes. */
+  --sys-space-header-expanded-avatar-gap: var(--base-space-px-30); /** Shared across colour modes. */
+  --sys-space-header-vertical-inset: var(--base-space-px-15); /** Shared across colour modes. */
+  --sys-space-alert-padding-top: var(--base-space-px-15); /** Shared across colour modes. */
+  --sys-space-alert-padding-inline: var(--base-space-px-18); /** Shared across colour modes. */
+  --sys-space-alert-padding-bottom: var(--base-space-px-18); /** Shared across colour modes. */
+  --sys-space-alert-icon-gap: var(--base-space-px-9); /** Shared across colour modes. */
+  --sys-space-dock-viewport-floor: var(--base-space-px-3); /** Shared across colour modes. */
+  --sys-space-question-answer-label-pad: var(--base-space-px-24); /** Question answer label aligned to the title axis. */
+  --sys-material-glass-blur: var(--base-blur-px-19);
+  --sys-material-body: var(--base-color-elevated);
+  --sys-material-ink: var(--base-color-text-primary);
+  --sys-material-tint-ink: var(--base-color-ready);
+  --sys-material-grid: var(--base-color-text-supporting);
+  --sys-material-sage: var(--base-color-success);
+  --sys-material-glass-base-alpha: var(--base-opacity-fraction-0-23);
+  --sys-material-glass-tint: var(--base-opacity-fraction-0-15);
+  --sys-material-glass-saturation: var(--base-saturation-factor-1-25);
+  --primitives-shared-typography-tone-default: var(--sys-color-text-primary);
+  --primitives-shared-typography-tone-muted: var(--sys-color-text-supporting);
+  --primitives-shared-typography-tone-dim: var(--sys-color-text-tertiary);
+  --primitives-shared-typography-tone-accent: var(--sys-color-action-blue);
+  --primitives-shared-foundation-separator-ink: var(--sys-material-grid);
+  --primitives-shared-scroll-area-light-ink: var(--sys-color-structural-violet);
+  --primitives-shared-scroll-area-ink: var(--sys-color-structural-violet); /** Structural Violet thumb ink for both themes. */
+  --primitives-shared-spacing-stack: var(--sys-space-stack);
+  --primitives-shared-spacing-inline-cluster: var(--sys-space-inline-cluster);
+  --primitives-shared-spacing-field-group-compact: var(--sys-space-field-group-compact);
+  --primitives-shared-spacing-field-group-default: var(--sys-space-field-group-default);
+  --primitives-shared-spacing-field-group-comfortable: var(--sys-space-field-group-comfortable);
+  --primitives-shared-spacing-inset-compact: var(--sys-space-inset-compact);
+  --primitives-shared-spacing-inset-default: var(--sys-space-inset-default);
+  --primitives-shared-spacing-inset-comfortable: var(--sys-space-inset-comfortable);
+  --primitives-shared-surface-layer-chrome: var(--sys-color-chrome);
+  --primitives-shared-surface-layer-ground: var(--sys-color-ground);
+  --primitives-shared-surface-layer-elevated: var(--sys-color-elevated);
+  --primitives-shared-surface-layer-elevated-2: var(--sys-color-elevated-2);
+  --primitives-shared-surface-layer-top: var(--sys-color-top);
+  --primitives-shared-surface-button-bed: var(--sys-color-ground);
+  --primitives-shared-surface-button-default: var(--sys-color-action-blue);
+  --primitives-shared-surface-button-hover: var(--sys-color-action-blue-hover);
+  --primitives-shared-surface-button-pressed: var(--sys-color-structural-violet);
+  --primitives-shared-surface-button-success: var(--sys-color-success);
+  --primitives-shared-surface-button-disabled-bed: var(--sys-color-elevated-2);
+  --primitives-shared-icon-ink: var(--sys-color-text-primary);
+  --primitives-shared-recipes-focus-foreground: var(--sys-color-action-blue-hover); /** Focused text and icon ink on the owning surface. */
+  --primitives-shared-recipes-focus-glow-ink: var(--sys-color-action-blue-hover);
+  --primitives-shared-graph-ink: var(--sys-material-grid);
+  --primitives-shared-glass-body: var(--sys-material-body);
+  --primitives-shared-glass-foreground: var(--sys-material-ink);
+  --primitives-shared-glass-tint-ink: var(--sys-material-tint-ink);
+  --primitives-shared-glass-sage: var(--sys-material-sage);
+  --primitives-shared-glass-base-alpha: var(--sys-material-glass-base-alpha);
+  --primitives-shared-glass-blur: var(--sys-material-glass-blur);
+  --primitives-shared-glass-tint: var(--sys-material-glass-tint);
+  --primitives-shared-glass-saturation: var(--sys-material-glass-saturation);
+  --primitives-shared-cloud-body: var(--sys-color-elevated-2);
+  --primitives-shared-cloud-rest-start: var(--sys-color-ready);
+  --primitives-shared-cloud-rest-end: var(--sys-color-success);
+  --primitives-shared-cloud-wash-start: var(--sys-color-ready);
+  --primitives-shared-cloud-wash-end: var(--sys-color-success);
+  --primitives-shared-menu-feather-start: var(--sys-color-action-blue-hover);
+  --primitives-shared-menu-feather-end: var(--sys-color-ready);
+  --controls-shared-button-tint: var(--primitives-shared-surface-button-tint);
+  --controls-shared-button-focus-glow-blur: var(--primitives-shared-recipes-focus-glow-blur);
+  --controls-shared-button-focus-glow-opacity: var(--primitives-shared-recipes-focus-glow-opacity);
+  --controls-shared-button-glow-offset: var(--primitives-shared-surface-button-glow-offset);
+  --controls-shared-input-label-gap: var(--sys-space-field-interior);
+  --controls-shared-input-description-gap: var(--sys-space-field-interior);
+  --controls-shared-input-focus-glow-blur: var(--primitives-shared-recipes-focus-glow-blur);
+  --controls-shared-input-focus-glow-opacity: var(--primitives-shared-recipes-focus-glow-opacity);
+  --controls-shared-input-error-ink: var(--sys-color-danger);
+  --controls-shared-input-family: var(--primitives-shared-typography-family-ui);
+  --controls-shared-input-text-size: var(--primitives-shared-typography-size-label);
+  --controls-shared-input-text-line: var(--primitives-shared-typography-line-label);
+  --controls-shared-input-glyph-size: var(--primitives-shared-icon-picker-size);
+  --controls-shared-input-cloud-body-alpha: var(--primitives-shared-cloud-body-alpha);
+  --controls-shared-input-cloud-rest-start-alpha: var(--primitives-shared-cloud-rest-start-alpha);
+  --controls-shared-input-cloud-rest-end-alpha: var(--primitives-shared-cloud-rest-end-alpha);
+  --controls-shared-input-cloud-wash-start-alpha: var(--primitives-shared-cloud-wash-start-alpha);
+  --controls-shared-input-cloud-wash-end-alpha: var(--primitives-shared-cloud-wash-end-alpha);
+  --controls-shared-input-cloud-wash-rest: var(--primitives-shared-cloud-wash-rest);
+  --controls-shared-input-cloud-wash-hover: var(--primitives-shared-cloud-wash-hover);
+  --controls-shared-input-cloud-wash-focus: var(--primitives-shared-cloud-wash-focus);
+  --controls-shared-input-cloud-disabled-alpha: var(--primitives-shared-cloud-disabled-alpha);
+  --controls-shared-input-cloud-angle: var(--primitives-shared-cloud-angle);
+  --controls-shared-input-cloud-duration: var(--primitives-shared-cloud-duration);
+  --controls-shared-input-cloud-ease: var(--primitives-shared-cloud-ease);
+  --controls-shared-input-cloud-reduced-duration: var(--primitives-shared-cloud-reduced-duration);
+  --controls-shared-input-cloud-inset: var(--primitives-shared-cloud-inset);
+  --controls-shared-input-cloud-underlay: var(--primitives-shared-cloud-underlay);
+  --controls-shared-avatar-initials-size-sm: var(--primitives-shared-typography-size-micro);
+  --controls-shared-avatar-initials-size-md: var(--primitives-shared-typography-size-caption);
+  --controls-shared-avatar-initials-size-lg: var(--primitives-shared-typography-size-body);
+  --controls-shared-avatar-initials-size-xl: var(--primitives-shared-typography-size-lead);
+  --controls-shared-avatar-initials-size-xxl: var(--primitives-shared-typography-size-subheading);
+  --controls-shared-tab-trigger-type-size: var(--primitives-shared-typography-size-label);
+  --controls-shared-tab-trigger-type-line: var(--primitives-shared-typography-line-label);
+  --controls-shared-tab-trigger-type-family: var(--primitives-shared-typography-family-ui);
+  --controls-shared-nova-horizonloader-ink: var(--sys-color-text-primary);
+  --overlays-shared-tooltip-fill: var(--sys-color-success);
+  --overlays-shared-tooltip-text: var(--sys-color-text-primary);
+  --units-chat-composer-root-fill: var(--sys-color-elevated);
+  --units-chat-composer-root-option-fill: var(--sys-color-elevated-2);
+  --units-chat-composer-root-selected-fill: var(--sys-color-top);
+  --units-chat-composer-root-text: var(--sys-color-text-primary);
+  --units-chat-composer-root-supporting: var(--sys-color-text-supporting);
+  --units-chat-composer-root-muted: var(--sys-color-text-tertiary);
+  --units-chat-composer-root-disabled: var(--sys-color-text-faint);
+  --units-chat-composer-root-neutral-edge: var(--sys-color-elevated-2);
+  --units-chat-composer-root-send-fill: var(--sys-color-action-blue);
+  --units-chat-composer-root-ground: var(--sys-color-ground);
+  --controls-shared-button-foreground: var(--primitives-shared-typography-tone-default);
+  --controls-shared-button-focus-foreground: var(--primitives-shared-recipes-focus-foreground);
+  --controls-shared-button-disabled-foreground: var(--primitives-shared-typography-tone-dim);
+  --controls-shared-button-bed: var(--primitives-shared-surface-button-bed);
+  --controls-shared-button-default: var(--primitives-shared-surface-button-default);
+  --controls-shared-button-hover: var(--primitives-shared-surface-button-hover);
+  --controls-shared-button-pressed: var(--primitives-shared-surface-button-pressed);
+  --controls-shared-button-success: var(--primitives-shared-surface-button-success);
+  --controls-shared-button-focus-glow-ink: var(--primitives-shared-recipes-focus-glow-ink);
+  --controls-shared-button-disabled-bed: var(--primitives-shared-surface-button-disabled-bed);
+  --controls-shared-input-surface: var(--primitives-shared-cloud-body);
+  --controls-shared-input-hover-surface: var(--primitives-shared-cloud-body);
+  --controls-shared-input-foreground: var(--primitives-shared-typography-tone-muted);
+  --controls-shared-input-supporting-ink: var(--primitives-shared-typography-tone-dim);
+  --controls-shared-input-disabled-ink: var(--primitives-shared-typography-tone-dim);
+  --controls-shared-input-hover-foreground: var(--primitives-shared-recipes-focus-foreground); /** Blue editable text on pointer hover. Active entered text uses focus-foreground, the primary text role. */
+  --controls-shared-input-focus-glow-ink: var(--primitives-shared-recipes-focus-glow-ink);
+  --controls-shared-input-control-inset: var(--primitives-shared-spacing-inset-compact);
+  --controls-shared-input-icon-gap: var(--primitives-shared-spacing-inline-cluster);
+  --controls-shared-input-cloud-body: var(--primitives-shared-cloud-body);
+  --controls-shared-input-cloud-rest-start: var(--primitives-shared-cloud-rest-start);
+  --controls-shared-input-cloud-rest-end: var(--primitives-shared-cloud-rest-end);
+  --controls-shared-input-cloud-wash-start: var(--primitives-shared-cloud-wash-start);
+  --controls-shared-input-cloud-wash-end: var(--primitives-shared-cloud-wash-end);
+  --controls-shared-input-focus-foreground: var(--primitives-shared-typography-tone-default); /** Primary text for entered content in every focused input. Placeholder hints and supporting copy keep their dim role; labels keep their muted role. */
+}

@@ -3,10 +3,12 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "test": "node --test"
+    "test": "node --test",
+    "build:tokens": "node style-dictionary.config.mjs"
   },
   "devDependencies": {
     "husky": "9.1.7",
+    "style-dictionary": "5.8.0",
     "typescript": "5.8.2"
   }
 }
