@@ -1,0 +1,9 @@
+{
+  // Static viewer host. The Worker name must equal the Cloudflare project name.
+  "name": "caelos-designsystem",
+  "compatibility_date": "2026-10-20",
+  "assets": { "directory": "./viewer-probe" },
+  "workers_dev": true,
+  "preview_urls": true,
+  "previews": {}
+}
