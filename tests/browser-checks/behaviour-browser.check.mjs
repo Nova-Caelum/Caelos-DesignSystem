@@ -38,13 +38,28 @@ const flakyLine = {
   ],
 };
 
-async function runBrowserCase(name, lines) {
+const passScreen = "export function S(){ const handlePass=()=>{}; return <button onClick={handlePass}>Pass action</button>; }\n";
+const emptyScreen = "export function S(){ return <main />; }\n";
+const flakyScreen = "export function S(){ const handleFlaky=()=>{}; return <button onClick={handleFlaky}>Flaky action</button>; }\n";
+const saveScreen = "export function S(){ const handleSave=()=>{}; return <button onClick={handleSave}>Save draft</button>; }\n";
+
+async function readJsonIfWritten(file) {
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function runBrowserCase(name, lines, screenSource, { route = "/" } = {}) {
   const folder = await mkdtemp(path.join(tmpdir(), `behaviour-browser-${name}-`));
   const behaviours = path.join(folder, "behaviours");
   await mkdir(behaviours);
+  await writeFile(path.join(folder, "Screen.jsx"), screenSource);
   await writeFile(
     path.join(behaviours, `${name}.behaviours.json`),
-    `${JSON.stringify({ screen: "PrimaryScreen.jsx", lines }, null, 2)}\n`,
+    `${JSON.stringify({ screen: "../Screen.jsx", route, lines }, null, 2)}\n`,
   );
   const out = path.join(folder, "results.json");
   const unsteady = path.join(folder, "unsteady-lines.json");
@@ -55,28 +70,86 @@ async function runBrowserCase(name, lines) {
   );
   return {
     result,
-    results: JSON.parse(await readFile(out, "utf8")),
-    unsteady: JSON.parse(await readFile(unsteady, "utf8")),
+    results: await readJsonIfWritten(out),
+    unsteady: await readJsonIfWritten(unsteady),
   };
 }
 
-test("browser (a) every line passes end to end", async () => {
-  const run = await runBrowserCase("pass", [passLine]);
+test("W1: every line passes end to end", async () => {
+  const run = await runBrowserCase("pass", [passLine], passScreen);
   assert.equal(run.result.status, 0, `${run.result.stdout}\n${run.result.stderr}`);
   assert.equal(run.results.summary.failed, 0);
   assert.equal(run.unsteady.lines.length, 0);
 });
 
-test("browser (b) a line failing twice exits 1 and names its id and step", async () => {
-  const run = await runBrowserCase("fail", [failLine]);
+test("W2: a line failing twice exits 1 and names its id and step", async () => {
+  const run = await runBrowserCase("fail", [failLine], emptyScreen);
   assert.equal(run.result.status, 1, `${run.result.stdout}\n${run.result.stderr}`);
   assert.match(run.result.stdout, /browser-fails-twice/);
   assert.match(run.result.stdout, /step 1/);
   assert.equal(run.results.summary.failed, 1);
 });
 
-test("browser (c) a line failing then passing is recorded as unsteady", async () => {
-  const run = await runBrowserCase("unsteady", [flakyLine]);
+test("W3: a line failing then passing is recorded as unsteady", async () => {
+  const run = await runBrowserCase("unsteady", [flakyLine], flakyScreen);
   assert.equal(run.result.status, 0, `${run.result.stdout}\n${run.result.stderr}`);
   assert.deepEqual(run.unsteady.lines.map((line) => line.id), ["browser-fail-then-pass"]);
+});
+
+test("W4: browser storage is fresh per line but retained for a retry", async () => {
+  const lines = [
+    {
+      id: "first-flaky-line",
+      kind: "action",
+      handler: "handleFlaky",
+      steps: [
+        { do: "click", role: "button", name: "Flaky action" },
+        { do: "expect", role: "status", name: "Not ready yet", expect: "visible" },
+      ],
+    },
+    { ...flakyLine, id: "second-flaky-line" },
+  ];
+  const run = await runBrowserCase("fresh-context", lines, flakyScreen);
+
+  assert.equal(run.result.status, 0, `${run.result.stdout}\n${run.result.stderr}`);
+  assert.deepEqual(
+    run.results.lines.map(({ id, status, attempts }) => ({ id, status, attempts })),
+    [
+      { id: "first-flaky-line", status: "passed", attempts: 1 },
+      { id: "second-flaky-line", status: "unsteady", attempts: 2 },
+    ],
+  );
+});
+
+test("W5: a dead action cannot claim an old or absent result", async () => {
+  const idleLine = {
+    id: "dead-idle",
+    kind: "action",
+    handler: "handleSave",
+    steps: [
+      { do: "click", role: "button", name: "Save draft" },
+      { do: "expect", role: "status", name: "Idle", expect: "visible" },
+    ],
+  };
+  const savedLine = {
+    ...idleLine,
+    id: "dead-saved",
+    steps: [
+      { do: "click", role: "button", name: "Save draft" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ],
+  };
+
+  const alreadyHeld = await runBrowserCase("dead-idle", [idleLine], saveScreen);
+  assert.equal(alreadyHeld.result.status, 1, `${alreadyHeld.result.stdout}\n${alreadyHeld.result.stderr}`);
+  assert.match(alreadyHeld.result.stdout, /already held/);
+
+  const absent = await runBrowserCase("dead-saved", [savedLine], saveScreen);
+  assert.equal(absent.result.status, 1, `${absent.result.stdout}\n${absent.result.stderr}`);
+});
+
+test("W6: a missing app route is an operational refusal", async () => {
+  const run = await runBrowserCase("missing-route", [passLine], passScreen, { route: "/missing/" });
+  assert.equal(run.result.status, 2, `${run.result.stdout}\n${run.result.stderr}`);
+  assert.match(run.result.stderr, /\/missing\//);
 });

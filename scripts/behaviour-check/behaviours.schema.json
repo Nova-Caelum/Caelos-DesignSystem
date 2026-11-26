@@ -4,9 +4,18 @@
   "title": "Screen behaviour list",
   "type": "object",
   "additionalProperties": false,
-  "required": ["screen", "lines"],
+  "required": ["screen", "route", "lines"],
   "properties": {
     "screen": { "type": "string", "minLength": 1 },
+    "route": {
+      "type": "string",
+      "pattern": "^/(?!/)",
+      "description": "App route opened for every line; it must be a safe path beginning with one slash."
+    },
+    "componentRoles": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
     "lines": {
       "type": "array",
       "minItems": 1,
@@ -27,12 +36,43 @@
             { "type": "null" }
           ]
         },
+        "covers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["prop", "at"],
+            "properties": {
+              "prop": { "type": "string", "minLength": 1 },
+              "at": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" }
+            }
+          }
+        },
         "steps": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/step" }
+          "items": { "$ref": "#/$defs/step" },
+          "description": "A line containing an action step must end with an expect step, and its final expected result must not already hold before the first action."
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "enum": ["action", "keyboard"] } },
+            "required": ["kind"]
+          },
+          "then": {
+            "properties": {
+              "steps": {
+                "contains": {
+                  "properties": { "do": { "const": "expect" } },
+                  "required": ["do"]
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "step": {
       "type": "object",

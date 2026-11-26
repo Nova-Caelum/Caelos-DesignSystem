@@ -1,5 +1,6 @@
 {
   "screen": "../PrimaryScreen.jsx",
+  "route": "/",
   "lines": [
     {
       "id": "pass-action",

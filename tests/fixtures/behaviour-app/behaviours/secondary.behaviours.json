@@ -1,5 +1,6 @@
 {
   "screen": "../SecondaryScreen.jsx",
+  "route": "/",
   "lines": [
     {
       "id": "reset-fixture",

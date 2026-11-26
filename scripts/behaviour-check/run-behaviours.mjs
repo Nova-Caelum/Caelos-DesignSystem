@@ -6,8 +6,16 @@ import { createServer } from "node:http";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import {
+  checkListCoverage,
+  formatCoverageRefusal,
+  InputError,
+  resolveScreen,
+} from "./count-handlers.mjs";
+
 const LIST_SUFFIX = ".behaviours.json";
 const STEP_ACTIONS = new Set(["click", "type", "press", "focus", "expect"]);
+const ACTION_STEPS = new Set(["click", "type", "press", "focus"]);
 const LINE_KINDS = new Set(["action", "state", "keyboard"]);
 const EXPECT_STATES = new Set(["visible", "hidden", "enabled", "disabled", "focused"]);
 
@@ -135,6 +143,30 @@ function validateList(value, file) {
   if (typeof value.screen !== "string" || value.screen.length === 0) {
     throw refusal(`behaviour list '${file}' has no screen`, "set screen to the source file path");
   }
+  const unknownKeys = Object.keys(value).filter(
+    (key) => !["screen", "route", "componentRoles", "lines"].includes(key),
+  );
+  if (unknownKeys.length > 0) {
+    throw refusal(
+      `behaviour list '${file}' has unknown top-level key '${unknownKeys[0]}'`,
+      "remove keys that are not defined by behaviours.schema.json",
+    );
+  }
+  const routePath = typeof value.route === "string" ? value.route.split("?", 1)[0] : "";
+  if (
+    typeof value.route !== "string"
+    || !value.route.startsWith("/")
+    || value.route.startsWith("//")
+    || value.route.includes("\\")
+    || value.route.includes("#")
+    || /\s/.test(value.route)
+    || routePath.split("/").includes("..")
+  ) {
+    throw refusal(
+      `behaviour list '${file}' has invalid route '${value.route ?? "missing"}'`,
+      "set route to a safe app path beginning with one slash",
+    );
+  }
   if (!Array.isArray(value.lines) || value.lines.length === 0) {
     throw refusal(`behaviour list '${file}' has no lines`, "add at least one behaviour line for the screen");
   }
@@ -162,6 +194,19 @@ function validateList(value, file) {
       throw refusal(`${context} has no steps`, "add at least one role-and-accessible-name step");
     }
     line.steps.forEach((step, stepIndex) => validateStep(step, `${context}, step ${stepIndex + 1}`));
+    const hasAction = line.steps.some((step) => ACTION_STEPS.has(step.do));
+    if (["action", "keyboard"].includes(line.kind) && !hasAction) {
+      throw refusal(
+        `${context} ('${line.id}') has kind '${line.kind}' but contains no action step`,
+        "add a click, type, press, or focus step",
+      );
+    }
+    if (hasAction && line.steps.at(-1).do !== "expect") {
+      throw refusal(
+        `${file} line ${lineIndex + 1} ('${line.id}') performs an action but its last step is not an expect`,
+        "add an expect step that observes the action's result",
+      );
+    }
   });
   return value;
 }
@@ -179,9 +224,39 @@ export async function loadBehaviourLists(folder) {
         "fix the JSON and validate it against behaviours.schema.json",
       );
     }
-    lists.push({ file: path.relative(discovery.root, file), ...validateList(value, file) });
+    lists.push({
+      file: path.relative(discovery.root, file),
+      path: file,
+      ...validateList(value, file),
+    });
   }
   return lists;
+}
+
+export async function checkCoverage(lists) {
+  const coverage = [];
+  const refused = [];
+  for (const list of lists) {
+    let result;
+    try {
+      result = await checkListCoverage({ listFile: list.path, list });
+    } catch (error) {
+      if (error instanceof InputError) throw refusal(error.message, error.next);
+      throw error;
+    }
+    if (result.missing.length > 0 || result.problems.length > 0) {
+      refused.push({ file: list.file, message: formatCoverageRefusal(result) });
+      continue;
+    }
+    coverage.push({
+      file: list.file,
+      screen: resolveScreen(list.path, list),
+      handlers: result.entries.length,
+      covered: result.covered.length,
+      declared: result.declared.length,
+    });
+  }
+  return { coverage, refused };
 }
 
 function failureDetails(error, step, stepIndex) {
@@ -194,30 +269,60 @@ function failureDetails(error, step, stepIndex) {
   };
 }
 
-async function attemptLine(driver, line, attempt) {
-  await driver.beginLine(line, attempt);
+async function attemptLine(driver, line, attempt, route) {
+  await driver.beginLine(line, attempt, { route });
+  const firstAction = line.steps.findIndex((step) => ACTION_STEPS.has(step.do));
+  let lastAction = -1;
+  for (let stepIndex = line.steps.length - 1; stepIndex >= 0; stepIndex -= 1) {
+    if (ACTION_STEPS.has(line.steps[stepIndex].do)) {
+      lastAction = stepIndex;
+      break;
+    }
+  }
+  const finalExpectations = lastAction < 0
+    ? []
+    : line.steps
+      .map((step, stepIndex) => ({ step, stepIndex }))
+      .filter(({ step, stepIndex }) => stepIndex > lastAction && step.do === "expect");
+  let heldBeforeAction = [];
   for (let stepIndex = 0; stepIndex < line.steps.length; stepIndex += 1) {
     const step = line.steps[stepIndex];
     try {
+      if (stepIndex === firstAction) {
+        heldBeforeAction = await Promise.all(
+          finalExpectations.map(({ step: expectation }) => driver.holds(expectation)),
+        );
+      }
       await driver.performStep(step, { line, stepIndex, attempt });
     } catch (error) {
       if (error?.operational) throw error;
       return { passed: false, failure: failureDetails(error, step, stepIndex) };
     }
   }
+  if (heldBeforeAction.length > 0 && heldBeforeAction.every(Boolean)) {
+    const lastExpectation = finalExpectations.at(-1);
+    return {
+      passed: false,
+      failure: failureDetails(
+        new Error("expected result already held before the action, so the line proves nothing"),
+        lastExpectation.step,
+        lastExpectation.stepIndex,
+      ),
+    };
+  }
   return { passed: true };
 }
 
-export async function runLines({ driver, lines, file, screen }) {
+export async function runLines({ driver, lines, file, screen, route }) {
   const results = [];
   for (const line of lines) {
-    const first = await attemptLine(driver, line, 1);
+    const first = await attemptLine(driver, line, 1, route);
     if (first.passed) {
       results.push({ file, screen, id: line.id, kind: line.kind, handler: line.handler, status: "passed", attempts: 1 });
       continue;
     }
 
-    const second = await attemptLine(driver, line, 2);
+    const second = await attemptLine(driver, line, 2, route);
     if (second.passed) {
       results.push({
         file,
@@ -259,11 +364,17 @@ function formatFailure(line) {
   return `${line.file}:${line.id} failed twice at step ${line.failure.step} (${line.failure.do}, role '${line.failure.role}', name '${line.failure.name}'): ${line.failure.message}`;
 }
 
-export async function runLoadedBehaviourLists({ driver, lists, out, unsteady }) {
+export async function runLoadedBehaviourLists({ driver, lists, coverage, out, unsteady }) {
   const lineResults = [];
   for (const list of lists) {
     lineResults.push(
-      ...(await runLines({ driver, lines: list.lines, file: list.file, screen: list.screen })),
+      ...(await runLines({
+        driver,
+        lines: list.lines,
+        file: list.file,
+        screen: list.screen,
+        route: list.route,
+      })),
     );
   }
 
@@ -272,6 +383,7 @@ export async function runLoadedBehaviourLists({ driver, lists, out, unsteady }) 
   const results = {
     schemaVersion: 1,
     lists: lists.map(({ file, screen }) => ({ file, screen })),
+    coverage,
     summary: {
       files: lists.length,
       total: lineResults.length,
@@ -291,13 +403,37 @@ export async function runLoadedBehaviourLists({ driver, lists, out, unsteady }) 
   return { exitCode: failed.length > 0 ? 1 : 0, message, results, unsteadyLines };
 }
 
+function listsNeedHolds(lists) {
+  return lists.some((list) => list.lines.some(
+    (line) => line.steps.some((step) => ACTION_STEPS.has(step.do)),
+  ));
+}
+
 export async function runBehaviourCheck({ app, behaviours, out, unsteady, driver }) {
   await validateApp(app);
   const lists = await loadBehaviourLists(behaviours);
-  if (!driver || typeof driver.beginLine !== "function" || typeof driver.performStep !== "function") {
-    throw refusal("page driver is unusable", "provide a driver that implements beginLine and performStep");
+  const coverageResult = await checkCoverage(lists);
+  if (coverageResult.refused.length > 0) {
+    const message = coverageResult.refused
+      .map(({ file, message: details }) => `Behaviour check refused: handler coverage failed for ${file}: ${details}`)
+      .join("\n");
+    return { exitCode: 1, message };
   }
-  return runLoadedBehaviourLists({ driver, lists, out, unsteady });
+  const needsHolds = listsNeedHolds(lists);
+  if (!driver || typeof driver.beginLine !== "function" || typeof driver.performStep !== "function"
+    || (needsHolds && typeof driver.holds !== "function")) {
+    throw refusal(
+      "page driver is unusable",
+      "provide a driver that implements beginLine, performStep, and holds for action lines",
+    );
+  }
+  return runLoadedBehaviourLists({
+    driver,
+    lists,
+    coverage: coverageResult.coverage,
+    out,
+    unsteady,
+  });
 }
 
 function contentType(file) {
@@ -341,12 +477,14 @@ function expectationObject(expect) {
   return typeof expect === "string" ? { state: expect } : expect;
 }
 
-export async function createPlaywrightDriver(baseUrl) {
-  let chromium;
-  try {
-    ({ chromium } = await import("playwright"));
-  } catch (error) {
-    throw refusal(`Playwright is unavailable: ${error.message}`, "run npm ci in the design-system checkout");
+export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromium } = {}) {
+  let chromium = injectedChromium;
+  if (!chromium) {
+    try {
+      ({ chromium } = await import("playwright"));
+    } catch (error) {
+      throw refusal(`Playwright is unavailable: ${error.message}`, "run npm ci in the design-system checkout");
+    }
   }
 
   let browser;
@@ -358,21 +496,67 @@ export async function createPlaywrightDriver(baseUrl) {
       "install the Playwright Chromium browser in the configured cache, then rerun test:browser",
     );
   }
-  const context = await browser.newContext();
-  context.setDefaultTimeout(5_000);
-  context.setDefaultNavigationTimeout(15_000);
+  const base = new URL(baseUrl);
+  if (!base.pathname.endsWith("/")) base.pathname = `${base.pathname}/`;
+  let context;
   let page;
   return {
-    async beginLine() {
+    async beginLine(_line, attempt, { route }) {
       if (page) await page.close();
+      page = undefined;
+      if (attempt === 1) {
+        if (context) await context.close();
+        context = await browser.newContext();
+        context.setDefaultTimeout(5_000);
+        context.setDefaultNavigationTimeout(15_000);
+      }
+      if (!context) throw refusal("browser context is unavailable", "start each line with attempt 1");
       page = await context.newPage();
+      const routeUrl = new URL(route.slice(1), base).href;
+      let response;
       try {
-        await page.goto(baseUrl, { waitUntil: "load" });
+        response = await page.goto(routeUrl, { waitUntil: "load" });
       } catch (error) {
         throw refusal(
-          `app page '${baseUrl}' could not load: ${error.message}`,
+          `app route '${route}' could not load: ${error.message}`,
           "make the built app reachable and rerun the behaviour check",
         );
+      }
+      const status = response?.status() ?? "no response";
+      if (!response || status >= 400) {
+        throw refusal(
+          `app route '${route}' returned ${status}`,
+          "make the route available in the built app and rerun the behaviour check",
+        );
+      }
+    },
+    async holds(step) {
+      try {
+        const locator = page.getByRole(step.role, { name: step.name, exact: true });
+        const expected = expectationObject(step.expect);
+        const count = await locator.count();
+        if (count === 0) {
+          return expected.state === "hidden"
+            && expected.value === undefined
+            && expected.text === undefined;
+        }
+        if (count !== 1) return false;
+        if (expected.state === "visible" && !(await locator.isVisible({ timeout: 1_000 }))) return false;
+        if (expected.state === "hidden" && (await locator.isVisible({ timeout: 1_000 }))) return false;
+        if (expected.state === "enabled" && !(await locator.isEnabled({ timeout: 1_000 }))) return false;
+        if (expected.state === "disabled" && !(await locator.isDisabled({ timeout: 1_000 }))) return false;
+        if (expected.state === "focused" && !(await locator.evaluate(
+          (node) => node === document.activeElement,
+          undefined,
+          { timeout: 1_000 },
+        ))) return false;
+        if (expected.value !== undefined
+          && (await locator.inputValue({ timeout: 1_000 })) !== expected.value) return false;
+        if (expected.text !== undefined
+          && (await locator.textContent({ timeout: 1_000 })) !== expected.text) return false;
+        return true;
+      } catch {
+        return false;
       }
     },
     async performStep(step) {
@@ -402,7 +586,7 @@ export async function createPlaywrightDriver(baseUrl) {
     },
     async close() {
       if (page) await page.close();
-      await context.close();
+      if (context) await context.close();
       await browser.close();
     },
   };
@@ -446,13 +630,28 @@ export async function runCli(argv, { driverFactory = createPlaywrightDriver, io 
     const options = parseArguments(argv);
     const app = await validateApp(options.app);
     const lists = await loadBehaviourLists(options.behaviours);
+    const coverageResult = await checkCoverage(lists);
+    if (coverageResult.refused.length > 0) {
+      for (const { file, message } of coverageResult.refused) {
+        io.error(`Behaviour check refused: handler coverage failed for ${file}: ${message}`);
+      }
+      return 1;
+    }
     if (app.kind === "folder") server = await serveStatic(app.value);
     const baseUrl = app.kind === "folder" ? server.url : app.value;
     driver = await driverFactory(baseUrl);
-    if (!driver || typeof driver.beginLine !== "function" || typeof driver.performStep !== "function") {
+    const needsHolds = listsNeedHolds(lists);
+    if (!driver || typeof driver.beginLine !== "function" || typeof driver.performStep !== "function"
+      || (needsHolds && typeof driver.holds !== "function")) {
       throw refusal("browser driver is unusable", "repair the Playwright driver and rerun the check");
     }
-    const result = await runLoadedBehaviourLists({ driver, lists, out: options.out, unsteady: options.unsteady });
+    const result = await runLoadedBehaviourLists({
+      driver,
+      lists,
+      coverage: coverageResult.coverage,
+      out: options.out,
+      unsteady: options.unsteady,
+    });
     io.out(result.message);
     return result.exitCode;
   } catch (error) {
