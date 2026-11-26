@@ -106,15 +106,6 @@ test('(f) matching base declarations in any other CSS file remain raw style valu
   assert.match(output(result), /src\/other\.css:2: raw style value/);
 });
 
-test('(g) var base chains in generated tokens are judged by the existing rules', () => {
-  const catalog = { base: { space: {
-    first: leaf('dimension', { value: 3, unit: 'px' }),
-    second: leaf('dimension', { value: 6, unit: 'px' }),
-  } } };
-  const result = run({ 'generated/tokens.css': ':root {\n  --base-space-first: var(--base-space-second);\n}\n' }, catalog);
-  assert.equal(result.status, 0, output(result));
-});
-
 test('(h) a generated base declaration without a catalog leaf is an unknown token', () => {
   const result = run({ 'generated/tokens.css': ':root {\n  --base-not-in-catalog: 3px;\n}\n' });
   assert.equal(result.status, 1, output(result));
@@ -294,4 +285,30 @@ test('(z) only CSS whitespace separates tokens; a no-break space is not whitespa
   assertFindings(generated(`${nbsp}:root {\n  --base-space-sm: 3px;\n}\n`), [shape(1, OPEN)]);
   assertFindings(generated(`:root {\n  --base-space-sm: 3px${nbsp};\n}\n`), [mismatch(2, '--base-space-sm', `3px${nbsp}`, '3px')]);
   assertFindings(generated(`:root {\n  --sys-gap: var(${nbsp}--base-space-sm);\n}\n`), [`${G}:2: raw style value`]);
+});
+
+// A base value is the catalog's raw value. A var() reference on a base name is never that value,
+// whatever it points at; only names outside base may carry a reference.
+const baseReference = (line, name, raw) => `${G}:${line}: ${name} base value ${raw} is a reference; a base value must be the catalog's raw value, not a reference; regenerate with npm run build:tokens`;
+const withSystem = { base: spaces.base, sys: { gap: leaf('dimension', ['{', 'base.space.md', '}'].join('')) } };
+
+test('(g1) a base name whose value refers to another base token is flagged', () => {
+  assertFindings(generated(':root {\n  --base-space-sm: var(--base-space-md);\n}\n'),
+    [baseReference(2, '--base-space-sm', 'var(--base-space-md)')]);
+});
+
+test('(g2) a base name whose value refers to itself is flagged', () => {
+  assertFindings(generated(':root {\n  --base-space-sm: var(--base-space-sm);\n}\n'),
+    [baseReference(2, '--base-space-sm', 'var(--base-space-sm)')]);
+});
+
+test('(g3) a base name whose value refers to a non-base token is flagged', () => {
+  assertFindings(generated(':root {\n  --base-space-sm: var(--sys-gap);\n}\n', withSystem),
+    [baseReference(2, '--base-space-sm', 'var(--sys-gap)')]);
+});
+
+test('(g4) a non-base name with one var() reference to a known token still passes', () => {
+  const result = generated(':root {\n  --base-space-md: 6px;\n  --sys-gap: var(--base-space-md);\n  --sys-pad: var(--sys-gap);\n}\n', withSystem);
+  assert.equal(result.status, 0, output(result));
+  assert.deepEqual(findings(result), []);
 });

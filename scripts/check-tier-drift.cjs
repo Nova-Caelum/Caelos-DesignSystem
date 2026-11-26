@@ -168,8 +168,10 @@ async function main() {
         if (error) report(error.pos, 'not in generated shape: ' + error.reason + '; regenerate with npm run build:tokens');
         else for (const { key, raw, pos } of entries) {
           const leaf = baseLeaves.get(key);
-          if (generatedReference.test(raw)) value(raw, pos, key);
-          else if (!key.startsWith('--base-')) report(pos, 'raw style value');
+          if (!key.startsWith('--base-')) {
+            if (generatedReference.test(raw)) value(raw, pos, key);
+            else report(pos, 'raw style value');
+          } else if (/var\(/i.test(raw)) report(pos, key + ' base value ' + raw + " is a reference; a base value must be the catalog's raw value, not a reference; regenerate with npm run build:tokens");
           else if (!leaf) report(pos, 'unknown base token ' + key);
           else {
             const expected = generatedBaseValue(leaf);
