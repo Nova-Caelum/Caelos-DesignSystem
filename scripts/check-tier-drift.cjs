@@ -8,6 +8,7 @@ const tokens = new Map();
 const catalogLeaves = [];
 const cssTokens = new Map();
 const files = [];
+const generatedTokensFile = 'generated/tokens.css';
 
 function list(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -33,7 +34,7 @@ function register(obj, prefix, tier) {
     const name = [...prefix, key];
     if ('$value' in value) {
       tokens.set(name.join('.'), tier);
-      catalogLeaves.push({ name: name.join('.'), value: value.$value, tier });
+      catalogLeaves.push({ name: name.join('.'), value: value.$value, type: value.$type, tier });
       cssTokens.set('--' + name.join('-'), tier);
     } else register(value, name, tier);
   }
@@ -50,6 +51,30 @@ for (const f of files.filter(f => f.endsWith('.tokens.json'))) {
     continue;
   }
   register(doc, [], tierOf(name));
+}
+const baseLeaves = new Map(catalogLeaves.filter(leaf => leaf.name.startsWith('base.'))
+  .map(leaf => ['--' + leaf.name.replaceAll('.', '-'), leaf]));
+function decimalSeconds(value) {
+  const match = String(value).match(/^(-?)(\d+)(?:\.(\d+))?$/);
+  if (!match) return undefined;
+  const fraction = match[3] || '';
+  const scale = 3 + fraction.length;
+  const digits = (match[2] + fraction).padStart(scale + 1, '0');
+  const whole = digits.slice(0, -scale).replace(/^0+(?=\d)/, '');
+  const decimal = digits.slice(-scale).replace(/0+$/, '');
+  return match[1] + whole + (decimal ? '.' + decimal : '');
+}
+function generatedBaseValue(leaf) {
+  const value = leaf.value;
+  if (leaf.type === 'color') return String(value.hex).toLowerCase();
+  if (leaf.type === 'dimension') return String(value.value) + value.unit;
+  if (leaf.type === 'number' || leaf.type === 'fontWeight') return String(value);
+  if (leaf.type === 'fontFamily') {
+    const family = name => /^[A-Za-z_-][A-Za-z0-9_-]*$/.test(name) ? name : "'" + name + "'";
+    return (Array.isArray(value) ? value : [value]).map(family).join(', ');
+  }
+  if (leaf.type === 'duration') return value.unit === 'ms' ? decimalSeconds(value.value) + 's' : String(value.value) + 's';
+  if (leaf.type === 'cubicBezier') return 'cubic-bezier(' + value.join(', ') + ')';
 }
 for (const leaf of catalogLeaves) {
   if (leaf.name.startsWith('base.') && leaf.tier === 0) continue;
@@ -90,8 +115,9 @@ async function main() {
       }).replace(/\{([\w.-]+)\}/g, (_, key) => { reference(key, tokens, pos); return 'TOKEN'; });
       if (numeric.test(withoutVars) || scanText('a { color: ' + withoutVars + '; }', {allowed: new Set()}).length) report(pos, 'raw style value');
     }
-    function declarations(text, pos) {
+    function declarations(text, pos, generated = false) {
       for (const m of text.matchAll(/(?:^|[;{(\s])([\w-]+)\s*:\s*([^;{}"']+)/g)) {
+        if (generated && m[1].startsWith('--base-') && !/^var\(\s*--[\w-]+\s*\)$/.test(m[2].trim())) continue;
         if (property(m[1]) || /^(min|max)-(width|height)$/.test(m[1])) value(m[2], pos+m.index, m[1]);
       }
     }
@@ -104,7 +130,21 @@ async function main() {
     }
     if (/\.(?:s?css|less|html?|vue|svelte|svg)$/i.test(f)) {
       for (const m of source.matchAll(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g)) if (suppress.test(m[0])) report(m.index, 'suppression comment');
-      declarations(source.replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length)), 0);
+      const cssSource = source.replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length));
+      if (name === generatedTokensFile) {
+        for (const m of cssSource.matchAll(/(?:^|[;{\s])(--base-[\w-]+)\s*:\s*([^;{}]+)(?:;|(?=\s*}))/g)) {
+          const raw = m[2].trim();
+          if (/^var\(\s*--[\w-]+\s*\)$/.test(raw)) continue;
+          const leaf = baseLeaves.get(m[1]);
+          if (!leaf) report(m.index, 'unknown base token ' + m[1]);
+          else {
+            const expected = generatedBaseValue(leaf);
+            if (expected === undefined) report(m.index, m[1] + ' unsupported base value type ' + leaf.type);
+            else if (raw !== expected) report(m.index, m[1] + ' generated base value ' + raw + ' does not equal catalog value ' + expected + '; generated base values must equal their catalog tokens; regenerate with npm run build:tokens, or fix the catalog');
+          }
+        }
+      }
+      declarations(cssSource, 0, name === generatedTokensFile);
       for (const m of source.matchAll(/\bstyle\s*=\s*(["'])([\s\S]*?)\1/gi)) declarations(m[2],m.index);
       for (const m of source.matchAll(/\bclass(?:Name)?=["']([^"']+)["']/g)) if (arbitrary.test(m[1])) report(m.index,'arbitrary utility');
       for (const m of source.matchAll(/@(?:import|use|forward)\s+(?:url\()?["']([^"']+)/g)) importPath(m[1], m.index);
