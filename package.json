@@ -2,11 +2,14 @@
   "name": "caelos-design-system-catalog",
   "private": true,
   "scripts": {
+    "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
     "prepare": "husky",
-    "test": "node --test"
+    "test": "node --test",
+    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs"
   },
   "devDependencies": {
     "husky": "9.1.7",
+    "playwright": "1.65.1",
     "typescript": "5.8.2"
   }
 }

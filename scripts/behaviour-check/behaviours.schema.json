@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nova-caelum.example/schemas/behaviours.schema.json",
+  "title": "Screen behaviour list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["screen", "lines"],
+  "properties": {
+    "screen": { "type": "string", "minLength": 1 },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/line" }
+    }
+  },
+  "$defs": {
+    "line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "handler", "steps"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["action", "state", "keyboard"] },
+        "handler": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/step" }
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["do", "role", "name"],
+      "properties": {
+        "do": { "enum": ["click", "type", "press", "focus", "expect"] },
+        "role": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "value": { "type": "string" },
+        "expect": {
+          "oneOf": [
+            { "enum": ["visible", "hidden", "enabled", "disabled", "focused"] },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "properties": {
+                "state": { "enum": ["visible", "hidden", "enabled", "disabled", "focused"] },
+                "value": { "type": "string" },
+                "text": { "type": "string" }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "do": { "enum": ["type", "press"] } }, "required": ["do"] },
+          "then": { "required": ["value"] }
+        },
+        {
+          "if": { "properties": { "do": { "const": "expect" } }, "required": ["do"] },
+          "then": { "required": ["expect"] }
+        }
+      ]
+    }
+  }
+}

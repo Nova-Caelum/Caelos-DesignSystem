@@ -1,0 +1,14 @@
+{
+  "screen": "SecondaryScreen.jsx",
+  "lines": [
+    {
+      "id": "reset-fixture",
+      "kind": "action",
+      "handler": "handleReset",
+      "steps": [
+        { "do": "click", "role": "button", "name": "Reset fixture" },
+        { "do": "expect", "role": "status", "name": "Reset", "expect": "visible" }
+      ]
+    }
+  ]
+}

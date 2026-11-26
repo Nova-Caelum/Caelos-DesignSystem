@@ -1,0 +1,42 @@
+{
+  "screen": "PrimaryScreen.jsx",
+  "lines": [
+    {
+      "id": "pass-action",
+      "kind": "action",
+      "handler": "handlePass",
+      "steps": [
+        { "do": "click", "role": "button", "name": "Pass action" },
+        { "do": "expect", "role": "status", "name": "Passed", "expect": "visible" }
+      ]
+    },
+    {
+      "id": "unsteady-action",
+      "kind": "action",
+      "handler": "handleFlaky",
+      "steps": [
+        { "do": "click", "role": "button", "name": "Flaky action" },
+        { "do": "expect", "role": "status", "name": "Ready after retry", "expect": "visible" }
+      ]
+    },
+    {
+      "id": "type-message",
+      "kind": "state",
+      "handler": "handleMessage",
+      "steps": [
+        { "do": "type", "role": "textbox", "name": "Message", "value": "hello" },
+        { "do": "expect", "role": "status", "name": "Typed hello", "expect": "visible" }
+      ]
+    },
+    {
+      "id": "submit-with-keyboard",
+      "kind": "keyboard",
+      "handler": "handleKeyDown",
+      "steps": [
+        { "do": "focus", "role": "textbox", "name": "Message" },
+        { "do": "press", "role": "textbox", "name": "Message", "value": "Enter" },
+        { "do": "expect", "role": "status", "name": "Submitted", "expect": "visible" }
+      ]
+    }
+  ]
+}
