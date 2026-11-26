@@ -1,6 +1,11 @@
 name: Catalog checks
+# The checkers, their rules (schema, paint families, templates) and their
+# dependencies come from the default branch. The candidate is exported as plain
+# files and read as data: nothing from it is installed, imported or run.
 on:
-  pull_request:
+  pull_request_target:
+  push:
+    branches: [main]
 permissions:
   contents: read
 jobs:
@@ -9,7 +14,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out the trusted checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -17,7 +23,31 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - run: npm install --ignore-scripts --no-audit --no-fund
-      - env:
-          BASE_REF: ${{ github.base_ref }}
-        run: npm run check:catalog -- --base "origin/$BASE_REF"
+      - name: Install trusted checker dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Export the candidate as data
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -eu
+          if [ "$EVENT" = pull_request_target ]; then
+            git fetch --no-tags --quiet origin "+refs/pull/$PR_NUMBER/head:refs/catalog/candidate"
+            head=$(git rev-parse refs/catalog/candidate)
+            if [ "$head" != "$PR_HEAD" ]; then
+              echo "pull request head moved from $PR_HEAD to $head; re-run the check"; exit 1
+            fi
+            base=$(git merge-base HEAD "$head")
+          else
+            head=$GITHUB_SHA
+            base=$PUSH_BEFORE
+            git cat-file -e "$base^{commit}" 2>/dev/null || { echo "push base $base is not available; re-run the check"; exit 1; }
+          fi
+          mkdir -p "$RUNNER_TEMP/candidate"
+          git archive "$head" | tar -x -C "$RUNNER_TEMP/candidate"
+          echo "candidate $head, base $base, checker $(git rev-parse HEAD)"
+          echo "CATALOG_BASE=$base" >> "$GITHUB_ENV"
+      - name: Run the trusted catalog checks on the candidate
+        run: npm run check:catalog -- --candidate "$RUNNER_TEMP/candidate" --base "$CATALOG_BASE"
