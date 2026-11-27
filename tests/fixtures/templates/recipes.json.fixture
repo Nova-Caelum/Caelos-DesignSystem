@@ -31,13 +31,14 @@
       "layerOrder": ["value"],
       "variants": { "variant": ["composer"] },
       "defaultVariants": { "variant": "composer" },
-      "states": ["hover", "pressed", "focus", "disabled"],
+      "states": ["hover", "pressed", "focus", "error", "disabled"],
       "statePaints": {
         "composer": {
           "default": { "foreground": "{tone.default.foreground}", "fill": "{tone.default.fill}" },
           "hover": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
           "pressed": { "foreground": "{tone.pressed.foreground}", "fill": "{tone.pressed.fill}" },
           "focus": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
+          "error": { "foreground": "{tone.error.foreground}", "fill": "{tone.error.fill}" },
           "disabled": { "foreground": "{tone.disabled.foreground}", "fill": "{tone.disabled.fill}" }
         }
       }
@@ -86,6 +87,21 @@
       "variants": { "variant": ["default"] },
       "defaultVariants": { "variant": "default" },
       "states": ["active", "inactive"]
+    }
+  },
+  "disclosure": {
+    "tier": 3,
+    "name": "overlays.shared.fixture-disclosure",
+    "componentName": "FixtureDisclosure",
+    "className": "fixture-disclosure",
+    "record": {
+      "kind": "disclosure",
+      "contents": ["details"],
+      "layerOrder": ["trigger", "panel"],
+      "madeOf": ["controls.shared.fixture-button"],
+      "variants": { "variant": ["default"] },
+      "defaultVariants": { "variant": "default" },
+      "states": ["open", "closed"]
     }
   }
 }

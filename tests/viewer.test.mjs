@@ -320,6 +320,52 @@ test('the repository live catalog builds in temporary folders with resolved sour
   }
 });
 
+test('a scratch catalog with a tabs entry builds the viewer without passing a tabs prop', () => {
+  const folder = path.join(workspace, 'tabs-entry-build');
+  const catalog = path.join(folder, 'token_catalog');
+  const generated = path.join(folder, 'generated');
+  const out = path.join(folder, 'dist');
+  materializeFixtures(fixtureRoot, catalog);
+  const tierFile = path.join(catalog, '03-overlays.tokens.json');
+  const tier = JSON.parse(readFileSync(tierFile, 'utf8'));
+  tier.controls ??= {};
+  tier.controls.shared ??= {};
+  tier.controls.shared.UsageTabs = {
+    $extensions: {
+      'app.caelos': {
+        lifecycle: 'draft',
+        recipeInStaging: true,
+        kind: 'tabs',
+        contents: ['Usage', 'Cost'],
+        layerOrder: ['list', 'panel'],
+        madeOf: ['controls.shared.Button'],
+        variants: { variant: ['default'] },
+        defaultVariants: { variant: 'default' },
+        states: ['active', 'inactive'],
+      },
+    },
+  };
+  writeFileSync(tierFile, `${JSON.stringify(tier, null, 2)}\n`);
+  const generation = run(process.execPath, [
+    path.join(root, 'scripts/generate-components.mjs'),
+    '--catalog', catalog,
+    '--templates', path.join(root, 'templates'),
+    '--out', generated,
+  ]);
+  assert.equal(generation.status, 0, generation.stderr || generation.stdout);
+  const build = run(process.execPath, [
+    path.join(root, 'viewer/build.mjs'),
+    '--catalog', catalog,
+    '--generated', generated,
+    '--out', out,
+  ], catalogOptions());
+  assert.equal(build.status, 0, build.stderr || build.stdout);
+  const document = readFileSync(path.join(out, 'index.html'), 'utf8');
+  const tabsSection = document.match(/<section[^>]+data-family="controls\.shared\.UsageTabs"[\s\S]*?<\/section>/u)?.[0] ?? '';
+  assert.match(tabsSection, /data-entry="controls\.shared\.UsageTabs"/u);
+  assert.doesNotMatch(tabsSection, /not generated:/u);
+});
+
 test('candidate mode emits exactly the skip line and writes nothing', () => {
   const out = path.join(workspace, 'candidate-direct-out');
   const generated = path.join(workspace, 'candidate-direct-generated');

@@ -103,6 +103,7 @@ export function ${componentName}({
       data-layer-order=${quote(record.layerOrder.join(" "))}
       data-state={props.disabled ? 'disabled' : state}
       data-variant={variant}
+      aria-invalid={state === 'error' || undefined}
       onKeyDown={handleKeyDown}
     />
   );

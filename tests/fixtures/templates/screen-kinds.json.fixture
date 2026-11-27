@@ -5,6 +5,7 @@
     { "kind": "tabs", "source_line_number": 2, "source_line": "<UsageTabs tabs={tabs} />" },
     { "kind": "menu", "source_line_number": 3, "source_line": "<div role=\"menu\" aria-label=\"Chat actions\" />" },
     { "kind": "input", "source_line_number": 4, "source_line": "<textarea aria-label=\"Message\" />" },
-    { "kind": "sheet", "source_line_number": 5, "source_line": "<ModelSelectorSheet open />" }
+    { "kind": "sheet", "source_line_number": 5, "source_line": "<ModelSelectorSheet open />" },
+    { "kind": "disclosure", "source_line_number": 6, "source_line": "<button aria-expanded={open} aria-controls=\"details\">Details</button>" }
   ]
 }

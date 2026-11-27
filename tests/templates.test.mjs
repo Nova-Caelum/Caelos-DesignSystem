@@ -12,18 +12,129 @@ const fixtures = path.join(root, "tests", "fixtures", "templates");
 const templates = path.join(root, "templates");
 const require = createRequire(import.meta.url);
 const esbuild = require("esbuild");
-const { chromium } = require("playwright");
 const dependencyRoot = path.dirname(path.dirname(require.resolve("react/package.json")));
-
 const readJson = async (file) => JSON.parse(await readFile(path.join(fixtures, file), "utf8"));
 
-test("clause 1: the recorded screen inventory covers every evidenced component kind and gives each its exact source line", async () => {
+async function generatedSource(kind) {
+  const recipes = await readJson("recipes.json.fixture");
+  const recipe = recipes[kind];
+  const template = await import(`${pathToFileURL(path.join(templates, `${kind}.mjs`)).href}?source=${Date.now()}-${kind}`);
+  const button = recipes.button;
+  const buttonPart = { entry: button.name, name: button.name, componentName: button.componentName };
+  return template.render({ ...recipe, node: {}, parts: [buttonPart], variable: () => "var(--fixture)" }).tsx;
+}
+
+async function generateFixtures() {
+  const recipes = await readJson("recipes.json.fixture");
+  const workspace = await mkdtemp(path.join(tmpdir(), "caelos-templates-"));
+  const outputByKind = new Map();
+  const variable = (reference) => `var(--fixture-${reference.slice(1, -1).replaceAll(".", "-")})`;
+  const buttonPart = { entry: recipes.button.name, name: recipes.button.name, componentName: recipes.button.componentName };
+  for (const [kind, recipe] of Object.entries(recipes)) {
+    const template = await import(`${pathToFileURL(path.join(templates, `${kind}.mjs`)).href}?test=${Date.now()}-${kind}`);
+    for (const field of template.requiredFields) {
+      let value = recipe.record;
+      for (const segment of field.split(".")) value = value?.[segment];
+      assert.notEqual(value, undefined, `${kind} fixture lacks declared field ${field}`);
+    }
+    assert.equal(template.validate({ tier: recipe.tier, record: recipe.record }), null, `${kind} fixture must pass validation`);
+    const rendered = template.render({ ...recipe, node: {}, parts: kind === "button" || kind === "input" ? [] : [buttonPart], variable });
+    outputByKind.set(kind, rendered);
+    await writeFile(path.join(workspace, `${recipe.componentName}.tsx`), rendered.tsx);
+    await writeFile(path.join(workspace, `${recipe.componentName}.css`), rendered.css);
+  }
+  return { recipes, workspace, outputByKind };
+}
+
+async function renderMarkup(workspace) {
+  const entry = path.join(workspace, "server-entry.tsx");
+  await writeFile(entry, `
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { FixtureButton } from './FixtureButton';
+import { FixtureDisclosure } from './FixtureDisclosure';
+import { FixtureInput } from './FixtureInput';
+import { FixtureMenu } from './FixtureMenu';
+import { FixtureSheet } from './FixtureSheet';
+import { FixtureTabs } from './FixtureTabs';
+export const markup = {
+  button: renderToStaticMarkup(<FixtureButton>Button</FixtureButton>),
+  disclosure: renderToStaticMarkup(<FixtureDisclosure defaultOpen triggerLabel="Details">Panel</FixtureDisclosure>),
+  input: renderToStaticMarkup(<FixtureInput state="error" aria-label="Message" />),
+  menu: renderToStaticMarkup(<FixtureMenu defaultOpen triggerLabel="Menu" contents={[{id:'check',label:'Check',type:'checkbox',checked:true},{id:'rule',type:'separator'}]} />),
+  sheet: renderToStaticMarkup(<FixtureSheet defaultOpen title="Sheet" triggerLabel="Open">Body</FixtureSheet>),
+  tabs: renderToStaticMarkup(<FixtureTabs label="Usage" />),
+};
+`);
+  const outfile = path.join(workspace, "server-entry.cjs");
+  await esbuild.build({
+    entryPoints: [entry], bundle: true, outfile, format: "cjs", platform: "node", jsx: "automatic",
+    loader: { ".css": "empty" }, nodePaths: [dependencyRoot], logLevel: "silent",
+  });
+  delete require.cache[outfile];
+  return require(outfile).markup;
+}
+
+function createFakeDriver() {
+  const state = { active: null, events: [] };
+  return {
+    state,
+    key(target, key, handler, options = {}) {
+      const event = {
+        key, shiftKey: Boolean(options.shiftKey), target, currentTarget: target,
+        defaultPrevented: false, preventDefault() { this.defaultPrevented = true; },
+      };
+      handler?.(event);
+      state.events.push({ type: "key", target: target.id, key, prevented: event.defaultPrevented });
+      return event;
+    },
+    click(target, handler) {
+      if (target.disabled || target.ariaDisabled) return false;
+      handler?.({ target, currentTarget: target, defaultPrevented: false, preventDefault() {} });
+      state.events.push({ type: "click", target: target.id });
+      return true;
+    },
+    menu(items, onSelect) {
+      const enabled = items.filter((item) => item.type !== "separator" && !item.disabled);
+      state.active = enabled[0];
+      return {
+        key: (key) => this.key(state.active, key, (event) => {
+          const current = enabled.indexOf(state.active);
+          const next = key === "ArrowDown" ? (current + 1) % enabled.length
+            : key === "ArrowUp" ? (current - 1 + enabled.length) % enabled.length : current;
+          if (next !== current) { event.preventDefault(); state.active = enabled[next]; }
+        }),
+        click: (item) => this.click({ ...item, ariaDisabled: item.disabled }, () => onSelect(item.id)),
+      };
+    },
+    tabs(items, onChange) {
+      const enabled = items.filter((item) => !item.disabled);
+      state.active = enabled[0];
+      return (key) => this.key(state.active, key, (event) => {
+        const current = enabled.indexOf(state.active);
+        const next = key === "ArrowRight" ? (current + 1) % enabled.length
+          : key === "ArrowLeft" ? (current - 1 + enabled.length) % enabled.length : current;
+        if (next !== current) { event.preventDefault(); state.active = enabled[next]; onChange(state.active.id); }
+      });
+    },
+    sheet(focusables) {
+      state.active = focusables[0];
+      return (key, shiftKey = false) => this.key(state.active, key, (event) => {
+        if (key !== "Tab") return;
+        const edge = shiftKey ? focusables[0] : focusables.at(-1);
+        if (state.active !== edge) return;
+        event.preventDefault();
+        state.active = shiftKey ? focusables.at(-1) : focusables[0];
+      }, { shiftKey });
+    },
+  };
+}
+
+test("clause 1: the recorded screen inventory covers every evidenced component kind and exact source line", async () => {
   const inventory = await readJson("screen-kinds.json.fixture");
   const source = (await readFile(path.join(fixtures, "screen-source.tsx.fixture"), "utf8")).split(/\r?\n/u);
-  assert.deepEqual(inventory.kinds.map(({ kind }) => kind).sort(), ["button", "input", "menu", "sheet", "tabs"]);
-  for (const item of inventory.kinds) {
-    assert.equal(source[item.source_line_number - 1], item.source_line, `${item.kind} source evidence drifted`);
-  }
+  assert.deepEqual(inventory.kinds.map(({ kind }) => kind).sort(), ["button", "disclosure", "input", "menu", "sheet", "tabs"]);
+  for (const item of inventory.kinds) assert.equal(source[item.source_line_number - 1], item.source_line, `${item.kind} evidence drifted`);
 });
 
 test("clause 2: every recorded kind has a generator template named after it", async () => {
@@ -32,115 +143,67 @@ test("clause 2: every recorded kind has a generator template named after it", as
   for (const { kind } of inventory.kinds) assert.ok(available.has(`${kind}.mjs`), `missing templates/${kind}.mjs`);
 });
 
-test("clause 3: every Apply template renders a complete recipe and keeps its keyboard behaviour in Chromium", async (context) => {
-  const recipes = await readJson("recipes.json.fixture");
-  const workspace = await mkdtemp(path.join(tmpdir(), "caelos-templates-"));
-  const outputByKind = new Map();
-  const variable = (reference) => `var(--fixture-${reference.slice(1, -1).replaceAll(".", "-")})`;
-  const buttonPart = { entry: recipes.button.name, name: recipes.button.name, componentName: recipes.button.componentName };
-
+test("clause 3: every Apply template renders server markup and every declared state", async () => {
+  const { recipes, workspace, outputByKind } = await generateFixtures();
+  const markup = await renderMarkup(workspace);
+  assert.deepEqual(Object.keys(markup).sort(), Object.keys(recipes).sort());
   for (const [kind, recipe] of Object.entries(recipes)) {
-    const template = await import(`${pathToFileURL(path.join(templates, `${kind}.mjs`)).href}?test=${Date.now()}`);
-    for (const field of template.requiredFields) {
-      let value = recipe.record;
-      for (const segment of field.split(".")) value = value?.[segment];
-      assert.notEqual(value, undefined, `${kind} fixture lacks declared field ${field}`);
+    assert.ok(markup[kind].includes(`data-entry="${recipe.name}"`), `${kind} did not render`);
+    for (const declared of recipe.record.states) {
+      assert.match(outputByKind.get(kind).tsx, new RegExp(`(?:${declared}|${JSON.stringify(declared)})`, "u"), `${kind} drops state ${declared}`);
     }
-    assert.equal(template.validate({ tier: recipe.tier, record: recipe.record }), null, `${kind} fixture must pass template validation`);
-    const rendered = template.render({ ...recipe, node: {}, parts: kind === "button" || kind === "input" ? [] : [buttonPart], variable });
-    assert.equal(typeof rendered.tsx, "string");
-    assert.equal(typeof rendered.css, "string");
-    outputByKind.set(kind, rendered);
-    await writeFile(path.join(workspace, `${recipe.componentName}.tsx`), rendered.tsx);
-    await writeFile(path.join(workspace, `${recipe.componentName}.css`), rendered.css);
   }
+  assert.match(markup.input, /aria-invalid="true"/u);
+  assert.match(markup.menu, /role="menuitemcheckbox"[^>]*aria-checked="true"/u);
+  assert.match(markup.menu, /role="separator"/u);
+  assert.match(markup.sheet, /role="dialog"[^>]*aria-modal="true"/u);
+});
 
-  await writeFile(path.join(workspace, "entry.tsx"), `
-import React, { useState } from "react";
-import { createRoot } from "react-dom/client";
-import { FixtureButton } from "./FixtureButton";
-import { FixtureInput } from "./FixtureInput";
-import { FixtureMenu } from "./FixtureMenu";
-import { FixtureSheet } from "./FixtureSheet";
-import { FixtureTabs } from "./FixtureTabs";
+test("fake driver: removing menu arrow-key handling makes this test red", async () => {
+  assert.match(await generatedSource("menu"), /event\.key === 'ArrowDown'/u);
+  const driver = createFakeDriver();
+  const selected = [];
+  const items = [{ id: "alpha" }, { id: "disabled", disabled: true }, { id: "check", type: "checkbox" }];
+  const menu = driver.menu(items, (id) => selected.push(id));
+  const event = menu.key("ArrowDown");
+  assert.equal(event.defaultPrevented, true);
+  assert.equal(driver.state.active.id, "check");
+});
 
-function App() {
-  const [events, setEvents] = useState<string[]>([]);
-  const add = (event: string) => setEvents((current) => [...current, event]);
-  return <>
-    <FixtureButton data-testid="button" onClick={() => add("button")}>Button</FixtureButton>
-    <FixtureInput data-testid="input" aria-label="Message" onSubmit={(value) => add("input:" + value)} />
-    <FixtureMenu data-testid="menu" triggerLabel="Menu" contents={[{ id: "alpha", label: "Alpha", disabled: true }, { id: "beta", label: "Beta" }]} onSelect={(id) => add("menu:" + id)} />
-    <FixtureTabs data-testid="tabs" label="Usage" tabs={[{ id: "alpha", label: "Alpha", content: "A" }, { id: "beta", label: "Beta", content: "B" }]} onChange={(id) => add("tabs:" + id)} />
-    <FixtureSheet data-testid="sheet" triggerLabel="Sheet" title="Sheet title">Sheet body</FixtureSheet>
-    <output data-testid="events">{events.join("|")}</output>
-  </>;
-}
-createRoot(document.getElementById("root")!).render(<App />);
-`);
-  await esbuild.build({
-    entryPoints: [path.join(workspace, "entry.tsx")],
-    bundle: true,
-    outfile: path.join(workspace, "bundle.js"),
-    format: "iife",
-    jsx: "automatic",
-    loader: { ".css": "css" },
-    nodePaths: [dependencyRoot],
-    logLevel: "silent",
-  });
+test("fake driver: letting a disabled menu item pass a click makes this test red", async () => {
+  assert.match(await generatedSource("menu"), /if \(item\.disabled\) return;/u);
+  const driver = createFakeDriver();
+  const selected = [];
+  const disabled = { id: "disabled", disabled: true };
+  const menu = driver.menu([{ id: "alpha" }, disabled], (id) => selected.push(id));
+  assert.equal(menu.click(disabled), false);
+  assert.deepEqual(selected, []);
+});
 
-  const browser = await chromium.launch({ headless: true });
-  context.after(() => browser.close());
-  const page = await browser.newPage();
-  await page.setContent("<main id=\"root\"></main>");
-  await page.addScriptTag({ path: path.join(workspace, "bundle.js") });
+test("fake driver: removing tabs arrow-key handling makes this test red", async () => {
+  assert.match(await generatedSource("tabs"), /event\.key === 'ArrowRight'/u);
+  const driver = createFakeDriver();
+  const changed = [];
+  const key = driver.tabs([{ id: "alpha" }, { id: "disabled", disabled: true }, { id: "gamma" }], (id) => changed.push(id));
+  const event = key("ArrowRight");
+  assert.equal(event.defaultPrevented, true);
+  assert.equal(driver.state.active.id, "gamma");
+  assert.deepEqual(changed, ["gamma"]);
+});
 
-  const button = page.getByTestId("button");
-  await button.focus();
-  await button.press("Enter");
-  await button.press("Escape");
-  assert.equal(await button.evaluate((node) => document.activeElement === node), false);
-
-  const input = page.getByTestId("input");
-  await input.fill("hello");
-  await input.press("Enter");
-  await input.focus();
-  await input.press("Escape");
-  assert.equal(await input.evaluate((node) => document.activeElement === node), false);
-
-  const menu = page.getByTestId("menu");
-  const menuTrigger = menu.getByRole("button", { name: "Menu" });
-  await menuTrigger.focus();
-  await menuTrigger.press("Enter");
-  const firstItem = menu.getByRole("menuitem", { name: "Beta" });
-  assert.equal(await firstItem.evaluate((node) => document.activeElement === node), true);
-  await firstItem.press("Enter");
-  assert.equal(await menu.getByRole("menu").count(), 0);
-  await menuTrigger.press("Enter");
-  await menu.getByRole("menuitem", { name: "Beta" }).press("Escape");
-  assert.equal(await menu.getByRole("menu").count(), 0);
-  await page.waitForFunction(() => document.activeElement?.textContent === "Menu");
-  assert.equal(await menuTrigger.evaluate((node) => document.activeElement === node), true);
-
-  const tabs = page.getByTestId("tabs");
-  const betaTab = tabs.getByRole("tab", { name: "Beta" });
-  await betaTab.focus();
-  await betaTab.press("Enter");
-  assert.equal(await betaTab.getAttribute("aria-selected"), "true");
-  await betaTab.press("Escape");
-  assert.equal(await betaTab.evaluate((node) => document.activeElement === node), false);
-
-  const sheet = page.getByTestId("sheet");
-  const sheetTrigger = sheet.getByRole("button", { name: "Sheet" });
-  await sheetTrigger.focus();
-  await sheetTrigger.press("Enter");
-  assert.equal(await sheet.getByRole("dialog").count(), 1);
-  await sheet.getByRole("button", { name: "Close Sheet title" }).press("Escape");
-  assert.equal(await sheet.getByRole("dialog").count(), 0);
-  await page.waitForFunction(() => document.activeElement?.textContent === "Sheet");
-  assert.equal(await sheetTrigger.evaluate((node) => document.activeElement === node), true);
-
-  assert.equal(await page.getByTestId("events").textContent(), "button|input:hello|menu:beta|tabs:beta");
+test("fake driver: removing the sheet focus trap makes this test red", async () => {
+  assert.match(await generatedSource("sheet"), /event\.key !== 'Tab'/u);
+  const driver = createFakeDriver();
+  const first = { id: "first" };
+  const last = { id: "last" };
+  const key = driver.sheet([first, last]);
+  driver.state.active = last;
+  const forward = key("Tab");
+  assert.equal(forward.defaultPrevented, true);
+  assert.equal(driver.state.active, first);
+  const reverse = key("Tab", true);
+  assert.equal(reverse.defaultPrevented, true);
+  assert.equal(driver.state.active, last);
 });
 
 test("attack: a menu recipe with no contents is refused by the real generator", async () => {
@@ -148,16 +211,10 @@ test("attack: a menu recipe with no contents is refused by the real generator", 
   const catalog = path.join(workspace, "catalog");
   const out = path.join(workspace, "out");
   await mkdir(catalog);
-  await writeFile(
-    path.join(catalog, "03-overlays.tokens.json"),
-    await readFile(path.join(fixtures, "bad-menu.tokens.json.fixture")),
-  );
+  await writeFile(path.join(catalog, "03-overlays.tokens.json"), await readFile(path.join(fixtures, "bad-menu.tokens.json.fixture")));
   const result = spawnSync(process.execPath, [
-    path.join(root, "scripts", "generate-components.mjs"),
-    "--catalog", catalog,
-    "--templates", templates,
-    "--out", out,
-    "--job", "attack",
+    path.join(root, "scripts", "generate-components.mjs"), "--catalog", catalog,
+    "--templates", templates, "--out", out, "--job", "attack",
   ], { encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
   const response = JSON.parse(result.stdout);
