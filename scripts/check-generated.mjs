@@ -77,7 +77,7 @@ function buildOwnedGeneratedFiles(root) {
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
     }
-    const build = run('npm', ['run', 'build'], { cwd: root, stdio: 'inherit' });
+    const build = run('npm', ['run', 'build:all'], { cwd: root, stdio: 'inherit' });
     if (build.status !== 0) throw new Error('could not determine generated-file ownership from a clean build');
     return new Set(generatedFiles(root).filter((file) => file.startsWith(`${generatedDirectory}/`)));
   } finally {
@@ -132,7 +132,7 @@ if (args.includes('--candidate')) {
     console.log("check:generated: skipped for a candidate tree; the pull request's own build is checked by the unit workflow");
   }
 } else {
-  const build = run('npm', ['run', 'build'], { cwd: process.cwd(), stdio: 'inherit' });
+  const build = run('npm', ['run', 'build:all'], { cwd: process.cwd(), stdio: 'inherit' });
   if (build.status !== 0) {
     process.exitCode = build.status ?? 1;
   } else {

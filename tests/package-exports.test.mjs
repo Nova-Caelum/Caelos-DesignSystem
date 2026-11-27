@@ -71,7 +71,8 @@ test("package files include all public export targets", () => {
 test("a git install runs no lifecycle script of the package", () => {
   const { scripts } = readPackageJson();
 
-  for (const lifecycleScript of ["prepare", "preinstall", "install", "postinstall", "prepack", "postpack"]) {
+  // npm prepares a git dependency that has either a prepare or build script.
+  for (const lifecycleScript of ["prepare", "build", "preinstall", "install", "postinstall", "prepack", "postpack"]) {
     assert.equal(scripts[lifecycleScript], undefined, `${lifecycleScript} must not be a package lifecycle script`);
   }
   assert.equal(scripts.hooks, "husky");
