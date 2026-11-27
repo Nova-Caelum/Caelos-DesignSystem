@@ -4,6 +4,7 @@
   "scripts": {
     "prepare": "husky",
     "test": "node --test",
+    "build:tokens": "node style-dictionary.config.mjs",
     "check:app": "node scripts/check-app.mjs",
     "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet --",
     "check:recipes": "node scripts/check-recipes.mjs",
@@ -11,6 +12,7 @@
   },
   "devDependencies": {
     "husky": "9.1.7",
+    "style-dictionary": "5.8.0",
     "typescript": "5.8.2"
   }
 }

@@ -56,18 +56,6 @@
       }
     },
     "material": {
-      "glass-blur": {
-        "$type": "dimension",
-        "$value": "{base.blur.px-2}",
-        "$extensions": {
-          "app.caelos": {
-            "lifecycle": "promoted",
-            "status": "provisional",
-            "decision": "D31",
-            "note": "D31 decides one role for content behind glass; its value follows the shared glass blur."
-          }
-        }
-      },
       "body": {
         "$type": "color",
         "$value": "{base.color.light-ground}",
