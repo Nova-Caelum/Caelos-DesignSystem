@@ -1,6 +1,15 @@
 {
   "name": "caelos-design-system-catalog",
   "private": true,
+  "exports": {
+    ".": "./generated/components/index.ts",
+    "./components": "./generated/components/index.ts",
+    "./tailwind-theme.css": "./generated/tailwind-theme.css",
+    "./tokens.css": "./generated/tokens.css"
+  },
+  "files": [
+    "generated/"
+  ],
   "scripts": {
     "prepare": "husky",
     "test": "node --test",
