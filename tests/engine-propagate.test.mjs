@@ -55,7 +55,7 @@ function buildLock(designSystem) {
   assert.equal(result.status, 0, result.stderr);
 }
 
-function makeWork(t, { stray = false } = {}) {
+function makeWork(t, { stray = false, staleGenerated = false, modelCalls = 0, wrongAppPin = false } = {}) {
   const work = mkdtempSync(path.join(tmpdir(), 'engine-propagate-'));
   const designSystem = path.join(work, 'design-system');
   const app = path.join(work, 'app');
@@ -65,7 +65,13 @@ function makeWork(t, { stray = false } = {}) {
   mkdirSync(jobFolder);
   materializeCatalog(designSystem);
   mkdirSync(path.join(designSystem, 'generated'));
-  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), ':root{--fixture:old}\n');
+  const oldCss = `:root {
+  --base-color-primary: fixture-primary;
+  --primitives-shared-surface-fill: var(--base-color-primary);
+  --controls-shared-button-padding: var(--base-space-medium);
+}\n`;
+  const updatedCss = oldCss.replace('fixture-primary', 'fixture-updated');
+  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
   buildLock(designSystem);
   command(designSystem, 'git', 'init', '-q');
   const designBase = commit(designSystem, 'fixture design base');
@@ -95,17 +101,32 @@ function makeWork(t, { stray = false } = {}) {
     },
   };
   writeFileSync(path.join(jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
-  writeFileSync(path.join(jobFolder, 'events.jsonl'), [
+  const events = [
     { seq: 1, kind: 'node.enter', node: 'apply-propagate-edit' },
     { seq: 2, kind: 'node.exit', node: 'apply-propagate-edit' },
-  ].map(JSON.stringify).join('\n') + '\n');
+  ];
+  for (let index = 0; index < modelCalls; index += 1) {
+    events.push({
+      seq: events.length + 1,
+      kind: 'node.enter',
+      node: `model-${index}`,
+      model_source: 'run-setting',
+      model: 'fixture-model',
+    });
+  }
+  writeFileSync(path.join(jobFolder, 'events.jsonl'), `${events.map(JSON.stringify).join('\n')}\n`);
 
   const edit = applyPropagateEdit({ jobFolder });
   assert.equal(edit.token, 'base.color.primary');
-  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), ':root{--fixture:updated}\n');
+  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), updatedCss);
+  const editFile = path.join(jobFolder, 'propagate-edit.json');
+  const editRecord = json(editFile);
+  editRecord.generated_outputs = ['generated/tokens.css'];
+  writeFileSync(editFile, `${JSON.stringify(editRecord, null, 2)}\n`);
   buildLock(designSystem);
   const expected = collectExpectedDependents({ jobFolder });
   writeFileSync(path.join(jobFolder, 'expected-dependents.json'), `${JSON.stringify(expected, null, 2)}\n`);
+  if (staleGenerated) writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
   if (stray) writeFileSync(path.join(designSystem, 'generated', 'stray.js'), 'export const stray = true;\n');
   const designCommit = commit(designSystem, 'propagate fixture edit');
 
@@ -131,6 +152,13 @@ function makeWork(t, { stray = false } = {}) {
   }, null, 2)}\n`);
   t.after(() => rmSync(work, { recursive: true, force: true }));
   return pin.then(() => {
+    if (wrongAppPin) {
+      const packageFile = path.join(app, 'package.json');
+      const packageDocument = json(packageFile);
+      packageDocument.dependencies['@fixture/design-system'] = 'github:fixture/design-system#wrong-commit';
+      writeFileSync(packageFile, `${JSON.stringify(packageDocument, null, 2)}\n`);
+      appCommit = commit(app, 'record wrong design-system pin');
+    }
     const stateFile = path.join(jobFolder, 'finish.json');
     const state = json(stateFile);
     state.appMergeCommit = appCommit;
@@ -151,6 +179,47 @@ test('criterion 1: one tier-0 edit misses no dependent, calls no model, and chan
   assert.equal(report.dependents_missed, 0);
   assert.equal(report.model_calls, 0);
   assert.deepEqual(report.non_dependents_changed, []);
+});
+
+test('mutation actual-from-expected: a rebuilt lock with stale generated CSS misses every dependent', async (t) => {
+  const work = await makeWork(t, { staleGenerated: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.deepEqual(report.actual_dependents, []);
+  assert.equal(report.dependents_missed, report.expected_dependents.length);
+  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+});
+
+test('regression: the report step exits nonzero after writing a report with missed dependents', async (t) => {
+  const work = await makeWork(t, { staleGenerated: true });
+  const result = spawnSync(process.execPath, [
+    path.join(root, 'engine', 'lib', 'propagate-report.mjs'),
+    'write-propagate-report', '--job', work.jobFolder,
+  ], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stderr, /dependent.*missed/i);
+  assert.ok(json(path.join(work.jobFolder, 'propagate.json')).dependents_missed > 0);
+});
+
+test('mutation missed-empty: stale generated CSS produces a nonzero missed count', async (t) => {
+  const work = await makeWork(t, { staleGenerated: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.dependents_missed > 0);
+  assert.ok(report.missed_dependents.length > 0);
+});
+
+test('mutation model-count-zero: one recorded model entry is counted', async (t) => {
+  const work = await makeWork(t, { modelCalls: 1 });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.equal(report.model_calls, 1);
+});
+
+test('mutation app-pin-check-off: a wrong app pin is a missed dependent', async (t) => {
+  const work = await makeWork(t, { wrongAppPin: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.equal(report.dependents_missed, 1);
+  assert.deepEqual(report.missed_dependents, [
+    'app:package.json#dependencies.@fixture/design-system',
+  ]);
 });
 
 test('criterion 2: a generated file outside the dependent set is reported as a non-dependent', async (t) => {
@@ -178,6 +247,32 @@ test('criterion 4: the first step applies fixture job.json and refuses a missing
   job.propagate.token = 'base.color.missing';
   writeFileSync(jobFile, `${JSON.stringify(job, null, 2)}\n`);
   assert.throws(() => applyPropagateEdit({ jobFolder: work.jobFolder }), /token .* does not exist/i);
+});
+
+test('ruling 3: the tier-0 edit changes only the selected value bytes', async (t) => {
+  const work = await makeWork(t);
+  const tierFile = path.join(work.designSystem, 'token_catalog', '00-foundations.tokens.json');
+  command(work.designSystem, 'git', 'checkout', work.designBase, '--', 'token_catalog/00-foundations.tokens.json');
+  const before = readFileSync(tierFile, 'utf8');
+  applyPropagateEdit({ jobFolder: work.jobFolder });
+  assert.equal(
+    readFileSync(tierFile, 'utf8'),
+    before.replace('"fixture-primary"', '"fixture-updated"'),
+  );
+});
+
+test('ruling 4: a value that does not match the token type is refused without an edit', async (t) => {
+  const work = await makeWork(t);
+  const tierFile = path.join(work.designSystem, 'token_catalog', '00-foundations.tokens.json');
+  command(work.designSystem, 'git', 'checkout', work.designBase, '--', 'token_catalog/00-foundations.tokens.json');
+  const before = readFileSync(tierFile, 'utf8');
+  const jobFile = path.join(work.jobFolder, 'job.json');
+  const job = json(jobFile);
+  job.propagate.token = 'base.space.medium';
+  job.propagate.value = 'fixture-colour';
+  writeFileSync(jobFile, `${JSON.stringify(job, null, 2)}\n`);
+  assert.throws(() => applyPropagateEdit({ jobFolder: work.jobFolder }), /dimension.*value|value.*dimension/i);
+  assert.equal(readFileSync(tierFile, 'utf8'), before);
 });
 
 test('criterion 5: the Propagate chain declares only script steps', () => {

@@ -49,21 +49,122 @@ function locateToken(catalog, token) {
   const matches = [];
   for (const name of readdirSync(catalog).filter((file) => /^00-.*\.tokens\.json$/u.test(file)).sort()) {
     const file = path.join(catalog, name);
-    const root = readJson(file);
+    const source = readFileSync(file, 'utf8');
+    const root = JSON.parse(source);
     let node = root;
+    let type = root.$type;
     for (const segment of segments) {
       if (!node || typeof node !== 'object' || Array.isArray(node) || !Object.hasOwn(node, segment)) {
         node = null;
         break;
       }
       node = node[segment];
+      if (node && typeof node === 'object' && typeof node.$type === 'string') type = node.$type;
     }
     if (node && typeof node === 'object' && !Array.isArray(node) && Object.hasOwn(node, '$value')) {
-      matches.push({ file, root, node });
+      matches.push({ file, source, node, type });
     }
   }
   if (matches.length > 1) throw new Error(`token ${token} has multiple tier 0 definitions`);
   return matches[0] ?? null;
+}
+
+function skipWhitespace(source, offset) {
+  let cursor = offset;
+  while (/\s/u.test(source[cursor] ?? '')) cursor += 1;
+  return cursor;
+}
+
+function scanString(source, offset) {
+  let cursor = offset + 1;
+  while (cursor < source.length) {
+    if (source[cursor] === '\\') cursor += 2;
+    else if (source[cursor] === '"') return cursor + 1;
+    else cursor += 1;
+  }
+  throw new Error('unterminated JSON string');
+}
+
+function jsonValueRange(source, target) {
+  function parseValue(offset, segments) {
+    const start = skipWhitespace(source, offset);
+    const selected = segments.length === target.length
+      && segments.every((segment, index) => segment === target[index]);
+    let cursor = start;
+    let nestedRange = null;
+    if (source[cursor] === '"') {
+      cursor = scanString(source, cursor);
+    } else if (source[cursor] === '{') {
+      cursor = skipWhitespace(source, cursor + 1);
+      while (source[cursor] !== '}') {
+        const keyStart = cursor;
+        const keyEnd = scanString(source, keyStart);
+        const key = JSON.parse(source.slice(keyStart, keyEnd));
+        cursor = skipWhitespace(source, keyEnd);
+        if (source[cursor] !== ':') throw new Error('invalid JSON object');
+        const parsed = parseValue(cursor + 1, [...segments, key]);
+        nestedRange ??= parsed.range;
+        cursor = skipWhitespace(source, parsed.end);
+        if (source[cursor] === ',') cursor = skipWhitespace(source, cursor + 1);
+        else if (source[cursor] !== '}') throw new Error('invalid JSON object');
+      }
+      cursor += 1;
+    } else if (source[cursor] === '[') {
+      cursor = skipWhitespace(source, cursor + 1);
+      let index = 0;
+      while (source[cursor] !== ']') {
+        const parsed = parseValue(cursor, [...segments, String(index)]);
+        nestedRange ??= parsed.range;
+        cursor = skipWhitespace(source, parsed.end);
+        if (source[cursor] === ',') cursor = skipWhitespace(source, cursor + 1);
+        else if (source[cursor] !== ']') throw new Error('invalid JSON array');
+        index += 1;
+      }
+      cursor += 1;
+    } else {
+      while (cursor < source.length && !/[\s,\]}]/u.test(source[cursor])) cursor += 1;
+    }
+    return { end: cursor, range: selected ? { start, end: cursor } : nestedRange };
+  }
+  const { range } = parseValue(0, []);
+  if (!range) throw new Error(`cannot find JSON value ${target.join('.')}`);
+  return range;
+}
+
+function valueMatchesType(type, value) {
+  if (typeof value === 'string' && /^\{[^{}]+\}$/u.test(value)) return true;
+  if (type === 'dimension') {
+    return (typeof value === 'string'
+      && /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:px|rem|em|%|vh|vw|vmin|vmax|ch|ex|cm|mm|in|pt|pc)$/u.test(value))
+      || (value !== null && typeof value === 'object' && !Array.isArray(value)
+        && typeof value.value === 'number' && Number.isFinite(value.value)
+        && typeof value.unit === 'string' && value.unit.length > 0);
+  }
+  if (type === 'duration') {
+    return (typeof value === 'string' && /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:ms|s)$/u.test(value))
+      || (value !== null && typeof value === 'object' && !Array.isArray(value)
+        && typeof value.value === 'number' && Number.isFinite(value.value)
+        && /^(?:ms|s)$/u.test(value.unit));
+  }
+  if (type === 'number') return typeof value === 'number' && Number.isFinite(value);
+  if (type === 'cubicBezier') return Array.isArray(value) && value.length === 4
+    && value.every((part) => typeof part === 'number' && Number.isFinite(part));
+  if (type === 'color') return typeof value === 'string'
+    || (value !== null && typeof value === 'object' && !Array.isArray(value)
+      && typeof value.colorSpace === 'string' && Array.isArray(value.components));
+  if (['fontFamily', 'fontWeight', 'strokeStyle'].includes(type)) {
+    return typeof value === 'string' || (type === 'fontWeight' && typeof value === 'number');
+  }
+  if (['border', 'transition', 'shadow', 'gradient', 'typography'].includes(type)) {
+    return value !== null && typeof value === 'object';
+  }
+  return ['string', 'boolean', 'object'].includes(typeof value) || typeof value === 'number';
+}
+
+function assertValueShape(type, value, token) {
+  if (typeof type !== 'string' || !valueMatchesType(type, value)) {
+    throw new Error(`token ${token} requires a ${type ?? 'declared'} value`);
+  }
 }
 
 export function applyPropagateEdit({ jobFolder }) {
@@ -72,8 +173,11 @@ export function applyPropagateEdit({ jobFolder }) {
   const located = locateToken(path.join(design.folder, 'token_catalog'), token);
   if (!located) throw new Error(`token ${token} does not exist in tier 0`);
   const previous = located.node.$value;
-  located.node.$value = job.propagate.value;
-  writeJson(located.file, located.root);
+  assertValueShape(located.type, job.propagate.value, token);
+  const range = jsonValueRange(located.source, [...tokenSegments(token), '$value']);
+  const replacement = JSON.stringify(job.propagate.value);
+  writeFileSync(located.file,
+    `${located.source.slice(0, range.start)}${replacement}${located.source.slice(range.end)}`);
   const edit = {
     token,
     previous,
@@ -106,30 +210,52 @@ function changedFiles(folder, base, head) {
   return output ? output.split('\n') : [];
 }
 
+function workingTreeFiles(folder) {
+  const tracked = git(folder, ['diff', '--name-only', 'HEAD']).trim();
+  const untracked = git(folder, ['ls-files', '--others', '--exclude-standard']).trim();
+  return [...new Set([...tracked.split('\n'), ...untracked.split('\n')].filter(Boolean))].sort();
+}
+
 function fileAt(folder, commit, file) {
   return git(folder, ['show', `${commit}:${file}`]);
 }
 
-function lockIds(lock) {
-  const ids = [];
-  for (const [entry, record] of Object.entries(lock.entries ?? {})) {
-    ids.push(entry);
-    for (const variant of Object.keys(record.variants ?? {})) ids.push(`${entry}#${variant}`);
-  }
-  return ids;
+function kebab(value) {
+  return value.replace(/([a-z0-9])([A-Z])/gu, '$1-$2')
+    .replace(/[^A-Za-z0-9]+/gu, '-').replace(/^-|-$/gu, '').toLowerCase();
 }
 
-function lockValue(lock, id) {
-  const separator = id.indexOf('#');
-  const entry = separator < 0 ? id : id.slice(0, separator);
-  const variant = separator < 0 ? null : id.slice(separator + 1);
-  const record = lock.entries?.[entry];
-  return variant === null ? record?.fingerprint : record?.variants?.[variant];
+function componentName(entry) {
+  const words = entry.split('#')[0].split('.').at(-1)
+    .replace(/([a-z0-9])([A-Z])/gu, '$1 $2')
+    .split(/[^A-Za-z0-9]+/u).filter(Boolean);
+  const name = words.map((word) => word[0].toUpperCase() + word.slice(1)).join('');
+  return /^\d/u.test(name) ? `Component${name}` : name;
 }
 
-function changedLockIds(before, after) {
-  const ids = new Set([...lockIds(before), ...lockIds(after)]);
-  return [...ids].filter((id) => lockValue(before, id) !== lockValue(after, id)).sort();
+// This is the single mapping from a lock entry to the files emitted for it. The
+// candidate paths come from the generator outputs recorded by the apply step.
+function builtFilesByEntry({ folder, commit, entries, outputPaths }) {
+  const sources = new Map(outputPaths.map((output) => {
+    try {
+      return [output, fileAt(folder, commit, output)];
+    } catch {
+      return [output, ''];
+    }
+  }));
+  return new Map(entries.map((entry) => {
+    const baseEntry = entry.split('#')[0];
+    const cssPrefix = `--${baseEntry.split('.').map(kebab).join('-')}`;
+    const generatedName = componentName(baseEntry);
+    const files = outputPaths.filter((output) => {
+      const source = sources.get(output);
+      const basename = path.basename(output);
+      return source.includes(cssPrefix)
+        || basename === `${generatedName}.tsx`
+        || basename === `${generatedName}.css`;
+    });
+    return [entry, files];
+  }));
 }
 
 function eventModelCalls(jobFolder) {
@@ -147,11 +273,11 @@ function eventModelCalls(jobFolder) {
   }, 0);
 }
 
-function expectedDesignFiles(design, edit) {
+function expectedDesignFiles(edit) {
   return new Set([
     edit.file,
     lockFile,
-    ...(design.outputs ?? []).map(({ path: output }) => output),
+    ...edit.generated_outputs,
   ]);
 }
 
@@ -191,16 +317,25 @@ export async function writePropagateReport({ jobFolder }) {
     throw new Error('expected-dependents.json must be a string array');
   }
   const edit = readJson(path.join(jobFolder, 'propagate-edit.json'), 'propagate-edit.json');
+  if (!Array.isArray(edit.generated_outputs)
+      || edit.generated_outputs.some((output) => typeof output !== 'string')) {
+    throw new Error('propagate-edit.json must contain generated_outputs as a string array');
+  }
   const designChanged = changedFiles(design.folder, design.baseCommit, state.designSystemMergeCommit);
-  const beforeLock = JSON.parse(fileAt(design.folder, design.baseCommit, lockFile));
-  const afterLock = JSON.parse(fileAt(design.folder, state.designSystemMergeCommit, lockFile));
-  const actualDependents = changedLockIds(beforeLock, afterLock);
-  const expectedSet = new Set(expected);
+  const builtFiles = builtFilesByEntry({
+    folder: design.folder,
+    commit: state.designSystemMergeCommit,
+    entries: expected,
+    outputPaths: edit.generated_outputs,
+  });
+  const changedSet = new Set(designChanged);
+  const actualDependents = expected
+    .filter((entry) => builtFiles.get(entry).some((file) => changedSet.has(file)))
+    .sort();
   const actualSet = new Set(actualDependents);
   const missed = expected.filter((name) => !actualSet.has(name)).sort();
-  const nonDependents = actualDependents.filter((name) => !expectedSet.has(name))
-    .map((name) => `design-system:${name}`);
-  const allowedDesign = expectedDesignFiles(design, edit);
+  const nonDependents = [];
+  const allowedDesign = expectedDesignFiles(edit);
   nonDependents.push(...designChanged
     .filter((file) => !allowedDesign.has(file))
     .map((file) => `design-system:${file}`));
@@ -263,14 +398,21 @@ async function main() {
   const jobFolder = jobIndex >= 0 ? process.argv[jobIndex + 1] : null;
   if (!jobFolder) throw new Error('usage: propagate-report <step> --job <folder>');
   if (step === 'apply-propagate-edit') {
-    applyPropagateEdit({ jobFolder });
+    const edit = applyPropagateEdit({ jobFolder });
     const { design } = jobConfig(jobFolder);
     runBuild(design.folder);
+    const declaredOutputs = new Set((design.outputs ?? []).map(({ path: output }) => output));
+    edit.generated_outputs = workingTreeFiles(design.folder)
+      .filter((output) => output !== edit.file && output !== lockFile && declaredOutputs.has(output));
+    writeJson(path.join(jobFolder, 'propagate-edit.json'), edit);
     writeJson(path.join(jobFolder, 'expected-dependents.json'), collectExpectedDependents({ jobFolder }));
     return;
   }
   if (step === 'write-propagate-report') {
-    await writePropagateReport({ jobFolder });
+    const report = await writePropagateReport({ jobFolder });
+    if (report.dependents_missed > 0) {
+      throw new Error(`${report.dependents_missed} dependent(s) missed: ${report.missed_dependents.join(', ')}`);
+    }
     return;
   }
   throw new Error(`unknown propagate step: ${step}`);
