@@ -11,7 +11,7 @@
     "generated/"
   ],
   "scripts": {
-    "prepare": "husky",
+    "hooks": "husky",
     "test": "node --test",
     "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
