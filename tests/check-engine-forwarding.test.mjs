@@ -97,7 +97,7 @@ test('check:engine ignores directly forwarded arguments', (t) => {
     'run', 'check:engine', '--', '--base', 'HEAD', '--candidate', work.candidate,
   ]);
   assert.equal(result.status, 0, output(result));
-  assert.match(output(result), /# pass [1-9]\d*/);
+  assert.match(output(result), /(?:#|ℹ) pass [1-9]\d*/);
   assert.equal(existsSync(work.marker), false, output(result));
   assert.equal(existsSync(work.evilMarker), false, output(result));
 });
@@ -108,7 +108,7 @@ test('check:engine finds its own repository root when run from another cwd', (t)
 
   const result = spawnSync(process.execPath, [launcher], { cwd: elsewhere, encoding: 'utf8', env: environment });
   assert.equal(result.status, 0, output(result));
-  assert.match(output(result), /# pass [1-9]\d*/);
+  assert.match(output(result), /(?:#|ℹ) pass [1-9]\d*/);
 });
 
 test('check:engine refuses a root without engine tests', (t) => {
