@@ -114,6 +114,20 @@ test('(a) materialized fixture exits 1 and reports raw-equal-to-token and empty 
   assert.match(raw?.message ?? '', /12px is a hand-written spacing value.*use var\(--base-space-px-12\) \(12px\)/);
   assert.equal(empty?.file, 'src/required.tsx');
   assert.match(empty?.message ?? '', /interactive with no motion token/);
+  assert.deepEqual(report.namesNotReachingTier0, [{
+    name: '--fixture-local-space', file: 'src/raw.css', line: 4, stopsAt: '12px',
+  }]);
+});
+
+test('tier-zero owner: gate always publishes used names whose alias chain stops above tier 0', () => {
+  const { code, report } = run({
+    'src/a.css': ':root { --local-space: 7px; }\n.a { padding: var(--local-space); margin: var(--missing-space); }\n',
+  });
+  assert.equal(code, 1);
+  assert.deepEqual(report.namesNotReachingTier0, [
+    { name: '--local-space', file: 'src/a.css', line: 2, stopsAt: '7px' },
+    { name: '--missing-space', file: 'src/a.css', line: 2, stopsAt: null },
+  ]);
 });
 
 test('(b) clean materialized fixture exits 0', () => {
@@ -124,7 +138,9 @@ test('(b) clean materialized fixture exits 0', () => {
   writeFileSync(path.join(root, 'src', 'required.tsx'), 'export const Required = () => <button type="button" className="motion">Save</button>;\n');
   const proc = invoke(root, ['--json']);
   assert.equal(proc.status, 0, proc.stderr);
-  assert.deepEqual(JSON.parse(proc.stdout).findings, []);
+  const report = JSON.parse(proc.stdout);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.namesNotReachingTier0, []);
 });
 
 test('(c) bad config exits 2', () => {
@@ -184,6 +200,7 @@ test('test_output_line_format_and_nearest_token: output line format includes nea
   assert.equal(proc.status, 1);
   const line = proc.stdout.split('\n').find((item) => item.includes('[spacing]'));
   assert.match(line, /^\s+src\/a\.css:1  \[spacing\] .+ — .+var\(--base-space-px-12\)/);
+  assert.match(proc.stdout, /names not reaching tier 0: 0/);
 });
 
 test('test_dtcg_token_source_and_nearest: DTCG token source supplies nearest token', () => {

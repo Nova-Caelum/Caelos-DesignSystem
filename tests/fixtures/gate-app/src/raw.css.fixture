@@ -1,1 +1,5 @@
 .raw { padding: 12px; }
+.stops-above-tier-zero {
+  --fixture-local-space: 12px;
+  --fixture-local-alias: var(--fixture-local-space);
+}

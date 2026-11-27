@@ -143,7 +143,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
   const sev = (rule, dflt = "error") => cfg.severity[rule] ?? dflt;
 
   function scanFile(f, raw) {
-    const st = { rel: f.rel, raw, findings: [], ranges: [], moduleIdents: new Map(), localClasses: new Map(), iconNames: new Set(), bindings: staticBindings(raw) };
+    const st = { rel: f.rel, raw, findings: [], usedTokens: [], ranges: [], moduleIdents: new Map(), localClasses: new Map(), iconNames: new Set(), bindings: staticBindings(raw) };
     const text = stripComments(raw, { line: !["css"].includes(f.type) });
     const lineAt = lineIndex(raw);
     const add = (rule, idx, message, severity = sev(rule)) => { if (severity !== "off") st.findings.push({ file: f.rel, line: lineAt(idx), idx, rule, severity, message }); };
@@ -233,6 +233,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     // ---- var() hygiene (every file) -----------------------------------
     const varCalls = cfg.pagePaint ? /var\(\s*(--[\w-]+)\s*(,)?/gi : /var\(\s*(--[\w-]+)\s*(,)?/g;
     for (const m of text.matchAll(varCalls)) {
+      st.usedTokens.push({ name: m[1], file: f.rel, line: lineAt(m.index) });
       const after = text[m.index + m[0].length - (m[2] ? 1 : 0)];
       if (cfg.var.noFallback && m[2]) add("fallback", m.index, `var(${m[1]}, …) has a fallback — remove it; if the token is missing, use one that exists`);
       if (cfg.var.mustBeDefined && !defined.has(m[1]) && !ignoreVar.some((r) => r.test(m[1])) && !(m[1].endsWith("-") && /[$'"`]/.test(after ?? ""))) add("undefined", m.index, `${m[1]} is not defined in the token sources or the app's CSS — pick a token that exists`);
@@ -342,7 +343,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       else if (reason === "") kept.push(fd); // an exemption without a reason does not exempt
       else exempt.push({ ...fd, reason });
     }
-    return { findings: kept, exempt };
+    return { findings: kept, exempt, usedTokens: st.usedTokens };
   }
 
   // ---- element rules ------------------------------------------------

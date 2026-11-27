@@ -114,6 +114,52 @@ test('(b) two builds produce byte-identical lock files', (t) => {
   assert.deepEqual(readFileSync(work.lock), first);
 });
 
+test('tier-zero owner: --tier0-report lists a catalog entry that stops above tier 0', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    data.primitives.shared.empty = {};
+    data.primitives.shared.orphan = { $type: 'dimension', $value: '7px' };
+  });
+  const reportFile = path.join(work.cwd, 'tier-zero-report.json');
+  const result = build(work, ['--tier0-report', reportFile]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(reportFile, 'utf8')), {
+    namesNotReachingTier0: [{
+      name: 'primitives.shared.orphan',
+      file: '01-primitives.tokens.json',
+      line: 0,
+      stopsAt: '7px',
+    }],
+  });
+});
+
+test('tier-zero owner: the real catalog has no valued entry that stops above tier 0', (t) => {
+  const work = liveWorkspace(t);
+  const reportFile = path.join(work.cwd, 'tier-zero-report.json');
+  const result = build(work, ['--tier0-report', reportFile]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(reportFile, 'utf8')), { namesNotReachingTier0: [] });
+});
+
+test('tier-zero owner: an undefined token name is the reported stop', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    data.primitives.shared.unknown = { $type: 'dimension', $value: '{missing.shared.token}' };
+  });
+  const reportFile = path.join(work.cwd, 'tier-zero-report.json');
+  const result = build(work, ['--tier0-report', reportFile]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Unknown token reference: missing\.shared\.token/);
+  assert.deepEqual(JSON.parse(readFileSync(reportFile, 'utf8')), {
+    namesNotReachingTier0: [{
+      name: 'primitives.shared.unknown',
+      file: '01-primitives.tokens.json',
+      line: 0,
+      stopsAt: 'missing.shared.token',
+    }],
+  });
+});
+
 test('(c) a tier-0 change reaches direct references and transitive madeOf only', (t) => {
   const work = workspace(t);
   assert.equal(build(work).status, 0);

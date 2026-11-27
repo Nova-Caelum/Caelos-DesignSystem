@@ -3,6 +3,7 @@
   "tokens": 2,
   "errors": 0,
   "warnings": 0,
+  "namesNotReachingTier0": [],
   "byRule": {},
   "findings": [],
   "exempt": []

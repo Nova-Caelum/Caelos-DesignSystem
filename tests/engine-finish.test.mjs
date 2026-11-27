@@ -68,7 +68,7 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
   mkdirSync(evidenceFolder);
   const designBase = makeRepository(path.join(fixtureRoot, 'design-system'), designSystem);
   const appBase = makeRepository(path.join(fixtureRoot, 'app'), app);
-  for (const name of ['behaviour-results.json', 'gate-results.json', 'integrate.json']) {
+  for (const name of ['behaviour-results.json', 'gate-results.json', 'integrate.json', 'tier-zero-report.json']) {
     cpSync(path.join(fixtureRoot, 'facts', name), path.join(jobFolder, name));
   }
   if (signoff) writeFileSync(path.join(jobFolder, 'signoff.json'), `${JSON.stringify(promoteRecord(undefined, id), null, 2)}\n`);
@@ -99,6 +99,7 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
         ],
       },
       behaviourResults: 'behaviour-results.json', gateResults: 'gate-results.json',
+      tierZeroReport: 'tier-zero-report.json',
       integrateResults: 'integrate.json',
     },
   };
@@ -568,10 +569,19 @@ test('criterion: app pull request is refused before the injected pin deployment 
   assert.equal(interfaces.calls.some(([kind, repo]) => kind === 'open' && repo === 'fixture/app'), false);
 });
 
-test('B5: unavailable tier-0 owner fields are named and never represented as a pass', async (t) => {
+test('B5: finish reads the gate and Expand tier-zero owners into system-faithful evidence', async (t) => {
   const first = makeWork(t);
   const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
   promoteFixture(second);
+  writeFileSync(path.join(first.jobFolder, 'gate-results.json'), JSON.stringify({
+    errors: 0,
+    namesNotReachingTier0: [{ name: '--app-local', file: 'app/page.css', line: 3, stopsAt: '7px' }],
+  }));
+  writeFileSync(path.join(second.jobFolder, 'tier-zero-report.json'), JSON.stringify({
+    namesNotReachingTier0: [{
+      name: 'controls.button', file: '02-controls.fixture.json', line: 0, stopsAt: '7px',
+    }],
+  }));
   writeFileSync(path.join(second.jobFolder, 'integrate.json'), '{"gaps":[{"entry":"invented.by.model","gapFill":"invented"}]}\n');
   await recomputeCrossJobEvidence({ jobFolders: [first.jobFolder, second.jobFolder], evidenceFolder: first.evidenceFolder });
   assert.deepEqual(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs.map(({ job }) => job), ['job-apply', 'job-expand']);
@@ -580,11 +590,90 @@ test('B5: unavailable tier-0 owner fields are named and never represented as a p
   assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps_not_listed_at_signoff, 0);
   const report = readJson(path.join(first.evidenceFolder, 'system-faithful.json'));
   assert.deepEqual(report.jobs, ['job-apply', 'job-expand']);
-  assert.equal(report.names_not_reaching_tier_0, null);
-  assert.match(report.names_not_reaching_tier_0_source, /^unavailable:/);
-  for (const owner of ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build']) {
-    assert.match(report.names_not_reaching_tier_0_source, new RegExp(owner));
-  }
+  assert.deepEqual(report.names_not_reaching_tier_0, [
+    { job: 'job-apply', name: '--app-local', file: 'app/page.css', line: 3, stopsAt: '7px' },
+    { job: 'job-expand', name: 'controls.button', file: '02-controls.fixture.json', line: 0, stopsAt: '7px' },
+  ]);
+  assert.deepEqual(report.names_not_reaching_tier_0_source, [
+    { job: 'job-apply', owner: 'enforcer gate', file: 'gate-results.json' },
+    { job: 'job-expand', owner: 'lock build', file: 'tier-zero-report.json' },
+  ]);
+});
+
+test('tier-zero owner: an entry in an unchanged app file has an empty job share', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.jobFolder, 'gate-results.json'), JSON.stringify({
+    errors: 0,
+    namesNotReachingTier0: [{ name: '--local', file: 'app/globals.css', line: 1, stopsAt: '7px' }],
+  }));
+  writeFileSync(path.join(work.app, 'app/page.tsx'), 'export default function Page() { return "changed"; }\n');
+  const appCommit = commit(work.app, 'change app output');
+  storeOutputHashes(work);
+  const report = await passingEvidence(work, { appCommit });
+  assert.deepEqual(report.names_not_reaching_tier_0, []);
+  assert.equal(report.job_passed, true);
+});
+
+test('tier-zero owner: an entry in a changed app file makes job_passed false', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.jobFolder, 'gate-results.json'), JSON.stringify({
+    errors: 0,
+    namesNotReachingTier0: [{ name: '--local', file: 'app/page.tsx', line: 1, stopsAt: '7px' }],
+  }));
+  writeFileSync(path.join(work.app, 'app/page.tsx'), 'export default function Page() { return "changed"; }\n');
+  const appCommit = commit(work.app, 'change app output');
+  storeOutputHashes(work);
+  const report = await passingEvidence(work, { appCommit });
+  assert.deepEqual(report.names_not_reaching_tier_0, [
+    { name: '--local', file: 'app/page.tsx', line: 1, stopsAt: '7px' },
+  ]);
+  assert.equal(report.job_passed, false);
+});
+
+test('tier-zero owner: an Expand report entry outside the signoff has an empty share', async (t) => {
+  const work = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  writeFileSync(path.join(work.jobFolder, 'tier-zero-report.json'), JSON.stringify({
+    namesNotReachingTier0: [{
+      name: 'controls.shared.local', file: '02-controls.tokens.json', line: 0, stopsAt: '7px',
+    }],
+  }));
+  const designCommit = promoteFixture(work);
+  storeOutputHashes(work);
+  const report = await passingEvidence(work, { designCommit });
+  assert.deepEqual(report.names_not_reaching_tier_0, []);
+  assert.equal(report.job_passed, true);
+});
+
+test('tier-zero owner: an Expand report entry in the signoff makes job_passed false', async (t) => {
+  const work = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  writeFileSync(path.join(work.jobFolder, 'tier-zero-report.json'), JSON.stringify({
+    namesNotReachingTier0: [{
+      name: 'controls.button', file: '02-controls.fixture.json', line: 0, stopsAt: '7px',
+    }],
+  }));
+  const report = await passingEvidence(work);
+  assert.deepEqual(report.names_not_reaching_tier_0, [{
+    name: 'controls.button', file: '02-controls.fixture.json', line: 0, stopsAt: '7px',
+  }]);
+  assert.equal(report.job_passed, false);
+});
+
+test('tier-zero owner: a missing Expand report throws with the job and file', async (t) => {
+  const work = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  rmSync(path.join(work.jobFolder, 'tier-zero-report.json'));
+  await assert.rejects(
+    recomputeCrossJobEvidence({ jobFolders: [work.jobFolder], evidenceFolder: work.evidenceFolder }),
+    /job-expand.*tier-zero-report\.json.*cannot be read/,
+  );
+});
+
+test('attack: a gate owner without the tier-zero array is refused with the job and file', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.jobFolder, 'gate-results.json'), '{"errors":0}\n');
+  await assert.rejects(
+    recomputeCrossJobEvidence({ jobFolders: [work.jobFolder], evidenceFolder: work.evidenceFolder }),
+    /job-apply.*gate-results\.json.*no namesNotReachingTier0 array/,
+  );
 });
 
 test('B6: a stale or unrelated deploy id fails the job', async (t) => {
