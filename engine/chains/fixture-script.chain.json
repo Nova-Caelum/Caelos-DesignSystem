@@ -1,0 +1,29 @@
+{
+  "chain": "fixture-script",
+  "steps": [
+    {
+      "step": "prepare",
+      "kind": "script",
+      "script": "tests/fixtures/engine/step.mjs",
+      "inputs": ["job.json"],
+      "outputs": ["prepare.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "convert",
+      "kind": "script",
+      "script": "tests/fixtures/engine/step.mjs",
+      "inputs": ["prepare.json"],
+      "outputs": ["convert.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "finish",
+      "kind": "script",
+      "script": "tests/fixtures/engine/step.mjs",
+      "inputs": ["convert.json"],
+      "outputs": ["finish.json"],
+      "check": "npm run check:catalog"
+    }
+  ]
+}
