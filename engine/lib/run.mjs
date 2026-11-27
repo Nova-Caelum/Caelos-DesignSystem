@@ -7,6 +7,7 @@ import {
 } from './chain.mjs';
 import { createEventWriter, finishedSteps, readEvents } from './events.mjs';
 import { assertCodexAvailable, runCodexStep } from '../adapters/codex.mjs';
+import { storeEngineOutputHashes } from './evidence.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 
@@ -130,6 +131,7 @@ export function runJob(folder, options = {}) {
   events.emit(previous.length ? 'run.resume' : 'run.start', null);
 
   for (const row of chain.steps.slice(start)) {
+    if (row.step === 'finish' && job.finish) storeEngineOutputHashes(jobFolder, job.finish);
     events.emit('node.enter', row.step);
     try {
       const stepResult = stepRunner({ jobFolder, row });

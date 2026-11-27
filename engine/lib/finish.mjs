@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import {
-  captureEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
+  readEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
 } from './evidence.mjs';
 import { pinApp } from '../steps/pin-app.mjs';
 
@@ -57,9 +57,22 @@ const defaultGit = {
   async readFileAt({ folder, commit, file }) {
     return execFileSync('git', ['show', `${commit}:${file}`], { cwd: folder });
   },
+  async isAncestor({ folder, ancestor, commit }) {
+    try {
+      const resolved = execFileSync('git', ['rev-parse', '--verify', `${commit}^{commit}`], {
+        cwd: folder, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+      execFileSync('git', ['merge-base', '--is-ancestor', ancestor, resolved], {
+        cwd: folder, stdio: 'ignore',
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
 };
 
-const defaultDeployReader = {
+export const defaultDeployReader = {
   async read() {
     let argv;
     try {
@@ -103,13 +116,13 @@ export async function finishJob({
   requirePromoteRecord(jobFolder);
   const evidence = evidenceFolder || job.finish.evidenceFolder;
   if (!evidence) throw new Error('finish requires an evidence folder argument or job.finish.evidenceFolder');
+  const outputHashes = readEngineOutputHashes(jobFolder);
   const stateFile = path.join(jobFolder, stateName);
   const state = existsSync(stateFile) ? json(stateFile, stateName) : {};
   const save = () => writeJson(stateFile, state);
   const design = job.finish.designSystem;
 
   if (!state.designSystemPullRequest) {
-    state.outputHashes = captureEngineOutputHashes(job.finish);
     await git.push({ folder: design.folder, head: design.head });
     const opened = await github.openPullRequest({
       repository: design.repository, base: design.base, head: design.head,
@@ -132,7 +145,7 @@ export async function finishJob({
 
   if (!job.finish.app) {
     const report = await writeJobEvidence({
-      jobFolder, evidenceFolder: evidence, snapshot: state.outputHashes, state, git, deployRecord: null,
+      jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord: null,
     });
     await recomputeCrossJobEvidence({ jobFolders, evidenceFolder: evidence });
     state.report = report;
@@ -175,7 +188,7 @@ export async function finishJob({
   }
   state.deployRecord = deployRecord;
   const report = await writeJobEvidence({
-    jobFolder, evidenceFolder: evidence, snapshot: state.outputHashes, state, git, deployRecord,
+    jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord,
   });
   await recomputeCrossJobEvidence({ jobFolders, evidenceFolder: evidence });
   state.report = report;

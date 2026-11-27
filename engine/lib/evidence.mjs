@@ -6,6 +6,8 @@ import path from 'node:path';
 
 const refusedModels = JSON.parse(readFileSync(new URL('../refused-models.json', import.meta.url), 'utf8')).models;
 const pinFiles = new Set(['package.json', 'package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock']);
+const tierZeroOwners = ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build'];
+const outputHashesName = 'output-hashes.json';
 
 function readJson(file, label = file) {
   let source;
@@ -21,12 +23,12 @@ function readJson(file, label = file) {
   }
 }
 
-function removeLifecycle(value) {
-  if (Array.isArray(value)) return value.map(removeLifecycle);
+function removeLifecycle(value, parentKey = null) {
+  if (Array.isArray(value)) return value.map((child) => removeLifecycle(child, parentKey));
   if (!value || typeof value !== 'object') return value;
   return Object.fromEntries(Object.entries(value)
-    .filter(([key]) => key !== 'lifecycle')
-    .map(([key, child]) => [key, removeLifecycle(child)]));
+    .filter(([key]) => !(parentKey === 'app.caelos' && key === 'lifecycle'))
+    .map(([key, child]) => [key, removeLifecycle(child, key)]));
 }
 
 function tierFile(output) {
@@ -49,7 +51,7 @@ function repositories(finish) {
 }
 
 function includedOutput(repository, output) {
-  return !(repository === 'app' && pinFiles.has(path.basename(output.path)));
+  return !(repository === 'app' && pinFiles.has(output.path));
 }
 
 export function captureEngineOutputHashes(finish) {
@@ -65,6 +67,18 @@ export function captureEngineOutputHashes(finish) {
     }
   }
   return snapshot;
+}
+
+export function storeEngineOutputHashes(jobFolder, finish) {
+  const file = path.join(jobFolder, outputHashesName);
+  if (existsSync(file)) return readJson(file, outputHashesName);
+  const snapshot = captureEngineOutputHashes(finish);
+  writeFileSync(file, `${JSON.stringify(snapshot, null, 2)}\n`);
+  return snapshot;
+}
+
+export function readEngineOutputHashes(jobFolder) {
+  return readJson(path.join(jobFolder, outputHashesName), outputHashesName);
 }
 
 async function outputWasEdited({ finish, snapshot, state, git }) {
@@ -83,31 +97,60 @@ async function outputWasEdited({ finish, snapshot, state, git }) {
   return false;
 }
 
-function containsDraft(value) {
-  if (Array.isArray(value)) return value.some(containsDraft);
-  if (!value || typeof value !== 'object') return false;
-  if (value.lifecycle === 'draft') return true;
-  return Object.values(value).some(containsDraft);
-}
-
-function draftsRemain(finish) {
-  return (finish.draftFiles || []).some(({ repository, path: file }) => {
-    const config = finish[repository];
-    return containsDraft(readJson(path.join(config.folder, file), file));
+function eventRecords(jobFolder) {
+  const file = path.join(jobFolder, 'events.jsonl');
+  if (!existsSync(file)) return [];
+  return readFileSync(file, 'utf8').split('\n').filter(Boolean).flatMap((line) => {
+    try {
+      return [JSON.parse(line)];
+    } catch {
+      return [];
+    }
   });
 }
 
-function eventModels(jobFolder) {
-  const file = path.join(jobFolder, 'events.jsonl');
-  if (!existsSync(file)) return [];
-  return readFileSync(file, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line))
-    .filter(({ kind, model }) => kind === 'node.exit' && typeof model === 'string')
-    .map(({ model }) => model);
+function modelEvidence(jobFolder) {
+  const chain = readJson(path.join(jobFolder, 'chain.json'), 'chain.json');
+  const modelSteps = chain.steps.filter(({ kind }) => kind === 'model').map(({ step }) => step);
+  const exits = eventRecords(jobFolder).filter(({ kind }) => kind === 'node.exit');
+  const recorded = exits.filter(({ model }) => typeof model === 'string' && model.trim())
+    .map(({ node, model }) => ({ node, model }));
+  return {
+    models: recorded.map(({ model }) => model),
+    missing: modelSteps.filter((step) => !recorded.some(({ node }) => node === step)),
+  };
 }
 
 function hasRefusedModel(models) {
   const refused = new Set(refusedModels.map((model) => model.toLowerCase()));
-  return models.some((model) => refused.has(model.toLowerCase()));
+  return models.some((model) => model.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+    .some((token) => refused.has(token)));
+}
+
+async function catalogDrafts({ job, commit, git }) {
+  if (!commit) return [];
+  const drafts = [];
+  const visit = (value, keys, file) => {
+    if (Array.isArray(value)) {
+      value.forEach((child, index) => visit(child, [...keys, String(index)], file));
+      return;
+    }
+    if (!value || typeof value !== 'object') return;
+    const metadata = value.$extensions?.['app.caelos'];
+    if (metadata?.lifecycle === 'draft' && metadata.draftedBy === job.id) {
+      drafts.push({ file, id: keys.join('.') });
+    }
+    for (const [key, child] of Object.entries(value)) {
+      if (key !== '$extensions') visit(child, [...keys, key], file);
+    }
+  };
+  for (const output of job.finish.designSystem.outputs.filter(tierFile)) {
+    const bytes = await git.readFileAt({
+      folder: job.finish.designSystem.folder, commit, file: output.path,
+    });
+    visit(JSON.parse(bytes.toString('utf8')), [], output.path);
+  }
+  return drafts;
 }
 
 function backendFile(file) {
@@ -131,6 +174,8 @@ export async function writeJobEvidence({
   const gate = appRequired
     ? readJson(path.join(jobFolder, finish.gateResults), 'gate results')
     : { errors: 0 };
+  const drafts = await catalogDrafts({ job, commit: state.designSystemMergeCommit, git });
+  const model = modelEvidence(jobFolder);
   const engineOutputEdited = await outputWasEdited({ finish, snapshot, state, git });
   const changed = finish.app && state.appMergeCommit
     ? await git.changedFiles({
@@ -145,10 +190,16 @@ export async function writeJobEvidence({
   const signoffAfterMerge = Boolean(state.appMergedAt) && signedAt > Date.parse(state.appMergedAt);
   const designChecksPassed = successfulIds(state.designSystemCheckRunIds).length > 0;
   const appChecksPassed = !appRequired || successfulIds(state.appCheckRunIds).length > 0;
+  const deployMatchesAppMerge = !appRequired || Boolean(
+    state.appMergeCommit && deployRecord?.id && await git.isAncestor({
+      folder: finish.app.folder, ancestor: state.appMergeCommit, commit: deployRecord.id,
+    }),
+  );
   const passed = signoff.status === 'promoted'
-    && !draftsRemain(finish)
+    && drafts.length === 0
     && !signoffAfterMerge
-    && !hasRefusedModel(eventModels(jobFolder))
+    && model.missing.length === 0
+    && !hasRefusedModel(model.models)
     && behavioursFailed === 0
     && backendChanged === 0
     && gate.errors === 0
@@ -156,7 +207,7 @@ export async function writeJobEvidence({
     && Boolean(state.designSystemMergeCommit)
     && designChecksPassed
     && appChecksPassed
-    && (!appRequired || (Boolean(state.appMergeCommit) && Boolean(deployRecord)));
+    && (!appRequired || (Boolean(state.appMergeCommit) && Boolean(deployRecord) && deployMatchesAppMerge));
   const report = {
     job_passed: passed,
     behaviours_failed: behavioursFailed,
@@ -167,6 +218,9 @@ export async function writeJobEvidence({
     design_system_check_run_ids: successfulIds(state.designSystemCheckRunIds),
     app_check_run_ids: successfulIds(state.appCheckRunIds),
     deploy_record: deployRecord || null,
+    deploy_matches_app_merge: deployMatchesAppMerge,
+    draft_catalog_entries: drafts,
+    model_steps_missing_records: model.missing,
   };
   writeFileSync(path.join(evidenceFolder, finish.evidenceFile), `${JSON.stringify(report, null, 2)}\n`);
   return report;
@@ -211,7 +265,6 @@ export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) 
   const signoffJobs = [];
   const gaps = [];
   const gapsNotListed = [];
-  const missingNames = new Set();
   for (const jobFolder of jobFolders) {
     const job = readJson(path.join(jobFolder, 'job.json'), 'job.json');
     const records = signoffRecords(jobFolder);
@@ -227,11 +280,6 @@ export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) 
       gaps.push(row);
       if (!signoffEntry || typeof signoffEntry.gapFill !== 'string') gapsNotListed.push(row);
     }
-    const system = readJson(path.join(jobFolder, job.finish.systemFaithfulResults), 'system-faithful results');
-    if (!Array.isArray(system.names_not_reaching_tier_0)) {
-      throw new Error('system-faithful results have no names_not_reaching_tier_0 list');
-    }
-    for (const name of system.names_not_reaching_tier_0) missingNames.add(name);
   }
   const signoffs = {
     jobs: signoffJobs,
@@ -243,12 +291,16 @@ export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) 
     gaps_not_listed_at_signoff: gapsNotListed.length,
     gap_entries_not_listed_at_signoff: gapsNotListed,
   };
-  const systemFaithful = {
-    names_not_reaching_tier_0: missingNames.size,
-    names: [...missingNames].sort(),
-  };
+  const systemFaithful = readNamesNotReachingTierZero();
   for (const [name, value] of [
     ['signoffs.json', signoffs], ['gaps.json', gapReport], ['system-faithful.json', systemFaithful],
   ]) writeFileSync(path.join(evidenceFolder, name), `${JSON.stringify(value, null, 2)}\n`);
   return { signoffs, gaps: gapReport, systemFaithful };
+}
+
+function readNamesNotReachingTierZero() {
+  return {
+    names_not_reaching_tier_0: null,
+    names_not_reaching_tier_0_source: `unavailable: ${tierZeroOwners.join(', ')} publish no tier-0 field`,
+  };
 }

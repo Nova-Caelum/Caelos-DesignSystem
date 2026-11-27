@@ -5,10 +5,10 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
 
-import { finishJob } from '../engine/lib/finish.mjs';
+import { defaultDeployReader, finishJob } from '../engine/lib/finish.mjs';
 import {
   captureEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
 } from '../engine/lib/evidence.mjs';
@@ -19,6 +19,7 @@ import { runJob } from '../engine/lib/run.mjs';
 const repository = fileURLToPath(new URL('..', import.meta.url));
 const fixtureRoot = path.join(repository, 'tests', 'fixtures', 'engine-finish');
 const refusedModels = JSON.parse(readFileSync(path.join(repository, 'engine', 'refused-models.json'), 'utf8')).models;
+const outputHashesName = 'output-hashes.json';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -46,6 +47,15 @@ function promoteRecord(signedAt = '2026-11-26T10:00:00.000Z', jobId = 'job-apply
     promoted: [{ file: '02-controls.fixture.json', id: 'controls.button', gapFill: 'reference' }],
     skipped: [],
   };
+}
+
+function deployRecord(work, commit = work.appBase) {
+  return { id: commit.slice(0, 7) };
+}
+
+function storeOutputHashes(work, snapshot = captureEngineOutputHashes(work.job.finish)) {
+  writeFileSync(path.join(work.jobFolder, outputHashesName), `${JSON.stringify(snapshot, null, 2)}\n`);
+  return snapshot;
 }
 
 function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {}) {
@@ -94,8 +104,16 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
     },
   };
   writeFileSync(path.join(jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
+  writeFileSync(path.join(jobFolder, 'chain.json'), `${JSON.stringify({
+    chain, commit: designBase, steps: [{
+      step: 'craft', kind: 'model', instructions: 'instructions.md', schema: 'schema.json',
+      inputs: ['input.json'], outputs: ['output.json'], check: 'npm run check:catalog',
+    }],
+  }, null, 2)}\n`);
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  return { root, designSystem, app, jobFolder, evidenceFolder, designBase, appBase, job };
+  const work = { root, designSystem, app, jobFolder, evidenceFolder, designBase, appBase, job };
+  storeOutputHashes(work);
+  return work;
 }
 
 function promoteFixture(work, message = 'promote fixture lifecycle') {
@@ -116,6 +134,29 @@ function passingState(work, designSystemMergeCommit, overrides = {}) {
     appMergedAt: '2026-11-26T12:00:00Z',
     ...overrides,
   };
+}
+
+function writeEvents(work, records) {
+  writeFileSync(path.join(work.jobFolder, 'events.jsonl'), records.map((record, index) => JSON.stringify({
+    seq: index + 1,
+    kind: 'node.exit',
+    run_id: 'fixture-run',
+    node: record.node,
+    ts: '2026-11-26T09:00:00.000Z',
+    ...(record.model === undefined ? {} : { model: record.model }),
+  })).join('\n') + (records.length ? '\n' : ''));
+}
+
+async function passingEvidence(work, { designCommit, appCommit = work.appBase, deploy } = {}) {
+  const mergedDesign = designCommit || promoteFixture(work);
+  return writeJobEvidence({
+    jobFolder: work.jobFolder,
+    evidenceFolder: work.evidenceFolder,
+    snapshot: readJson(path.join(work.jobFolder, outputHashesName)),
+    state: passingState(work, mergedDesign, { appMergeCommit: appCommit }),
+    git: makeInterfaces(work).git,
+    deployRecord: deploy || deployRecord(work, appCommit),
+  });
 }
 
 function makeInterfaces(work) {
@@ -147,6 +188,15 @@ function makeInterfaces(work) {
     },
     async readFileAt({ folder, commit: target, file }) {
       return execFileSync('git', ['show', `${target}:${file}`], { cwd: folder });
+    },
+    async isAncestor({ folder, ancestor, commit: target }) {
+      const resolved = spawnSync('git', ['rev-parse', '--verify', `${target}^{commit}`], {
+        cwd: folder, encoding: 'utf8',
+      });
+      if (resolved.status !== 0) return false;
+      return spawnSync('git', ['merge-base', '--is-ancestor', ancestor, resolved.stdout.trim()], {
+        cwd: folder, encoding: 'utf8',
+      }).status === 0;
     },
   };
   const pin = async (options) => pinApp({
@@ -209,7 +259,8 @@ test('criterion: the job report carries every owned fact and reads deploy throug
   const work = makeWork(t);
   const interfaces = makeInterfaces(work);
   const { options } = await advanceThroughPullRequests(work, interfaces);
-  interfaces.setDeploy({ id: 'abc1234' });
+  const appCommit = command(work.app, 'git', 'rev-parse', 'HEAD');
+  interfaces.setDeploy(deployRecord(work, appCommit));
   const result = await finishJob(options);
   assert.equal(result.status, 'complete');
   const report = readJson(path.join(work.evidenceFolder, 'job-apply.json'));
@@ -228,7 +279,7 @@ test('criterion: the job report carries every owned fact and reads deploy throug
     engine_output_edited_after_run: false,
     design_system_merge_commit: command(work.designSystem, 'git', 'rev-parse', 'HEAD'),
     app_merge_commit: command(work.app, 'git', 'rev-parse', 'HEAD'),
-    design_system_check_run_ids: [101], app_check_run_ids: [202], deploy_record: { id: 'abc1234' },
+    design_system_check_run_ids: [101], app_check_run_ids: [202], deploy_record: deployRecord(work, appCommit),
   });
   assert.ok(interfaces.calls.some(([kind]) => kind === 'deploy'));
 });
@@ -242,7 +293,7 @@ test('criterion: an edited engine-written file is detected and fails the job', a
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, designCommit),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work),
   });
   assert.equal(report.engine_output_edited_after_run, true);
   assert.equal(report.job_passed, false);
@@ -254,7 +305,7 @@ test('criterion: an unpromoted draft keeps job_passed false', async (t) => {
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, work.designBase),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work),
   });
   assert.equal(report.job_passed, false);
 });
@@ -273,24 +324,38 @@ test('criterion: lifecycle plus app package and lock rewrites are excluded from 
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, designCommit, { appMergeCommit: appCommit }),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work, appCommit),
   });
   assert.equal(report.engine_output_edited_after_run, false);
   assert.equal(report.job_passed, true);
 });
 
-test('criterion: gate baseline and contract recorded and index files are included in output editing', async (t) => {
+test('criterion: gate baseline is independently included in output editing', async (t) => {
   const work = makeWork(t);
   const snapshot = captureEngineOutputHashes(work.job.finish);
   const designCommit = promoteFixture(work);
   writeFileSync(path.join(work.app, 'gate-baseline.json'), '{"edited":true}\n');
-  writeFileSync(path.join(work.app, 'lib/taskgraph-client/recorded.ts'), 'export const recorded = "edited";\n');
-  writeFileSync(path.join(work.app, 'lib/taskgraph-client/index.ts'), 'export const index = "edited";\n');
-  const appCommit = commit(work.app, 'edit included app outputs');
+  const appCommit = commit(work.app, 'edit gate baseline');
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, designCommit, { appMergeCommit: appCommit }),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work, appCommit),
+  });
+  assert.equal(report.engine_output_edited_after_run, true);
+  assert.equal(report.job_passed, false);
+});
+
+test('criterion: contract recorded and index files are included in output editing', async (t) => {
+  const work = makeWork(t);
+  const snapshot = captureEngineOutputHashes(work.job.finish);
+  const designCommit = promoteFixture(work);
+  writeFileSync(path.join(work.app, 'lib/taskgraph-client/recorded.ts'), 'export const recorded = "edited";\n');
+  writeFileSync(path.join(work.app, 'lib/taskgraph-client/index.ts'), 'export const index = "edited";\n');
+  const appCommit = commit(work.app, 'edit contract outputs');
+  const report = await writeJobEvidence({
+    jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
+    state: passingState(work, designCommit, { appMergeCommit: appCommit }),
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work, appCommit),
   });
   assert.equal(report.engine_output_edited_after_run, true);
   assert.equal(report.job_passed, false);
@@ -305,9 +370,128 @@ test('criterion: a refused model recorded in events makes job_passed false', asy
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, designCommit),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work),
   });
   assert.ok(refusedModels.includes(event.model));
+  assert.equal(report.job_passed, false);
+});
+
+const [firstRefusedFamily, secondRefusedFamily] = refusedModels;
+const refusedRecordedIds = [
+  `claude-${firstRefusedFamily.toLowerCase()}-4-5`,
+  firstRefusedFamily,
+  `${secondRefusedFamily.toLowerCase()}-1`,
+  secondRefusedFamily.toUpperCase(),
+];
+
+for (const [index, model] of refusedRecordedIds.entries()) {
+  test(`E1: refused family variant ${index + 1} keeps job_passed false`, async (t) => {
+    const work = makeWork(t);
+    writeEvents(work, [{ node: 'craft', model }]);
+    assert.equal((await passingEvidence(work)).job_passed, false);
+  });
+}
+
+test('E1: family letters inside a longer token remain allowed', async (t) => {
+  const work = makeWork(t);
+  writeEvents(work, [{ node: 'craft', model: `pre${firstRefusedFamily.toLowerCase()}post-1` }]);
+  assert.equal((await passingEvidence(work)).job_passed, true);
+});
+
+test('E2: a model step exit without a recorded model is named and fails the job', async (t) => {
+  const work = makeWork(t);
+  writeEvents(work, [{ node: 'craft' }]);
+  const report = await passingEvidence(work);
+  assert.deepEqual(report.model_steps_missing_records, ['craft']);
+  assert.equal(report.job_passed, false);
+});
+
+test('E2: a missing event log names every unrecorded model step and fails the job', async (t) => {
+  const work = makeWork(t);
+  rmSync(path.join(work.jobFolder, 'events.jsonl'));
+  const report = await passingEvidence(work);
+  assert.deepEqual(report.model_steps_missing_records, ['craft']);
+  assert.equal(report.job_passed, false);
+});
+
+test('E3: drafts are found in the merge catalog without consulting draftFiles', async (t) => {
+  const work = makeWork(t);
+  delete work.job.finish.draftFiles;
+  writeFileSync(path.join(work.jobFolder, 'job.json'), `${JSON.stringify(work.job, null, 2)}\n`);
+  const report = await passingEvidence(work, { designCommit: work.designBase });
+  assert.equal(report.job_passed, false);
+});
+
+test('E4: the runner stores output hashes immediately before entering finish', async (t) => {
+  const work = makeWork(t);
+  const runnerRepository = path.join(work.root, 'runner-repository');
+  cpSync(path.join(repository, 'engine'), path.join(runnerRepository, 'engine'), { recursive: true });
+  mkdirSync(path.join(runnerRepository, 'scripts'));
+  cpSync(
+    path.join(repository, 'scripts', 'check-recipes.mjs'),
+    path.join(runnerRepository, 'scripts', 'check-recipes.mjs'),
+  );
+  command(runnerRepository, 'git', 'init', '-q');
+  commit(runnerRepository, 'runner fixture base');
+  const { runJob: runRunnerJob } = await import(
+    pathToFileURL(path.join(runnerRepository, 'engine', 'lib', 'run.mjs')).href,
+  );
+  rmSync(path.join(work.jobFolder, outputHashesName));
+  rmSync(path.join(work.jobFolder, 'events.jsonl'));
+  rmSync(path.join(work.jobFolder, 'chain.json'));
+  const job = readJson(path.join(work.jobFolder, 'job.json'));
+  job.chain = 'apply';
+  writeFileSync(path.join(work.jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
+  const result = runRunnerJob(work.jobFolder, {
+    harnessCheck() {},
+    catalogCheck() {},
+    stepRunner({ row }) {
+      if (row.step === 'count-handlers') {
+        writeFileSync(path.join(work.designSystem, 'generated/button.js'), 'export const button = "run complete";\n');
+      }
+      if (row.step === 'finish') {
+        assert.equal(existsSync(path.join(work.jobFolder, outputHashesName)), true);
+        const pause = new Error('waiting for merge');
+        pause.exitCode = 75;
+        throw pause;
+      }
+      return row.kind === 'model' ? { model: 'fixture-allowed-model' } : {};
+    },
+  });
+  assert.equal(result.complete, false);
+  assert.deepEqual(
+    readJson(path.join(work.jobFolder, outputHashesName)),
+    captureEngineOutputHashes(work.job.finish),
+  );
+});
+
+test('E4: an edit made after the run snapshot but before finish is detected', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.designSystem, 'generated/button.js'), 'export const button = "after run";\n');
+  const designCommit = promoteFixture(work, 'edit after run and merge');
+  const report = await writeJobEvidence({
+    jobFolder: work.jobFolder,
+    evidenceFolder: work.evidenceFolder,
+    snapshot: readJson(path.join(work.jobFolder, outputHashesName)),
+    state: passingState(work, designCommit),
+    git: makeInterfaces(work).git,
+    deployRecord: deployRecord(work),
+  });
+  assert.equal(report.engine_output_edited_after_run, true);
+  assert.equal(report.job_passed, false);
+});
+
+test('E4: finish reads the runner snapshot instead of recapturing edited outputs', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.designSystem, 'generated/button.js'), 'export const button = "between run and finish";\n');
+  commit(work.designSystem, 'edit between run and finish');
+  const interfaces = makeInterfaces(work);
+  const { options } = await advanceThroughPullRequests(work, interfaces);
+  const appCommit = command(work.app, 'git', 'rev-parse', 'HEAD');
+  interfaces.setDeploy(deployRecord(work, appCommit));
+  assert.equal((await finishJob(options)).status, 'complete');
+  const report = readJson(path.join(work.evidenceFolder, 'job-apply.json'));
+  assert.equal(report.engine_output_edited_after_run, true);
   assert.equal(report.job_passed, false);
 });
 
@@ -349,18 +533,91 @@ test('criterion: app pull request is refused before the injected pin deployment 
   assert.equal(interfaces.calls.some(([kind, repo]) => kind === 'open' && repo === 'fixture/app'), false);
 });
 
-test('criterion: signoffs, gaps, and system-faithful are recomputed from every given job folder', async (t) => {
+test('B5: unavailable tier-0 owner fields are named and never represented as a pass', async (t) => {
   const first = makeWork(t);
   const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
   promoteFixture(second);
   writeFileSync(path.join(second.jobFolder, 'integrate.json'), '{"gaps":[{"entry":"invented.by.model","gapFill":"invented"}]}\n');
+  rmSync(path.join(first.jobFolder, 'system-faithful.json'));
+  rmSync(path.join(second.jobFolder, 'system-faithful.json'));
   await recomputeCrossJobEvidence({ jobFolders: [first.jobFolder, second.jobFolder], evidenceFolder: first.evidenceFolder });
   assert.deepEqual(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs.map(({ job }) => job), ['job-apply', 'job-expand']);
   assert.equal(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs_with_more_than_one_signoff, 0);
   assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps.length, 2);
   assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps_not_listed_at_signoff, 0);
-  assert.equal(readJson(path.join(first.evidenceFolder, 'system-faithful.json')).names_not_reaching_tier_0, 0);
+  const report = readJson(path.join(first.evidenceFolder, 'system-faithful.json'));
+  assert.equal(report.names_not_reaching_tier_0, null);
+  assert.match(report.names_not_reaching_tier_0_source, /^unavailable:/);
+  for (const owner of ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build']) {
+    assert.match(report.names_not_reaching_tier_0_source, new RegExp(owner));
+  }
 });
+
+test('B6: a stale or unrelated deploy id fails the job', async (t) => {
+  const work = makeWork(t);
+  const report = await passingEvidence(work, { deploy: { id: work.designBase.slice(0, 7) } });
+  assert.equal(report.deploy_matches_app_merge, false);
+  assert.equal(report.job_passed, false);
+});
+
+test('B6: a deploy commit descended from the app merge commit is accepted', async (t) => {
+  const work = makeWork(t);
+  writeFileSync(path.join(work.app, 'app/page.tsx'), 'export default function Page() { return "deployed"; }\n');
+  const deployedCommit = commit(work.app, 'deploy descendant');
+  const report = await passingEvidence(work, {
+    appCommit: work.appBase,
+    deploy: { id: deployedCommit.slice(0, 7) },
+  });
+  assert.equal(report.deploy_matches_app_merge, true);
+  assert.equal(report.job_passed, true);
+});
+
+test('B7: CLI aggregates every explicit job with non-zero cross-job counts', (t) => {
+  const first = makeWork(t);
+  const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  promoteFixture(second);
+  writeFileSync(path.join(first.jobFolder, 'signoff-extra.json'), `${JSON.stringify(promoteRecord(undefined, first.job.id), null, 2)}\n`);
+  writeFileSync(path.join(second.jobFolder, 'signoff.json'), `${JSON.stringify({
+    ...promoteRecord(undefined, second.job.id), promoted: [],
+  }, null, 2)}\n`);
+  const result = spawnSync(process.execPath, [
+    path.join(repository, 'engine', 'cli.mjs'), 'evidence',
+    '--job', first.jobFolder, '--job', second.jobFolder, '--evidence', first.evidenceFolder,
+  ], { cwd: repository, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs_with_more_than_one_signoff, 1);
+  assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps_not_listed_at_signoff, 1);
+});
+
+test('B7: CLI discovers every job beneath a jobs root', (t) => {
+  const first = makeWork(t);
+  const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  const jobsRoot = path.join(first.root, 'jobs');
+  mkdirSync(jobsRoot);
+  cpSync(first.jobFolder, path.join(jobsRoot, 'apply'), { recursive: true });
+  cpSync(second.jobFolder, path.join(jobsRoot, 'expand'), { recursive: true });
+  const result = spawnSync(process.execPath, [
+    path.join(repository, 'engine', 'cli.mjs'), 'evidence',
+    '--jobs-root', jobsRoot, '--evidence', first.evidenceFolder,
+  ], { cwd: repository, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(
+    readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs.map(({ job }) => job),
+    ['job-apply', 'job-expand'],
+  );
+});
+
+for (const [label, output] of [['empty', ''], ['malformed', 'not-a-commit']]) {
+  test(`deploy reader: ${label} output is rejected`, async (t) => {
+    const original = process.env.CAELOS_DEPLOY_ID_COMMAND;
+    process.env.CAELOS_DEPLOY_ID_COMMAND = JSON.stringify([process.execPath, '-e', `process.stdout.write(${JSON.stringify(output)})`]);
+    t.after(() => {
+      if (original === undefined) delete process.env.CAELOS_DEPLOY_ID_COMMAND;
+      else process.env.CAELOS_DEPLOY_ID_COMMAND = original;
+    });
+    await assert.rejects(defaultDeployReader.read(), /short hexadecimal commit id/);
+  });
+}
 
 test('criterion: finish waits for the post-merge deploy record before writing evidence', async (t) => {
   const work = makeWork(t);
@@ -379,7 +636,7 @@ test('attack: a promote record dated after the app merge yields job_passed false
   const report = await writeJobEvidence({
     jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, snapshot,
     state: passingState(work, designCommit),
-    git: makeInterfaces(work).git, deployRecord: { id: 'abc1234' },
+    git: makeInterfaces(work).git, deployRecord: deployRecord(work),
   });
   assert.equal(report.job_passed, false);
 });
