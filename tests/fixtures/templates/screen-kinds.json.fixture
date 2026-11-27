@@ -1,0 +1,10 @@
+{
+  "apply_screen": "components/example/example-screen.tsx",
+  "kinds": [
+    { "kind": "button", "source_line_number": 1, "source_line": "<button type=\"button\">New chat</button>" },
+    { "kind": "tabs", "source_line_number": 2, "source_line": "<UsageTabs tabs={tabs} />" },
+    { "kind": "menu", "source_line_number": 3, "source_line": "<div role=\"menu\" aria-label=\"Chat actions\" />" },
+    { "kind": "input", "source_line_number": 4, "source_line": "<textarea aria-label=\"Message\" />" },
+    { "kind": "sheet", "source_line_number": 5, "source_line": "<ModelSelectorSheet open />" }
+  ]
+}

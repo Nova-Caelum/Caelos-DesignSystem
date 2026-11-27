@@ -1,0 +1,91 @@
+{
+  "button": {
+    "tier": 2,
+    "name": "controls.shared.fixture-button",
+    "componentName": "FixtureButton",
+    "className": "fixture-button",
+    "record": {
+      "kind": "button",
+      "layerOrder": ["label"],
+      "variants": { "variant": ["primary"] },
+      "defaultVariants": { "variant": "primary" },
+      "states": ["hover", "pressed", "focus", "disabled"],
+      "statePaints": {
+        "primary": {
+          "default": { "foreground": "{tone.default.foreground}", "fill": "{tone.default.fill}" },
+          "hover": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
+          "pressed": { "foreground": "{tone.pressed.foreground}", "fill": "{tone.pressed.fill}" },
+          "focus": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
+          "disabled": { "foreground": "{tone.disabled.foreground}", "fill": "{tone.disabled.fill}" }
+        }
+      }
+    }
+  },
+  "input": {
+    "tier": 2,
+    "name": "controls.shared.fixture-input",
+    "componentName": "FixtureInput",
+    "className": "fixture-input",
+    "record": {
+      "kind": "input",
+      "layerOrder": ["value"],
+      "variants": { "variant": ["composer"] },
+      "defaultVariants": { "variant": "composer" },
+      "states": ["hover", "pressed", "focus", "disabled"],
+      "statePaints": {
+        "composer": {
+          "default": { "foreground": "{tone.default.foreground}", "fill": "{tone.default.fill}" },
+          "hover": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
+          "pressed": { "foreground": "{tone.pressed.foreground}", "fill": "{tone.pressed.fill}" },
+          "focus": { "foreground": "{tone.hover.foreground}", "fill": "{tone.hover.fill}" },
+          "disabled": { "foreground": "{tone.disabled.foreground}", "fill": "{tone.disabled.fill}" }
+        }
+      }
+    }
+  },
+  "menu": {
+    "tier": 3,
+    "name": "overlays.shared.fixture-menu",
+    "componentName": "FixtureMenu",
+    "className": "fixture-menu",
+    "record": {
+      "kind": "menu",
+      "contents": ["alpha", "beta"],
+      "layerOrder": ["trigger", "items"],
+      "madeOf": ["controls.shared.fixture-button"],
+      "variants": { "variant": ["default"] },
+      "defaultVariants": { "variant": "default" },
+      "states": ["open", "closed"]
+    }
+  },
+  "sheet": {
+    "tier": 3,
+    "name": "overlays.shared.fixture-sheet",
+    "componentName": "FixtureSheet",
+    "className": "fixture-sheet",
+    "record": {
+      "kind": "sheet",
+      "contents": ["body"],
+      "layerOrder": ["trigger", "dialog"],
+      "madeOf": ["controls.shared.fixture-button"],
+      "variants": { "variant": ["default"] },
+      "defaultVariants": { "variant": "default" },
+      "states": ["open", "closed"]
+    }
+  },
+  "tabs": {
+    "tier": 3,
+    "name": "controls.shared.fixture-tabs",
+    "componentName": "FixtureTabs",
+    "className": "fixture-tabs",
+    "record": {
+      "kind": "tabs",
+      "contents": ["alpha", "beta"],
+      "layerOrder": ["list", "panel"],
+      "madeOf": ["controls.shared.fixture-button"],
+      "variants": { "variant": ["default"] },
+      "defaultVariants": { "variant": "default" },
+      "states": ["active", "inactive"]
+    }
+  }
+}

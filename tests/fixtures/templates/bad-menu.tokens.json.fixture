@@ -1,0 +1,18 @@
+{
+  "overlays": {
+    "shared": {
+      "bad-menu": {
+        "$extensions": {
+          "app.caelos": {
+            "kind": "menu",
+            "layerOrder": ["trigger", "items"],
+            "madeOf": ["controls.shared.fixture-button"],
+            "variants": { "variant": ["default"] },
+            "defaultVariants": { "variant": "default" },
+            "states": ["open", "closed"]
+          }
+        }
+      }
+    }
+  }
+}

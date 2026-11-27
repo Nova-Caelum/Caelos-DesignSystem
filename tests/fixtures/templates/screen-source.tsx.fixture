@@ -1,0 +1,5 @@
+<button type="button">New chat</button>
+<UsageTabs tabs={tabs} />
+<div role="menu" aria-label="Chat actions" />
+<textarea aria-label="Message" />
+<ModelSelectorSheet open />
