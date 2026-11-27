@@ -1,4 +1,4 @@
-export const requiredFields = ['kind', 'layerOrder'];
+export const requiredFields = ["kind", "layerOrder"];
 
 const quote = (value) => JSON.stringify(value);
 
