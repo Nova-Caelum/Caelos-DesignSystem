@@ -58,6 +58,17 @@ test('an app with tokens but no matching files is refused', () => {
   assert.match(proc.stderr, EMPTY_SCAN_MESSAGE);
 });
 
+test('an app with files but no tokens is refused', () => {
+  const root = makeTemp();
+  mkdirSync(path.join(root, 'src'), { recursive: true });
+  writeFileSync(path.join(root, 'src', 'a.css'), '.a { padding: var(--base-space-px-4); }\n');
+  writeFileSync(path.join(root, 'design-system-enforcer-gate.config.json'), JSON.stringify(configForNoSources([])));
+  const proc = invoke(root);
+  assert.equal(proc.status, 2, proc.stderr);
+  assert.match(proc.stderr, /found 0 tokens: check the token-source paths and the gate config/);
+  assert.doesNotMatch(proc.stderr, EMPTY_SCAN_MESSAGE);
+});
+
 test('an app with a violation keeps the gate failure', () => {
   const proc = invoke(materializeFixture());
   assert.equal(proc.status, 1, proc.stderr);

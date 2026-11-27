@@ -231,10 +231,12 @@ test('test_icon_svg_and_import: icon SVG, imports, allowed component, and fill a
   assert.equal(result.code, 1);
   assert.deepEqual(rules(result.report), new Set(['icon-svg']));
   result = run({ 'src/a.tsx': 'import { FaBeer } from "react-icons/fa";\nexport const A = () => <FaBeer />;\n' }, config);
+  assert.equal(result.code, 1);
   assert.deepEqual(rules(result.report), new Set(['icon-import']));
   result = run({ 'src/a.tsx': 'import { Brain } from "lucide-react";\nexport const A = () => <Brain />;\n' }, config);
   assert.equal(result.code, 0);
   result = run({ 'src/a.tsx': `import { Brain } from "lucide-react";\nexport const A = () => <Brain fill="${BAD_FILL}" />;\n` }, config);
+  assert.equal(result.code, 1);
   assert.deepEqual(rules(result.report), new Set(['icon-fill']));
 });
 
