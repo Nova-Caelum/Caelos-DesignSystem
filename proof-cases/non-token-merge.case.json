@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "non-token-merge",
+  "kind": "non-token-merge",
+  "expected": "refused",
+  "branch": "proof/non-token-merge",
+  "file": "token_catalog/01-primitives.tokens.json",
+  "check": "tier-proof",
+  "token": "primitives.shared.scrollArea.light-ink",
+  "mutation": "resolve-alias"
+}

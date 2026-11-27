@@ -2,15 +2,24 @@
 // command and a real git commit, then verify that HEAD did not advance.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const temp = mkdtempSync(path.join(tmpdir(), 'caelos-tier-proof-'));
-const scratch = path.join(temp, 'repo');
-mkdirSync(scratch);
+
+let temp;
+let scratch;
 const probe = 'src/tiers/1-primitives/probe';
 const catalog = 'token_catalog/01-primitives.tokens.json';
 const style = (key, val) => 'export const recipe = { ' + key + ': ' + JSON.stringify(val) + ' };';
@@ -88,6 +97,331 @@ const cases = [
 function command(bin, args, cwd=scratch) {
   return spawnSync(bin,args,{cwd,encoding:'utf8',maxBuffer:16*1024*1024});
 }
+
+const CASE_KINDS = new Set([
+  'rebuilt-component',
+  'reused-component',
+  'raw-value-equal-to-token',
+  'empty-required-value',
+  'non-token-merge',
+]);
+const CASE_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+const DOT_PATH = /^[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*$/u;
+
+function assertSafeRelative(value, label) {
+  assert.equal(typeof value, 'string', `${label} must be a string`);
+  const normalized = value.replaceAll('\\', '/');
+  assert.ok(value.length > 0 && !path.isAbsolute(value), `${label} is an unsafe path`);
+  assert.ok(!normalized.split('/').includes('..'), `${label} must stay inside the case workspace`);
+  assert.ok(!normalized.includes('\0'), `${label} is an unsafe path`);
+}
+
+function assertDotPath(value, label) {
+  assert.ok(typeof value === 'string' && DOT_PATH.test(value), `${label} must be a safe dotted path`);
+}
+
+function validatePlant(entry, caseName, index) {
+  const label = `${caseName} plant ${index + 1}`;
+  assert.ok(entry && typeof entry === 'object' && !Array.isArray(entry), `${label} must be an object`);
+  assert.ok(entry.surface === 'catalog' || entry.surface === 'app', `${label} has an unknown surface`);
+  if (entry.file !== undefined) assertSafeRelative(entry.file, `${label} file`);
+  if (entry.fixture !== undefined) assertSafeRelative(entry.fixture, `${label} fixture`);
+  if (entry.page !== undefined) assertSafeRelative(entry.page, `${label} page`);
+  for (const field of ['source', 'target', 'token', 'record']) {
+    if (entry[field] !== undefined) assertDotPath(entry[field], `${label} ${field}`);
+  }
+  return entry;
+}
+
+export function validateProofCase(rawCase, filename = '<case>') {
+  try {
+    assert.ok(rawCase && typeof rawCase === 'object' && !Array.isArray(rawCase), 'case must be an object');
+    assert.equal(rawCase.schemaVersion, 1, 'schemaVersion must be 1');
+    assert.ok(typeof rawCase.name === 'string' && CASE_NAME.test(rawCase.name), 'name is invalid');
+    assert.ok(CASE_KINDS.has(rawCase.kind), `unknown kind ${rawCase.kind}`);
+    const accepted = rawCase.kind === 'reused-component';
+    assert.equal(rawCase.expected, accepted ? 'accepted' : 'refused', `${rawCase.kind} has the wrong expectation`);
+    if (rawCase.kind === 'non-token-merge') {
+      assertSafeRelative(rawCase.file, `${rawCase.name} file`);
+      assertDotPath(rawCase.token, `${rawCase.name} token`);
+      assert.ok(/^proof\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(rawCase.branch), `${rawCase.name} branch is invalid`);
+      assert.equal(rawCase.check, 'tier-proof', `${rawCase.name} must expect tier-proof`);
+      assert.equal(rawCase.mutation, 'resolve-alias', `${rawCase.name} has an unknown mutation`);
+      assert.equal(rawCase.plants, undefined, `${rawCase.name} must not contain ordinary plants`);
+      return rawCase;
+    }
+    assert.ok(Array.isArray(rawCase.plants), `${rawCase.name} plants must be an array`);
+    const plants = rawCase.plants.map((entry, index) => validatePlant(entry, rawCase.name, index));
+    assert.equal(plants.length, 2, `${rawCase.name} must have two plants`);
+    assert.deepEqual(new Set(plants.map((entry) => entry.surface)), new Set(['catalog', 'app']), `${rawCase.name} must plant catalog and app surfaces`);
+    const [catalogPlant] = plants.filter((entry) => entry.surface === 'catalog');
+    const [appPlant] = plants.filter((entry) => entry.surface === 'app');
+    if (rawCase.kind === 'rebuilt-component') {
+      assert.equal(catalogPlant.check, 'duplicates');
+      assert.equal(appPlant.check, 'page-paint');
+      for (const field of ['file', 'source', 'target']) assert.ok(catalogPlant[field], `${rawCase.name} catalog plant needs ${field}`);
+      for (const field of ['fixture', 'page']) assert.ok(appPlant[field], `${rawCase.name} app plant needs ${field}`);
+    } else if (rawCase.kind === 'reused-component') {
+      assert.equal(catalogPlant.check, 'duplicates');
+      assert.equal(appPlant.check, 'page-paint');
+      for (const field of ['file', 'source', 'target']) assert.ok(catalogPlant[field], `${rawCase.name} catalog plant needs ${field}`);
+      for (const field of ['fixture', 'page']) assert.ok(appPlant[field], `${rawCase.name} app plant needs ${field}`);
+    } else if (rawCase.kind === 'raw-value-equal-to-token') {
+      assert.equal(catalogPlant.check, 'tier-drift');
+      assert.equal(catalogPlant.mutation, 'resolve-alias');
+      assert.equal(appPlant.check, 'enforcer');
+      for (const field of ['file', 'token']) assert.ok(catalogPlant[field], `${rawCase.name} catalog plant needs ${field}`);
+      for (const field of ['fixture', 'file']) assert.ok(appPlant[field], `${rawCase.name} app plant needs ${field}`);
+    } else if (rawCase.kind === 'empty-required-value') {
+      assert.equal(catalogPlant.check, 'recipes');
+      assert.equal(appPlant.check, 'enforcer');
+      for (const field of ['file', 'record', 'field']) assert.ok(catalogPlant[field], `${rawCase.name} catalog plant needs ${field}`);
+      for (const field of ['fixture', 'file']) assert.ok(appPlant[field], `${rawCase.name} app plant needs ${field}`);
+    }
+    return rawCase;
+  } catch (error) {
+    throw new Error(`${path.basename(filename)}: ${error.message}`);
+  }
+}
+
+export function loadProofCaseFile(filename) {
+  let parsed;
+  try {
+    parsed = JSON.parse(readFileSync(filename, 'utf8'));
+  } catch (error) {
+    throw new Error(`${path.basename(filename)}: invalid JSON: ${error.message}`);
+  }
+  return validateProofCase(parsed, filename);
+}
+
+export async function loadProofCases(casesFolder) {
+  assertSafeRelative(path.basename(path.resolve(casesFolder)), 'cases folder');
+  const filenames = readdirSync(casesFolder)
+    .filter((name) => name.endsWith('.case.json'))
+    .sort();
+  assert.ok(filenames.length > 0, `${casesFolder}: no .case.json files`);
+  const loaded = filenames.map((name) => loadProofCaseFile(path.join(casesFolder, name)));
+  assert.equal(new Set(loaded.map((entry) => entry.name)).size, loaded.length, `${casesFolder}: duplicate case name`);
+  return loaded;
+}
+
+function getAt(root, dotted) {
+  return dotted.split('.').reduce((node, part) => node?.[part], root);
+}
+
+function setAt(root, dotted, value) {
+  const parts = dotted.split('.');
+  const key = parts.pop();
+  const parent = parts.reduce((node, part) => node?.[part], root);
+  assert.ok(parent && typeof parent === 'object', `cannot find ${dotted}`);
+  parent[key] = value;
+}
+
+function catalogFiles(root) {
+  return readdirSync(path.join(root, 'token_catalog'))
+    .filter((name) => name.endsWith('.tokens.json'))
+    .map((name) => path.join(root, 'token_catalog', name));
+}
+
+function resolveCatalogValue(root, dotted, seen = new Set()) {
+  assert.ok(!seen.has(dotted), `catalog alias cycle at ${dotted}`);
+  seen.add(dotted);
+  let node;
+  for (const filename of catalogFiles(root)) {
+    node = getAt(JSON.parse(readFileSync(filename, 'utf8')), dotted);
+    if (node !== undefined) break;
+  }
+  assert.ok(node && Object.hasOwn(node, '$value'), `cannot resolve catalog token ${dotted}`);
+  const reference = typeof node.$value === 'string' ? node.$value.match(/^\{([^}]+)\}$/u)?.[1] : null;
+  return reference ? resolveCatalogValue(root, reference, seen) : structuredClone(node.$value);
+}
+
+export function applyCatalogCase(root, caseDefinition, plant = caseDefinition) {
+  const filename = path.join(root, plant.file);
+  const document = JSON.parse(readFileSync(filename, 'utf8'));
+  if (caseDefinition.kind === 'rebuilt-component') {
+    const source = getAt(document, plant.source);
+    assert.ok(source, `cannot find ${plant.source}`);
+    setAt(document, plant.target, structuredClone(source));
+  } else if (caseDefinition.kind === 'reused-component') {
+    setAt(document, plant.target, {
+      '$description': 'Visible proof recipe composed from an existing lower tier.',
+      '$extensions': { 'app.caelos': { lifecycle: 'draft', madeOf: [plant.source] } },
+    });
+  } else if (caseDefinition.kind === 'raw-value-equal-to-token' || caseDefinition.kind === 'non-token-merge') {
+    const node = getAt(document, plant.token);
+    assert.ok(node && Object.hasOwn(node, '$value'), `cannot find ${plant.token}`);
+    node.$value = resolveCatalogValue(root, plant.token);
+  } else if (caseDefinition.kind === 'empty-required-value') {
+    const record = getAt(document, plant.record);
+    assert.ok(record?.$extensions?.['app.caelos'], `cannot find ${plant.record}`);
+    record.$extensions['app.caelos'][plant.field] = '';
+  } else {
+    assert.fail(`unsupported catalog case ${caseDefinition.kind}`);
+  }
+  writeFileSync(filename, `${JSON.stringify(document, null, 2)}\n`);
+}
+
+function materializeFixture(source, destination) {
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    if (entry.name === 'README.md') continue;
+    const from = path.join(source, entry.name);
+    if (entry.isDirectory()) {
+      materializeFixture(from, path.join(destination, entry.name));
+    } else if (entry.name.endsWith('.fixture')) {
+      const to = path.join(destination, entry.name.slice(0, -'.fixture'.length));
+      mkdirSync(path.dirname(to), { recursive: true });
+      writeFileSync(to, readFileSync(from));
+    }
+  }
+}
+
+function prepareAppCase(root, projectRoot, caseDefinition, plant) {
+  materializeFixture(path.join(projectRoot, plant.fixture), root);
+  const rawFile = path.join(root, 'src/raw.css');
+  const requiredFile = path.join(root, 'src/required.tsx');
+  if (caseDefinition.kind !== 'raw-value-equal-to-token') {
+    writeFileSync(rawFile, '.raw { padding: var(--base-space-px-12); }\n');
+  }
+  if (caseDefinition.kind !== 'empty-required-value') {
+    writeFileSync(requiredFile, 'export const Required = () => <div />;\n');
+  }
+  if (caseDefinition.kind === 'rebuilt-component' || caseDefinition.kind === 'reused-component') {
+    const configFile = path.join(root, 'design-system-enforcer-gate.config.json');
+    const config = JSON.parse(readFileSync(configFile, 'utf8'));
+    config.pages = ['src/pages/**/*.tsx'];
+    writeFileSync(configFile, `${JSON.stringify(config, null, 2)}\n`);
+    const component = path.join(root, 'src/components/ProofComponent.tsx');
+    mkdirSync(path.dirname(component), { recursive: true });
+    writeFileSync(component, 'export const ProofComponent = () => <span style={{ color: "var(--base-color-chrome)" }} />;\n');
+    const page = path.join(root, plant.page);
+    mkdirSync(path.dirname(page), { recursive: true });
+    if (caseDefinition.kind === 'rebuilt-component') {
+      writeFileSync(page, 'export const ProofRebuilt = () => <main style={{ color: "var(--base-color-chrome)" }} />;\n');
+    } else {
+      writeFileSync(page, 'import { ProofComponent } from "../components/ProofComponent";\nexport const ProofReused = () => <main style={{ padding: "var(--base-space-px-12)" }}><ProofComponent /></main>;\n');
+    }
+    const tokenCss = path.join(root, 'tokens.css');
+    writeFileSync(tokenCss, `${readFileSync(tokenCss, 'utf8')}\n:root { --base-color-chrome: transparent; }\n`);
+  }
+}
+
+function initializeCatalogWorkspace(projectRoot) {
+  const temp = mkdtempSync(path.join(tmpdir(), 'caelos-planted-catalog-'));
+  const root = path.join(temp, 'repo');
+  mkdirSync(root);
+  cpSync(path.join(projectRoot, 'token_catalog'), path.join(root, 'token_catalog'), { recursive: true });
+  const invoke = (bin, args) => spawnSync(bin, args, { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  for (const args of [
+    ['init', '--quiet'],
+    ['config', 'user.email', 'planted-proof@example.invalid'],
+    ['config', 'user.name', 'Planted proof'],
+    ['add', '.'],
+    ['-c', 'core.hooksPath=/dev/null', 'commit', '--quiet', '-m', 'baseline'],
+  ]) {
+    const result = invoke('git', args);
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+  }
+  return { root, temp };
+}
+
+async function defaultCheckRunner({ caseDefinition, plant, workspace, projectRoot }) {
+  const scriptArgs = plant.check === 'duplicates'
+    ? ['scripts/check-duplicates.mjs', '--candidate', workspace, '--base', 'HEAD', '--git-root', workspace]
+    : plant.check === 'recipes'
+      ? ['scripts/check-recipes.mjs', '--candidate', workspace, '--base', 'HEAD', '--git-root', workspace]
+      : plant.check === 'tier-drift'
+        ? ['scripts/check-tier-drift.cjs', workspace]
+        : ['scripts/check-app.mjs', workspace];
+  return spawnSync(process.execPath, [path.join(projectRoot, scriptArgs[0]), ...scriptArgs.slice(1)], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+  });
+}
+
+export async function runProofCases({
+  casesFolder = path.join(project, 'proof-cases'),
+  cases: suppliedCases,
+  evidenceOutput,
+  projectRoot = project,
+  checkRunner = defaultCheckRunner,
+} = {}) {
+  const definitions = suppliedCases ?? await loadProofCases(casesFolder);
+  const result = { schemaVersion: 1, cases: [] };
+  for (const definition of definitions) {
+    const caseDefinition = validateProofCase(definition, `${definition.name}.case.json`);
+    if (caseDefinition.kind === 'non-token-merge') {
+      result.cases.push({ name: caseDefinition.name, kind: caseDefinition.kind, status: 'passed', mode: 'on-demand' });
+      continue;
+    }
+    const caseResult = { name: caseDefinition.name, kind: caseDefinition.kind, status: 'passed', plants: [] };
+    for (const plant of caseDefinition.plants) {
+      let temp;
+      let workspace;
+      try {
+        if (plant.surface === 'catalog') {
+          ({ root: workspace, temp } = initializeCatalogWorkspace(projectRoot));
+          applyCatalogCase(workspace, caseDefinition, plant);
+        } else {
+          temp = mkdtempSync(path.join(tmpdir(), 'caelos-planted-app-'));
+          workspace = path.join(temp, 'app');
+          mkdirSync(workspace);
+          prepareAppCase(workspace, projectRoot, caseDefinition, plant);
+        }
+        const checked = await checkRunner({ caseDefinition, plant, workspace, projectRoot });
+        assert.ok(checked && (checked.status === 0 || checked.status === 1), `${caseDefinition.name} ${plant.surface} check failed to run: ${checked?.stderr ?? ''}${checked?.stdout ?? ''}`);
+        const shouldAccept = caseDefinition.expected === 'accepted';
+        if (shouldAccept && checked.status !== 0) {
+          throw new Error(`${caseDefinition.name} was wrongly refused on ${plant.surface}: ${checked.stderr ?? ''}${checked.stdout ?? ''}`);
+        }
+        if (!shouldAccept && checked.status !== 1) {
+          throw new Error(`${caseDefinition.name} was wrongly accepted on ${plant.surface}`);
+        }
+        caseResult.plants.push({ surface: plant.surface, check: plant.check, status: 'passed' });
+      } finally {
+        if (temp) rmSync(temp, { recursive: true, force: true });
+      }
+    }
+    result.cases.push(caseResult);
+  }
+  if (evidenceOutput) {
+    mkdirSync(path.dirname(path.resolve(evidenceOutput)), { recursive: true });
+    writeFileSync(evidenceOutput, `${JSON.stringify(result, null, 2)}\n`);
+  }
+  return result;
+}
+
+function parseRunnerArgs(argv) {
+  const options = { casesFolder: path.join(project, 'proof-cases'), validateOnly: false };
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === '--validate-only') options.validateOnly = true;
+    else if (argument === '--cases') options.casesFolder = path.resolve(argv[++index] ?? '');
+    else if (argument === '--evidence') options.evidenceOutput = path.resolve(argv[++index] ?? '');
+    else throw new Error(`unknown argument: ${argument}`);
+  }
+  return options;
+}
+
+async function main() {
+  const options = parseRunnerArgs(process.argv.slice(2));
+  const definitions = await loadProofCases(options.casesFolder);
+  if (options.validateOnly) {
+    console.log(`Validated ${definitions.length} proof cases in ${options.casesFolder}`);
+    return;
+  }
+  runLegacyProof();
+  const result = await runProofCases({ ...options, cases: definitions });
+  console.log(`PASS · ${result.cases.length} visible planted proof cases`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
 function ok(bin,args,cwd) {
   const r=command(bin,args,cwd);
   assert.equal(r.status,0,r.stderr+r.stdout);
@@ -100,6 +434,10 @@ function write(file,body) {
 }
 const git=(...args)=>ok('git',args);
 function ci() { return command('sh',[path.join(project,'scripts/check-tier-index.sh'),scratch]); }
+function runLegacyProof() {
+temp = mkdtempSync(path.join(tmpdir(), 'caelos-tier-proof-'));
+scratch = path.join(temp, 'repo');
+mkdirSync(scratch);
 try {
   ok('git',['checkout-index','--all','--prefix='+scratch+'/'],project);
   git('init','--quiet');
@@ -150,4 +488,5 @@ try {
   console.log(cases.length+' violations rejected twice; clean commit accepted.');
 } finally {
   rmSync(temp,{recursive:true,force:true});
+}
 }
