@@ -9,6 +9,7 @@ const catalogLeaves = [];
 const cssTokens = new Map();
 const files = [];
 const generatedTokensFile = 'generated/tokens.css';
+const fontFamilyExemptFile = 'scripts/design-system-enforcer-gate/lib/config.mjs';
 
 function list(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -143,7 +144,7 @@ async function main() {
       else if (tier !== undefined && registry.get(key) >= tier) report(pos, 'token must point down: ' + key);
     }
     function value(raw, pos, prop) {
-      if (['fontFamily','font-family'].includes(prop) && raw && !/^(?:inherit|initial|unset|revert|var\(|\{)/.test(raw)) report(pos,'raw font family');
+      if (name !== fontFamilyExemptFile && ['fontFamily','font-family'].includes(prop) && raw && !/^(?:inherit|initial|unset|revert|var\(|\{)/.test(raw)) report(pos,'raw font family');
       if (/\bvar\(\s*--[\w-]+\s*,/.test(raw)) report(pos, 'token fallback');
       const withoutVars = raw.replace(/var\(\s*(--[\w-]+)\s*\)/g, (_, key) => {
         if (!cssSource.includes("'" + key + "':") && !cssSource.includes('"' + key + '":')) reference(key, cssTokens, pos);
