@@ -12,6 +12,11 @@ const rules = [
   { ns: 'radius', test: p => p[0] === 'base' && p[1] === 'radius' && p.length === 3 },
   { ns: 'text', test: p => p[0] === 'base' && p[1] === 'type' && p[2] === 'size' && p.length === 4 },
 ];
+const cssTokenName = StyleDictionary.hooks.transforms['name/kebab'].transform;
+
+export function tokenName(path) {
+  return cssTokenName({ path }, {});
+}
 
 function fail(message) { throw new Error(message); }
 export function countTokens(node) {
