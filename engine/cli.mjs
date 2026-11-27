@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-import { recomputeCrossJobEvidence } from './lib/evidence.mjs';
+import { jobFoldersUnder, recomputeCrossJobEvidence } from './lib/evidence.mjs';
 import { executeStep, runJob } from './lib/run.mjs';
 
 function usage() {
@@ -33,11 +32,7 @@ function evidenceFolders(args) {
     else throw Object.assign(new Error(usage()), { exitCode: 2 });
   }
   if (jobsRoot && jobs.length) throw Object.assign(new Error(usage()), { exitCode: 2 });
-  const jobFolders = jobsRoot
-    ? readdirSync(jobsRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory() && existsSync(path.join(jobsRoot, entry.name, 'job.json')))
-      .map((entry) => path.join(jobsRoot, entry.name)).sort()
-    : jobs;
+  const jobFolders = jobsRoot ? jobFoldersUnder(jobsRoot) : jobs;
   if (!jobFolders.length || !evidenceFolder) throw Object.assign(new Error(usage()), { exitCode: 2 });
   return { jobFolders, evidenceFolder };
 }

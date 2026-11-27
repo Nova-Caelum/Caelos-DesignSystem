@@ -10,7 +10,7 @@ import test from 'node:test';
 
 import { defaultDeployReader, finishJob } from '../engine/lib/finish.mjs';
 import {
-  captureEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
+  captureEngineOutputHashes, recomputeCrossJobEvidence, storeEngineOutputHashes, writeJobEvidence,
 } from '../engine/lib/evidence.mjs';
 import { pinApp } from '../engine/steps/pin-app.mjs';
 import { runCodexStep } from '../engine/adapters/codex.mjs';
@@ -68,7 +68,7 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
   mkdirSync(evidenceFolder);
   const designBase = makeRepository(path.join(fixtureRoot, 'design-system'), designSystem);
   const appBase = makeRepository(path.join(fixtureRoot, 'app'), app);
-  for (const name of ['behaviour-results.json', 'gate-results.json', 'system-faithful.json', 'integrate.json']) {
+  for (const name of ['behaviour-results.json', 'gate-results.json', 'integrate.json']) {
     cpSync(path.join(fixtureRoot, 'facts', name), path.join(jobFolder, name));
   }
   if (signoff) writeFileSync(path.join(jobFolder, 'signoff.json'), `${JSON.stringify(promoteRecord(undefined, id), null, 2)}\n`);
@@ -99,8 +99,7 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
         ],
       },
       behaviourResults: 'behaviour-results.json', gateResults: 'gate-results.json',
-      systemFaithfulResults: 'system-faithful.json', integrateResults: 'integrate.json',
-      draftFiles: [{ repository: 'designSystem', path: 'token_catalog/02-controls.fixture.json' }],
+      integrateResults: 'integrate.json',
     },
   };
   writeFileSync(path.join(jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
@@ -189,6 +188,10 @@ function makeInterfaces(work) {
     async readFileAt({ folder, commit: target, file }) {
       return execFileSync('git', ['show', `${target}:${file}`], { cwd: folder });
     },
+    async listFilesAt({ folder, commit: target, directory }) {
+      const output = command(folder, 'git', 'ls-tree', '-r', '--name-only', target, '--', directory);
+      return output ? output.split('\n') : [];
+    },
     async isAncestor({ folder, ancestor, commit: target }) {
       const resolved = spawnSync('git', ['rev-parse', '--verify', `${target}^{commit}`], {
         cwd: folder, encoding: 'utf8',
@@ -220,7 +223,7 @@ function makeInterfaces(work) {
 }
 
 async function advanceThroughPullRequests(work, interfaces) {
-  const options = { ...interfaces, jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder, jobFolders: [work.jobFolder] };
+  const options = { ...interfaces, jobFolder: work.jobFolder, evidenceFolder: work.evidenceFolder };
   const first = await finishJob(options);
   const designPull = interfaces.pullRequests.get('fixture/design-system');
   designPull.mergeCommit = promoteFixture(work, 'design merge');
@@ -378,10 +381,13 @@ test('criterion: a refused model recorded in events makes job_passed false', asy
 
 const [firstRefusedFamily, secondRefusedFamily] = refusedModels;
 const refusedRecordedIds = [
-  `claude-${firstRefusedFamily.toLowerCase()}-4-5`,
+  `x-${firstRefusedFamily.toLowerCase()}-4-5`,
   firstRefusedFamily,
   `${secondRefusedFamily.toLowerCase()}-1`,
   secondRefusedFamily.toUpperCase(),
+  `${firstRefusedFamily.toLowerCase()}4`,
+  `${firstRefusedFamily}4.5`,
+  `${secondRefusedFamily.toLowerCase()}2`,
 ];
 
 for (const [index, model] of refusedRecordedIds.entries()) {
@@ -414,12 +420,29 @@ test('E2: a missing event log names every unrecorded model step and fails the jo
   assert.equal(report.job_passed, false);
 });
 
-test('E3: drafts are found in the merge catalog without consulting draftFiles', async (t) => {
+test('E3: drafts are found in the merge catalog', async (t) => {
   const work = makeWork(t);
-  delete work.job.finish.draftFiles;
-  writeFileSync(path.join(work.jobFolder, 'job.json'), `${JSON.stringify(work.job, null, 2)}\n`);
   const report = await passingEvidence(work, { designCommit: work.designBase });
   assert.equal(report.job_passed, false);
+});
+
+test('round 2: an undeclared tier catalog draft from this job fails finish', async (t) => {
+  const work = makeWork(t);
+  promoteFixture(work);
+  const undeclared = 'token_catalog/03-undeclared.fixture.json';
+  writeFileSync(path.join(work.designSystem, undeclared), `${JSON.stringify({
+    patterns: {
+      menu: {
+        $extensions: {
+          'app.caelos': { lifecycle: 'draft', draftedBy: work.job.id },
+        },
+      },
+    },
+  }, null, 2)}\n`);
+  const designCommit = commit(work.designSystem, 'add undeclared tier draft');
+  const report = await passingEvidence(work, { designCommit });
+  assert.equal(report.job_passed, false);
+  assert.deepEqual(report.draft_catalog_entries, [{ file: undeclared, id: 'patterns.menu' }]);
 });
 
 test('E4: the runner stores output hashes immediately before entering finish', async (t) => {
@@ -495,6 +518,15 @@ test('E4: finish reads the runner snapshot instead of recapturing edited outputs
   assert.equal(report.job_passed, false);
 });
 
+test('round 2: the run-end output hash snapshot cannot be rewritten on resume', (t) => {
+  const work = makeWork(t);
+  const snapshotFile = path.join(work.jobFolder, outputHashesName);
+  const original = readJson(snapshotFile);
+  writeFileSync(path.join(work.designSystem, 'generated/button.js'), 'export const button = "edited after run";\n');
+  assert.deepEqual(storeEngineOutputHashes(work.jobFolder, work.job.finish), original);
+  assert.deepEqual(readJson(snapshotFile), original);
+});
+
 test('criterion: pin moves the dependency, reinstalls, and commits the app branch', async (t) => {
   const work = makeWork(t);
   const calls = [];
@@ -538,14 +570,13 @@ test('B5: unavailable tier-0 owner fields are named and never represented as a p
   const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
   promoteFixture(second);
   writeFileSync(path.join(second.jobFolder, 'integrate.json'), '{"gaps":[{"entry":"invented.by.model","gapFill":"invented"}]}\n');
-  rmSync(path.join(first.jobFolder, 'system-faithful.json'));
-  rmSync(path.join(second.jobFolder, 'system-faithful.json'));
   await recomputeCrossJobEvidence({ jobFolders: [first.jobFolder, second.jobFolder], evidenceFolder: first.evidenceFolder });
   assert.deepEqual(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs.map(({ job }) => job), ['job-apply', 'job-expand']);
   assert.equal(readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs_with_more_than_one_signoff, 0);
   assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps.length, 2);
   assert.equal(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps_not_listed_at_signoff, 0);
   const report = readJson(path.join(first.evidenceFolder, 'system-faithful.json'));
+  assert.deepEqual(report.jobs, ['job-apply', 'job-expand']);
   assert.equal(report.names_not_reaching_tier_0, null);
   assert.match(report.names_not_reaching_tier_0_source, /^unavailable:/);
   for (const owner of ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build']) {
@@ -607,6 +638,30 @@ test('B7: CLI discovers every job beneath a jobs root', (t) => {
   );
 });
 
+test('round 2: finish recomputes all cross-job files from every sibling job', async (t) => {
+  const first = makeWork(t);
+  const second = makeWork(t, { chain: 'expand', id: 'job-expand' });
+  promoteFixture(second);
+  cpSync(second.jobFolder, path.join(first.root, 'job-expand'), { recursive: true });
+  const interfaces = makeInterfaces(first);
+  const { options, appPull } = await advanceThroughPullRequests(first, interfaces);
+  interfaces.setDeploy(deployRecord(first, appPull.mergeCommit));
+  const result = await finishJob(options);
+  assert.equal(result.status, 'complete');
+  assert.deepEqual(
+    readJson(path.join(first.evidenceFolder, 'signoffs.json')).jobs.map(({ job }) => job),
+    ['job-apply', 'job-expand'],
+  );
+  assert.deepEqual(
+    [...new Set(readJson(path.join(first.evidenceFolder, 'gaps.json')).gaps.map(({ job }) => job))],
+    ['job-apply', 'job-expand'],
+  );
+  assert.deepEqual(
+    readJson(path.join(first.evidenceFolder, 'system-faithful.json')).jobs,
+    ['job-apply', 'job-expand'],
+  );
+});
+
 for (const [label, output] of [['empty', ''], ['malformed', 'not-a-commit']]) {
   test(`deploy reader: ${label} output is rejected`, async (t) => {
     const original = process.env.CAELOS_DEPLOY_ID_COMMAND;
@@ -619,13 +674,19 @@ for (const [label, output] of [['empty', ''], ['malformed', 'not-a-commit']]) {
   });
 }
 
-test('criterion: finish waits for the post-merge deploy record before writing evidence', async (t) => {
+test('round 2: finish waits for a matching deploy before writing evidence and resumes afterward', async (t) => {
   const work = makeWork(t);
   const interfaces = makeInterfaces(work);
-  const { options } = await advanceThroughPullRequests(work, interfaces);
-  const result = await finishJob(options);
-  assert.equal(result.status, 'waiting-deploy');
+  const { options, appPull } = await advanceThroughPullRequests(work, interfaces);
+  assert.equal((await finishJob(options)).status, 'waiting-deploy');
+  interfaces.setDeploy({ id: work.designBase.slice(0, 7) });
+  assert.equal((await finishJob(options)).status, 'waiting-deploy');
   assert.equal(existsSync(path.join(work.evidenceFolder, 'job-apply.json')), false);
+  assert.equal(Object.hasOwn(readJson(path.join(work.jobFolder, 'finish.json')), 'report'), false);
+  interfaces.setDeploy(deployRecord(work, appPull.mergeCommit));
+  const resumed = await finishJob(options);
+  assert.equal(resumed.status, 'complete');
+  assert.equal(readJson(path.join(work.evidenceFolder, 'job-apply.json')).job_passed, true);
 });
 
 test('attack: a promote record dated after the app merge yields job_passed false', async (t) => {

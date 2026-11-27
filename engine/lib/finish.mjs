@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import {
-  readEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
+  jobFoldersUnder, readEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
 } from './evidence.mjs';
 import { pinApp } from '../steps/pin-app.mjs';
 
@@ -57,6 +57,12 @@ const defaultGit = {
   async readFileAt({ folder, commit, file }) {
     return execFileSync('git', ['show', `${commit}:${file}`], { cwd: folder });
   },
+  async listFilesAt({ folder, commit, directory }) {
+    const text = execFileSync('git', ['ls-tree', '-r', '--name-only', commit, '--', directory], {
+      cwd: folder, encoding: 'utf8',
+    }).trim();
+    return text ? text.split('\n') : [];
+  },
   async isAncestor({ folder, ancestor, commit }) {
     try {
       const resolved = execFileSync('git', ['rev-parse', '--verify', `${commit}^{commit}`], {
@@ -108,7 +114,7 @@ function requirePromoteRecord(jobFolder) {
 }
 
 export async function finishJob({
-  jobFolder, evidenceFolder, jobFolders = [jobFolder], github = defaultGithub, git = defaultGit,
+  jobFolder, evidenceFolder, github = defaultGithub, git = defaultGit,
   deployReader = defaultDeployReader, pin = pinApp,
 }) {
   const job = json(path.join(jobFolder, 'job.json'), 'job.json');
@@ -117,6 +123,7 @@ export async function finishJob({
   const evidence = evidenceFolder || job.finish.evidenceFolder;
   if (!evidence) throw new Error('finish requires an evidence folder argument or job.finish.evidenceFolder');
   const outputHashes = readEngineOutputHashes(jobFolder);
+  const jobFolders = jobFoldersUnder(path.dirname(path.resolve(jobFolder)));
   const stateFile = path.join(jobFolder, stateName);
   const state = existsSync(stateFile) ? json(stateFile, stateName) : {};
   const save = () => writeJson(stateFile, state);
@@ -182,7 +189,10 @@ export async function finishJob({
   if (!successful(appChecks)) return result(jobFolder, state, 'waiting-app-checks');
   state.appCheckRunIds = appChecks;
   const deployRecord = await deployReader.read({ appMergeCommit: state.appMergeCommit });
-  if (!deployRecord) {
+  const deployMatchesAppMerge = Boolean(deployRecord?.id) && await git.isAncestor({
+    folder: app.folder, ancestor: state.appMergeCommit, commit: deployRecord.id,
+  });
+  if (!deployMatchesAppMerge) {
     save();
     return result(jobFolder, state, 'waiting-deploy');
   }

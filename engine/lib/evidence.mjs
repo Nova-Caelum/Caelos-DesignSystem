@@ -4,7 +4,9 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
-const refusedModels = JSON.parse(readFileSync(new URL('../refused-models.json', import.meta.url), 'utf8')).models;
+const refusedModelFamilies = JSON.parse(
+  readFileSync(new URL('../refused-models.json', import.meta.url), 'utf8'),
+).models.map((model) => model.toLowerCase());
 const pinFiles = new Set(['package.json', 'package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock']);
 const tierZeroOwners = ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build'];
 const outputHashesName = 'output-hashes.json';
@@ -122,9 +124,9 @@ function modelEvidence(jobFolder) {
 }
 
 function hasRefusedModel(models) {
-  const refused = new Set(refusedModels.map((model) => model.toLowerCase()));
   return models.some((model) => model.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
-    .some((token) => refused.has(token)));
+    .some((token) => refusedModelFamilies.some((family) => token === family
+      || (token.startsWith(family) && /^\d/.test(token.slice(family.length))))));
 }
 
 async function catalogDrafts({ job, commit, git }) {
@@ -144,11 +146,14 @@ async function catalogDrafts({ job, commit, git }) {
       if (key !== '$extensions') visit(child, [...keys, key], file);
     }
   };
-  for (const output of job.finish.designSystem.outputs.filter(tierFile)) {
+  const files = await git.listFilesAt({
+    folder: job.finish.designSystem.folder, commit, directory: 'token_catalog',
+  });
+  for (const file of files.filter((name) => /^token_catalog\/\d\d-[\w.-]+\.json$/.test(name))) {
     const bytes = await git.readFileAt({
-      folder: job.finish.designSystem.folder, commit, file: output.path,
+      folder: job.finish.designSystem.folder, commit, file,
     });
-    visit(JSON.parse(bytes.toString('utf8')), [], output.path);
+    visit(JSON.parse(bytes.toString('utf8')), [], file);
   }
   return drafts;
 }
@@ -291,16 +296,24 @@ export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) 
     gaps_not_listed_at_signoff: gapsNotListed.length,
     gap_entries_not_listed_at_signoff: gapsNotListed,
   };
-  const systemFaithful = readNamesNotReachingTierZero();
+  const systemFaithful = readNamesNotReachingTierZero(signoffJobs.map(({ job }) => job));
   for (const [name, value] of [
     ['signoffs.json', signoffs], ['gaps.json', gapReport], ['system-faithful.json', systemFaithful],
   ]) writeFileSync(path.join(evidenceFolder, name), `${JSON.stringify(value, null, 2)}\n`);
   return { signoffs, gaps: gapReport, systemFaithful };
 }
 
-function readNamesNotReachingTierZero() {
+function readNamesNotReachingTierZero(jobs) {
   return {
+    jobs,
     names_not_reaching_tier_0: null,
     names_not_reaching_tier_0_source: `unavailable: ${tierZeroOwners.join(', ')} publish no tier-0 field`,
   };
+}
+
+export function jobFoldersUnder(jobsRoot) {
+  return readdirSync(jobsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(path.join(jobsRoot, entry.name, 'job.json')))
+    .map((entry) => path.join(jobsRoot, entry.name))
+    .sort();
 }
