@@ -22,7 +22,8 @@ function cleanEnv(extra = {}) {
 }
 
 function fixture(t, {
-  baseFields = {}, basePaint = false, checkerPath = checker, commit = true, tier = 4,
+  baseFields = {}, basePaint = false, baseSchema = (schema) => schema,
+  checkerPath = checker, commit = true, tier = 4,
 } = {}) {
   const cwd = mkdtempSync(path.join(tmpdir(), 'catalog-recipe-test-'));
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
@@ -52,6 +53,8 @@ function fixture(t, {
   for (const file of ['recipe.schema.json', 'paint-families.json']) {
     copyFileSync(path.join(root, catalog, file), path.join(cwd, catalog, file));
   }
+  const schemaFile = `${catalog}/recipe.schema.json`;
+  write(schemaFile, baseSchema(JSON.parse(readFileSync(path.join(cwd, schemaFile), 'utf8'))));
   write(`${catalog}/tier-line.exceptions.json`, basePaint ? [`${pattern}.ink`] : []);
   write(`${catalog}/00-foundations.tokens.json`, {
     base: { shared: {
@@ -173,6 +176,72 @@ test('A3 refuses a candidate schema required-list shrink', (t) => {
   assert.match(result.stderr, /required.*lifecycle.*restore/);
 });
 
+test('a schema marker loosened by a candidate is refused', (t) => {
+  const cases = [
+    ['madeOf', 'x-caelos-required-from-tier', (rule) => { delete rule['x-caelos-required-from-tier']; }],
+    ['madeOf', 'x-caelos-required-from-tier', (rule) => { rule['x-caelos-required-from-tier'] += 1; }],
+    ['kind', 'x-caelos-required-on-active-recipe', (rule) => { delete rule['x-caelos-required-on-active-recipe']; }],
+    ['madeOf', 'x-caelos-ignore-for-change', (rule) => { rule['x-caelos-ignore-for-change'] = true; }],
+    ['contents', 'x-caelos-recipe-tier', (rule) => { delete rule['x-caelos-recipe-tier']; }],
+  ];
+  for (const [property, marker, mutate] of cases) {
+    const current = fixture(t);
+    const schema = JSON.parse(readFileSync(path.join(current.cwd, catalog, 'recipe.schema.json')));
+    mutate(schema.properties[property]);
+    current.write(`${catalog}/recipe.schema.json`, schema);
+    const result = current.run();
+    assert.equal(result.status, 1, `expected ${property}.${marker} refusal, got ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, new RegExp(`properties\\.${property}.*${marker}`));
+  }
+});
+
+const loosenedKeywordCases = [
+  ['enum', undefined, (schema) => { schema.properties.lifecycle.enum.push('retired'); }, 'lifecycle'],
+  ['minItems', undefined, (schema) => { schema.properties.madeOf.minItems = 0; }, 'madeOf'],
+  ['pattern', undefined, (schema) => { delete schema.properties.kind.pattern; }, 'kind'],
+  ['minLength', undefined, (schema) => { schema.properties.draftedBy.minLength = 0; }, 'draftedBy'],
+  ['maxItems', (schema) => { schema.properties.madeOf.maxItems = 4; },
+    (schema) => { schema.properties.madeOf.maxItems = 5; }, 'madeOf'],
+  ['const', (schema) => { schema.properties.draftedBy.const = 'catalog'; },
+    (schema) => { delete schema.properties.draftedBy.const; }, 'draftedBy'],
+  ['additionalProperties', (schema) => { schema.additionalProperties = false; },
+    (schema) => { schema.additionalProperties = true; }, '<schema>'],
+];
+
+for (const [keyword, establish, loosen, property] of loosenedKeywordCases) {
+  test(`a candidate cannot loosen schema keyword ${keyword}`, (t) => {
+    const current = fixture(t, { baseSchema: (schema) => {
+      establish?.(schema);
+      return schema;
+    } });
+    const schema = JSON.parse(readFileSync(path.join(current.cwd, catalog, 'recipe.schema.json')));
+    loosen(schema);
+    current.write(`${catalog}/recipe.schema.json`, schema);
+    const result = current.run();
+    assert.equal(result.status, 1, `expected ${keyword} refusal, got ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, new RegExp(`${property.replaceAll('.', '\\.')}.*${keyword}`));
+  });
+}
+
+test('candidate schema tightening and a marked new property pass', (t) => {
+  const current = fixture(t);
+  const schema = JSON.parse(readFileSync(path.join(current.cwd, catalog, 'recipe.schema.json')));
+  schema.properties.lifecycle.enum = ['draft', 'promoted'];
+  schema.properties.draftedBy.minLength = 2;
+  schema.properties.madeOf.minItems = 2;
+  schema.properties.madeOf.maxItems = 8;
+  schema.properties.madeOf['x-caelos-required-from-tier'] = 2;
+  schema.additionalProperties = false;
+  schema.properties.futureField = {
+    type: 'string',
+    const: 'future',
+    'x-caelos-required-on-active-recipe': true,
+  };
+  current.write(`${catalog}/recipe.schema.json`, schema);
+  const result = current.run();
+  assert.equal(result.status, 0, result.stderr);
+});
+
 test('A3 refuses removed candidate paint families', (t) => {
   const { run, write } = fixture(t);
   write(`${catalog}/paint-families.json`, {
@@ -181,6 +250,26 @@ test('A3 refuses removed candidate paint families', (t) => {
   const result = run();
   assert.equal(result.status, 1);
   assert.match(result.stderr, /paint family color.*restore/);
+});
+
+test('a removed paint tokenType is refused', (t) => {
+  const { cwd, run, write } = fixture(t);
+  const paint = JSON.parse(readFileSync(path.join(cwd, catalog, 'paint-families.json')));
+  paint.type.tokenTypes = paint.type.tokenTypes.slice(1);
+  write(`${catalog}/paint-families.json`, paint);
+  const result = run();
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /tokenType fontFamily was removed from type/);
+});
+
+test('a removed paint pathFamily is refused', (t) => {
+  const { cwd, run, write } = fixture(t);
+  const paint = JSON.parse(readFileSync(path.join(cwd, catalog, 'paint-families.json')));
+  paint.color.pathFamilies = paint.color.pathFamilies.slice(1);
+  write(`${catalog}/paint-families.json`, paint);
+  const result = run();
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /pathFamily color was removed from color/);
 });
 
 test('A4 refuses a symlinked candidate tier file without following it', (t) => {

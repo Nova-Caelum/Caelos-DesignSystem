@@ -16,10 +16,16 @@ export const paintFile = `${directory}/paint-families.json`;
 export const trustedRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const maxBuffer = 16 * 1024 * 1024;
 const annotationKeys = new Set(['title', 'description', '$comment']);
-const topSchemaKeys = new Set(['$schema', 'title', 'description', '$comment', 'type', 'required', 'properties']);
-const propertySchemaKeys = new Set([
-  'type', 'enum', 'minLength', 'pattern', 'format', 'minProperties', 'minItems', 'uniqueItems', 'items',
+const topSchemaKeys = new Set([
+  '$schema', 'title', 'description', '$comment', 'type', 'required', 'properties', 'additionalProperties',
 ]);
+const propertySchemaKeys = new Set([
+  'type', 'enum', 'minLength', 'pattern', 'format', 'minProperties', 'minItems', 'maxItems', 'uniqueItems',
+  'items', 'const', 'required', 'additionalProperties',
+]);
+const tightenOnlyKeywords = [
+  'enum', 'minItems', 'maxItems', 'pattern', 'minLength', 'const', 'required', 'additionalProperties',
+];
 
 export function object(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -159,6 +165,26 @@ function validatePropertySchema(rule, label, property) {
     unsupportedSchema(label, property, 'type');
   }
   if (rule.format !== undefined && rule.format !== 'date-time') unsupportedSchema(label, property, 'format');
+  if (rule.enum !== undefined && !Array.isArray(rule.enum)) unsupportedSchema(label, property, 'enum');
+  for (const keyword of ['minLength', 'minItems', 'maxItems']) {
+    if (rule[keyword] !== undefined && (!Number.isInteger(rule[keyword]) || rule[keyword] < 0)) {
+      unsupportedSchema(label, property, keyword);
+    }
+  }
+  if (rule.pattern !== undefined) {
+    if (typeof rule.pattern !== 'string') unsupportedSchema(label, property, 'pattern');
+    try {
+      new RegExp(rule.pattern);
+    } catch {
+      unsupportedSchema(label, property, 'pattern');
+    }
+  }
+  if (rule.required !== undefined && (!stringList(rule.required) || new Set(rule.required).size !== rule.required.length)) {
+    unsupportedSchema(label, property, 'required');
+  }
+  if (rule.additionalProperties !== undefined && typeof rule.additionalProperties !== 'boolean') {
+    unsupportedSchema(label, property, 'additionalProperties');
+  }
   if (rule.items !== undefined) validatePropertySchema(rule.items, label, `${property}.items`);
 }
 
@@ -172,8 +198,83 @@ export function validateSchema(schema, label) {
       schema.required.some((name) => !Object.hasOwn(schema.properties, name))) {
     throw new Error(`${label}: expected record properties and required field names; fix the recipe schema`);
   }
+  if (new Set(schema.required).size !== schema.required.length) unsupportedSchema(label, '<schema>', 'required');
+  if (schema.additionalProperties !== undefined && typeof schema.additionalProperties !== 'boolean') {
+    unsupportedSchema(label, '<schema>', 'additionalProperties');
+  }
   for (const [property, rule] of Object.entries(schema.properties)) validatePropertySchema(rule, label, property);
   return schema;
+}
+
+function includesDeep(list, value) {
+  return list.some((item) => isDeepStrictEqual(item, value));
+}
+
+function loosenedSchema(pathName, keyword, detail = '') {
+  const kind = keyword.startsWith('x-caelos-') ? 'marker' : 'keyword';
+  throw new Error(
+    `${schemaFile}: property path ${pathName}: ${kind} ${keyword} was loosened${detail}; restore or tighten it`,
+  );
+}
+
+function compareTightenOnlyRule(previous, candidate, pathName) {
+  const prior = object(previous) ? previous : {};
+  const next = object(candidate) ? candidate : {};
+  const markers = new Set([...Object.keys(prior), ...Object.keys(next)]
+    .filter((key) => key.startsWith('x-caelos-')));
+  for (const marker of markers) {
+    const before = prior[marker];
+    const after = next[marker];
+    if (marker === 'x-caelos-ignore-for-change') {
+      if (before !== true && after === true) loosenedSchema(pathName, marker);
+    } else if (marker === 'x-caelos-required-from-tier') {
+      if (before !== undefined && !(Number.isInteger(after) && after <= before)) loosenedSchema(pathName, marker);
+    } else if (marker === 'x-caelos-required-on-active-recipe') {
+      if (before === true && after !== true) loosenedSchema(pathName, marker);
+    } else if (marker === 'x-caelos-recipe-tier') {
+      if (before !== undefined && !isDeepStrictEqual(after, before)) loosenedSchema(pathName, marker);
+    } else if (!isDeepStrictEqual(after, before)) {
+      loosenedSchema(pathName, marker, '; its tightening direction is unknown');
+    }
+  }
+
+  for (const keyword of tightenOnlyKeywords) {
+    const before = prior[keyword];
+    const after = next[keyword];
+    if (keyword === 'required') {
+      if (before === undefined) continue;
+      for (const name of before) {
+        if (!Array.isArray(after) || !after.includes(name)) loosenedSchema(pathName, keyword, ` by removing ${name}`);
+      }
+    } else if (keyword === 'enum') {
+      if (before !== undefined && (!Array.isArray(after) || after.some((value) => !includesDeep(before, value)))) {
+        if (after === undefined && prior.const === undefined && next.const !== undefined) {
+          throw new Error(
+            `${schemaFile}: const on property path ${pathName} does not implement the base enum constraint; ` +
+            'keyword enum was loosened; restore or tighten it',
+          );
+        }
+        loosenedSchema(pathName, keyword);
+      }
+    } else if (keyword === 'minItems' || keyword === 'minLength') {
+      if (before !== undefined && !(typeof after === 'number' && after >= before)) loosenedSchema(pathName, keyword);
+    } else if (keyword === 'maxItems') {
+      if (before !== undefined && !(typeof after === 'number' && after <= before)) loosenedSchema(pathName, keyword);
+    } else if (keyword === 'pattern' || keyword === 'const') {
+      if (before !== undefined && !isDeepStrictEqual(after, before)) loosenedSchema(pathName, keyword);
+    } else if (keyword === 'additionalProperties') {
+      if (before === false && after !== false) loosenedSchema(pathName, keyword);
+    }
+  }
+
+  if (object(prior.items)) compareTightenOnlyRule(prior.items, next.items, `${pathName}.items`);
+}
+
+function compareTightenOnlySchema(previous, candidate) {
+  compareTightenOnlyRule(previous, candidate, '<schema>');
+  for (const [property, rule] of Object.entries(previous.properties ?? {})) {
+    compareTightenOnlyRule(rule, candidate.properties?.[property], `properties.${property}`);
+  }
 }
 
 function validatePaintFamilies(data, label) {
@@ -197,14 +298,8 @@ export function validateCandidateRuleData(context, tree) {
   if (!tree) return;
   const baseFiles = treeFiles(tree, directory, context);
   if (baseFiles.has(schemaFile)) {
-    const previous = readTreeJson(schemaFile, tree, context);
-    if (stringList(previous.required)) {
-      for (const name of previous.required) {
-        if (!candidateSchema.required.includes(name)) {
-          throw new Error(`${schemaFile}: required name ${name} was removed; restore it to the required list`);
-        }
-      }
-    }
+    const previous = validateSchema(readTreeJson(schemaFile, tree, context), `${schemaFile} at base ${tree}`);
+    compareTightenOnlySchema(previous, candidateSchema);
   }
   if (baseFiles.has(paintFile)) {
     const previous = validatePaintFamilies(readTreeJson(paintFile, tree, context), `${paintFile} at base ${tree}`);
@@ -368,6 +463,7 @@ function schemaError(value, rule) {
     return `expected ${rule.type}`;
   }
   if (rule.enum && !rule.enum.includes(value)) return `use one of ${rule.enum.join(', ')}`;
+  if (Object.hasOwn(rule, 'const') && !isDeepStrictEqual(value, rule.const)) return 'use the required constant value';
   if (rule.minLength !== undefined && value.trim().length < rule.minLength) return 'supply a non-empty string';
   if (rule.pattern && !new RegExp(rule.pattern).test(value)) return 'supply a structured identifier';
   if (rule.format === 'date-time') {
@@ -381,6 +477,9 @@ function schemaError(value, rule) {
     return 'describe the accepted contents as structured data';
   }
   if (rule.minItems !== undefined && value.length < rule.minItems) return 'list at least one lower-tier entry';
+  if (rule.maxItems !== undefined && value.length > rule.maxItems) return `list no more than ${rule.maxItems} entries`;
+  if (rule.required && rule.required.some((key) => !Object.hasOwn(value, key))) return 'supply every required property';
+  if (rule.additionalProperties === false && Object.keys(value).length) return 'remove additional properties';
   if (rule.uniqueItems && value.some((item, index) => value.slice(0, index).some((prior) => isDeepStrictEqual(prior, item)))) {
     return 'remove duplicate items';
   }
@@ -470,6 +569,11 @@ async function checkRecipes(values) {
     }
     for (const key of required) {
       if (!Object.hasOwn(record, key)) say(`requires ${key}; add ${key} to the recipe record`);
+    }
+    if (schema.additionalProperties === false) {
+      for (const key of Object.keys(record)) {
+        if (!Object.hasOwn(schema.properties, key)) say(`${key} is not an allowed recipe property; remove it`);
+      }
     }
     if (Array.isArray(record.madeOf)) {
       for (const dependency of record.madeOf) {
