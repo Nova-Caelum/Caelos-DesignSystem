@@ -4,14 +4,17 @@
   "scripts": {
     "prepare": "husky",
     "test": "node --test",
+    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
     "check:app": "node scripts/check-app.mjs",
+    "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
     "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet --",
     "check:recipes": "node scripts/check-recipes.mjs",
     "check:ratchet": "node scripts/check-ratchet.mjs"
   },
   "devDependencies": {
     "husky": "9.1.7",
+    "playwright": "1.65.1",
     "style-dictionary": "5.8.0",
     "typescript": "5.8.2"
   }
