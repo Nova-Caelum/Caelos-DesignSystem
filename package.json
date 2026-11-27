@@ -4,6 +4,15 @@
   "bin": {
     "engine": "engine/cli.mjs"
   },
+  "exports": {
+    ".": "./generated/components/index.ts",
+    "./components": "./generated/components/index.ts",
+    "./tailwind-theme.css": "./generated/tailwind-theme.css",
+    "./tokens.css": "./generated/tokens.css"
+  },
+  "files": [
+    "generated/"
+  ],
   "scripts": {
     "prepare": "husky",
     "test": "node --test",
