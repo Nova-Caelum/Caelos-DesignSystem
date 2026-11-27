@@ -1,4 +1,6 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+// node scripts/promote.mjs --job <job-id> --record <path-to-signoff.json> --signer-words "<words>" [--catalog <dir>]
+import { randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const usage = 'Usage: node scripts/promote.mjs --job <job-id> --record <path-to-signoff.json> --signer-words <text> [--catalog <dir>]';
@@ -156,20 +158,68 @@ function recordField(record, name) {
   return record.record.properties.get(name);
 }
 
-function writePromotions(catalog, promotions) {
+function isPlaceholder(record) {
+  return recordField(record, 'lifecycle')?.value === 'placeholder' ||
+    recordField(record, 'gapFill')?.value === 'placeholder';
+}
+
+function promotionWrites(catalog, promotions) {
   const byFile = new Map();
   for (const promotion of promotions) {
     if (!byFile.has(promotion.file)) byFile.set(promotion.file, []);
     byFile.get(promotion.file).push(promotion);
   }
-  for (const input of catalog) {
+  return catalog.flatMap((input) => {
     const edits = byFile.get(input.file);
-    if (!edits) continue;
+    if (!edits) return [];
     const output = [...edits].sort((left, right) => right.lifecycle.start - left.lifecycle.start).reduce(
       (source, promotion) => `${source.slice(0, promotion.lifecycle.start)}"promoted"${source.slice(promotion.lifecycle.end)}`,
       input.source,
     );
-    writeFileSync(input.file, output);
+    return [{ file: input.file, original: input.source, output }];
+  });
+}
+
+function restoreTierFiles(writes, originalError) {
+  const failures = [];
+  for (const write of writes) {
+    try {
+      writeFileSync(write.file, write.original);
+    } catch (error) {
+      failures.push(`${write.file}: ${error.message}`);
+    }
+  }
+  if (failures.length) {
+    fail(`${originalError.message}; failed to restore tier files: ${failures.join('; ')}`);
+  }
+}
+
+function writeSignOff(catalog, promotions, recordPath, recordSource) {
+  const absoluteRecord = path.resolve(recordPath);
+  const temporaryRecord = path.join(path.dirname(absoluteRecord),
+    `.${path.basename(absoluteRecord)}.${process.pid}.${randomUUID()}.tmp`);
+  const writes = promotionWrites(catalog, promotions);
+  let tierWriteStarted = false;
+  let recordInstalled = false;
+
+  try {
+    writeFileSync(temporaryRecord, recordSource, { flag: 'wx' });
+    tierWriteStarted = true;
+    for (const write of writes) writeFileSync(write.file, write.output);
+    if (existsSync(absoluteRecord)) fail(`${recordPath}: sign-off record already exists`);
+    renameSync(temporaryRecord, absoluteRecord);
+    recordInstalled = true;
+  } catch (error) {
+    if (tierWriteStarted) restoreTierFiles(writes, error);
+    throw error;
+  } finally {
+    if (!recordInstalled) {
+      try {
+        unlinkSync(temporaryRecord);
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+    }
   }
 }
 
@@ -189,25 +239,27 @@ function main() {
   const catalog = readCatalog(options.catalog);
   const records = catalog.flatMap((input) => input.records);
   const drafted = records.filter((entry) => recordField(entry, 'draftedBy')?.value === options.job);
-  const draftRecords = drafted.filter((entry) => recordField(entry, 'lifecycle')?.value === 'draft');
   if (!drafted.length) fail(`nothing was drafted by that job: ${options.job}`);
-  if (!draftRecords.length) fail(`job ${options.job} was already signed off`);
 
-  const skipped = drafted.filter((entry) => recordField(entry, 'lifecycle')?.value === 'placeholder' ||
-    recordField(entry, 'gapFill')?.value === 'placeholder').map((entry) => ({ id: entry.id, reason: 'placeholder' }));
-  const promotions = draftRecords.filter((entry) => !skipped.some((item) => item.id === entry.id)).map((entry) => ({
+  const skipped = drafted.filter(isPlaceholder).map((entry) => ({ id: entry.id, reason: 'placeholder' }));
+  const promotions = drafted.filter((entry) => recordField(entry, 'lifecycle')?.value === 'draft' &&
+    !isPlaceholder(entry)).map((entry) => ({
     ...entry,
     lifecycle: recordField(entry, 'lifecycle'),
   }));
+  if (!promotions.length) {
+    const placeholders = skipped.length ? `; remaining placeholders still need values: ${skipped.map((entry) => entry.id).join(', ')}` : '';
+    fail(`job ${options.job} was already signed off${placeholders}`);
+  }
 
-  writePromotions(catalog, promotions);
-  writeFileSync(options.record, `${JSON.stringify({
+  const recordSource = `${JSON.stringify({
     jobId: options.job,
     signedAt: new Date().toISOString(),
     signerWords: options.signerWords,
     promoted: promotions.map((entry) => entry.id),
     skipped,
-  }, null, 2)}\n`);
+  }, null, 2)}\n`;
+  writeSignOff(catalog, promotions, options.record, recordSource);
   console.log(`promoted ${promotions.length} entries; skipped ${skipped.length} placeholders`);
 }
 
