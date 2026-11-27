@@ -1,7 +1,8 @@
 // The engine: runs every rule over one file and returns findings.
-import { dirname, posix } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, posix, resolve as resolvePath } from "node:path";
 import { stripComments, blank, lineIndex, kebab, matcher } from "./util.mjs";
-import { parseCss } from "./css.mjs";
+import { buildClassIndex, parseCss } from "./css.mjs";
 import { parseMarkup, attr, visualChildCount } from "./markup.mjs";
 import { checkValue, DYN } from "./values.mjs";
 import { nearestToken } from "./tokens.mjs";
@@ -22,6 +23,109 @@ const TW = [
   [/^(?:bg|from|via|to|fill|stroke|accent|caret|decoration|ring|outline|border(?:-[xytrbl])?|divide|placeholder)$/, "colour", "colour"],
 ];
 
+function splitTopLevel(source, separator) {
+  const parts = []; let start = 0, depth = 0, quote = null;
+  for (let i = 0; i < source.length; i++) {
+    const char = source[i];
+    if (quote) {
+      if (char === "\\") i++;
+      else if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") { quote = char; continue; }
+    if ("([{<".includes(char)) depth++;
+    else if (")]}>".includes(char)) depth--;
+    else if (char === separator && depth === 0) { parts.push(source.slice(start, i)); start = i + 1; }
+  }
+  parts.push(source.slice(start));
+  return parts;
+}
+
+function unwrap(source) {
+  let value = source.trim();
+  while (value.startsWith("(") && value.endsWith(")")) {
+    const parts = splitTopLevel(value.slice(1, -1), ",");
+    if (parts.length !== 1) break;
+    value = value.slice(1, -1).trim();
+  }
+  return value;
+}
+
+function decodeString(source) {
+  if (source[0] === '"') { try { return JSON.parse(source); } catch { return null; } }
+  if (source[0] === "'") return source.slice(1, -1).replace(/\\(['\\])/g, "$1");
+  return null;
+}
+
+function staticString(source, bindings, depth = 0) {
+  if (depth > 12) return null;
+  const value = unwrap(source);
+  const plus = splitTopLevel(value, "+");
+  if (plus.length > 1) {
+    const pieces = plus.map((part) => staticString(part, bindings, depth + 1));
+    return pieces.every((part) => part !== null) ? pieces.join("") : null;
+  }
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) return decodeString(value);
+  if (value.startsWith("`") && value.endsWith("`")) {
+    const body = value.slice(1, -1);
+    let failed = false;
+    const folded = body.replace(/\$\{([^{}]+)\}/g, (_, expression) => {
+      const result = staticString(expression, bindings, depth + 1);
+      if (result === null) failed = true;
+      return result ?? "";
+    });
+    return failed || /\$\{/.test(folded) ? null : folded.replace(/\\`/g, "`");
+  }
+  if (/^[A-Za-z_$][\w$]*$/.test(value)) return bindings.get(value) ?? null;
+  return null;
+}
+
+function staticBindings(text) {
+  const bindings = new Map(), pending = [];
+  for (const match of text.matchAll(/\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]+)/g)) pending.push([match[1], match[2]]);
+  for (let pass = 0; pass <= pending.length; pass++) for (const [name, expression] of pending) {
+    const value = staticString(expression, bindings);
+    if (value !== null) bindings.set(name, value);
+  }
+  return bindings;
+}
+
+function classExpressionStrings(source, bindings) {
+  const value = staticString(source, bindings);
+  if (value !== null) return [value];
+  const call = unwrap(source).match(/^(clsx|cn|classnames)\s*\(([\s\S]*)\)$/);
+  if (!call) return [];
+  return splitTopLevel(call[2], ",").map((part) => staticString(part, bindings)).filter((part) => part !== null);
+}
+
+function foldedStrings(text, bindings) {
+  const out = [];
+  const atoms = String.raw`(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\x60(?:\\.|[^\x60\\])*\x60|[A-Za-z_$][\w$]*)`;
+  for (const match of text.matchAll(new RegExp(`${atoms}(?:\\s*\\+\\s*${atoms})+`, "g"))) {
+    const value = staticString(match[0], bindings);
+    if (value !== null) out.push([value, match.index]);
+  }
+  for (const match of text.matchAll(/`(?:\\.|[^`\\])*`/g)) {
+    const value = staticString(match[0], bindings);
+    if (value !== null) out.push([value, match.index]);
+  }
+  return out;
+}
+
+function paintReferences(value) {
+  const refs = new Set();
+  for (const match of String(value).matchAll(/var\(\s*(--[\w-]+)/gi)) refs.add(match[1]);
+  for (const match of String(value).matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(?:[\w-]+\s*:\s*)?(--[\w-]+)\s*\)/gi)) refs.add(match[1]);
+  return refs;
+}
+
+function themeUtilityName(word) {
+  let name = splitTopLevel(word, ":").at(-1)?.trim() ?? "";
+  name = name.replace(/^!+|!+$/g, "");
+  name = splitTopLevel(name, "/")[0].trim();
+  return name.replace(/^!+|!+$/g, "");
+}
+
 export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined }) {
   const dims = cfg.compiled;
   const aliasOk = (name, dim, depth = 0) => {
@@ -39,7 +143,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
   const sev = (rule, dflt = "error") => cfg.severity[rule] ?? dflt;
 
   function scanFile(f, raw) {
-    const st = { rel: f.rel, raw, findings: [], ranges: [], moduleIdents: new Map(), localClasses: new Map(), iconNames: new Set() };
+    const st = { rel: f.rel, raw, findings: [], ranges: [], moduleIdents: new Map(), localClasses: new Map(), iconNames: new Set(), bindings: staticBindings(raw) };
     const text = stripComments(raw, { line: !["css"].includes(f.type) });
     const lineAt = lineIndex(raw);
     const add = (rule, idx, message, severity = sev(rule)) => { if (severity !== "off") st.findings.push({ file: f.rel, line: lineAt(idx), idx, rule, severity, message }); };
@@ -52,6 +156,21 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       if (cssProperty) return cssProperty[1];
       const attribute = before.match(/([:\w-]+)\s*=\s*(?:["']|\{\s*["'`])?[^<>"'\n]*$/);
       return attribute?.[1] ?? "value";
+    };
+    const reportPaint = (value, idx, label = paintContext(idx)) => {
+      if (!cfg.pagePaint) return;
+      for (const token of paintReferences(value)) if (cfg.pagePaint.isPaintToken(token, index)) {
+        add("page-paint", idx, `${label}: paint token ${token} — use an imported component for paint`);
+      }
+    };
+    const loadPaintModule = (spec, idx, id = null) => {
+      const rel = posix.normalize(posix.join(dirname(f.rel), spec));
+      if (id) st.moduleIdents.set(id, rel);
+      const absolute = resolvePath(root, rel);
+      if (!existsSync(absolute)) return;
+      const parsed = parseCss(readFileSync(absolute, "utf8"));
+      if (!moduleIdx.has(rel)) moduleIdx.set(rel, buildClassIndex(parsed, new Map()));
+      for (const declaration of parsed.decls) reportPaint(declaration.value, idx, `import "${spec}" ${declaration.prop}`);
     };
 
     // ---- value rules -------------------------------------------------
@@ -112,18 +231,30 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     }
 
     // ---- var() hygiene (every file) -----------------------------------
-    for (const m of text.matchAll(/var\(\s*(--[\w-]+)\s*(,)?/g)) {
+    const varCalls = cfg.pagePaint ? /var\(\s*(--[\w-]+)\s*(,)?/gi : /var\(\s*(--[\w-]+)\s*(,)?/g;
+    for (const m of text.matchAll(varCalls)) {
       const after = text[m.index + m[0].length - (m[2] ? 1 : 0)];
       if (cfg.var.noFallback && m[2]) add("fallback", m.index, `var(${m[1]}, …) has a fallback — remove it; if the token is missing, use one that exists`);
       if (cfg.var.mustBeDefined && !defined.has(m[1]) && !ignoreVar.some((r) => r.test(m[1])) && !(m[1].endsWith("-") && /[$'"`]/.test(after ?? ""))) add("undefined", m.index, `${m[1]} is not defined in the token sources or the app's CSS — pick a token that exists`);
-      if (cfg.pagePaint?.isPaintToken(m[1])) add("page-paint", m.index, `${paintContext(m.index)}: paint token ${m[1]} — use an imported component for paint`);
+      if (cfg.pagePaint?.isPaintToken(m[1], index)) add("page-paint", m.index, `${paintContext(m.index)}: paint token ${m[1]} — use an imported component for paint`);
+    }
+    if (cfg.pagePaint) {
+      for (const m of text.matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(?:[\w-]+\s*:\s*)?(--[\w-]+)\s*\)/gi)) reportPaint(m[0], m.index, `class "${m[0]}"`);
+      for (const [value, idx] of foldedStrings(text, st.bindings)) reportPaint(value, idx);
+      for (const m of text.matchAll(/@import\s+(?:url\()?\s*["']([^"']+\.module\.(?:css|scss|sass|less))["']/gi)) loadPaintModule(m[1], m.index);
     }
 
     if (f.type !== "css") {
       // ---- imports (icons, css modules) -------------------------------
       for (const m of text.matchAll(/import\s+(?:type\s+)?([^'";]*?)\s*from\s*["']([^"']+)["']|import\s*["']([^"']+)["']/g)) {
         const spec = m[2] ?? m[3], clause = m[1] ?? "";
-        if (/\.module\.(css|scss)$/.test(spec)) { const id = clause.match(/^(\w+)/)?.[1]; if (id) st.moduleIdents.set(id, posix.normalize(posix.join(dirname(f.rel), spec))); }
+        if (cfg.pagePaint && /\.module\.(css|scss|sass|less)$/.test(spec)) {
+          const id = clause.match(/^(\w+)/)?.[1];
+          loadPaintModule(spec, m.index, id);
+        } else if (/\.module\.(css|scss)$/.test(spec)) {
+          const id = clause.match(/^(\w+)/)?.[1];
+          if (id) st.moduleIdents.set(id, posix.normalize(posix.join(dirname(f.rel), spec)));
+        }
         if (cfg.icons.enabled) {
           if (forbidden.some((r) => r.test(spec))) add("icon-import", m.index, `import from "${spec}" — icons come only from ${cfg.icons.allowedImports.join(", ")}; pick the glyph the icon glossary lists`);
           if (/\.svg(\?.*)?$/.test(spec) && !svgOk(f.rel)) add("icon-svg", m.index, `import of ${spec} — hand-drawn SVG in app code; use an icon from ${cfg.icons.component}`);
@@ -175,7 +306,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     }
 
     // ---- markup rules -----------------------------------------------
-    const markupFile = ["tsx", "jsx", "vue", "svelte"].includes(f.type);
+    const markupFile = ["tsx", "jsx", "vue", "svelte"].includes(f.type) || (cfg.pagePaint && f.type === "mdx");
     if (markupFile) {
       const els = parseMarkup(markupText, isSfc ? "html" : "jsx");
       markupRules(f, st, els, add);
@@ -226,10 +357,11 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
         rawClass += " " + a.value;
         for (const m of a.value.matchAll(/\b(\w+)\.([A-Za-z_][\w-]*)\b/g)) if (st.moduleIdents.has(m[1])) refs.push([st.moduleIdents.get(m[1]), m[2]]);
         for (const m of a.value.matchAll(/\b(\w+)\[\s*["']([\w-]+)["']\s*\]/g)) if (st.moduleIdents.has(m[1])) refs.push([st.moduleIdents.get(m[1]), m[2]]);
-        const src = a.kind === "str" ? a.value : [...a.value.matchAll(/["'`]([^"'`]*)["'`]/g)].map((m) => m[1]).join(" ");
+        const staticValues = a.kind === "str" ? [a.value] : cfg.pagePaint ? classExpressionStrings(a.value, st.bindings) : [];
+        const src = staticValues.length ? staticValues.join(" ") : [...a.value.matchAll(/["'`]([^"'`]*)["'`]/g)].map((m) => m[1]).join(" ");
         for (const w of src.replace(/\$\{[^}]*\}/g, " ").split(/\s+/)) if (w) {
           words.add(w);
-          if (a.kind === "str" && (a.name === "class" || a.name === "className")) staticWords.add(w);
+          if (staticValues.length && (a.name === "class" || a.name === "className")) staticWords.add(w);
         }
       }
       return { words, staticWords, refs, rawClass };
@@ -284,17 +416,23 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
         }
       }
 
-      // page paint: static markup classes resolved from the existing CSS class index
-      if (cfg.pagePaint) for (const word of res.staticWords) {
-        const declarations = classGlobal.get(word);
-        if (!declarations) continue;
-        const uses = new Map();
-        for (const [property, values] of declarations) for (const value of values) {
-          for (const match of String(value).matchAll(/var\(\s*(--[\w-]+)/g)) uses.set(`${property}\0${match[1]}`, [property, match[1]]);
+      // page paint: static markup classes resolved from visible CSS and generated utilities
+      if (cfg.pagePaint) {
+        const reportClass = (word, declarations) => {
+          if (!declarations) return;
+          const uses = new Map();
+          for (const [property, values] of declarations) for (const value of values) {
+            for (const token of paintReferences(value)) uses.set(`${property}\0${token}`, [property, token]);
+          }
+          for (const [property, token] of uses.values()) if (cfg.pagePaint.isPaintToken(token, index)) {
+            add("page-paint", el.idx, `class "${word}" ${property}: paint token ${token} — use an imported component for paint`);
+          }
+        };
+        for (const word of res.staticWords) {
+          reportClass(word, classGlobal.get(word));
+          reportClass(word, cfg.pagePaint.themeClasses.get(themeUtilityName(word)));
         }
-        for (const [property, token] of uses.values()) if (cfg.pagePaint.isPaintToken(token)) {
-          add("page-paint", el.idx, `class "${word}" ${property}: paint token ${token} — use an imported component for paint`);
-        }
+        for (const [file, name] of classWords(el).refs) reportClass(name, moduleIdx.get(file)?.get(name));
       }
 
       // kit: required classes

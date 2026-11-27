@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { globToRegExp, walk } from './design-system-enforcer-gate/lib/util.mjs';
 
 const gate = new URL('./design-system-enforcer-gate/design-system-enforcer-gate.mjs', import.meta.url);
 const args = process.argv.slice(2);
@@ -55,31 +56,42 @@ if (args.includes('-h') || args.includes('--help')) {
   if (normal.status !== 0 && normal.status !== 1) {
     process.exitCode = normal.status;
   } else {
-    const { configPath } = invocation(args);
+    const { root, configPath } = invocation(args);
     if (!existsSync(configPath)) {
-      console.error('check-app: paint pass skipped: app config has no pages key');
-      process.exitCode = normal.status;
+      console.error(`page paint pass: the app config has no pages list; add "pages" to ${configPath}`);
+      process.exitCode = 2;
     } else {
       const appConfig = JSON.parse(readFileSync(configPath, 'utf8'));
-      if (!Object.hasOwn(appConfig, 'pages')) {
-        console.error('check-app: paint pass skipped: app config has no pages key');
-        process.exitCode = normal.status;
-      } else if (!Array.isArray(appConfig.pages) || appConfig.pages.length === 0 || appConfig.pages.some((page) => typeof page !== 'string' || page.trim() === '')) {
+      if (appConfig.pages == null || (Array.isArray(appConfig.pages) && appConfig.pages.length === 0)) {
+        console.error(`page paint pass: the app config has no pages list; add "pages" to ${configPath}`);
+        process.exitCode = 2;
+      } else if (!Array.isArray(appConfig.pages)) {
+        console.error('check-app: pages must be a non-empty list of globs');
+        process.exitCode = 2;
+      } else if (appConfig.pages.some((page) => typeof page !== 'string' || page.trim() === '')) {
         console.error('check-app: pages must be a non-empty list of globs');
         process.exitCode = 2;
       } else {
-        const paint = run(args, {
-          ...process.env,
-          CAELOS_PAGE_PAINT_CONFIG: paintConfigPath,
-          CAELOS_PAGE_PAINT_PAGES: JSON.stringify(appConfig.pages),
-        });
-        if (paint.stderr) process.stderr.write(paint.stderr);
-        const checked = reportFor(paint, 'paint pass');
-        for (const exemption of checked.report?.exempt ?? []) {
-          console.error(`check-app: paint exemption: ${exemption.file}:${exemption.line} ${exemption.message}; reason: ${exemption.reason}`);
+        const pageTypes = new Set(['tsx', 'jsx', 'ts', 'js', 'mdx', 'css', 'scss', 'sass', 'less']);
+        const candidates = walk(root).filter((file) => pageTypes.has(file.split('.').pop()));
+        const unmatched = appConfig.pages.find((page) => !candidates.some((file) => globToRegExp(page).test(file)));
+        if (unmatched) {
+          console.error(`page paint pass: page glob matched zero files: ${unmatched}`);
+          process.exitCode = 2;
+        } else {
+          const paint = run(args, {
+            ...process.env,
+            CAELOS_PAGE_PAINT_CONFIG: paintConfigPath,
+            CAELOS_PAGE_PAINT_PAGES: JSON.stringify(appConfig.pages),
+          });
+          if (paint.stderr) process.stderr.write(paint.stderr);
+          const checked = reportFor(paint, 'paint pass');
+          for (const exemption of checked.report?.exempt ?? []) {
+            console.error(`check-app: paint exemption: ${exemption.file}:${exemption.line} ${exemption.message}; reason: ${exemption.reason}`);
+          }
+          if (checked.status !== 0 && paint.stdout) process.stderr.write(paint.stdout);
+          process.exitCode = checked.status || normal.status;
         }
-        if (checked.status !== 0 && paint.stdout) process.stderr.write(paint.stdout);
-        process.exitCode = checked.status || normal.status;
       }
     }
   }
