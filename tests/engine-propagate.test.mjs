@@ -17,6 +17,7 @@ import {
 const root = fileURLToPath(new URL('..', import.meta.url));
 const fixtures = path.join(root, 'tests', 'fixtures', 'engine-propagate');
 const lockBuilder = path.join(root, 'scripts', 'build-lock.mjs');
+const tokenBuilder = path.join(root, 'style-dictionary.config.mjs');
 
 function json(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -55,10 +56,29 @@ function buildLock(designSystem) {
   assert.equal(result.status, 0, result.stderr);
 }
 
+function buildTokens(designSystem) {
+  const catalog = path.join(designSystem, 'token_catalog');
+  const sources = readdirSync(catalog)
+    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
+    .sort()
+    .map((file) => path.join(catalog, file));
+  const result = spawnSync(process.execPath, [tokenBuilder], {
+    cwd: designSystem,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      CAELOS_TOKEN_SOURCES: JSON.stringify(sources),
+      CAELOS_TOKEN_OUTPUT: path.join(designSystem, 'generated'),
+    },
+  });
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+}
+
 function makeWork(t, {
   extraTierZeroChange = false,
   mixedUnmappedLine = false,
   modelCalls = 0,
+  literalDependent = false,
   staleGenerated = false,
   staleOwnLines = false,
   stray = false,
@@ -73,24 +93,8 @@ function makeWork(t, {
   mkdirSync(jobFolder);
   materializeCatalog(designSystem);
   mkdirSync(path.join(designSystem, 'generated'));
-  mkdirSync(path.join(designSystem, 'generated', 'components'));
-  const oldCss = `:root {
-  --base-color-primary: fixture-primary;
-  --base-space-medium: 16px;
-  --primitives-shared-surface-fill: var(--base-color-primary);
-  --controls-shared-button-padding: var(--base-space-medium);
-  --fixture-unknown: before;
-}\n`;
-  const updatedCss = oldCss
-    .replace('fixture-primary', 'fixture-updated')
-    .replace(
-      '--primitives-shared-surface-fill: var(--base-color-primary);',
-      '--primitives-shared-surface-fill: var(--base-color-primary); /* rebuilt */',
-    );
-  const oldComponent = '.fixture-button { color: fixture-primary; }\n';
-  const updatedComponent = '.fixture-button { color: fixture-updated; }\n';
-  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
-  writeFileSync(path.join(designSystem, 'generated', 'components', 'Button.css'), oldComponent);
+  buildTokens(designSystem);
+  const oldCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
   buildLock(designSystem);
   command(designSystem, 'git', 'init', '-q');
   const designBase = commit(designSystem, 'fixture design base');
@@ -110,7 +114,7 @@ function makeWork(t, {
         { path: 'token_catalog/00-foundations.tokens.json', tierFile: true },
         { path: 'token_catalog/versions.lock.json' },
         { path: 'generated/tokens.css' },
-        { path: 'generated/components/Button.css' },
+        { path: 'generated/tailwind-theme.css' },
       ],
     },
     app: {
@@ -137,34 +141,37 @@ function makeWork(t, {
   writeFileSync(path.join(jobFolder, 'events.jsonl'), `${events.map(JSON.stringify).join('\n')}\n`);
 
   const edit = applyPropagateEdit({ jobFolder });
-  assert.equal(edit.token, 'base.color.primary');
-  let generatedCss = updatedCss;
-  if (mixedUnmappedLine) {
-    generatedCss = updatedCss.replace('--fixture-unknown: before;', '--fixture-unknown: after;');
+  assert.equal(edit.token, 'base.space.medium');
+  if (!staleGenerated) buildTokens(designSystem);
+  let generatedCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
+  if (mixedUnmappedLine) generatedCss = generatedCss.replace(/\}\s*$/u, '  --fixture-unknown: after;\n}\n');
+  if (literalDependent) {
+    generatedCss = generatedCss.replace(
+      '--primitives-shared-inset-value: var(--base-space-medium);',
+      '--primitives-shared-inset-value: 17px;',
+    );
   }
-  if (staleOwnLines) generatedCss = oldCss.replace('--base-space-medium: 16px;', '--base-space-medium: 17px;');
+  if (staleOwnLines) {
+    generatedCss = oldCss.replace('--base-space-other: 8px;', '--base-space-other: 9px;');
+  }
   if (extraTierZeroChange) {
     const tierFile = path.join(designSystem, 'token_catalog', '00-foundations.tokens.json');
     const tier = json(tierFile);
-    tier.base.space.medium.$value = '17px';
+    tier.base.space.other.$value = '9px';
     writeFileSync(tierFile, `${JSON.stringify(tier, null, 2)}\n`);
-    generatedCss = updatedCss.replace('--base-space-medium: 16px;', '--base-space-medium: 17px;');
+    buildTokens(designSystem);
+    generatedCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
   }
   writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), generatedCss);
-  writeFileSync(
-    path.join(designSystem, 'generated', 'components', 'Button.css'),
-    staleOwnLines ? oldComponent : updatedComponent,
-  );
   const editFile = path.join(jobFolder, 'propagate-edit.json');
   const editRecord = json(editFile);
-  editRecord.generated_outputs = ['generated/tokens.css', 'generated/components/Button.css'];
+  editRecord.generated_outputs = ['generated/tokens.css', 'generated/tailwind-theme.css'];
   writeFileSync(editFile, `${JSON.stringify(editRecord, null, 2)}\n`);
   buildLock(designSystem);
   const expected = collectExpectedDependents({ jobFolder });
   writeFileSync(path.join(jobFolder, 'expected-dependents.json'), `${JSON.stringify(expected, null, 2)}\n`);
   if (staleGenerated) {
     writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
-    writeFileSync(path.join(designSystem, 'generated', 'components', 'Button.css'), oldComponent);
   }
   if (stray) writeFileSync(path.join(designSystem, 'generated', 'stray.js'), 'export const stray = true;\n');
   const designCommit = commit(designSystem, 'propagate fixture edit');
@@ -210,8 +217,8 @@ test('criterion 1: one tier-0 edit misses no dependent, calls no model, and chan
   const work = await makeWork(t);
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   const fixtureDependents = [
-    'base.color.primary', 'controls.shared.button', 'primitives.shared.surface',
-    'primitives.shared.surface.fill',
+    'base.space.medium', 'controls.shared.button', 'primitives.shared.inset',
+    'primitives.shared.inset.value',
   ];
   assert.deepEqual(report.expected_dependents, fixtureDependents);
   assert.deepEqual(report.actual_dependents, fixtureDependents);
@@ -226,6 +233,27 @@ test('mutation actual-from-expected: a rebuilt lock with stale generated CSS mis
   assert.deepEqual(report.actual_dependents, []);
   assert.equal(report.dependents_missed, report.expected_dependents.length);
   assert.deepEqual(report.missed_dependents, report.expected_dependents);
+});
+
+test('condition (a): editing the catalog without rerunning the real token build misses every dependent', async (t) => {
+  const work = await makeWork(t, { staleGenerated: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.deepEqual(report.actual_dependents, []);
+  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+});
+
+test('condition (b): a dependent changed to a literal no longer resolves through built CSS', async (t) => {
+  const work = await makeWork(t, { literalDependent: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.missed_dependents.includes('primitives.shared.inset'));
+  assert.ok(report.missed_dependents.includes('primitives.shared.inset.value'));
+});
+
+test('built-chain source: the lock stays dependent when built CSS severs its var chain', async (t) => {
+  const work = await makeWork(t, { literalDependent: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.expected_dependents.includes('primitives.shared.inset.value'));
+  assert.ok(!report.actual_dependents.includes('primitives.shared.inset.value'));
 });
 
 test('regression: the report step exits nonzero after writing a report with missed dependents', async (t) => {
@@ -249,7 +277,7 @@ test('mutation missed-empty: stale generated CSS produces a nonzero missed count
 test('B3: a second rebuilt tier-0 value is named as a non-dependent change', async (t) => {
   const work = await makeWork(t, { extraTierZeroChange: true });
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
-  assert.ok(report.non_dependents_changed.includes('design-system:base.space.medium'));
+  assert.ok(report.non_dependents_changed.includes('design-system:base.space.other'));
 });
 
 test('B3: the report command fails after naming a second rebuilt tier-0 value', async (t) => {
@@ -259,7 +287,7 @@ test('B3: the report command fails after naming a second rebuilt tier-0 value', 
     'write-propagate-report', '--job', work.jobFolder,
   ], { encoding: 'utf8' });
   assert.notEqual(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stderr, /base\.space\.medium/);
+  assert.match(result.stderr, /base\.space\.other/);
 });
 
 test('mutation all-outputs-per-dependent: a changed foreign line leaves own-line dependents missed', async (t) => {
@@ -267,7 +295,7 @@ test('mutation all-outputs-per-dependent: a changed foreign line leaves own-line
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   assert.deepEqual(report.actual_dependents, []);
   assert.deepEqual(report.missed_dependents, report.expected_dependents);
-  assert.ok(report.non_dependents_changed.includes('design-system:base.space.medium'));
+  assert.ok(report.non_dependents_changed.includes('design-system:base.space.other'));
 });
 
 test('a mapped line cannot hide an unmapped declaration in the same output file', async (t) => {
@@ -310,7 +338,7 @@ test('criterion 3: the app dependency line and lock change are expected, not non
 test('criterion 4: the first step applies fixture job.json and refuses a missing token', async (t) => {
   const work = await makeWork(t);
   const tier = json(path.join(work.designSystem, 'token_catalog', '00-foundations.tokens.json'));
-  assert.equal(tier.base.color.primary.$value, 'fixture-updated');
+  assert.equal(tier.base.space.medium.$value, '17px');
   const jobFile = path.join(work.jobFolder, 'job.json');
   const job = json(jobFile);
   job.propagate.token = 'base.color.missing';
@@ -326,7 +354,7 @@ test('ruling 3: the tier-0 edit changes only the selected value bytes', async (t
   applyPropagateEdit({ jobFolder: work.jobFolder });
   assert.equal(
     readFileSync(tierFile, 'utf8'),
-    before.replace('"fixture-primary"', '"fixture-updated"'),
+    before.replace('"16px"', '"17px"'),
   );
 });
 

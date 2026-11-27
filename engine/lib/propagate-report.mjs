@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import {
   existsSync, readFileSync, readdirSync, writeFileSync,
 } from 'node:fs';
@@ -6,6 +7,9 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { tokenName } from '../../style-dictionary.config.mjs';
+
+const require = createRequire(import.meta.url);
+const { default: StyleDictionary } = await import(require.resolve('style-dictionary'));
 
 const repositoryRoot = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const lockBuilder = path.join(repositoryRoot, 'scripts', 'build-lock.mjs');
@@ -269,8 +273,32 @@ function addToMapSet(map, key, value) {
 function outputOwnership(...catalogs) {
   const properties = new Map();
   const components = new Map();
+  const construction = [];
   for (const catalog of catalogs) {
     for (const { root, tier } of catalog.values()) {
+      const shared = root?.controls?.$extensions?.['app.caelos']?.sharedConstruction;
+      const parameters = shared?.parameters;
+      if (parameters && typeof parameters === 'object' && !Array.isArray(parameters)) {
+        const selections = new Map();
+        for (const [group, choices] of Object.entries(parameters)) {
+          if (!choices || typeof choices !== 'object' || Array.isArray(choices)) continue;
+          for (const [choice, reference] of Object.entries(choices)) {
+            const match = typeof reference === 'string' ? /^\{([^{}]+)\}$/u.exec(reference) : null;
+            if (match) selections.set(`${group}/${choice}`, group);
+          }
+        }
+        for (const [name, entry] of Object.entries(root?.controls?.shared ?? {})) {
+          const recipe = entry?.$extensions?.['app.caelos']?.construction;
+          if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) continue;
+          for (const selection of Object.values(recipe)) {
+            const selected = selections.get(selection);
+            if (selected) construction.push({
+              entry: `controls.shared.${name}`,
+              group: selected,
+            });
+          }
+        }
+      }
       function visit(node, segments = []) {
         if (!node || typeof node !== 'object' || Array.isArray(node)) return;
         const isToken = Object.hasOwn(node, '$value');
@@ -290,7 +318,7 @@ function outputOwnership(...catalogs) {
       visit(root);
     }
   }
-  return { properties, components };
+  return { properties, components, construction };
 }
 
 function declarations(source) {
@@ -301,12 +329,62 @@ function declarations(source) {
   return result;
 }
 
+function declarationValues(source) {
+  const result = new Map();
+  for (const match of (source ?? '').matchAll(/^\s*(--[\w-]+)\s*:\s*([^;]*);.*$/gmu)) {
+    result.set(match[1], match[2].trim());
+  }
+  return result;
+}
+
+function builtDeclarations({ folder, commit, outputPaths }) {
+  const properties = new Map();
+  const duplicateFiles = new Set();
+  for (const output of outputPaths) {
+    for (const [property, value] of declarationValues(optionalFileAt(folder, commit, output))) {
+      if (properties.has(property)) {
+        duplicateFiles.add(properties.get(property).file);
+        duplicateFiles.add(output);
+      } else {
+        properties.set(property, { file: output, value });
+      }
+    }
+  }
+  return { properties, duplicateFiles };
+}
+
+function variableReferences(value) {
+  return [...value.matchAll(/var\(\s*(--[\w-]+)/gu)].map((match) => match[1]);
+}
+
+function declarationReaches(properties, property, target, visiting = new Set()) {
+  if (property === target) return true;
+  if (visiting.has(property)) return false;
+  const declaration = properties.get(property);
+  if (!declaration) return false;
+  const next = new Set(visiting).add(property);
+  return variableReferences(declaration.value)
+    .some((reference) => declarationReaches(properties, reference, target, next));
+}
+
+function addConstructionOwnership(ownership, properties, editedProperty) {
+  for (const { entry, group } of ownership.construction) {
+    for (const property of properties.keys()) {
+      if (ownership.properties.has(property) || !property.startsWith(`--${group}-`)) continue;
+      if (declarationReaches(properties, property, editedProperty)) {
+        addToMapSet(ownership.properties, property, entry);
+      }
+    }
+  }
+}
+
 function withoutDeclarations(source) {
   return (source ?? '').replace(/^\s*--[\w-]+\s*:\s*.*;.*$/gmu, '');
 }
 
 function changedOutputEntries({ folder, base, head, outputPaths, ownership }) {
   const entries = new Set();
+  const componentEntries = new Set();
   const unmappedFiles = new Set();
   for (const output of outputPaths) {
     const before = optionalFileAt(folder, base, output);
@@ -314,7 +392,11 @@ function changedOutputEntries({ folder, base, head, outputPaths, ownership }) {
     if (before === after) continue;
     const componentOwners = ownership.components.get(path.basename(output));
     if (componentOwners) {
-      if (componentOwners.size === 1) entries.add(componentOwners.values().next().value);
+      if (componentOwners.size === 1) {
+        const entry = componentOwners.values().next().value;
+        entries.add(entry);
+        componentEntries.add(entry);
+      }
       else unmappedFiles.add(output);
       continue;
     }
@@ -338,7 +420,30 @@ function changedOutputEntries({ folder, base, head, outputPaths, ownership }) {
       unmappedFiles.add(output);
     }
   }
-  return { entries, unmappedFiles };
+  return { entries, componentEntries, unmappedFiles };
+}
+
+function mergeCatalogValue(left, right) {
+  if (!left || !right || typeof left !== 'object' || typeof right !== 'object'
+      || Array.isArray(left) || Array.isArray(right)) return structuredClone(right);
+  const result = structuredClone(left);
+  for (const [key, value] of Object.entries(right)) {
+    result[key] = Object.hasOwn(result, key) ? mergeCatalogValue(result[key], value) : structuredClone(value);
+  }
+  return result;
+}
+
+async function transformedTokenValue(catalog, token) {
+  let tokens = {};
+  for (const { root } of catalog.values()) tokens = mergeCatalogValue(tokens, root);
+  const dictionary = await new StyleDictionary({
+    tokens,
+    log: { warnings: 'disabled', errors: { brokenReferences: 'throw' } },
+    platforms: { css: { transformGroup: 'css' } },
+  }).getPlatformTokens('css');
+  const found = dictionary.allTokens.find((candidate) => candidate.path.join('.') === token);
+  if (!found || typeof found.$value === 'object') return null;
+  return String(found.$value);
 }
 
 function nodeAt(root, segments) {
@@ -485,6 +590,18 @@ export async function writePropagateReport({ jobFolder }) {
       .map((output) => output.path),
     ...edit.generated_outputs,
   ])].sort();
+  const beforeBuilt = builtDeclarations({
+    folder: design.folder,
+    commit: design.baseCommit,
+    outputPaths,
+  });
+  const afterBuilt = builtDeclarations({
+    folder: design.folder,
+    commit: state.designSystemMergeCommit,
+    outputPaths,
+  });
+  const editedProperty = `--${tokenName(tokenSegments(edit.token))}`;
+  addConstructionOwnership(ownership, afterBuilt.properties, editedProperty);
   const outputChanges = changedOutputEntries({
     folder: design.folder,
     base: design.baseCommit,
@@ -493,8 +610,23 @@ export async function writePropagateReport({ jobFolder }) {
     ownership,
   });
   const changedEntries = outputChanges.entries;
+  const beforeEdited = beforeBuilt.properties.get(editedProperty);
+  const afterEdited = afterBuilt.properties.get(editedProperty);
+  const expectedBuiltValue = await transformedTokenValue(afterCatalog, edit.token);
+  const editedDeclarationReached = expectedBuiltValue !== null
+    && beforeEdited?.value !== afterEdited?.value
+    && afterEdited?.value === expectedBuiltValue;
   const actualDependents = expected
-    .filter((entry) => changedEntries.has(entry.split('#')[0]))
+    .filter((entry) => {
+      if (!editedDeclarationReached) return false;
+      const baseEntry = entry.split('#')[0];
+      if (outputChanges.componentEntries.has(baseEntry)) return true;
+      for (const [property, owners] of ownership.properties) {
+        if (owners.has(baseEntry)
+            && declarationReaches(afterBuilt.properties, property, editedProperty)) return true;
+      }
+      return false;
+    })
     .sort();
   const actualSet = new Set(actualDependents);
   const missed = expected.filter((name) => !actualSet.has(name)).sort();
@@ -511,6 +643,8 @@ export async function writePropagateReport({ jobFolder }) {
     .filter((entry) => !expectedBaseEntries.has(entry))
     .map((entry) => `design-system:${entry}`));
   nonDependents.push(...[...outputChanges.unmappedFiles]
+    .map((file) => `design-system:${file}`));
+  nonDependents.push(...[...beforeBuilt.duplicateFiles, ...afterBuilt.duplicateFiles]
     .map((file) => `design-system:${file}`));
   const allowedDesign = new Set([
     lockFile,

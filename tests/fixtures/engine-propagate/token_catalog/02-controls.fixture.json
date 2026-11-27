@@ -1,17 +1,44 @@
 {
   "controls": {
+    "$extensions": {
+      "app.caelos": {
+        "sharedConstruction": {
+          "parameters": {
+            "spacing": {
+              "medium": "{base.space.medium}"
+            }
+          },
+          "paints": {}
+        }
+      }
+    },
     "shared": {
       "button": {
         "$extensions": {
           "app.caelos": {
             "lifecycle": "promoted",
-            "madeOf": ["primitives.shared.surface"]
+            "construction": {
+              "pad-x": "spacing/medium"
+            },
+            "statePaints": {}
           }
-        },
-        "padding": {
-          "$type": "dimension",
-          "$value": "{base.space.medium}",
-          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "chip": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "construction": {},
+            "statePaints": {}
+          }
+        }
+      },
+      "badge": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "construction": {}
+          }
         }
       }
     }

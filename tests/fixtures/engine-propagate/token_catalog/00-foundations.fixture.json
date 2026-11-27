@@ -1,16 +1,14 @@
 {
   "base": {
-    "color": {
-      "primary": {
-        "$type": "color",
-        "$value": "fixture-primary",
-        "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
-      }
-    },
     "space": {
       "medium": {
         "$type": "dimension",
         "$value": "16px",
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+      },
+      "other": {
+        "$type": "dimension",
+        "$value": "8px",
         "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
       }
     }

@@ -2,7 +2,7 @@
   "id": "fixture-propagate",
   "chain": "propagate",
   "propagate": {
-    "token": "base.color.primary",
-    "value": "fixture-updated"
+    "token": "base.space.medium",
+    "value": "17px"
   }
 }

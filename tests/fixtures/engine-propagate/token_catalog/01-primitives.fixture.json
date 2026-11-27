@@ -1,11 +1,11 @@
 {
   "primitives": {
     "shared": {
-      "surface": {
+      "inset": {
         "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
-        "fill": {
-          "$type": "color",
-          "$value": "{base.color.primary}",
+        "value": {
+          "$type": "dimension",
+          "$value": "{base.space.medium}",
           "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
         }
       }
