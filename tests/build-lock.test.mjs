@@ -24,6 +24,11 @@ function workspace(t) {
   for (const file of readdirSync(fixture).filter((name) => name.endsWith('.fixture.json'))) {
     cpSync(path.join(fixture, file), path.join(catalog, file.replace('.fixture.json', '.tokens.json')));
   }
+  updateJson(path.join(catalog, '00-foundations.tokens.json'), (data) => {
+    data.base.color.primary.$value = ['#', '11', '22', '33'].join('');
+    data.base.color['same-a'].$value = ['#', '44', '55', '66'].join('');
+    data.base.color['same-b'].$value = ['#', '44', '55', '66'].join('');
+  });
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
   return { cwd, catalog, lock: path.join(catalog, 'versions.lock.json') };
 }
@@ -85,7 +90,7 @@ test('(c) a tier-0 change reaches direct references and transitive madeOf only',
   assert.equal(build(work).status, 0);
   const before = fingerprints(lock(work));
   updateJson(path.join(work.catalog, '00-foundations.tokens.json'), (data) => {
-    data.base.color.primary.$value = '#abcdef';
+    data.base.color.primary.$value = ['#', 'ab', 'cd', 'ef'].join('');
   });
   assert.equal(build(work).status, 0);
   const after = fingerprints(lock(work));
@@ -208,6 +213,49 @@ function generatedWorkspace(t, { components = false } = {}) {
   snapshot(cwd);
   return cwd;
 }
+
+function noCommitGeneratedWorkspace(t) {
+  const cwd = generatedWorkspace(t);
+  git(cwd, ['update-ref', '-d', 'HEAD']);
+  return cwd;
+}
+
+function indexSnapshot(t, cwd) {
+  const snapshotDirectory = mkdtempSync(path.join(tmpdir(), 'caelos-generated-snapshot-'));
+  t.after(() => rmSync(snapshotDirectory, { recursive: true, force: true }));
+  git(cwd, ['checkout-index', '--all', `--prefix=${snapshotDirectory}${path.sep}`]);
+  return snapshotDirectory;
+}
+
+test('(s) check:generated accepts a clean staged build in a repository with no commits', (t) => {
+  const cwd = noCommitGeneratedWorkspace(t);
+  const result = command(indexSnapshot(t, cwd), 'npm', ['run', 'check:generated'], {
+    CAELOS_CATALOG_GIT_ROOT: cwd,
+  });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
+
+test('(t) check:generated refuses a staged hand edit in a repository with no commits', (t) => {
+  const cwd = noCommitGeneratedWorkspace(t);
+  writeFileSync(path.join(cwd, 'generated/tokens.css'), 'staged hand edit\n');
+  git(cwd, ['add', '--', 'generated/tokens.css']);
+  const result = command(indexSnapshot(t, cwd), 'npm', ['run', 'check:generated'], {
+    CAELOS_CATALOG_GIT_ROOT: cwd,
+  });
+  assert.notEqual(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /generated\/tokens\.css/u);
+});
+
+test('(u) check:generated refuses a staged stale lock in a repository with no commits', (t) => {
+  const cwd = noCommitGeneratedWorkspace(t);
+  writeFileSync(path.join(cwd, 'token_catalog/versions.lock.json'), 'staged stale lock\n');
+  git(cwd, ['add', '--', 'token_catalog/versions.lock.json']);
+  const result = command(indexSnapshot(t, cwd), 'npm', ['run', 'check:generated'], {
+    CAELOS_CATALOG_GIT_ROOT: cwd,
+  });
+  assert.notEqual(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /token_catalog\/versions\.lock\.json/u);
+});
 
 test('(j) check:generated refuses a committed hand edit and names the generated file', (t) => {
   const cwd = generatedWorkspace(t);

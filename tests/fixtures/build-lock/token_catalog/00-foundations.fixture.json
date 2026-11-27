@@ -3,17 +3,17 @@
     "color": {
       "primary": {
         "$type": "color",
-        "$value": "#112233",
+        "$value": "fixture-primary",
         "$extensions": { "app.caelos": { "lifecycle": "promoted", "draftedBy": "fixture" } }
       },
       "same-a": {
         "$type": "color",
-        "$value": "#445566",
+        "$value": "fixture-shared",
         "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
       },
       "same-b": {
         "$type": "color",
-        "$value": "#445566",
+        "$value": "fixture-shared",
         "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
       }
     },
