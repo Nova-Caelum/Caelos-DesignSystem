@@ -1,0 +1,27 @@
+{
+  "primitives": {
+    "shared": {
+      "inset": {
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
+        "value": {
+          "$type": "dimension",
+          "$value": "{base.space.px-16}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "composed": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["primitives.shared.inset"]
+          }
+        },
+        "value": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.inset.value}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      }
+    }
+  }
+}

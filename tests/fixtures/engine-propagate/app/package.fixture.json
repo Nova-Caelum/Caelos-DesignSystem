@@ -1,0 +1,7 @@
+{
+  "name": "fixture-app",
+  "private": true,
+  "dependencies": {
+    "@fixture/design-system": "git+https://example.invalid/design-system.git#base"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "controls": {
+    "$extensions": {
+      "app.caelos": {
+        "sharedConstruction": {
+          "parameters": {
+            "spacing": {
+              "medium": "{base.space.px-16}"
+            },
+            "height": {
+              "medium": "{base.space.px-16}"
+            }
+          },
+          "paints": {
+            "medium": {
+              "fill": "{base.space.px-16}"
+            }
+          }
+        }
+      }
+    },
+    "shared": {
+      "button": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "kind": "button",
+            "layerOrder": ["surface"],
+            "variants": {
+              "variant": ["primary"]
+            },
+            "defaultVariants": {
+              "variant": "primary"
+            },
+            "states": ["default"],
+            "construction": {
+              "height": "height/medium"
+            },
+            "statePaints": {
+              "primary": {
+                "default": "medium"
+              }
+            }
+          }
+        }
+      },
+      "chip": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "construction": {},
+            "statePaints": {}
+          }
+        }
+      },
+      "badge": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "construction": {}
+          }
+        }
+      }
+    }
+  }
+}
