@@ -46,6 +46,11 @@ function counterStayedZero(interaction) {
   return interaction?.before === 0 && interaction?.after === 0;
 }
 
+function everyInteraction(interactions, predicate) {
+  const values = Array.isArray(interactions) ? interactions : [interactions];
+  return values.length > 0 && values.every(predicate);
+}
+
 function failuresFor(entry, state) {
   const failures = [];
   if (!state.shown) failures.push(`${entry}/${state.state}: card is not shown`);
@@ -106,10 +111,10 @@ export async function runViewerCheck({ driver, entries, out }) {
       if (checked.shown && checked.named) {
         const click = await driver.interact(card, 'click');
         const key = await driver.interact(card, 'key');
-        checked.clickResponded = counterIncreased(click);
-        checked.keyResponded = counterIncreased(key);
+        checked.clickResponded = everyInteraction(click, counterIncreased);
+        checked.keyResponded = everyInteraction(key, counterIncreased);
         checked.responding = state === 'disabled'
-          ? counterStayedZero(click) && counterStayedZero(key)
+          ? everyInteraction(click, counterStayedZero) && everyInteraction(key, counterStayedZero)
           : checked.clickResponded && checked.keyResponded;
       }
       states.push(checked);
@@ -138,6 +143,12 @@ function parseCounter(value) {
 
 function hasAccessibilityNode(snapshot) {
   return Array.isArray(snapshot) && snapshot.length > 0;
+}
+
+export async function resolveInteractionLocators(live) {
+  const markedControls = live.locator('[data-live-control]');
+  const count = await markedControls.count();
+  return count > 0 ? Array.from({ length: count }, (_, index) => markedControls.nth(index)) : [live];
 }
 
 export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromium } = {}) {
@@ -206,7 +217,9 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
           const live = card.locator('.live-component > *');
           const liveCount = await live.count();
           let liveDetails;
+          let interactionLocators;
           if (liveCount === 1) {
+            interactionLocators = await resolveInteractionLocators(live);
             const bounds = await live.boundingBox();
             const ariaHidden = await live.evaluate((node) => Boolean(node.closest('[aria-hidden="true"], [inert]')));
             let inAccessibilityTree = false;
@@ -227,30 +240,34 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
             state: await card.getAttribute('data-state-card'),
             shown: await card.isVisible(),
             live: liveDetails,
-            locator: liveCount === 1 ? live : undefined,
+            locators: interactionLocators,
             cardLocator: card,
           };
         })),
       };
     },
     async interact(card, interaction) {
-      if (!card.locator) return {};
+      if (!card.locators?.length) return [];
       const attribute = interaction === 'click' ? 'data-events-click' : 'data-events-key';
-      const before = parseCounter(await card.cardLocator.getAttribute(attribute));
-      try {
-        if (interaction === 'click') {
-          await card.locator.click({ timeout: 500 });
-        } else {
-          await card.locator.focus({ timeout: 500 });
-          await card.locator.press('Enter', { timeout: 500 });
+      const outcomes = [];
+      for (const locator of card.locators) {
+        const before = parseCounter(await card.cardLocator.getAttribute(attribute));
+        try {
+          if (interaction === 'click') {
+            await locator.click({ timeout: 500 });
+          } else {
+            await locator.focus({ timeout: 500 });
+            await locator.press('Enter', { timeout: 500 });
+          }
+        } catch {
+          // A disabled native control is expected to reject interaction.
         }
-      } catch {
-        // A disabled native control is expected to reject interaction.
+        outcomes.push({
+          before,
+          after: parseCounter(await card.cardLocator.getAttribute(attribute)),
+        });
       }
-      return {
-        before,
-        after: parseCounter(await card.cardLocator.getAttribute(attribute)),
-      };
+      return outcomes;
     },
     async close() {
       await browser.close();

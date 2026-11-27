@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { runViewerCheck } from '../viewer/check-viewer.mjs';
+import { resolveInteractionLocators, runViewerCheck } from '../viewer/check-viewer.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixture = JSON.parse(await readFile(path.join(root, 'tests/fixtures/viewer-check/recorded-dom.json'), 'utf8'));
@@ -26,32 +26,74 @@ function createFakeDriver(record) {
           ...card,
           events: card.events && { ...card.events },
           live: card.live && { ...card.live },
+          interactionTarget: card.interactionTarget && { ...card.interactionTarget },
+          interactionTargets: card.interactionTargets?.map((target) => ({ ...target })),
         })),
       };
     },
     async interact(card, interaction) {
-      const before = card.events?.[interaction];
-      if (card.live?.[interaction] === true && Number.isInteger(before)) {
-        card.events[interaction] += 1;
-      }
-      return {
-        before,
-        after: card.events?.[interaction],
-      };
+      const targets = card.interactionTargets ?? [card.interactionTarget ?? card.live];
+      return targets.map((target) => {
+        const before = card.events?.[interaction];
+        if (target?.[interaction] === true && Number.isInteger(before)) card.events[interaction] += 1;
+        return { before, after: card.events?.[interaction] };
+      });
     },
   };
 }
 
-async function runCase(entries) {
+test('the Playwright locator resolver returns every marked inner live control', async () => {
+  const controls = [{ id: 'first' }, { id: 'second' }];
+  const inner = { count: async () => controls.length, nth: (index) => controls[index] };
+  const live = { locator: (selector) => {
+    assert.equal(selector, '[data-live-control]');
+    return inner;
+  } };
+
+  assert.deepEqual(await resolveInteractionLocators(live), controls);
+});
+
+test('an inner control that forwards passes even when the composite root is dead', async () => {
+  const { result } = await runCase(['controls.shared.InnerForwards']);
+  assert.equal(result.exitCode, 0, result.message);
+});
+
+test('a dead inner control fails by entry name even when the composite root has handlers', async () => {
+  const { result, results } = await runCase(['controls.shared.InnerDeadRootForwards']);
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.InnerDeadRootForwards/u);
+  assert.equal(results.entries[0].states[0].responding, false);
+});
+
+async function runCase(entries, recorded = fixture) {
   const folder = await mkdtemp(path.join(tmpdir(), 'viewer-check-test-'));
   const out = path.join(folder, 'results.json');
   try {
-    const result = await runViewerCheck({ driver: createFakeDriver(fixture), entries, out });
+    const result = await runViewerCheck({ driver: createFakeDriver(recorded), entries, out });
     return { result, results: JSON.parse(await readFile(out, 'utf8')) };
   } finally {
     await rm(folder, { recursive: true, force: true });
   }
 }
+
+test('tabs whose second marked control swallows events fail by entry name', async () => {
+  const entry = 'controls.shared.TabsSecondDead';
+  const recorded = { entries: { [entry]: {
+    states: ['default'],
+    sideBySide: true,
+    cards: [{
+      state: 'default',
+      shown: true,
+      live: { name: entry, visible: true, inAccessibilityTree: true },
+      events: { click: 0, key: 0 },
+      interactionTargets: [{ click: true, key: true }, { click: false, key: false }],
+    }],
+  } } };
+  const { result, results } = await runCase([entry], recorded);
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.TabsSecondDead/u);
+  assert.equal(results.entries[0].states[0].responding, false);
+});
 
 test('the fixture Button passes with forwarding states and a non-forwarding disabled state', async () => {
   const { result, results } = await runCase(['controls.shared.Button']);

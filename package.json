@@ -13,7 +13,7 @@
   "scripts": {
     "hooks": "husky",
     "test": "node --test",
-    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs tests/browser-checks/viewer-browser.check.mjs",
+    "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs tests/browser-checks/viewer-browser.check.mjs tests/browser-checks/templates-browser.check.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
     "build:components": "node scripts/generate-components.mjs",
     "build:viewer": "node viewer/build.mjs",
