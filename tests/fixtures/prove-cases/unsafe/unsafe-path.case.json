@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "name": "unsafe-path",
+  "kind": "rebuilt-component",
+  "expected": "refused",
+  "plants": [
+    {
+      "surface": "catalog",
+      "check": "duplicates",
+      "file": "../outside.tokens.json",
+      "source": "overlays.shared.menu",
+      "target": "overlays.shared.unsafe"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "name": "raw-value-equal-to-token",
+  "kind": "raw-value-equal-to-token",
+  "expected": "refused",
+  "plants": [
+    {
+      "surface": "catalog",
+      "check": "tier-drift",
+      "expect": "primitives\\.shared\\.scrollArea\\.light-ink: raw catalog value",
+      "file": "token_catalog/01-primitives.tokens.json",
+      "token": "primitives.shared.scrollArea.light-ink",
+      "mutation": "resolve-alias"
+    },
+    {
+      "surface": "app",
+      "check": "enforcer",
+      "expect": "\"file\":\\s*\"src/raw\\.css\"[\\s\\S]*\"rule\":\\s*\"spacing\"",
+      "fixture": "tests/fixtures/gate-app",
+      "file": "src/raw.css"
+    }
+  ]
+}
