@@ -215,8 +215,12 @@ test('(b) Button has a live attributed button for every state', () => {
   assertBuildPassed();
   const family = html.match(/<section[^>]+data-family="controls\.shared\.Button"[\s\S]*?<\/section>/u)?.[0] ?? '';
   const states = [...family.matchAll(/data-state-card="([^"]+)"/gu)].map((match) => match[1]);
+  assert.match(family, /data-states="\[&quot;default&quot;,&quot;hover&quot;,&quot;pressed&quot;,&quot;success&quot;,&quot;focus&quot;,&quot;disabled&quot;\]"/u);
   assert.deepEqual(states, ['default', 'hover', 'pressed', 'success', 'focus', 'disabled']);
   assert.equal((family.match(/<button\b[^>]*data-entry="controls\.shared\.Button"/gu) ?? []).length, states.length);
+  assert.match(family, /data-events-click="0"/u);
+  assert.match(family, /data-events-key="0"/u);
+  assert.match(family, /data-event-readout="true"/u);
 });
 
 test('(c) every Button card lists token path, value and tier', () => {
