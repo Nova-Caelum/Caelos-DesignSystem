@@ -225,6 +225,10 @@ function compareTightenOnlyRule(previous, candidate, pathName) {
   for (const marker of markers) {
     const before = prior[marker];
     const after = next[marker];
+    const booleanMarker = marker === 'x-caelos-ignore-for-change' || marker === 'x-caelos-required-on-active-recipe';
+    if (booleanMarker && after !== undefined && typeof after !== 'boolean') {
+      loosenedSchema(pathName, marker, '; a marker must be true or false');
+    }
     if (marker === 'x-caelos-ignore-for-change') {
       if (before !== true && after === true) loosenedSchema(pathName, marker);
     } else if (marker === 'x-caelos-required-from-tier') {
@@ -525,7 +529,7 @@ async function checkRecipes(values) {
   validateCandidateRuleData(context, tree);
   const schema = validateSchema(readTrustedJson(schemaFile), schemaFile);
   const families = paintFamilySets(validatePaintFamilies(readTrustedJson(paintFile), paintFile));
-  const ignored = Object.keys(schema.properties).filter((key) => schema.properties[key]['x-caelos-ignore-for-change']);
+  const ignored = Object.keys(schema.properties).filter((key) => schema.properties[key]['x-caelos-ignore-for-change'] === true);
   const current = readCatalog(context);
   const previous = tree ? readCatalog(context, tree) : { files: [], entries: [], tokens: [] };
   if (!hasBase) console.log('no base given: changed-entry rule skipped');
@@ -557,7 +561,7 @@ async function checkRecipes(values) {
     const required = new Set(schema.required);
     for (const [key, rule] of Object.entries(schema.properties)) {
       const recipeTier = rule['x-caelos-recipe-tier'];
-      if (active && group && (rule['x-caelos-required-on-active-recipe'] || tier >= rule['x-caelos-required-from-tier'])) {
+      if (active && group && (rule['x-caelos-required-on-active-recipe'] === true || tier >= rule['x-caelos-required-from-tier'])) {
         required.add(key);
       }
       if (!Object.hasOwn(record, key)) continue;

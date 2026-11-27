@@ -182,6 +182,9 @@ test('a schema marker loosened by a candidate is refused', (t) => {
     ['madeOf', 'x-caelos-required-from-tier', (rule) => { rule['x-caelos-required-from-tier'] += 1; }],
     ['kind', 'x-caelos-required-on-active-recipe', (rule) => { delete rule['x-caelos-required-on-active-recipe']; }],
     ['madeOf', 'x-caelos-ignore-for-change', (rule) => { rule['x-caelos-ignore-for-change'] = true; }],
+    ['madeOf', 'x-caelos-ignore-for-change', (rule) => { rule['x-caelos-ignore-for-change'] = 1; }],
+    ['kind', 'x-caelos-ignore-for-change', (rule) => { rule['x-caelos-ignore-for-change'] = 'yes'; }],
+    ['kind', 'x-caelos-required-on-active-recipe', (rule) => { rule['x-caelos-required-on-active-recipe'] = 1; }],
     ['contents', 'x-caelos-recipe-tier', (rule) => { delete rule['x-caelos-recipe-tier']; }],
   ];
   for (const [property, marker, mutate] of cases) {
