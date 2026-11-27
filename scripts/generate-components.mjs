@@ -10,8 +10,11 @@
 import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { resolveControlCatalog } from '../src/tier-2/control-catalog.mjs';
+import { tokenName } from '../style-dictionary.config.mjs';
 
 const appExtension = 'app.caelos';
+const compareCodeUnits = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 
 function parseArguments(argv) {
   const options = {
@@ -80,7 +83,7 @@ function emptyVariantField(variants, segments = ['variants']) {
   }
   if (!variants || typeof variants !== 'object') return null;
   if (Object.keys(variants).length === 0) return segments.join('.');
-  for (const key of Object.keys(variants).sort()) {
+  for (const key of Object.keys(variants).sort(compareCodeUnits)) {
     const found = emptyVariantField(variants[key], [...segments, key]);
     if (found) return found;
   }
@@ -96,27 +99,19 @@ function identifier(value) {
   return /^\d/u.test(name) ? `Component${name}` : name;
 }
 
-function kebab(value) {
-  return value
-    .replace(/([a-z0-9])([A-Z])/gu, '$1-$2')
-    .replace(/[^A-Za-z0-9]+/gu, '-')
-    .replace(/^-|-$/gu, '')
-    .toLowerCase();
-}
-
 function tokenVariables(node, entrySegments) {
   const variables = {};
   function visit(value, relative = []) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return;
     if (Object.hasOwn(value, '$value')) {
-      const variable = `var(--${[...entrySegments, ...relative].map(kebab).join('-')})`;
+      const variable = `var(--${tokenName([...entrySegments, ...relative])})`;
       const relativeName = relative.join('.');
       variables[relativeName] = variable;
       const leafName = relative.at(-1);
       if (!Object.hasOwn(variables, leafName)) variables[leafName] = variable;
       return;
     }
-    for (const key of Object.keys(value).filter((key) => !key.startsWith('$')).sort()) {
+    for (const key of Object.keys(value).filter((key) => !key.startsWith('$')).sort(compareCodeUnits)) {
       visit(value[key], [...relative, key]);
     }
   }
@@ -128,7 +123,7 @@ async function loadTemplates(directory) {
   const templates = new Map();
   async function filesBelow(current, relative = '') {
     const found = [];
-    for (const entry of (await readdir(current, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name))) {
+    for (const entry of (await readdir(current, { withFileTypes: true })).sort((left, right) => compareCodeUnits(left.name, right.name))) {
       const childRelative = path.join(relative, entry.name);
       if (entry.isDirectory()) found.push(...await filesBelow(path.join(current, entry.name), childRelative));
       else if (entry.isFile() && entry.name.endsWith('.mjs')) found.push(childRelative);
@@ -152,19 +147,37 @@ async function loadTemplates(directory) {
 async function loadCatalog(directory) {
   const files = (await readdir(directory))
     .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
-    .sort();
+    .sort(compareCodeUnits);
   const allEntries = new Map();
   const candidates = [];
   for (const file of files) {
     const tier = Number.parseInt(file.slice(0, 2), 10);
-    const root = JSON.parse(await readFile(path.join(directory, file), 'utf8'));
+    const parsed = JSON.parse(await readFile(path.join(directory, file), 'utf8'));
+    let root = parsed;
+    if (tier === 2 && parsed.controls?.$extensions?.[appExtension]?.sharedConstruction) {
+      const buttonEntry = Object.entries(parsed.controls?.shared ?? {})
+        .find(([, entry]) => extension(entry)?.kind === 'button' &&
+          extension(entry)?.construction && extension(entry)?.statePaints);
+      if (buttonEntry) {
+        const [buttonName, button] = buttonEntry;
+        if (buttonName === 'button') {
+          root = resolveControlCatalog(parsed);
+        } else {
+          const canonicalInput = structuredClone(parsed);
+          canonicalInput.controls.shared.button = structuredClone(button);
+          const resolved = resolveControlCatalog(canonicalInput);
+          root = structuredClone(parsed);
+          root.controls.shared[buttonName] = resolved.controls.shared.button;
+        }
+      }
+    }
     function visit(node, segments = []) {
       if (!node || typeof node !== 'object' || Array.isArray(node)) return;
       if (tier === 0 && Object.hasOwn(node, '$value')) {
         allEntries.set(segments.join('.'), {
           name: segments.join('.'), segments, tier, node, record: extension(node) ?? {},
           componentName: identifier(segments.at(-1)),
-          className: `caelos-${segments.map(kebab).join('-')}`,
+          className: `caelos-${tokenName(segments)}`,
           variables: {},
         });
         return;
@@ -179,7 +192,7 @@ async function loadCatalog(directory) {
           node,
           record,
           componentName: identifier(segments.at(-1)),
-          className: `caelos-${segments.map(kebab).join('-')}`,
+          className: `caelos-${tokenName(segments)}`,
           variables: tokenVariables(node, segments),
         };
         allEntries.set(entry.name, entry);
@@ -188,13 +201,13 @@ async function loadCatalog(directory) {
         }
         return;
       }
-      for (const key of Object.keys(node).filter((key) => !key.startsWith('$')).sort()) {
+      for (const key of Object.keys(node).filter((key) => !key.startsWith('$')).sort(compareCodeUnits)) {
         visit(node[key], [...segments, key]);
       }
     }
     visit(root);
   }
-  candidates.sort((left, right) => left.tier - right.tier || left.name.localeCompare(right.name));
+  candidates.sort((left, right) => left.tier - right.tier || compareCodeUnits(left.name, right.name));
   return { allEntries, candidates };
 }
 
@@ -207,7 +220,7 @@ function orderParts(entry, parts) {
   return [...parts].sort((left, right) => {
     const leftPosition = positions.get(left.name) ?? Number.MAX_SAFE_INTEGER;
     const rightPosition = positions.get(right.name) ?? Number.MAX_SAFE_INTEGER;
-    return leftPosition - rightPosition || left.name.localeCompare(right.name);
+    return leftPosition - rightPosition || compareCodeUnits(left.name, right.name);
   });
 }
 
@@ -282,6 +295,11 @@ async function generate(options) {
       gaps.push(gap(entry, `empty value in field "${emptyVariant}"`, emptyVariant));
       continue;
     }
+    const templateGap = typeof template.validate === 'function' ? template.validate(entry) : null;
+    if (templateGap) {
+      gaps.push(gap(entry, templateGap.reason, templateGap.field));
+      continue;
+    }
     const missingPart = madeOf.find((name) => !allEntries.has(name));
     if (missingPart) {
       gaps.push(gap(entry, `madeOf names missing entry "${missingPart}"`, 'madeOf'));
@@ -310,11 +328,17 @@ async function generate(options) {
       gaps.push(gap(entry, `output name also belongs to "${collision}"`));
       continue;
     }
-    const output = template.render({ ...entry, parts: orderParts(entry, parts) });
+    const variable = (reference) => {
+      const match = /^\{([^{}]+)\}$/u.exec(reference);
+      if (!match) throw new Error(`Paint value for ${entry.name} is not a token reference: ${JSON.stringify(reference)}`);
+      return `var(--${tokenName(match[1].split('.'))})`;
+    };
+    const output = template.render({ ...entry, parts: orderParts(entry, parts), variable });
     if (!output || typeof output.tsx !== 'string' || typeof output.css !== 'string') {
       throw new Error(`Template "${entry.record.kind}" returned invalid output for ${entry.name}`);
     }
-    outputs.set(`${entry.componentName}.tsx`, output.tsx);
+    const clientSource = output.tsx.startsWith('"use client";\n') ? output.tsx : `"use client";\n${output.tsx}`;
+    outputs.set(`${entry.componentName}.tsx`, clientSource);
     outputs.set(`${entry.componentName}.css`, output.css);
     reservedNames.set(entry.componentName, entry.name);
     generated.set(entry.name, entry);
@@ -326,17 +350,17 @@ async function generate(options) {
       await unlink(path.join(options.out, file.name));
     }
   }
-  for (const [file, content] of [...outputs].sort(([left], [right]) => left.localeCompare(right))) {
+  for (const [file, content] of [...outputs].sort(([left], [right]) => compareCodeUnits(left, right))) {
     await writeFile(path.join(options.out, file), content);
   }
 
-  gaps.sort((left, right) => left.entry.localeCompare(right.entry) || left.reason.localeCompare(right.reason));
+  gaps.sort((left, right) => compareCodeUnits(left.entry, right.entry) || compareCodeUnits(left.reason, right.reason));
   const exports = [...generated.values()]
-    .sort((left, right) => left.componentName.localeCompare(right.componentName))
+    .sort((left, right) => compareCodeUnits(left.componentName, right.componentName))
     .map((entry) => `export { ${entry.componentName} } from './${entry.componentName}';`);
-  const index = ['// Generated by scripts/generate-components.mjs. Do not edit.', ...exports, ''].join('\n');
+  const index = ['// Generated by scripts/generate-components.mjs. Do not edit.', ...(exports.length ? exports : ['export {};']), ''].join('\n');
   await writeFile(path.join(options.out, 'index.ts'), index);
-  return { gaps, generated: [...generated.keys()].sort() };
+  return { gaps, generated: [...generated.keys()].sort(compareCodeUnits) };
 }
 
 try {

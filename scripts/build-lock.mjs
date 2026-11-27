@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const appExtension = 'app.caelos';
 const referencePattern = /^\{([^{}]+)\}$/u;
@@ -48,13 +49,13 @@ function fingerprint(value) {
   return createHash('sha256').update(serialise(value)).digest('hex');
 }
 
-function ignoredFields(schema) {
+function ignoredFields(schema, marker) {
   const ignored = new Set();
   function visit(node) {
     if (!node || typeof node !== 'object') return;
     if (node.properties && typeof node.properties === 'object') {
       for (const [name, definition] of Object.entries(node.properties)) {
-        if (definition?.['x-caelos-ignore-for-change'] === true) ignored.add(name);
+        if (definition?.[marker] === true) ignored.add(name);
       }
     }
     for (const value of Object.values(node)) visit(value);
@@ -73,15 +74,11 @@ function addDefinition(map, name, definition) {
   map.set(name, definitions);
 }
 
-async function loadCatalog(directory) {
-  const files = (await readdir(directory))
-    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
-    .sort();
+function catalogFromSources(sources) {
   const tokens = new Map();
   const entries = new Map();
-  for (const file of files) {
-    const tier = Number.parseInt(file.slice(0, 2), 10);
-    const root = JSON.parse(await readFile(path.join(directory, file), 'utf8'));
+  for (const { file, root } of sources) {
+    const tier = Number.parseInt(path.basename(file).slice(0, 2), 10);
     function visit(node, segments = []) {
       if (!node || typeof node !== 'object' || Array.isArray(node)) return;
       const name = segments.join('.');
@@ -98,6 +95,17 @@ async function loadCatalog(directory) {
     visit(root);
   }
   return { entries, tokens };
+}
+
+async function loadCatalog(directory) {
+  const files = (await readdir(directory))
+    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
+    .sort();
+  const sources = await Promise.all(files.map(async (file) => ({
+    file,
+    root: JSON.parse(await readFile(path.join(directory, file), 'utf8')),
+  })));
+  return { ...catalogFromSources(sources), sources };
 }
 
 function variantSelections(definitions) {
@@ -136,7 +144,8 @@ function createResolver(catalog, ignored) {
     for (const key of Object.keys(value).sort()) {
       if (inAppRecord && ignored.has(key)) continue;
       const childIsAppRecord = key === appExtension;
-      result[key] = clean(value[key], childIsAppRecord);
+      const child = clean(value[key], childIsAppRecord);
+      result[key] = child;
     }
     return result;
   }
@@ -188,6 +197,101 @@ function createResolver(catalog, ignored) {
   }
 
   return { clean, resolveEntry };
+}
+
+function createContentResolver(catalog) {
+  const tokenMemo = new Map();
+
+  function resolveValue(value, stack = []) {
+    if (typeof value === 'string') {
+      const match = referencePattern.exec(value);
+      return match ? resolveTokenValue(match[1], stack) : value;
+    }
+    if (Array.isArray(value)) return value.map((item) => resolveValue(item, stack));
+    if (!value || typeof value !== 'object') return value;
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, resolveValue(value[key], stack)]));
+  }
+
+  function resolveTokenValue(name, stack = []) {
+    if (stack.includes(name)) throw new Error(`token reference cycle: ${[...stack, name].join(' -> ')}`);
+    if (tokenMemo.has(name)) return tokenMemo.get(name);
+    const definitions = catalog.tokens.get(name);
+    if (!definitions) throw new Error(`Unknown token reference: ${name}`);
+    const nextStack = [...stack, name];
+    const values = definitions.map(({ node }) => resolveValue(node.$value, nextStack));
+    const resolved = values.length === 1
+      ? values[0]
+      : { $definitions: values.sort((left, right) => serialise(left).localeCompare(serialise(right))) };
+    tokenMemo.set(name, resolved);
+    return resolved;
+  }
+
+  function entryContent(name) {
+    const definitions = catalog.entries.get(name);
+    if (!definitions) throw new Error(`Missing entry: ${name}`);
+    const tokens = [];
+    for (const { node } of definitions) {
+      function visit(value, segments = []) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+        if (Object.hasOwn(value, '$value')) {
+          tokens.push([segments.join('.'), resolveValue(value.$value), value.$type ?? null]);
+          return;
+        }
+        for (const key of Object.keys(value).filter((key) => !key.startsWith('$')).sort()) {
+          visit(value[key], [...segments, key]);
+        }
+      }
+      visit(node);
+    }
+    const madeOf = [...new Set(definitions.flatMap(({ node }) => extension(node)?.madeOf ?? []))].sort();
+    return {
+      madeOf,
+      tokens: tokens.sort((left, right) => serialise(left).localeCompare(serialise(right))),
+    };
+  }
+
+  function resolveSelectionValues(selection) {
+    return Object.entries(selection)
+      .map(([axis, value]) => [axis, resolveValue(value)])
+      .sort((left, right) => serialise(left).localeCompare(serialise(right)));
+  }
+
+  return { entryContent, resolveSelectionValues };
+}
+
+function hasTokenReference(value) {
+  if (typeof value === 'string') return referencePattern.test(value);
+  if (Array.isArray(value)) return value.some(hasTokenReference);
+  if (!value || typeof value !== 'object') return false;
+  return Object.values(value).some(hasTokenReference);
+}
+
+export function buildContentFingerprintRecords(sources) {
+  const catalog = catalogFromSources(sources);
+  const resolver = createContentResolver(catalog);
+  const records = new Map();
+  for (const name of [...catalog.entries.keys()].sort()) {
+    const definitions = catalog.entries.get(name);
+    const content = resolver.entryContent(name);
+    const variantContentFingerprints = new Map();
+    const emptyVariants = new Set();
+    for (const selection of variantSelections(definitions)) {
+      if (Object.keys(selection).length === 0) continue;
+      const selected = resolver.resolveSelectionValues(selection);
+      const variant = selectionName(selection);
+      variantContentFingerprints.set(variant, fingerprint({ content, selected }));
+      if (content.tokens.length === 0 && content.madeOf.length === 0 && !hasTokenReference(selection)) {
+        emptyVariants.add(variant);
+      }
+    }
+    records.set(name, {
+      contentFingerprint: fingerprint(content),
+      empty: content.tokens.length === 0 && content.madeOf.length === 0,
+      emptyVariants,
+      variantContentFingerprints,
+    });
+  }
+  return records;
 }
 
 function createDependencyWalker(catalog, clean) {
@@ -251,8 +355,9 @@ function createDependencyWalker(catalog, clean) {
 async function run(options) {
   const schema = JSON.parse(await readFile(options.schema, 'utf8'));
   const catalog = await loadCatalog(options.catalog);
-  const resolver = createResolver(catalog, ignoredFields(schema));
-  const walker = createDependencyWalker(catalog, resolver.clean);
+  const changeResolver = createResolver(catalog, ignoredFields(schema, 'x-caelos-ignore-for-change'));
+  const contentRecords = buildContentFingerprintRecords(catalog.sources);
+  const walker = createDependencyWalker(catalog, changeResolver.clean);
 
   if (options.dependents !== undefined) {
     const target = catalog.tokens.get(options.dependents);
@@ -275,14 +380,27 @@ async function run(options) {
   let variantCount = 0;
   for (const name of [...catalog.entries.keys()].sort()) {
     const definitions = catalog.entries.get(name);
-    const content = resolver.resolveEntry(name);
+    const changeContent = changeResolver.resolveEntry(name);
+    const contentRecord = contentRecords.get(name);
     const variants = {};
+    const variantContentFingerprints = {};
+    const emptyVariants = [];
     for (const selection of variantSelections(definitions)) {
       if (Object.keys(selection).length === 0) continue;
-      variants[selectionName(selection)] = fingerprint({ content, selected: selection });
+      const variant = selectionName(selection);
+      variants[variant] = fingerprint({ content: changeContent, selected: selection });
+      variantContentFingerprints[variant] = contentRecord.variantContentFingerprints.get(variant);
+      if (contentRecord.emptyVariants.has(variant)) emptyVariants.push(variant);
       variantCount += 1;
     }
-    entries[name] = { fingerprint: fingerprint(content), variants };
+    entries[name] = {
+      fingerprint: fingerprint(changeContent),
+      contentFingerprint: contentRecord.contentFingerprint,
+      variants,
+      variantContentFingerprints,
+      ...(contentRecord.empty ? { empty: true } : {}),
+      ...(emptyVariants.length ? { emptyVariants } : {}),
+    };
   }
   const output = `${JSON.stringify(canonical({ entries }), null, 2)}\n`;
   await mkdir(path.dirname(options.out), { recursive: true });
@@ -290,9 +408,11 @@ async function run(options) {
   process.stdout.write(`Built lock: ${Object.keys(entries).length} entries, ${variantCount} variants\n`);
 }
 
-try {
-  await run(parseArguments(process.argv.slice(2)));
-} catch (error) {
-  process.stderr.write(`Lock build failed: ${error.message}\n`);
-  process.exitCode = 1;
+if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
+  try {
+    await run(parseArguments(process.argv.slice(2)));
+  } catch (error) {
+    process.stderr.write(`Lock build failed: ${error.message}\n`);
+    process.exitCode = 1;
+  }
 }

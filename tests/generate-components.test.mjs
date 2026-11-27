@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -9,6 +10,13 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const generator = path.join(root, 'scripts/generate-components.mjs');
 const fixtureCatalog = path.join(root, 'tests/fixtures/generator/token_catalog');
+const require = createRequire(import.meta.url);
+// Through require, so a standalone copy finds TypeScript via NODE_PATH as the pre-commit hook runs it.
+const ts = require('typescript');
+const { default: StyleDictionary } = await import(require.resolve('style-dictionary'));
+const nameKebab = StyleDictionary.hooks.transforms['name/kebab'].transform;
+const compareCodeUnits = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const tokenName = (reference) => nameKebab({ path: reference.slice(1, -1).split('.') }, {});
 
 function workspace(t) {
   const cwd = mkdtempSync(path.join(tmpdir(), 'caelos-component-test-'));
@@ -16,6 +24,24 @@ function workspace(t) {
   mkdirSync(catalog);
   for (const file of readdirSync(fixtureCatalog).filter((name) => name.endsWith('.fixture.json')).sort()) {
     copyFileSync(path.join(fixtureCatalog, file), path.join(catalog, file.replace('.fixture.json', '.tokens.json')));
+  }
+  function fixtureValue(type) {
+    if (type === 'color') return ['#', '142033'].join('');
+    if (type === 'dimension') return { value: 8, unit: 'px' };
+    if (type === 'fontFamily') return ['Fixture Sans'];
+    if (type === 'fontWeight') return Number.parseInt('500', 10);
+    if (type === 'number') return Number.parseFloat('0.5');
+    throw new Error(`No fixture value for ${type}`);
+  }
+  function materialize(node) {
+    if (!node || typeof node !== 'object') return;
+    if (typeof node.$value === 'string' && node.$value === `__FIXTURE_${node.$type}__`) {
+      node.$value = fixtureValue(node.$type);
+    }
+    for (const value of Object.values(node)) materialize(value);
+  }
+  for (const file of ['00-foundations.tokens.json', '01-primitives.tokens.json', '02-controls.tokens.json']) {
+    updateJson(path.join(catalog, file), materialize);
   }
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
   return { cwd, catalog };
@@ -30,10 +56,34 @@ function run(t, { job, outputName = 'generated' } = {}) {
   return { ...result, cwd, catalog, output };
 }
 
-function invoke({ cwd, catalog, output, templates = path.join(root, 'templates') }) {
+function invoke({ cwd, catalog, output, templates = path.join(root, 'templates'), env = {} }) {
   return spawnSync(process.execPath, [
     generator, '--catalog', catalog, '--templates', templates, '--out', output,
-  ], { cwd, encoding: 'utf8' });
+  ], { cwd, encoding: 'utf8', env: { ...process.env, ...env } });
+}
+
+function buildTokens({ cwd, catalog }) {
+  const output = path.join(cwd, 'token-build');
+  const sources = readdirSync(catalog)
+    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
+    .sort(compareCodeUnits)
+    .map((file) => path.join(catalog, file));
+  const result = spawnSync(process.execPath, [path.join(root, 'style-dictionary.config.mjs')], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, CAELOS_TOKEN_SOURCES: JSON.stringify(sources), CAELOS_TOKEN_OUTPUT: output },
+  });
+  assert.equal(result.status, 0, result.stderr);
+  return readFileSync(path.join(output, 'tokens.css'), 'utf8');
+}
+
+function completeButtonRecipe(catalog) {
+  return JSON.parse(readFileSync(path.join(catalog, '02-controls.tokens.json'), 'utf8'))
+    .controls.shared.Button.$extensions['app.caelos'];
+}
+
+function recipeWith(catalog, overrides = {}) {
+  return { ...structuredClone(completeButtonRecipe(catalog)), ...overrides };
 }
 
 function updateJson(file, update) {
@@ -50,11 +100,40 @@ function snapshot(directory) {
   return readdirSync(directory).sort().map((file) => [file, readFileSync(path.join(directory, file), 'utf8')]);
 }
 
-test('(a) a complete Button emits variable-only CSS and attributed elements', (t) => {
-  const result = run(t);
+test('renders every variant and state of the complete Button recipe', (t) => {
+  const work = workspace(t);
+  const tokensCss = buildTokens(work);
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output });
   assert.equal(result.status, 0, result.stderr);
-  const source = readFileSync(path.join(result.output, 'Button.tsx'), 'utf8');
-  const css = readFileSync(path.join(result.output, 'Button.css'), 'utf8');
+  const source = readFileSync(path.join(output, 'Button.tsx'), 'utf8');
+  const css = readFileSync(path.join(output, 'Button.css'), 'utf8');
+  const catalog = JSON.parse(readFileSync(path.join(work.catalog, '02-controls.tokens.json'), 'utf8'));
+  const recipe = catalog.controls.shared.Button.$extensions['app.caelos'];
+  const variants = recipe.variants.variant;
+  const className = 'caelos-controls-shared-button';
+
+  for (const variant of variants) {
+    assert.match(css, new RegExp(`\\.${className}\\[data-variant="${variant}"\\]\\s*\\{`, 'u'));
+    for (const state of recipe.states) {
+      assert.match(css, new RegExp(`\\.${className}\\[data-variant="${variant}"\\]\\[data-state="${state}"\\]`, 'u'));
+    }
+  }
+
+  const selectedPaints = new Set(Object.values(recipe.statePaints).flatMap((states) => Object.values(states)));
+  const expectedReferences = new Set([...selectedPaints].flatMap((paint) =>
+    Object.values(catalog.controls.$extensions['app.caelos'].sharedConstruction.paints[paint])));
+  for (const reference of expectedReferences) {
+    assert.match(css, new RegExp(`var\\(--${tokenName(reference)}\\)`, 'u'), reference);
+  }
+
+  const definitions = new Set([...tokensCss.matchAll(/^\s*(--[a-z0-9-]+)\s*:/gmu)].map((match) => match[1]));
+  const usedVariables = [...css.matchAll(/var\((--[a-z0-9-]+)\)/gu)].map((match) => match[1]);
+  assert.ok(usedVariables.length > 0);
+  for (const variable of usedVariables) assert.ok(definitions.has(variable), `${variable} is not in tokens.css`);
+
+  assert.match(source, new RegExp(`variant = ${JSON.stringify(recipe.defaultVariants.variant)}`, 'u'));
+  assert.match(source, new RegExp(`variant\\?: ${variants.map((variant) => JSON.stringify(variant)).join(' \\| ')}`, 'u'));
   const values = declarations(css);
   assert.ok(values.length > 0, 'fixture should exercise at least one CSS declaration');
   for (const value of values) assert.match(value, /^var\(--[a-z0-9-]+\)$/u);
@@ -66,12 +145,90 @@ test('(a) a complete Button emits variable-only CSS and attributed elements', (t
   }
 });
 
+test('a Button recipe missing statePaints is a gap and writes nothing', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (document) => {
+    delete document.controls.shared.Button.$extensions['app.caelos'].statePaints;
+  });
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /controls\.shared\.Button[^\n]*statePaints/u);
+  assert.ok(!readdirSync(output).some((file) => file.startsWith('Button.')));
+});
+
+test('uses the kebab-case focus-foreground token selected by statePaints', (t) => {
+  const result = run(t);
+  assert.equal(result.status, 0, result.stderr);
+  const css = readFileSync(path.join(result.output, 'Button.css'), 'utf8');
+  assert.match(css, /var\(--primitives-shared-recipes-focus-foreground\)/u);
+  assert.doesNotMatch(css, /focusForeground/u);
+});
+
+test('every generated component is a client module', (t) => {
+  const result = run(t);
+  assert.equal(result.status, 0, result.stderr);
+  for (const file of readdirSync(result.output).filter((name) => name.endsWith('.tsx'))) {
+    assert.ok(readFileSync(path.join(result.output, file), 'utf8').startsWith('"use client";\n'), file);
+  }
+});
+
+test('an empty component index is valid TypeScript', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (document) => {
+    for (const entry of Object.values(document.controls.shared)) {
+      const record = entry?.$extensions?.['app.caelos'];
+      if (!record) continue;
+      record.recipeInStaging = false;
+      delete record.kind;
+    }
+  });
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (document) => {
+    document.overlays.shared = {};
+  });
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output });
+  assert.equal(result.status, 0, result.stderr);
+  const index = readFileSync(path.join(output, 'index.ts'), 'utf8');
+  assert.equal(index, '// Generated by scripts/generate-components.mjs. Do not edit.\nexport {};\n');
+  const parsed = ts.createSourceFile('index.ts', index, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  assert.deepEqual(parsed.parseDiagnostics, []);
+});
+
 test('(b) two runs are byte-identical', (t) => {
   const first = run(t, { outputName: 'first' });
   const second = run(t, { outputName: 'second' });
   assert.equal(first.status, 0, first.stderr);
   assert.equal(second.status, 0, second.stderr);
   assert.deepEqual(snapshot(first.output), snapshot(second.output));
+});
+
+test('generation order is independent of LC_ALL', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(templates);
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'button.mjs'));
+  writeFileSync(path.join(templates, 'span.mjs'), `
+export const requiredFields = ['kind', 'layerOrder'];
+export const interactiveElement = null;
+export function render(model) {
+  return { tsx: \`export function \${model.componentName}() { return <span />; }\`, css: '' };
+}
+`);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (document) => {
+    for (const name of ['Iota', 'Yankee', 'Jot']) {
+      document.controls.shared[name] = { $extensions: { 'app.caelos': {
+        lifecycle: 'draft', recipeInStaging: true, kind: 'span', layerOrder: ['content'],
+      } } };
+    }
+  });
+  const first = path.join(work.cwd, 'c-locale');
+  const second = path.join(work.cwd, 'lt-locale');
+  const cResult = invoke({ ...work, output: first, templates, env: { LC_ALL: 'C' } });
+  const ltResult = invoke({ ...work, output: second, templates, env: { LC_ALL: 'lt_LT.UTF-8' } });
+  assert.equal(cResult.status, 0, cResult.stderr);
+  assert.equal(ltResult.status, 0, ltResult.stderr);
+  assert.deepEqual(snapshot(first), snapshot(second));
 });
 
 test('(c) an entry without a template is listed and not written', (t) => {
@@ -154,10 +311,10 @@ test('(f3) a tier-0 non-paint madeOf reference resolves without becoming a rende
   const work = workspace(t);
   updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (document) => {
     document.overlays.shared.TokenComposite = {
-      $extensions: { 'app.caelos': {
+      $extensions: { 'app.caelos': recipeWith(work.catalog, {
         lifecycle: 'draft', recipeInStaging: true, kind: 'button',
         madeOf: ['base.space.md'], layerOrder: ['base.space.md'],
-      } },
+      }) },
     };
   });
   const output = path.join(work.cwd, 'generated');
@@ -219,10 +376,10 @@ export function render(model) {
   const transitiveCatalog = {
     patterns: {
       shared: {
-        TransitiveComposite: { $extensions: { 'app.caelos': {
+        TransitiveComposite: { $extensions: { 'app.caelos': recipeWith(work.catalog, {
           lifecycle: 'draft', recipeInStaging: true, kind: 'button',
           madeOf: ['overlays.shared.NonInteractiveGroup'], layerOrder: ['overlays.shared.NonInteractiveGroup'],
-        } } },
+        }) } },
       },
     },
   };
@@ -239,16 +396,21 @@ test('(f5) empty generator inputs are refused with the entry and field, and neve
   const cases = [
     {
       name: 'madeOf item', entry: 'overlays.shared.EmptyMadeOf', field: 'madeOf', output: 'EmptyMadeOf',
-      mutate(document) {
-        document.overlays.shared.EmptyMadeOf = { $extensions: { 'app.caelos': {
+      mutate(document, catalog) {
+        document.overlays.shared.EmptyMadeOf = { $extensions: { 'app.caelos': recipeWith(catalog, {
           lifecycle: 'draft', recipeInStaging: true, kind: 'button', madeOf: [''], layerOrder: ['content'],
-        } } };
+        }) } };
       },
       file: '03-overlays.tokens.json',
     },
     {
-      name: 'variant value', entry: 'controls.shared.Button', field: 'variants.tone', output: 'Button',
-      mutate(document) { document.controls.shared.Button.$extensions['app.caelos'].variants = { tone: [''] }; },
+      name: 'variant value', entry: 'controls.shared.Button', field: 'variants.variant', output: 'Button',
+      mutate(document) { document.controls.shared.Button.$extensions['app.caelos'].variants = { variant: [''] }; },
+      file: '02-controls.tokens.json',
+    },
+    {
+      name: 'empty layerOrder', entry: 'controls.shared.Button', field: 'layerOrder', output: 'Button',
+      mutate(document) { document.controls.shared.Button.$extensions['app.caelos'].layerOrder = []; },
       file: '02-controls.tokens.json',
     },
     {
@@ -264,7 +426,7 @@ test('(f5) empty generator inputs are refused with the entry and field, and neve
   for (const fixtureCase of cases) {
     await t.test(fixtureCase.name, (inner) => {
       const work = workspace(inner);
-      updateJson(path.join(work.catalog, fixtureCase.file), fixtureCase.mutate);
+      updateJson(path.join(work.catalog, fixtureCase.file), (document) => fixtureCase.mutate(document, work.catalog));
       const output = path.join(work.cwd, 'generated');
       const result = invoke({ ...work, output });
       assert.equal(result.status, 0, result.stderr);
@@ -281,13 +443,13 @@ test('(attack) a missing madeOf entry is listed without writing a broken import'
   const document = JSON.parse(readFileSync(catalogFile, 'utf8'));
   document.overlays.shared.MissingPartComposite = {
     $extensions: {
-      'app.caelos': {
+      'app.caelos': recipeWith(catalog, {
         lifecycle: 'draft',
         recipeInStaging: true,
         kind: 'button',
         madeOf: ['controls.shared.AbsentPart'],
         layerOrder: ['controls.shared.AbsentPart'],
-      },
+      }),
     },
   };
   writeFileSync(catalogFile, JSON.stringify(document));
