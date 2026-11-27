@@ -14,7 +14,7 @@ import path from 'node:path';
 import {
   baseTree, createContext, guardBaseNone, isRecipeRecord, object, readTreeJson, treeFiles,
 } from './check-recipes.mjs';
-import { buildContentFingerprintRecords } from './build-lock.mjs';
+import { buildContentFingerprintRecords, buildLock } from './build-lock.mjs';
 
 const fingerprintPattern = /^[a-f0-9]{64}$/u;
 const tierFile = /^0[0-5]-[\w.-]+\.tokens\.json$/u;
@@ -23,6 +23,7 @@ function parseArguments(argv) {
   const options = {
     base: undefined,
     candidate: path.resolve(process.cwd()),
+    candidateMode: false,
     gitRoot: path.resolve(process.env.CAELOS_CATALOG_GIT_ROOT || process.cwd()),
     lock: undefined,
     near: undefined,
@@ -44,7 +45,10 @@ function parseArguments(argv) {
     if (value.startsWith('--')) throw new Error(`unknown or incomplete argument: ${flag}`);
     if (flag === '--lock') options.lock = path.resolve(value);
     if (flag === '--near') options.near = path.resolve(value);
-    if (flag === '--candidate') options.candidate = path.resolve(value);
+    if (flag === '--candidate') {
+      options.candidate = path.resolve(value);
+      options.candidateMode = true;
+    }
     if (flag === '--base') options.base = value;
     if (flag === '--git-root') options.gitRoot = path.resolve(value);
     index += 1;
@@ -345,13 +349,22 @@ async function run(options) {
   const hasBase = options.base !== 'none';
   if (!hasBase) guardBaseNone(options);
   let document;
-  try {
-    document = JSON.parse(await readFile(options.lock, 'utf8'));
-  } catch (error) {
-    const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code === 'ENOENT' ? 'missing lock file' : 'unreadable lock file';
-    throw new Error(`${options.lock}: ${reason}`);
+  let lockLabel = options.lock;
+  if (options.candidateMode) {
+    lockLabel = `trusted rebuild of ${options.candidate}`;
+    document = await buildLock({
+      catalog: path.join(options.candidate, 'token_catalog'),
+      schema: path.join(options.candidate, 'token_catalog/recipe.schema.json'),
+    });
+  } else {
+    try {
+      document = JSON.parse(await readFile(options.lock, 'utf8'));
+    } catch (error) {
+      const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code === 'ENOENT' ? 'missing lock file' : 'unreadable lock file';
+      throw new Error(`${options.lock}: ${reason}`);
+    }
   }
-  const records = readFingerprints(document, options.lock, await recordEntryNames(options.candidate));
+  const records = readFingerprints(document, lockLabel, await recordEntryNames(options.candidate));
   let entryComparison;
   let variantComparison;
   let baseIndex;

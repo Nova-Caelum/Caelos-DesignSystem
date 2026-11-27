@@ -33,6 +33,14 @@ function workspace(t) {
   return { cwd, catalog, lock: path.join(catalog, 'versions.lock.json') };
 }
 
+function liveWorkspace(t) {
+  const cwd = mkdtempSync(path.join(tmpdir(), 'caelos-live-lock-test-'));
+  const catalog = path.join(cwd, 'token_catalog');
+  cpSync(path.join(root, 'token_catalog'), catalog, { recursive: true });
+  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  return { cwd, catalog, lock: path.join(catalog, 'versions.lock.json') };
+}
+
 function build({ cwd, catalog, lock }, extra = []) {
   return spawnSync(process.execPath, [
     builder, '--catalog', catalog, '--schema', path.join(catalog, 'recipe.schema.json'), '--out', lock, ...extra,
@@ -166,6 +174,26 @@ test('(e) dependents walk references, including madeOf, without value-based fals
     'primitives.shared.equal-a',
     'primitives.shared.equal-a.fill',
   ]);
+});
+
+test('a sharedConstruction selector remap moves the button fingerprint', (t) => {
+  const work = liveWorkspace(t);
+  assert.equal(build(work).status, 0);
+  const before = lock(work).entries['controls.shared.button'].fingerprint;
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (data) => {
+    data.controls.$extensions['app.caelos'].sharedConstruction.parameters.spacing['15px'] =
+      '{base.space.px-12}';
+  });
+  const result = build(work);
+  assert.equal(result.status, 0, result.stderr);
+  assert.notEqual(lock(work).entries['controls.shared.button'].fingerprint, before);
+});
+
+test('--dependents includes a control reached only through sharedConstruction', (t) => {
+  const work = liveWorkspace(t);
+  const result = build(work, ['--dependents', 'base.space.px-15']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(result.stdout.trim().split('\n').includes('controls.shared.button'));
 });
 
 test('(f) description edits change the change fingerprint but not the content fingerprint', (t) => {
@@ -384,15 +412,19 @@ test('(i) check:generated fails closed when the build fails', (t) => {
 });
 
 test('(k) check:generated skips a candidate tree without running its build', (t) => {
-  const cwd = generatedWorkspace(t);
-  const packageFile = path.join(cwd, 'package.json');
-  const pkg = JSON.parse(readFileSync(packageFile, 'utf8'));
-  pkg.scripts.build = 'node -e "throw new Error(\\\'candidate build ran\\\')"';
-  writeFileSync(packageFile, `${JSON.stringify(pkg, null, 2)}\n`);
+  const work = workspace(t);
+  assert.equal(build(work).status, 0);
+  writeFileSync(path.join(work.cwd, 'package.json'), `${JSON.stringify({
+    private: true,
+    scripts: { build: 'node -e "throw new Error(\\\'candidate build ran\\\')"' },
+  }, null, 2)}\n`);
 
-  const result = command(cwd, process.execPath, [generatedCheck, '--candidate', cwd]);
+  const result = command(work.cwd, process.execPath, [generatedCheck, '--candidate', work.cwd]);
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-  assert.equal(result.stdout, 'check:generated: skipped for a candidate tree; the pull request\'s own build is checked by the unit workflow\n');
+  assert.equal(
+    result.stdout,
+    'check:generated: candidate lock matches trusted rebuild; component outputs skipped\n',
+  );
   assert.equal(result.stderr, '');
 });
 

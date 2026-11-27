@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveControlCatalog } from '../src/tier-2/control-catalog.mjs';
 
 const appExtension = 'app.caelos';
 const referencePattern = /^\{([^{}]+)\}$/u;
@@ -97,6 +98,15 @@ function catalogFromSources(sources) {
   return { entries, tokens };
 }
 
+function expandControlSources(sources) {
+  return sources.map(({ file, root }) => ({
+    file,
+    root: root?.controls?.$extensions?.[appExtension]?.sharedConstruction
+      ? resolveControlCatalog(root)
+      : root,
+  }));
+}
+
 async function loadCatalog(directory) {
   const files = (await readdir(directory))
     .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
@@ -105,7 +115,8 @@ async function loadCatalog(directory) {
     file,
     root: JSON.parse(await readFile(path.join(directory, file), 'utf8')),
   })));
-  return { ...catalogFromSources(sources), sources };
+  const expandedSources = expandControlSources(sources);
+  return { ...catalogFromSources(expandedSources), sources: expandedSources };
 }
 
 function variantSelections(definitions) {
@@ -267,7 +278,11 @@ function hasTokenReference(value) {
 }
 
 export function buildContentFingerprintRecords(sources) {
-  const catalog = catalogFromSources(sources);
+  const catalog = catalogFromSources(expandControlSources(sources));
+  return contentFingerprintRecords(catalog);
+}
+
+function contentFingerprintRecords(catalog) {
   const resolver = createContentResolver(catalog);
   const records = new Map();
   for (const name of [...catalog.entries.keys()].sort()) {
@@ -352,29 +367,12 @@ function createDependencyWalker(catalog, clean) {
   return { entryDependencies };
 }
 
-async function run(options) {
-  const schema = JSON.parse(await readFile(options.schema, 'utf8'));
-  const catalog = await loadCatalog(options.catalog);
+async function buildLockModel(catalogDirectory, schemaFile) {
+  const schema = JSON.parse(await readFile(schemaFile, 'utf8'));
+  const catalog = await loadCatalog(catalogDirectory);
   const changeResolver = createResolver(catalog, ignoredFields(schema, 'x-caelos-ignore-for-change'));
-  const contentRecords = buildContentFingerprintRecords(catalog.sources);
+  const contentRecords = contentFingerprintRecords(catalog);
   const walker = createDependencyWalker(catalog, changeResolver.clean);
-
-  if (options.dependents !== undefined) {
-    const target = catalog.tokens.get(options.dependents);
-    if (!target || !target.some(({ tier }) => tier === 0)) {
-      throw new Error(`Not a tier 0 token: ${options.dependents}`);
-    }
-    const matches = [];
-    for (const [name, definitions] of catalog.entries) {
-      if (!walker.entryDependencies(name).has(options.dependents)) continue;
-      matches.push(name);
-      for (const selection of variantSelections(definitions)) {
-        if (Object.keys(selection).length > 0) matches.push(`${name}#${selectionName(selection)}`);
-      }
-    }
-    process.stdout.write(matches.sort().map((name) => `${name}\n`).join(''));
-    return;
-  }
 
   const entries = {};
   let variantCount = 0;
@@ -402,10 +400,43 @@ async function run(options) {
       ...(emptyVariants.length ? { emptyVariants } : {}),
     };
   }
-  const output = `${JSON.stringify(canonical({ entries }), null, 2)}\n`;
+  return {
+    catalog,
+    document: canonical({ entries }),
+    variantCount,
+    walker,
+  };
+}
+
+export async function buildLock({ catalog, schema }) {
+  return (await buildLockModel(catalog, schema)).document;
+}
+
+async function run(options) {
+  const model = await buildLockModel(options.catalog, options.schema);
+  if (options.dependents !== undefined) {
+    const target = model.catalog.tokens.get(options.dependents);
+    if (!target || !target.some(({ tier }) => tier === 0)) {
+      throw new Error(`Not a tier 0 token: ${options.dependents}`);
+    }
+    const matches = [];
+    for (const [name, definitions] of model.catalog.entries) {
+      if (!model.walker.entryDependencies(name).has(options.dependents)) continue;
+      matches.push(name);
+      for (const selection of variantSelections(definitions)) {
+        if (Object.keys(selection).length > 0) matches.push(`${name}#${selectionName(selection)}`);
+      }
+    }
+    process.stdout.write(matches.sort().map((name) => `${name}\n`).join(''));
+    return;
+  }
+
+  const output = `${JSON.stringify(model.document, null, 2)}\n`;
   await mkdir(path.dirname(options.out), { recursive: true });
   await writeFile(options.out, output);
-  process.stdout.write(`Built lock: ${Object.keys(entries).length} entries, ${variantCount} variants\n`);
+  process.stdout.write(
+    `Built lock: ${Object.keys(model.document.entries).length} entries, ${model.variantCount} variants\n`,
+  );
 }
 
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {

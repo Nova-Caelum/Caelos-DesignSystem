@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { lstatSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
+import { buildLock } from './build-lock.mjs';
 
 const generatedDirectory = 'generated';
 const lockFile = 'token_catalog/versions.lock.json';
@@ -8,6 +10,20 @@ const lockFile = 'token_catalog/versions.lock.json';
 function candidateDirectory(args) {
   const index = args.indexOf('--candidate');
   return index < 0 ? undefined : args[index + 1];
+}
+
+function firstDifferingEntry(committed, rebuilt) {
+  const committedEntries = committed?.entries;
+  const rebuiltEntries = rebuilt?.entries;
+  if (!committedEntries || typeof committedEntries !== 'object' || Array.isArray(committedEntries)) {
+    return '<entries>';
+  }
+  for (const name of [...new Set([
+    ...Object.keys(committedEntries), ...Object.keys(rebuiltEntries),
+  ])].sort()) {
+    if (!isDeepStrictEqual(committedEntries[name], rebuiltEntries[name])) return name;
+  }
+  return isDeepStrictEqual(committed, rebuilt) ? undefined : '<document>';
 }
 
 function run(command, args, options = {}) {
@@ -129,7 +145,24 @@ if (args.includes('--candidate')) {
     process.exitCode = 2;
   }
   if (!process.exitCode) {
-    console.log("check:generated: skipped for a candidate tree; the pull request's own build is checked by the unit workflow");
+    try {
+      const catalog = path.join(candidate, 'token_catalog');
+      const committed = JSON.parse(readFileSync(path.join(candidate, lockFile), 'utf8'));
+      const rebuilt = await buildLock({
+        catalog,
+        schema: path.join(catalog, 'recipe.schema.json'),
+      });
+      const differing = firstDifferingEntry(committed, rebuilt);
+      if (differing) {
+        console.error(`check:generated: candidate lock differs from trusted rebuild at entry: ${differing}`);
+        process.exitCode = 1;
+      } else {
+        console.log('check:generated: candidate lock matches trusted rebuild; component outputs skipped');
+      }
+    } catch (error) {
+      console.error(`check:generated: could not rebuild candidate lock: ${error.message}`);
+      process.exitCode = 1;
+    }
   }
 } else {
   const build = run('npm', ['run', 'build'], { cwd: process.cwd(), stdio: 'inherit' });
