@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "lifecycle": { "type": "string", "x-caelos-ignore-for-change": true },
+    "draftedBy": { "type": "string", "x-caelos-ignore-for-change": true },
+    "gapFill": { "type": "string", "x-caelos-ignore-for-change": true },
+    "madeOf": { "type": "array", "items": { "type": "string" } }
+  }
+}

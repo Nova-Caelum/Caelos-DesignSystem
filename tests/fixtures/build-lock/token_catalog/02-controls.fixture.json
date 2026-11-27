@@ -1,0 +1,49 @@
+{
+  "controls": {
+    "shared": {
+      "button": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "draftedBy": "fixture",
+            "madeOf": ["primitives.shared.surface"],
+            "variants": {
+              "size": ["small", "large"],
+              "tone": ["primary", "quiet"]
+            },
+            "defaultVariants": { "size": "small", "tone": "primary" }
+          }
+        },
+        "padding": {
+          "$type": "dimension",
+          "$value": "{base.space.medium}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "independent": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["primitives.shared.spacing"]
+          }
+        }
+      },
+      "same-value-a": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["primitives.shared.equal-a"]
+          }
+        }
+      },
+      "same-value-b": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["primitives.shared.equal-b"]
+          }
+        }
+      }
+    }
+  }
+}
