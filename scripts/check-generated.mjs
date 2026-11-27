@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { lstatSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { lstatSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const generatedDirectory = 'generated';
@@ -63,12 +63,41 @@ function stagedFiles(gitRoot) {
   return files;
 }
 
-function compareBuildToIndex(root, gitRoot) {
+function buildOwnedGeneratedFiles(root) {
+  const generated = path.join(root, generatedDirectory);
+  const holdingDirectory = mkdtempSync(path.join(root, '.check-generated-owner-'));
+  const original = path.join(holdingDirectory, generatedDirectory);
+  let moved = false;
+  try {
+    try {
+      if (lstatSync(generated).isDirectory()) {
+        renameSync(generated, original);
+        moved = true;
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+    const build = run('npm', ['run', 'build'], { cwd: root, stdio: 'inherit' });
+    if (build.status !== 0) throw new Error('could not determine generated-file ownership from a clean build');
+    return new Set(generatedFiles(root).filter((file) => file.startsWith(`${generatedDirectory}/`)));
+  } finally {
+    rmSync(generated, { recursive: true, force: true });
+    if (moved) renameSync(original, generated);
+    rmSync(holdingDirectory, { recursive: true, force: true });
+  }
+}
+
+function compareBuildToIndex(root, gitRoot, ownedGenerated) {
   const staged = stagedFiles(gitRoot);
   const built = new Set(generatedFiles(root));
   const files = [...new Set([...staged.keys(), ...built])].sort();
   let clean = true;
   for (const file of files) {
+    if (file.startsWith(`${generatedDirectory}/`) && !ownedGenerated.has(file)) {
+      console.error(`check:generated: generated file has no build owner: ${file}`);
+      clean = false;
+      continue;
+    }
     const hash = staged.get(file);
     if (!hash) {
       console.error(`check:generated: generated file is not staged: ${file}`);
@@ -103,14 +132,15 @@ if (args.includes('--candidate')) {
     console.log("check:generated: skipped for a candidate tree; the pull request's own build is checked by the unit workflow");
   }
 } else {
-  const build = run('npm', ['run', 'build'], { stdio: 'inherit' });
+  const build = run('npm', ['run', 'build'], { cwd: process.cwd(), stdio: 'inherit' });
   if (build.status !== 0) {
     process.exitCode = build.status ?? 1;
   } else {
     try {
       const root = process.cwd();
       const gitRoot = path.resolve(process.env.CAELOS_CATALOG_GIT_ROOT || root);
-      if (!compareBuildToIndex(root, gitRoot)) process.exitCode = 1;
+      const ownedGenerated = buildOwnedGeneratedFiles(root);
+      if (!compareBuildToIndex(root, gitRoot, ownedGenerated)) process.exitCode = 1;
     } catch (error) {
       console.error(`check:generated: ${error.message}`);
       process.exitCode = 1;

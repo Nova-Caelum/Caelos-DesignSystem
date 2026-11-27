@@ -51,6 +51,42 @@ function hasField(record, node, field) {
   return value !== undefined && value !== null;
 }
 
+function fieldValue(record, node, field) {
+  const segments = field.split('.');
+  let value = Object.hasOwn(record, segments[0]) ? record : node;
+  for (const segment of segments) {
+    if (value === null || typeof value !== 'object' || !Object.hasOwn(value, segment)) return undefined;
+    value = value[segment];
+  }
+  return value;
+}
+
+function isEmpty(value) {
+  if (typeof value === 'string') return value.trim() === '';
+  if (Array.isArray(value)) return value.length === 0;
+  if (value && typeof value === 'object') return Object.keys(value).length === 0;
+  return value === undefined || value === null;
+}
+
+function emptyVariantField(variants, segments = ['variants']) {
+  if (typeof variants === 'string') return variants.trim() === '' ? segments.join('.') : null;
+  if (Array.isArray(variants)) {
+    if (variants.length === 0) return segments.join('.');
+    for (let index = 0; index < variants.length; index += 1) {
+      const found = emptyVariantField(variants[index], segments);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (!variants || typeof variants !== 'object') return null;
+  if (Object.keys(variants).length === 0) return segments.join('.');
+  for (const key of Object.keys(variants).sort()) {
+    const found = emptyVariantField(variants[key], [...segments, key]);
+    if (found) return found;
+  }
+  return null;
+}
+
 function identifier(value) {
   const words = value
     .replace(/([a-z0-9])([A-Z])/gu, '$1 $2')
@@ -90,17 +126,25 @@ function tokenVariables(node, entrySegments) {
 
 async function loadTemplates(directory) {
   const templates = new Map();
-  const files = (await readdir(directory, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.mjs'))
-    .map((entry) => entry.name)
-    .sort();
-  for (const file of files) {
+  async function filesBelow(current, relative = '') {
+    const found = [];
+    for (const entry of (await readdir(current, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name))) {
+      const childRelative = path.join(relative, entry.name);
+      if (entry.isDirectory()) found.push(...await filesBelow(path.join(current, entry.name), childRelative));
+      else if (entry.isFile() && entry.name.endsWith('.mjs')) found.push(childRelative);
+    }
+    return found;
+  }
+  for (const file of await filesBelow(directory)) {
     const kind = path.basename(file, '.mjs');
+    if (templates.has(kind)) {
+      throw new Error(`duplicate template kind "${kind}" in ${templates.get(kind).file} and ${file}`);
+    }
     const template = await import(pathToFileURL(path.join(directory, file)).href);
     if (!Array.isArray(template.requiredFields) || typeof template.render !== 'function') {
       throw new Error(`${file} must export requiredFields and render`);
     }
-    templates.set(kind, template);
+    templates.set(kind, { ...template, file });
   }
   return templates;
 }
@@ -116,6 +160,15 @@ async function loadCatalog(directory) {
     const root = JSON.parse(await readFile(path.join(directory, file), 'utf8'));
     function visit(node, segments = []) {
       if (!node || typeof node !== 'object' || Array.isArray(node)) return;
+      if (tier === 0 && Object.hasOwn(node, '$value')) {
+        allEntries.set(segments.join('.'), {
+          name: segments.join('.'), segments, tier, node, record: extension(node) ?? {},
+          componentName: identifier(segments.at(-1)),
+          className: `caelos-${segments.map(kebab).join('-')}`,
+          variables: {},
+        });
+        return;
+      }
       if (tier > 0 && segments.length === 3) {
         const record = extension(node);
         if (!record) return;
@@ -158,6 +211,31 @@ function orderParts(entry, parts) {
   });
 }
 
+function nestedInteractivePath(entry, parts, allEntries, templates, interactiveElement) {
+  function visit(part, path, ancestors) {
+    if (ancestors.has(part.name)) return null;
+    const nextPath = [...path, part];
+    const partTemplate = templates.get(part.record.kind);
+    if (partTemplate?.interactiveElement === interactiveElement) return nextPath;
+    const nextAncestors = new Set(ancestors);
+    nextAncestors.add(part.name);
+    const madeOf = Array.isArray(part.record.madeOf) ? part.record.madeOf : [];
+    for (const name of madeOf) {
+      const child = allEntries.get(name);
+      if (!child) continue;
+      const nested = visit(child, nextPath, nextAncestors);
+      if (nested) return nested;
+    }
+    return null;
+  }
+
+  for (const part of parts) {
+    const nested = visit(part, [entry], new Set([entry.name]));
+    if (nested) return nested;
+  }
+  return null;
+}
+
 async function generate(options) {
   const templates = await loadTemplates(options.templates);
   const { allEntries, candidates } = await loadCatalog(options.catalog);
@@ -172,31 +250,58 @@ async function generate(options) {
       gaps.push(gap(entry, 'missing required field "kind"', 'kind'));
       continue;
     }
+    if (isEmpty(fieldValue(entry.record, entry.node, 'kind'))) {
+      gaps.push(gap(entry, 'empty required field "kind"', 'kind'));
+      continue;
+    }
     const template = templates.get(entry.record.kind);
     if (!template) {
       gaps.push(gap(entry, `no template for kind "${entry.record.kind}"`));
       continue;
     }
-    const missing = template.requiredFields.find((field) => !hasField(entry.record, entry.node, field));
+    const missing = template.requiredFields.find((field) => !hasField(entry.record, entry.node, field) ||
+      isEmpty(fieldValue(entry.record, entry.node, field)));
     if (missing) {
-      gaps.push(gap(entry, `missing required field "${missing}"`, missing));
+      gaps.push(gap(entry, `missing or empty required field "${missing}"`, missing));
       continue;
     }
-    if (entry.tier > 2 && !hasField(entry.record, entry.node, 'madeOf')) {
+    if (entry.tier > 2 && (!hasField(entry.record, entry.node, 'madeOf') ||
+      isEmpty(fieldValue(entry.record, entry.node, 'madeOf')))) {
       gaps.push(gap(entry, 'missing required field "madeOf"', 'madeOf'));
       continue;
     }
     const madeOf = Array.isArray(entry.record.madeOf) ? entry.record.madeOf : [];
+    const emptyMadeOf = madeOf.findIndex((name) => typeof name !== 'string' || name.trim() === '');
+    if (emptyMadeOf !== -1) {
+      gaps.push(gap(entry, `empty value in field "madeOf" at index ${emptyMadeOf}`, 'madeOf'));
+      continue;
+    }
+    const emptyVariant = hasField(entry.record, entry.node, 'variants')
+      ? emptyVariantField(fieldValue(entry.record, entry.node, 'variants')) : null;
+    if (emptyVariant) {
+      gaps.push(gap(entry, `empty value in field "${emptyVariant}"`, emptyVariant));
+      continue;
+    }
     const missingPart = madeOf.find((name) => !allEntries.has(name));
     if (missingPart) {
       gaps.push(gap(entry, `madeOf names missing entry "${missingPart}"`, 'madeOf'));
       continue;
     }
-    const parts = madeOf.map((name) => allEntries.get(name));
+    const dependencies = madeOf.map((name) => allEntries.get(name));
+    const parts = dependencies.filter((part) => part.tier > 0);
     if (entry.tier > 2) {
       const unbuiltPart = parts.find((part) => !generated.has(part.name));
       if (unbuiltPart) {
         gaps.push(gap(entry, `madeOf part "${unbuiltPart.name}" was not generated`, 'madeOf'));
+        continue;
+      }
+      const interactivePath = typeof template.interactiveElement === 'string'
+        ? nestedInteractivePath(entry, parts, allEntries, templates, template.interactiveElement)
+        : null;
+      if (interactivePath) {
+        gaps.push(gap(entry,
+          `interactive ${template.interactiveElement} part "${interactivePath.at(-1).name}" would nest inside the same interactive element via ${interactivePath.map((part) => part.name).join(' → ')}`,
+          'madeOf'));
         continue;
       }
     }
