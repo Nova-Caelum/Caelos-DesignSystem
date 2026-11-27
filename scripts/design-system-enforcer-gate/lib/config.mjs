@@ -121,7 +121,9 @@ function withPagePaintConfig(raw) {
   }
   const pages = JSON.parse(process.env.CAELOS_PAGE_PAINT_PAGES ?? "null");
   if (!Array.isArray(pages) || pages.length === 0 || pages.some((page) => typeof page !== "string" || page.trim() === "")) throw new Error("page paint pass requires page globs");
-  return deepMerge(deepMerge(raw, overlay), { scan: { include: pages } });
+  const paintRaw = deepMerge(deepMerge(raw, overlay), { scan: { include: pages } });
+  paintRaw.scan.exclude = overlay.scan?.exclude ?? DEFAULTS.scan.exclude;
+  return paintRaw;
 }
 
 function applyPagePaintDimensions(dims) {

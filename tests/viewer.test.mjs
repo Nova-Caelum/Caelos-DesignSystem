@@ -258,7 +258,7 @@ test('(f) state cards use a token-based responsive grid without horizontal clipp
 
 test('(g) skipped live entries are named with generator reasons', () => {
   assertBuildPassed();
-  assert.match(html, /not generated: missing required field &quot;layerOrder&quot;/u);
+  assert.match(html, /not generated: missing or empty required field &quot;layerOrder&quot;/u);
   assert.match(html, /not generated: no template for kind &quot;viewer-fixture-unknown&quot;/u);
 });
 
