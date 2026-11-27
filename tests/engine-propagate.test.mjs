@@ -257,7 +257,21 @@ function makeWork(t, {
   });
 }
 
-function makeLiveTokenWork(t, { token, value }) {
+function replaceDeclaration(file, property, value) {
+  const source = readFileSync(file, 'utf8');
+  const escaped = property.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+  const pattern = new RegExp(`^(\\s*${escaped}\\s*:)\\s*[^;]*;`, 'mu');
+  assert.match(source, pattern);
+  writeFileSync(file, source.replace(pattern, `$1 ${value};`));
+}
+
+function makeLiveTokenWork(t, {
+  token,
+  value,
+  omitBuiltOutputs = false,
+  staleGenerated = false,
+  staleLiteral = null,
+}) {
   const work = mkdtempSync(path.join(tmpdir(), 'engine-propagate-live-'));
   const designSystem = path.join(work, 'design-system');
   const jobFolder = path.join(work, 'job');
@@ -270,6 +284,15 @@ function makeLiveTokenWork(t, { token, value }) {
     path.join(designSystem, 'generated', 'components', 'index.ts'),
   );
   buildTokens(designSystem);
+  if (staleLiteral) {
+    replaceDeclaration(
+      path.join(designSystem, 'generated', 'tokens.css'),
+      staleLiteral.property,
+      staleLiteral.value,
+    );
+  }
+  const baseTokenCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
+  const baseThemeCss = readFileSync(path.join(designSystem, 'generated', 'tailwind-theme.css'), 'utf8');
   buildLock(designSystem);
   command(designSystem, 'git', 'init', '-q');
   const designBase = commit(designSystem, 'live catalog base');
@@ -285,8 +308,10 @@ function makeLiveTokenWork(t, { token, value }) {
         outputs: [
           { path: 'token_catalog/00-foundations.tokens.json', tierFile: true },
           { path: 'token_catalog/versions.lock.json' },
-          { path: 'generated/tokens.css' },
-          { path: 'generated/tailwind-theme.css' },
+          ...(!omitBuiltOutputs ? [
+            { path: 'generated/tokens.css' },
+            { path: 'generated/tailwind-theme.css' },
+          ] : []),
         ],
       },
     },
@@ -298,8 +323,20 @@ function makeLiveTokenWork(t, { token, value }) {
   ].map(JSON.stringify).join('\n') + '\n');
   const edit = applyPropagateEdit({ jobFolder });
   buildTokens(designSystem);
+  if (staleGenerated) {
+    writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), baseTokenCss);
+    writeFileSync(path.join(designSystem, 'generated', 'tailwind-theme.css'), baseThemeCss);
+  } else if (staleLiteral) {
+    replaceDeclaration(
+      path.join(designSystem, 'generated', 'tokens.css'),
+      staleLiteral.property,
+      staleLiteral.value,
+    );
+  }
   buildLock(designSystem);
-  edit.generated_outputs = ['generated/tokens.css', 'generated/tailwind-theme.css'];
+  edit.generated_outputs = omitBuiltOutputs
+    ? []
+    : ['generated/tokens.css', 'generated/tailwind-theme.css'];
   writeFileSync(path.join(jobFolder, 'propagate-edit.json'), `${JSON.stringify(edit, null, 2)}\n`);
   const expected = collectExpectedDependents({ jobFolder });
   writeFileSync(path.join(jobFolder, 'expected-dependents.json'), `${JSON.stringify(expected, null, 2)}\n`);
@@ -310,6 +347,17 @@ function makeLiveTokenWork(t, { token, value }) {
   }, null, 2)}\n`);
   t.after(() => rmSync(work, { recursive: true, force: true }));
   return { work, designSystem, jobFolder, designBase, designCommit };
+}
+
+function assertDependentPartition(report) {
+  const buckets = [
+    ...report.actual_dependents,
+    ...report.missed_dependents,
+    ...report.dependents_without_built_output.map(({ name }) => name),
+  ];
+  assert.equal(buckets.length, report.expected_dependents.length);
+  assert.equal(new Set(buckets).size, buckets.length);
+  assert.deepEqual(new Set(buckets), new Set(report.expected_dependents));
 }
 
 test('criterion 1: one tier-0 edit misses no dependent, calls no model, and changes no non-dependent', async (t) => {
@@ -360,6 +408,61 @@ test('a clean base.size.px-32 real build passes with Badge listed without built 
   assert.equal(report.dependents_missed, 0);
   assert.deepEqual(report.actual_dependents.filter((name) => badges.includes(name)), []);
   assert.deepEqual(report.dependents_without_built_output.map(({ name }) => name), badges);
+});
+
+test('case 1: a stale emitted declaration is missed and names its token entry', async (t) => {
+  const work = makeLiveTokenWork(t, {
+    token: 'base.space.px-15',
+    value: { value: 20, unit: 'px' },
+    staleLiteral: {
+      property: '--controls-shared-tab-trigger-pad-x',
+      value: '15px',
+    },
+  });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.missed_dependents.includes('controls.shared.tabTrigger.pad-x'));
+  assert.ok(!report.dependents_without_built_output
+    .some(({ name }) => name === 'controls.shared.tabTrigger.pad-x'));
+  assertDependentPartition(report);
+
+  const result = spawnSync(process.execPath, [
+    path.join(root, 'engine', 'lib', 'propagate-report.mjs'),
+    'write-propagate-report', '--job', work.jobFolder,
+  ], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stderr, /controls\.shared\.tabTrigger\.pad-x/u);
+});
+
+test('mutation has-built-output-from-run: omitted job outputs cannot hide a stale edited token', async (t) => {
+  const work = makeLiveTokenWork(t, {
+    token: 'base.space.px-15',
+    value: { value: 20, unit: 'px' },
+    omitBuiltOutputs: true,
+    staleGenerated: true,
+  });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.missed_dependents.includes('base.space.px-15'));
+  assert.ok(!report.dependents_without_built_output
+    .some(({ name }) => name === 'base.space.px-15'));
+  assertDependentPartition(report);
+
+  const result = spawnSync(process.execPath, [
+    path.join(root, 'engine', 'lib', 'propagate-report.mjs'),
+    'write-propagate-report', '--job', work.jobFolder,
+  ], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stderr, /base\.space\.px-15/u);
+});
+
+test('attack: expected dependents cannot omit the edited token', async (t) => {
+  const work = await makeWork(t);
+  const expectedFile = path.join(work.jobFolder, 'expected-dependents.json');
+  const expected = json(expectedFile).filter((name) => name !== 'base.space.px-16');
+  writeFileSync(expectedFile, `${JSON.stringify(expected, null, 2)}\n`);
+  await assert.rejects(
+    writePropagateReport({ jobFolder: work.jobFolder }),
+    /must include edited token base\.space\.px-16/u,
+  );
 });
 
 test('a construction group with no theme alias does not miss its outputless control', async (t) => {

@@ -14,6 +14,12 @@ const { default: StyleDictionary } = await import(require.resolve('style-diction
 const repositoryRoot = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const lockBuilder = path.join(repositoryRoot, 'scripts', 'build-lock.mjs');
 const lockFile = 'token_catalog/versions.lock.json';
+// These are the destinations declared by the token build's CSS platform.
+// Reporting must not infer them from a particular job's output allow-list.
+const tokenBuildOutputPaths = [
+  'generated/tokens.css',
+  'generated/tailwind-theme.css',
+];
 const pinFiles = new Set([
   'package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock',
 ]);
@@ -297,6 +303,52 @@ function outputOwnership(...catalogs) {
   return { properties, components };
 }
 
+function sourcePropertyReferences(...catalogs) {
+  const references = new Map();
+  function collect(value, found) {
+    if (typeof value === 'string') {
+      for (const match of value.matchAll(/\{([^{}]+)\}/gu)) {
+        found.add(`--${tokenName(match[1].split('.'))}`);
+      }
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) collect(item, found);
+      return;
+    }
+    if (value && typeof value === 'object') {
+      for (const item of Object.values(value)) collect(item, found);
+    }
+  }
+  for (const catalog of catalogs) {
+    for (const { root } of catalog.values()) {
+      function visit(node, segments = []) {
+        if (!node || typeof node !== 'object' || Array.isArray(node)) return;
+        if (Object.hasOwn(node, '$value')) {
+          const property = `--${tokenName(segments)}`;
+          const found = references.get(property) ?? new Set();
+          collect(node.$value, found);
+          references.set(property, found);
+          return;
+        }
+        for (const key of Object.keys(node).filter((key) => !key.startsWith('$')).sort()) {
+          visit(node[key], [...segments, key]);
+        }
+      }
+      visit(root);
+    }
+  }
+  return references;
+}
+
+function sourcePropertyReaches(references, property, target, visiting = new Set()) {
+  if (property === target) return true;
+  if (visiting.has(property)) return false;
+  const next = new Set(visiting).add(property);
+  return [...(references.get(property) ?? [])]
+    .some((reference) => sourcePropertyReaches(references, reference, target, next));
+}
+
 function declarations(source) {
   const result = new Map();
   for (const match of (source ?? '').matchAll(/^\s*(--[\w-]+)\s*:\s*.*;.*$/gmu)) {
@@ -561,41 +613,46 @@ export async function writePropagateReport({ jobFolder }) {
   if (!Array.isArray(expected) || expected.some((name) => typeof name !== 'string')) {
     throw new Error('expected-dependents.json must be a string array');
   }
+  if (new Set(expected).size !== expected.length) {
+    throw new Error('expected-dependents.json must not contain duplicate dependents');
+  }
   const edit = readJson(path.join(jobFolder, 'propagate-edit.json'), 'propagate-edit.json');
   if (!Array.isArray(edit.generated_outputs)
       || edit.generated_outputs.some((output) => typeof output !== 'string')) {
     throw new Error('propagate-edit.json must contain generated_outputs as a string array');
   }
+  if (!expected.includes(edit.token)) {
+    throw new Error(`expected-dependents.json must include edited token ${edit.token}`);
+  }
   const designChanged = changedFiles(design.folder, design.baseCommit, state.designSystemMergeCommit);
   const beforeCatalog = catalogDocuments(design.folder, design.baseCommit);
   const afterCatalog = catalogDocuments(design.folder, state.designSystemMergeCommit);
   const ownership = outputOwnership(beforeCatalog, afterCatalog);
-  const outputPaths = [...new Set([
-    ...(design.outputs ?? [])
-      .filter((output) => !output.tierFile && output.path !== lockFile)
-      .map((output) => output.path),
-    ...edit.generated_outputs,
-  ])].sort();
+  const sourceReferences = sourcePropertyReferences(beforeCatalog, afterCatalog);
   const componentPaths = [...new Set([
     ...componentFilesAt(design.folder, design.baseCommit),
     ...componentFilesAt(design.folder, state.designSystemMergeCommit),
   ])].sort();
+  const builtOutputPaths = [...new Set([
+    ...tokenBuildOutputPaths,
+    ...componentPaths,
+  ])].sort();
   const beforeBuilt = builtDeclarations({
     folder: design.folder,
     commit: design.baseCommit,
-    outputPaths,
+    outputPaths: tokenBuildOutputPaths,
   });
   const afterBuilt = builtDeclarations({
     folder: design.folder,
     commit: state.designSystemMergeCommit,
-    outputPaths,
+    outputPaths: tokenBuildOutputPaths,
   });
   const editedProperty = `--${tokenName(tokenSegments(edit.token))}`;
   const outputChanges = changedOutputEntries({
     folder: design.folder,
     base: design.baseCommit,
     head: state.designSystemMergeCommit,
-    outputPaths: [...new Set([...outputPaths, ...componentPaths])],
+    outputPaths: builtOutputPaths,
     ownership,
   });
   const changedEntries = outputChanges.entries;
@@ -619,19 +676,22 @@ export async function writePropagateReport({ jobFolder }) {
   });
   const ownProperties = new Map();
   for (const [property, owners] of ownership.properties) {
-    if (!beforeBuilt.properties.has(property) && !afterBuilt.properties.has(property)) continue;
     for (const owner of owners) addToMapSet(ownProperties, owner, property);
   }
+  const entriesWithGeneratedComponents = new Set([
+    ...beforeComponents.keys(),
+    ...afterComponents.keys(),
+  ]);
   const classifications = expected.map((entry) => {
     const baseEntry = entry.split('#')[0];
     const properties = ownProperties.get(baseEntry) ?? new Set();
-    const relevantProperties = [...properties].filter((property) => (
-      declarationReaches(beforeBuilt.properties, property, editedProperty)
-      || declarationReaches(afterBuilt.properties, property, editedProperty)
-    ));
+    const relevantProperties = [...properties]
+      .filter((property) => sourcePropertyReaches(sourceReferences, property, editedProperty));
     const components = afterComponents.get(baseEntry) ?? [];
-    if (relevantProperties.length === 0 && components.length === 0) {
-      return { entry, withoutBuiltOutput: true, reached: false };
+    const hasBuiltOutput = relevantProperties.length > 0
+      || entriesWithGeneratedComponents.has(baseEntry);
+    if (!hasBuiltOutput) {
+      return { entry, status: 'without-built-output' };
     }
     const declarationReached = relevantProperties
       .some((property) => declarationReaches(afterBuilt.properties, property, editedProperty));
@@ -644,27 +704,30 @@ export async function writePropagateReport({ jobFolder }) {
     ));
     return {
       entry,
-      withoutBuiltOutput: false,
-      reached: editedDeclarationReached
-        && (declarationReached || componentReferenceReached || componentChanged),
+      status: editedDeclarationReached
+        && (declarationReached || componentReferenceReached || componentChanged)
+        ? 'reached'
+        : 'missed',
     };
   });
   const actualDependents = classifications
-    .filter(({ reached }) => reached)
+    .filter(({ status }) => status === 'reached')
     .map(({ entry }) => entry)
     .sort();
   const dependentsWithoutBuiltOutput = classifications
-    .filter(({ withoutBuiltOutput }) => withoutBuiltOutput)
+    .filter(({ status }) => status === 'without-built-output')
     .map(({ entry }) => ({
       name: entry,
       reason: 'there is no built output yet, so nothing exists to reach; generating the component later makes it subject to built-output reachability',
     }))
     .sort((left, right) => left.name.localeCompare(right.name));
-  const actualSet = new Set(actualDependents);
-  const outputlessSet = new Set(dependentsWithoutBuiltOutput.map(({ name }) => name));
-  const missed = expected
-    .filter((name) => !actualSet.has(name) && !outputlessSet.has(name))
+  const missed = classifications
+    .filter(({ status }) => status === 'missed')
+    .map(({ entry }) => entry)
     .sort();
+  if (actualDependents.length + missed.length + dependentsWithoutBuiltOutput.length !== expected.length) {
+    throw new Error('dependent classifications must partition expected dependents');
+  }
   const expectedBaseEntries = new Set(expected.map((entry) => entry.split('#')[0]));
   const nonDependents = [...catalogViolations({
     folder: design.folder,
@@ -685,8 +748,7 @@ export async function writePropagateReport({ jobFolder }) {
     lockFile,
     ...beforeCatalog.keys(),
     ...afterCatalog.keys(),
-    ...outputPaths,
-    ...componentPaths,
+    ...builtOutputPaths,
   ]);
   nonDependents.push(...designChanged
     .filter((file) => !allowedDesign.has(file))
