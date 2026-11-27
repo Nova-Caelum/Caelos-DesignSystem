@@ -7,14 +7,12 @@
             "lifecycle": "draft",
             "recipeInStaging": true,
             "kind": "button",
-            "madeOf": [
-              "controls.shared.TrailingPart",
-              "controls.shared.LeadingPart"
-            ],
-            "layerOrder": [
-              "controls.shared.LeadingPart",
-              "controls.shared.TrailingPart"
-            ]
+            "madeOf": ["controls.shared.TrailingPart", "controls.shared.LeadingPart"],
+            "layerOrder": ["controls.shared.LeadingPart", "controls.shared.TrailingPart"],
+            "variants": { "variant": ["primary", "tonal", "text"] },
+            "defaultVariants": { "variant": "tonal" },
+            "states": ["default", "hover", "pressed", "success", "focus", "disabled"],
+            "statePaints": { "primary": { "default": {} }, "tonal": { "default": {} }, "text": { "default": {} } }
           }
         }
       }
