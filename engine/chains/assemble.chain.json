@@ -3,16 +3,18 @@
   "steps": [
     {
       "step": "match",
-      "kind": "script",
-      "script": "engine/adapters/codex.mjs",
+      "kind": "model",
+      "instructions": "engine/contracts/match.instructions.md",
+      "schema": "engine/contracts/match.schema.json",
       "inputs": ["wireframe.json"],
       "outputs": ["match.json"],
       "check": "npm run check:catalog"
     },
     {
       "step": "integrate",
-      "kind": "script",
-      "script": "engine/adapters/codex.mjs",
+      "kind": "model",
+      "instructions": "engine/contracts/integrate.instructions.md",
+      "schema": "engine/contracts/integrate.schema.json",
       "inputs": ["job.json", "wireframe.json", "match.json", "reference"],
       "outputs": ["integrate.json"],
       "check": "npm run check:catalog"
@@ -35,8 +37,9 @@
     },
     {
       "step": "assemble",
-      "kind": "script",
-      "script": "engine/adapters/codex.mjs",
+      "kind": "model",
+      "instructions": "engine/contracts/assemble.instructions.md",
+      "schema": "engine/contracts/assemble.schema.json",
       "inputs": ["wireframe.json", "match.json", "integrate.json", "generated-components.json", "backend-contract", "contract-kit.json", "behaviours.json"],
       "outputs": ["assemble.json"],
       "check": "npm run check:catalog"

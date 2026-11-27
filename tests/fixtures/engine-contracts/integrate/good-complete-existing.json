@@ -1,0 +1,18 @@
+{
+  "jobId": "job-fixture",
+  "drafts": [
+    {
+      "need": "primary-action",
+      "entry": "controls.shared.button",
+      "tier": 4,
+      "case": "complete-existing",
+      "recipe": {
+        "lifecycle": "draft",
+        "draftedBy": "job-fixture",
+        "gapFill": "reference",
+        "madeOf": ["colors.shared.actionSurface"]
+      }
+    }
+  ],
+  "gaps": []
+}

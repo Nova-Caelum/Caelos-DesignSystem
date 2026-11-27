@@ -2,6 +2,8 @@
 
 Read the job id, `wireframe.json`, `match.json`, the reference, the recipe schema, and the generator diagnostic. Write draft objects into the appropriate catalog tier files and return `integrate.json` matching the schema. `draftedBy` is the job id on every draft.
 
+An empty Match result means Integrate writes `integrate.json` with no entries and stops. The Apply chain needs no conditional for this case.
+
 Apply the gap rule in this order: use the reference value as a draft; otherwise use the nearest entry and flag it; otherwise use a marked placeholder. A gap must never stop the job. Record every choice in `gaps` and in the recipe's `gapFill`.
 
 When new paint is needed by an entry above tier 2, make two drafts: a paint draft at tier 1 or 2 and the higher-tier entry draft that uses it.

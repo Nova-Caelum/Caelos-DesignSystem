@@ -4,6 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { validateChain } from "../engine/lib/chain.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixtures = path.join(root, "tests/fixtures/engine-contracts");
@@ -27,19 +28,20 @@ function validate(schema, value, location = "$", rootSchema = schema) {
     return validate(target, value, location, rootSchema);
   }
 
+  const errors = [];
   if (schema.oneOf) {
     const results = schema.oneOf.map((branch) =>
       validate(branch, value, location, rootSchema),
     );
     const passing = results.filter((errors) => errors.length === 0);
-    if (passing.length === 1) return [];
-    return [
-      `${location} must match exactly one allowed shape`,
-      ...results.flat(),
-    ];
+    if (passing.length !== 1) {
+      errors.push(
+        `${location} must match exactly one allowed shape`,
+        ...results.flat(),
+      );
+    }
   }
 
-  const errors = [];
   if (Object.hasOwn(schema, "const") && !equalJson(value, schema.const)) {
     errors.push(`${location} must equal ${JSON.stringify(schema.const)}`);
   }
@@ -47,7 +49,9 @@ function validate(schema, value, location = "$", rootSchema = schema) {
     errors.push(`${location} must be one of ${schema.enum.map(JSON.stringify).join(", ")}`);
   }
 
-  if (schema.type === "object") {
+  const hasObjectKeywords = schema.type === undefined
+    && (schema.properties || schema.required || schema.additionalProperties !== undefined);
+  if (schema.type === "object" || hasObjectKeywords) {
     if (value === null || typeof value !== "object" || Array.isArray(value)) {
       return [...errors, `${location} must be an object`];
     }
@@ -121,18 +125,76 @@ test("each contract accepts its good fixture and refuses its bad fixture by fiel
   }
 });
 
+test("integrate accepts complete-existing and empty results", async (t) => {
+  const schema = readJson("engine/contracts/integrate.schema.json");
+  for (const name of ["good-complete-existing", "good-empty"]) {
+    await t.test(name, () => {
+      const fixture = readJson(`tests/fixtures/engine-contracts/integrate/${name}.json`);
+      assert.deepEqual(validate(schema, fixture), []);
+    });
+  }
+});
+
+test("integrate refuses incomplete or invalid draft metadata", async (t) => {
+  const schema = readJson("engine/contracts/integrate.schema.json");
+  const cases = [
+    ["bad-gap-fill-missing", "gapFill"],
+    ["bad-drafted-by-missing", "draftedBy"],
+    ["bad-lifecycle-promoted", "lifecycle"],
+    ["bad-gap-fill-value", "gapFill"],
+  ];
+  for (const [name, field] of cases) {
+    await t.test(name, () => {
+      const fixture = readJson(`tests/fixtures/engine-contracts/integrate/${name}.json`);
+      const errors = validate(schema, fixture);
+      assert.ok(errors.length > 0, `${name} unexpectedly passed`);
+      assert.match(errors.join("\n"), new RegExp(field, "u"));
+    });
+  }
+  assert.ok(schema.$defs.recipe.properties.gapFill.enum.includes("placeholder"));
+});
+
 test("craft permits a plain wireframe container", () => {
   const schema = readJson("engine/contracts/craft.schema.json");
   assert.ok(schema.properties.container.enum.includes("plain"));
 });
 
-test("integrate recipe fields come exactly from the recipe schema", () => {
+function withoutCaelosMarkers(value) {
+  if (Array.isArray(value)) return value.map(withoutCaelosMarkers);
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !key.startsWith("x-caelos-"))
+      .map(([key, item]) => [key, withoutCaelosMarkers(item)]),
+  );
+}
+
+function namedConstraints(schema) {
+  const clean = withoutCaelosMarkers(schema);
+  return Object.fromEntries(
+    ["type", "enum", "items", "required"]
+      .filter((keyword) => Object.hasOwn(clean, keyword))
+      .map((keyword) => [keyword, clean[keyword]]),
+  );
+}
+
+test("integrate recipe fields and named constraints match the recipe schema", () => {
   const integrate = readJson("engine/contracts/integrate.schema.json");
   const recipe = readJson("token_catalog/recipe.schema.json");
+  const integrateProperties = integrate.$defs.recipe.properties;
   assert.deepEqual(
-    Object.keys(integrate.$defs.recipe.properties).sort(),
+    Object.keys(integrateProperties).sort(),
     Object.keys(recipe.properties).sort(),
   );
+  for (const [name, propertySchema] of Object.entries(recipe.properties)) {
+    if (name === "lifecycle") continue;
+    assert.deepEqual(
+      namedConstraints(integrateProperties[name]),
+      namedConstraints(propertySchema),
+      `integrate recipe constraints drifted for ${name}`,
+    );
+  }
+  assert.deepEqual(integrateProperties.lifecycle, { const: "draft" });
 });
 
 test("integrate instructions preserve gap and draft rules", () => {
@@ -147,6 +209,7 @@ test("integrate instructions preserve gap and draft rules", () => {
   assert.match(instructions, /draftedBy[^\n]*job id/iu);
   assert.match(instructions, /gapFill/iu);
   assert.match(instructions, /do not (?:write|create)[^\n]*template/iu);
+  assert.match(instructions, /empty Match result[^\n]*no entries[^\n]*stops/iu);
 });
 
 const chainOrders = {
@@ -157,7 +220,6 @@ const chainOrders = {
 };
 
 test("every chain validates and each job chain has its required order", async (t) => {
-  const schema = readJson("engine/chain.schema.json");
   const names = readdirSync(path.join(root, "engine/chains"), { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".chain.json"))
     .map((entry) => entry.name.replace(/\.chain\.json$/u, ""))
@@ -165,7 +227,7 @@ test("every chain validates and each job chain has its required order", async (t
   for (const name of names) {
     await t.test(name, () => {
       const chain = readJson(`engine/chains/${name}.chain.json`);
-      assert.deepEqual(validate(schema, chain), []);
+      assert.doesNotThrow(() => validateChain(chain, `chain ${name}`));
       if (chainOrders[name]) {
         assert.deepEqual(chain.steps.map((step) => step.step), chainOrders[name]);
       }
@@ -176,6 +238,33 @@ test("every chain validates and each job chain has its required order", async (t
     [],
     "a required job chain is missing",
   );
+});
+
+test("every model step is bound to its contract", () => {
+  const modelSteps = new Set(["craft", "match", "integrate", "assemble"]);
+  let count = 0;
+  for (const name of Object.keys(chainOrders)) {
+    const chain = readJson(`engine/chains/${name}.chain.json`);
+    for (const step of chain.steps.filter((row) => modelSteps.has(row.step))) {
+      count += 1;
+      assert.deepEqual(
+        {
+          kind: step.kind,
+          instructions: step.instructions,
+          schema: step.schema,
+          script: step.script,
+        },
+        {
+          kind: "model",
+          instructions: `engine/contracts/${step.step}.instructions.md`,
+          schema: `engine/contracts/${step.step}.schema.json`,
+          script: undefined,
+        },
+        `${name}:${step.step} is not bound to its contract`,
+      );
+    }
+  }
+  assert.equal(count, 14);
 });
 
 test("job-specific chain boundaries are explicit", () => {
