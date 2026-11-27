@@ -5,6 +5,8 @@ import {
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { tokenName } from '../../style-dictionary.config.mjs';
+
 const repositoryRoot = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const lockBuilder = path.join(repositoryRoot, 'scripts', 'build-lock.mjs');
 const lockFile = 'token_catalog/versions.lock.json';
@@ -220,11 +222,6 @@ function fileAt(folder, commit, file) {
   return git(folder, ['show', `${commit}:${file}`]);
 }
 
-function kebab(value) {
-  return value.replace(/([a-z0-9])([A-Z])/gu, '$1-$2')
-    .replace(/[^A-Za-z0-9]+/gu, '-').replace(/^-|-$/gu, '').toLowerCase();
-}
-
 function componentName(entry) {
   const words = entry.split('#')[0].split('.').at(-1)
     .replace(/([a-z0-9])([A-Z])/gu, '$1 $2')
@@ -233,29 +230,194 @@ function componentName(entry) {
   return /^\d/u.test(name) ? `Component${name}` : name;
 }
 
-// This is the single mapping from a lock entry to the files emitted for it. The
-// candidate paths come from the generator outputs recorded by the apply step.
-function builtFilesByEntry({ folder, commit, entries, outputPaths }) {
-  const sources = new Map(outputPaths.map((output) => {
-    try {
-      return [output, fileAt(folder, commit, output)];
-    } catch {
-      return [output, ''];
+function optionalFileAt(folder, commit, file) {
+  try {
+    return fileAt(folder, commit, file);
+  } catch {
+    return null;
+  }
+}
+
+function catalogFilesAt(folder, commit) {
+  const output = git(folder, [
+    'ls-tree', '-r', '--name-only', commit, '--', 'token_catalog',
+  ]).trim();
+  return output.split('\n').filter((file) => /^token_catalog\/0[0-5]-.*\.tokens\.json$/u.test(file));
+}
+
+function catalogDocuments(folder, commit) {
+  return new Map(catalogFilesAt(folder, commit).map((file) => {
+    const source = fileAt(folder, commit, file);
+    return [file, {
+      file,
+      root: JSON.parse(source),
+      source,
+      tier: Number.parseInt(path.basename(file).slice(0, 2), 10),
+    }];
+  }));
+}
+
+function addToMapSet(map, key, value) {
+  const values = map.get(key) ?? new Set();
+  values.add(value);
+  map.set(key, values);
+}
+
+// Property names are taken from the transform used by the token build. A tier
+// entry owns every token declaration below it; a token leaf also owns its own
+// declaration because it is independently represented in the lock.
+function outputOwnership(...catalogs) {
+  const properties = new Map();
+  const components = new Map();
+  for (const catalog of catalogs) {
+    for (const { root, tier } of catalog.values()) {
+      function visit(node, segments = []) {
+        if (!node || typeof node !== 'object' || Array.isArray(node)) return;
+        const isToken = Object.hasOwn(node, '$value');
+        const entryNames = [];
+        if (tier > 0 && segments.length >= 3) entryNames.push(segments.slice(0, 3).join('.'));
+        if (isToken) entryNames.push(segments.join('.'));
+        for (const entry of new Set(entryNames)) {
+          addToMapSet(components, `${componentName(entry)}.css`, entry);
+          addToMapSet(components, `${componentName(entry)}.tsx`, entry);
+          if (isToken) addToMapSet(properties, `--${tokenName(segments)}`, entry);
+        }
+        if (isToken) return;
+        for (const key of Object.keys(node).filter((key) => !key.startsWith('$')).sort()) {
+          visit(node[key], [...segments, key]);
+        }
+      }
+      visit(root);
     }
-  }));
-  return new Map(entries.map((entry) => {
-    const baseEntry = entry.split('#')[0];
-    const cssPrefix = `--${baseEntry.split('.').map(kebab).join('-')}`;
-    const generatedName = componentName(baseEntry);
-    const files = outputPaths.filter((output) => {
-      const source = sources.get(output);
-      const basename = path.basename(output);
-      return source.includes(cssPrefix)
-        || basename === `${generatedName}.tsx`
-        || basename === `${generatedName}.css`;
-    });
-    return [entry, files];
-  }));
+  }
+  return { properties, components };
+}
+
+function declarations(source) {
+  const result = new Map();
+  for (const match of (source ?? '').matchAll(/^\s*(--[\w-]+)\s*:\s*.*;.*$/gmu)) {
+    result.set(match[1], match[0].trim());
+  }
+  return result;
+}
+
+function withoutDeclarations(source) {
+  return (source ?? '').replace(/^\s*--[\w-]+\s*:\s*.*;.*$/gmu, '');
+}
+
+function changedOutputEntries({ folder, base, head, outputPaths, ownership }) {
+  const entries = new Set();
+  const unmappedFiles = new Set();
+  for (const output of outputPaths) {
+    const before = optionalFileAt(folder, base, output);
+    const after = optionalFileAt(folder, head, output);
+    if (before === after) continue;
+    const componentOwners = ownership.components.get(path.basename(output));
+    if (componentOwners) {
+      if (componentOwners.size === 1) entries.add(componentOwners.values().next().value);
+      else unmappedFiles.add(output);
+      continue;
+    }
+    const beforeDeclarations = declarations(before);
+    const afterDeclarations = declarations(after);
+    const propertyNames = new Set([...beforeDeclarations.keys(), ...afterDeclarations.keys()]);
+    let changedDeclaration = false;
+    let unmappedDeclaration = false;
+    for (const property of propertyNames) {
+      if (beforeDeclarations.get(property) === afterDeclarations.get(property)) continue;
+      changedDeclaration = true;
+      const owners = ownership.properties.get(property);
+      if (!owners) {
+        unmappedDeclaration = true;
+        continue;
+      }
+      for (const entry of owners) entries.add(entry);
+    }
+    if (unmappedDeclaration || !changedDeclaration
+        || withoutDeclarations(before) !== withoutDeclarations(after)) {
+      unmappedFiles.add(output);
+    }
+  }
+  return { entries, unmappedFiles };
+}
+
+function nodeAt(root, segments) {
+  let node = root;
+  for (const segment of segments) {
+    if (!node || typeof node !== 'object' || !Object.hasOwn(node, segment)) return null;
+    node = node[segment];
+  }
+  return node;
+}
+
+function catalogDifferences(before, after, segments = []) {
+  if (segments.at(-1) === '$value' || Array.isArray(before) || Array.isArray(after)
+      || before === null || after === null || typeof before !== 'object' || typeof after !== 'object') {
+    return JSON.stringify(before) === JSON.stringify(after) ? [] : [{ segments, before, after }];
+  }
+  const keys = new Set([
+    ...Object.keys(before ?? {}),
+    ...Object.keys(after ?? {}),
+  ]);
+  return [...keys].sort().flatMap((key) => catalogDifferences(
+    before?.[key], after?.[key], [...segments, key],
+  ));
+}
+
+function owningEntry(difference, before, after, tier) {
+  for (let length = difference.segments.length; length > 0; length -= 1) {
+    const segments = difference.segments.slice(0, length);
+    const candidates = [nodeAt(before, segments), nodeAt(after, segments)];
+    if (candidates.some((node) => node && typeof node === 'object' && Object.hasOwn(node, '$value'))) {
+      return segments.join('.');
+    }
+  }
+  if (tier > 0 && difference.segments.length >= 3) return difference.segments.slice(0, 3).join('.');
+  return null;
+}
+
+function catalogViolations({ folder, base, head, edit, beforeCatalog, afterCatalog }) {
+  const files = new Set([...beforeCatalog.keys(), ...afterCatalog.keys()]);
+  const allowedSegments = [...tokenSegments(edit.token), '$value'];
+  const violations = new Set();
+  let intendedChanges = 0;
+  for (const file of files) {
+    const beforeDocument = beforeCatalog.get(file);
+    const afterDocument = afterCatalog.get(file);
+    const differences = catalogDifferences(beforeDocument?.root, afterDocument?.root);
+    for (const difference of differences) {
+      const intended = file === edit.file
+        && difference.segments.length === allowedSegments.length
+        && difference.segments.every((segment, index) => segment === allowedSegments[index])
+        && JSON.stringify(difference.before) === JSON.stringify(edit.previous)
+        && JSON.stringify(difference.after) === JSON.stringify(edit.value);
+      if (intended) {
+        intendedChanges += 1;
+        continue;
+      }
+      const entry = owningEntry(
+        difference,
+        beforeDocument?.root,
+        afterDocument?.root,
+        beforeDocument?.tier ?? afterDocument?.tier ?? 0,
+      );
+      violations.add(`design-system:${entry ?? file}`);
+    }
+    if (file !== edit.file && beforeDocument?.source !== afterDocument?.source
+        && differences.length === 0) {
+      violations.add(`design-system:${file}`);
+    }
+  }
+  if (intendedChanges !== 1) violations.add(`design-system:${edit.token}`);
+
+  const beforeSource = optionalFileAt(folder, base, edit.file);
+  const afterSource = optionalFileAt(folder, head, edit.file);
+  if (beforeSource !== null) {
+    const range = jsonValueRange(beforeSource, allowedSegments);
+    const expectedSource = `${beforeSource.slice(0, range.start)}${JSON.stringify(edit.value)}${beforeSource.slice(range.end)}`;
+    if (afterSource !== expectedSource && violations.size === 0) violations.add(`design-system:${edit.file}`);
+  }
+  return violations;
 }
 
 function eventModelCalls(jobFolder) {
@@ -271,14 +433,6 @@ function eventModelCalls(jobFolder) {
       return count;
     }
   }, 0);
-}
-
-function expectedDesignFiles(edit) {
-  return new Set([
-    edit.file,
-    lockFile,
-    ...edit.generated_outputs,
-  ]);
 }
 
 function packageAt(app, commit) {
@@ -322,20 +476,48 @@ export async function writePropagateReport({ jobFolder }) {
     throw new Error('propagate-edit.json must contain generated_outputs as a string array');
   }
   const designChanged = changedFiles(design.folder, design.baseCommit, state.designSystemMergeCommit);
-  const builtFiles = builtFilesByEntry({
+  const beforeCatalog = catalogDocuments(design.folder, design.baseCommit);
+  const afterCatalog = catalogDocuments(design.folder, state.designSystemMergeCommit);
+  const ownership = outputOwnership(beforeCatalog, afterCatalog);
+  const outputPaths = [...new Set([
+    ...(design.outputs ?? [])
+      .filter((output) => !output.tierFile && output.path !== lockFile)
+      .map((output) => output.path),
+    ...edit.generated_outputs,
+  ])].sort();
+  const outputChanges = changedOutputEntries({
     folder: design.folder,
-    commit: state.designSystemMergeCommit,
-    entries: expected,
-    outputPaths: edit.generated_outputs,
+    base: design.baseCommit,
+    head: state.designSystemMergeCommit,
+    outputPaths,
+    ownership,
   });
-  const changedSet = new Set(designChanged);
+  const changedEntries = outputChanges.entries;
   const actualDependents = expected
-    .filter((entry) => builtFiles.get(entry).some((file) => changedSet.has(file)))
+    .filter((entry) => changedEntries.has(entry.split('#')[0]))
     .sort();
   const actualSet = new Set(actualDependents);
   const missed = expected.filter((name) => !actualSet.has(name)).sort();
-  const nonDependents = [];
-  const allowedDesign = expectedDesignFiles(edit);
+  const expectedBaseEntries = new Set(expected.map((entry) => entry.split('#')[0]));
+  const nonDependents = [...catalogViolations({
+    folder: design.folder,
+    base: design.baseCommit,
+    head: state.designSystemMergeCommit,
+    edit,
+    beforeCatalog,
+    afterCatalog,
+  })];
+  nonDependents.push(...[...changedEntries]
+    .filter((entry) => !expectedBaseEntries.has(entry))
+    .map((entry) => `design-system:${entry}`));
+  nonDependents.push(...[...outputChanges.unmappedFiles]
+    .map((file) => `design-system:${file}`));
+  const allowedDesign = new Set([
+    lockFile,
+    ...beforeCatalog.keys(),
+    ...afterCatalog.keys(),
+    ...outputPaths,
+  ]);
   nonDependents.push(...designChanged
     .filter((file) => !allowedDesign.has(file))
     .map((file) => `design-system:${file}`));
@@ -412,6 +594,9 @@ async function main() {
     const report = await writePropagateReport({ jobFolder });
     if (report.dependents_missed > 0) {
       throw new Error(`${report.dependents_missed} dependent(s) missed: ${report.missed_dependents.join(', ')}`);
+    }
+    if (report.non_dependents_changed.length > 0) {
+      throw new Error(`non-dependent change(s): ${report.non_dependents_changed.join(', ')}`);
     }
     return;
   }

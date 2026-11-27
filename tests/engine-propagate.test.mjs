@@ -55,7 +55,15 @@ function buildLock(designSystem) {
   assert.equal(result.status, 0, result.stderr);
 }
 
-function makeWork(t, { stray = false, staleGenerated = false, modelCalls = 0, wrongAppPin = false } = {}) {
+function makeWork(t, {
+  extraTierZeroChange = false,
+  mixedUnmappedLine = false,
+  modelCalls = 0,
+  staleGenerated = false,
+  staleOwnLines = false,
+  stray = false,
+  wrongAppPin = false,
+} = {}) {
   const work = mkdtempSync(path.join(tmpdir(), 'engine-propagate-'));
   const designSystem = path.join(work, 'design-system');
   const app = path.join(work, 'app');
@@ -65,13 +73,24 @@ function makeWork(t, { stray = false, staleGenerated = false, modelCalls = 0, wr
   mkdirSync(jobFolder);
   materializeCatalog(designSystem);
   mkdirSync(path.join(designSystem, 'generated'));
+  mkdirSync(path.join(designSystem, 'generated', 'components'));
   const oldCss = `:root {
   --base-color-primary: fixture-primary;
+  --base-space-medium: 16px;
   --primitives-shared-surface-fill: var(--base-color-primary);
   --controls-shared-button-padding: var(--base-space-medium);
+  --fixture-unknown: before;
 }\n`;
-  const updatedCss = oldCss.replace('fixture-primary', 'fixture-updated');
+  const updatedCss = oldCss
+    .replace('fixture-primary', 'fixture-updated')
+    .replace(
+      '--primitives-shared-surface-fill: var(--base-color-primary);',
+      '--primitives-shared-surface-fill: var(--base-color-primary); /* rebuilt */',
+    );
+  const oldComponent = '.fixture-button { color: fixture-primary; }\n';
+  const updatedComponent = '.fixture-button { color: fixture-updated; }\n';
   writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
+  writeFileSync(path.join(designSystem, 'generated', 'components', 'Button.css'), oldComponent);
   buildLock(designSystem);
   command(designSystem, 'git', 'init', '-q');
   const designBase = commit(designSystem, 'fixture design base');
@@ -91,6 +110,7 @@ function makeWork(t, { stray = false, staleGenerated = false, modelCalls = 0, wr
         { path: 'token_catalog/00-foundations.tokens.json', tierFile: true },
         { path: 'token_catalog/versions.lock.json' },
         { path: 'generated/tokens.css' },
+        { path: 'generated/components/Button.css' },
       ],
     },
     app: {
@@ -118,15 +138,34 @@ function makeWork(t, { stray = false, staleGenerated = false, modelCalls = 0, wr
 
   const edit = applyPropagateEdit({ jobFolder });
   assert.equal(edit.token, 'base.color.primary');
-  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), updatedCss);
+  let generatedCss = updatedCss;
+  if (mixedUnmappedLine) {
+    generatedCss = updatedCss.replace('--fixture-unknown: before;', '--fixture-unknown: after;');
+  }
+  if (staleOwnLines) generatedCss = oldCss.replace('--base-space-medium: 16px;', '--base-space-medium: 17px;');
+  if (extraTierZeroChange) {
+    const tierFile = path.join(designSystem, 'token_catalog', '00-foundations.tokens.json');
+    const tier = json(tierFile);
+    tier.base.space.medium.$value = '17px';
+    writeFileSync(tierFile, `${JSON.stringify(tier, null, 2)}\n`);
+    generatedCss = updatedCss.replace('--base-space-medium: 16px;', '--base-space-medium: 17px;');
+  }
+  writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), generatedCss);
+  writeFileSync(
+    path.join(designSystem, 'generated', 'components', 'Button.css'),
+    staleOwnLines ? oldComponent : updatedComponent,
+  );
   const editFile = path.join(jobFolder, 'propagate-edit.json');
   const editRecord = json(editFile);
-  editRecord.generated_outputs = ['generated/tokens.css'];
+  editRecord.generated_outputs = ['generated/tokens.css', 'generated/components/Button.css'];
   writeFileSync(editFile, `${JSON.stringify(editRecord, null, 2)}\n`);
   buildLock(designSystem);
   const expected = collectExpectedDependents({ jobFolder });
   writeFileSync(path.join(jobFolder, 'expected-dependents.json'), `${JSON.stringify(expected, null, 2)}\n`);
-  if (staleGenerated) writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
+  if (staleGenerated) {
+    writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), oldCss);
+    writeFileSync(path.join(designSystem, 'generated', 'components', 'Button.css'), oldComponent);
+  }
   if (stray) writeFileSync(path.join(designSystem, 'generated', 'stray.js'), 'export const stray = true;\n');
   const designCommit = commit(designSystem, 'propagate fixture edit');
 
@@ -205,6 +244,36 @@ test('mutation missed-empty: stale generated CSS produces a nonzero missed count
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   assert.ok(report.dependents_missed > 0);
   assert.ok(report.missed_dependents.length > 0);
+});
+
+test('B3: a second rebuilt tier-0 value is named as a non-dependent change', async (t) => {
+  const work = await makeWork(t, { extraTierZeroChange: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.non_dependents_changed.includes('design-system:base.space.medium'));
+});
+
+test('B3: the report command fails after naming a second rebuilt tier-0 value', async (t) => {
+  const work = await makeWork(t, { extraTierZeroChange: true });
+  const result = spawnSync(process.execPath, [
+    path.join(root, 'engine', 'lib', 'propagate-report.mjs'),
+    'write-propagate-report', '--job', work.jobFolder,
+  ], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stderr, /base\.space\.medium/);
+});
+
+test('mutation all-outputs-per-dependent: a changed foreign line leaves own-line dependents missed', async (t) => {
+  const work = await makeWork(t, { staleOwnLines: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.deepEqual(report.actual_dependents, []);
+  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+  assert.ok(report.non_dependents_changed.includes('design-system:base.space.medium'));
+});
+
+test('a mapped line cannot hide an unmapped declaration in the same output file', async (t) => {
+  const work = await makeWork(t, { mixedUnmappedLine: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.non_dependents_changed.includes('design-system:generated/tokens.css'));
 });
 
 test('mutation model-count-zero: one recorded model entry is counted', async (t) => {
