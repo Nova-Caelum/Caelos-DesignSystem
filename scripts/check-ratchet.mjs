@@ -1,23 +1,8 @@
-import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { baseTree, exceptionNames, exceptionsFile, legacyPaintNames, object, options, readJson, treeFiles } from './check-recipes.mjs';
-
-// The first guarded change introduces the list. Only the original, verified
-// base tree may use paint already present in its catalog as the ceiling.
-const preRatchetTree = '93e9d8a89d831d7a06dbba25d75815752896c195';
-const preRatchetPaintDigest = '2af7877ca2d97a6bc9b0d22477ca2ea435fd588867cfe7ea53338e3e32710f05';
-
-function baseExceptions(tree) {
-  if (tree !== preRatchetTree || treeFiles(tree, exceptionsFile).has(exceptionsFile)) {
-    return exceptionNames(readJson(exceptionsFile, tree), `${exceptionsFile} at base ${tree}`);
-  }
-  const names = legacyPaintNames(tree);
-  const digest = createHash('sha256').update(JSON.stringify(names)).digest('hex');
-  if (digest !== preRatchetPaintDigest) {
-    throw new Error(`${exceptionsFile}: the initial paint ceiling differs from the verified base; restore the original paint definitions`);
-  }
-  return new Set(names);
-}
+import {
+  baseTree, createContext, exceptionNames, exceptionsFile, guardBaseNone, object, options,
+  readCandidateJson, readTreeJson, validateCandidateRuleData,
+} from './check-recipes.mjs';
 
 function baselineCounts(data, label) {
   if (!object(data)) throw new Error(`${label}: expected counts by file and rule; fix the baseline format`);
@@ -32,14 +17,20 @@ function baselineCounts(data, label) {
   return data;
 }
 
-function checkBaseline(file, tree, errors) {
-  const relative = path.relative(process.cwd(), path.resolve(file));
-  if (!relative || relative === '..' || relative.startsWith(`..${path.sep}`)) {
-    throw new Error(`${file}: baseline must be inside the checkout; pass the path to the tracked baseline`);
+function candidateRelative(file, context) {
+  const absolute = path.resolve(context.candidate, file);
+  const relative = path.relative(context.candidate, absolute);
+  if (!relative || relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error(`${file}: baseline must be inside the candidate; pass the path to the tracked baseline`);
   }
-  const current = baselineCounts(readJson(relative), relative);
+  return relative.split(path.sep).join('/');
+}
+
+function checkBaseline(file, tree, errors, context) {
+  const relative = candidateRelative(file, context);
+  const current = baselineCounts(readCandidateJson(relative, context), relative);
   if (!tree) return;
-  const previous = baselineCounts(readJson(relative, tree), `${relative} at base ${tree}`);
+  const previous = baselineCounts(readTreeJson(relative, tree, context), `${relative} at base ${tree}`);
   for (const [fileName, counts] of Object.entries(current)) {
     if (!Object.hasOwn(previous, fileName)) {
       errors.push(`${relative}: file ${fileName} was added; remove the added baseline entry and fix new gate errors`);
@@ -56,21 +47,29 @@ function checkBaseline(file, tree, errors) {
 }
 
 try {
-  const { base, baseline } = options(process.argv.slice(2), ['--base', '--baseline']);
-  const current = exceptionNames(readJson(exceptionsFile), exceptionsFile);
-  const tree = base === 'none' ? undefined : baseTree(base);
+  const values = options(process.argv.slice(2), ['--base', '--baseline', '--candidate', '--git-root', '--mode']);
+  const mode = values.mode ?? 'full';
+  if (!['full', 'baseline'].includes(mode)) throw new Error('--mode must be full or baseline');
+  if (mode === 'baseline' && !values.baseline) throw new Error('--mode baseline requires --baseline <file>');
+  guardBaseNone(values);
+  const context = createContext(values);
+  const tree = values.base === 'none' ? undefined : baseTree(values.base, context);
   const errors = [];
-  if (!tree) {
-    console.log('no base given: ratchet comparison skipped');
-  } else {
-    const previous = baseExceptions(tree);
-    for (const name of current) {
-      if (!previous.has(name)) {
-        errors.push(`${exceptionsFile}: ${name} was added; remove the exception and move its paint to tier 1 or 2`);
+  if (!tree) console.log('no base given: ratchet comparison skipped');
+
+  if (mode === 'full') {
+    validateCandidateRuleData(context, tree);
+    const current = exceptionNames(readCandidateJson(exceptionsFile, context), exceptionsFile);
+    if (tree) {
+      const previous = exceptionNames(readTreeJson(exceptionsFile, tree, context), `${exceptionsFile} at base ${tree}`);
+      for (const name of current) {
+        if (!previous.has(name)) {
+          errors.push(`${exceptionsFile}: ${name} was added; remove the exception and move its paint to tier 1 or 2`);
+        }
       }
     }
   }
-  if (baseline) checkBaseline(baseline, tree, errors);
+  if (values.baseline) checkBaseline(values.baseline, tree, errors, context);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log('Shrink-only catalog ratchet passed.');
 } catch (error) {

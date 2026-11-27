@@ -1,0 +1,23 @@
+{
+  "overlays": {
+    "shared": {
+      "CompositeButton": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "recipeInStaging": true,
+            "kind": "button",
+            "madeOf": [
+              "controls.shared.TrailingPart",
+              "controls.shared.LeadingPart"
+            ],
+            "layerOrder": [
+              "controls.shared.LeadingPart",
+              "controls.shared.TrailingPart"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

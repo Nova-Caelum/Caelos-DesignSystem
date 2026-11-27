@@ -1,0 +1,79 @@
+{
+  "controls": {
+    "shared": {
+      "Button": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "recipeInStaging": true,
+            "kind": "button",
+            "layerOrder": ["label"]
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{sys.color.text.primary}"
+        },
+        "hoverForeground": {
+          "$type": "color",
+          "$value": "{sys.color.text.accent}"
+        },
+        "focusForeground": {
+          "$type": "color",
+          "$value": "{sys.color.text.accent}"
+        },
+        "pressedForeground": {
+          "$type": "color",
+          "$value": "{sys.color.text.primary}"
+        }
+      },
+      "LeadingPart": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "recipeInStaging": true,
+            "kind": "button",
+            "layerOrder": ["content"]
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{sys.color.text.primary}"
+        }
+      },
+      "TrailingPart": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "recipeInStaging": true,
+            "kind": "button",
+            "layerOrder": ["content"]
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{sys.color.text.primary}"
+        }
+      },
+      "MissingLayer": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "recipeInStaging": true,
+            "kind": "button"
+          }
+        }
+      },
+      "UnknownKind": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "recipeInStaging": true,
+            "kind": "fixture-unknown",
+            "layerOrder": ["content"]
+          }
+        }
+      }
+    }
+  }
+}
