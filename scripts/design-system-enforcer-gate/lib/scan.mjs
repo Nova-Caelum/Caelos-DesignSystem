@@ -44,6 +44,15 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     const lineAt = lineIndex(raw);
     const add = (rule, idx, message, severity = sev(rule)) => { if (severity !== "off") st.findings.push({ file: f.rel, line: lineAt(idx), idx, rule, severity, message }); };
     const showLit = (t) => t.replaceAll(DYN, "${…}");
+    const paintContext = (idx) => {
+      const before = text.slice(Math.max(0, idx - 500), idx);
+      const objectProperty = before.match(/(?:^|[{,])\s*(?:["']([^"']+)["']|([A-Za-z_$][\w$-]*))\s*:\s*[^,{}]*$/s);
+      if (objectProperty) return objectProperty[1] ?? objectProperty[2];
+      const cssProperty = before.match(/(?:^|[;{])\s*(--[\w-]+|[A-Za-z-]+)\s*:\s*[^;{}]*$/s);
+      if (cssProperty) return cssProperty[1];
+      const attribute = before.match(/([:\w-]+)\s*=\s*(?:["']|\{\s*["'`])?[^<>"'\n]*$/);
+      return attribute?.[1] ?? "value";
+    };
 
     // ---- value rules -------------------------------------------------
     const runDim = (dim, kind, prop, value, idx, label = prop) => {
@@ -107,6 +116,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       const after = text[m.index + m[0].length - (m[2] ? 1 : 0)];
       if (cfg.var.noFallback && m[2]) add("fallback", m.index, `var(${m[1]}, …) has a fallback — remove it; if the token is missing, use one that exists`);
       if (cfg.var.mustBeDefined && !defined.has(m[1]) && !ignoreVar.some((r) => r.test(m[1])) && !(m[1].endsWith("-") && /[$'"`]/.test(after ?? ""))) add("undefined", m.index, `${m[1]} is not defined in the token sources or the app's CSS — pick a token that exists`);
+      if (cfg.pagePaint?.isPaintToken(m[1])) add("page-paint", m.index, `${paintContext(m.index)}: paint token ${m[1]} — use an imported component for paint`);
     }
 
     if (f.type !== "css") {
@@ -202,7 +212,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
   function markupRules(f, st, els, add) {
     const { missing, kit, icons } = cfg;
     const classWords = (el) => {
-      const words = new Set(); const refs = [];
+      const words = new Set(), staticWords = new Set(); const refs = [];
       let rawClass = "";
       for (const a of el.attrs) {
         if (!CLASS_ATTRS(a.name)) continue;
@@ -211,15 +221,18 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
         for (const m of a.value.matchAll(/\b(\w+)\.([A-Za-z_][\w-]*)\b/g)) if (st.moduleIdents.has(m[1])) refs.push([st.moduleIdents.get(m[1]), m[2]]);
         for (const m of a.value.matchAll(/\b(\w+)\[\s*["']([\w-]+)["']\s*\]/g)) if (st.moduleIdents.has(m[1])) refs.push([st.moduleIdents.get(m[1]), m[2]]);
         const src = a.kind === "str" ? a.value : [...a.value.matchAll(/["'`]([^"'`]*)["'`]/g)].map((m) => m[1]).join(" ");
-        for (const w of src.replace(/\$\{[^}]*\}/g, " ").split(/\s+/)) if (w) words.add(w);
+        for (const w of src.replace(/\$\{[^}]*\}/g, " ").split(/\s+/)) if (w) {
+          words.add(w);
+          if (a.kind === "str" && (a.name === "class" || a.name === "className")) staticWords.add(w);
+        }
       }
-      return { words, refs, rawClass };
+      return { words, staticWords, refs, rawClass };
     };
     const resolve = (el) => {
       if (el._res) return el._res;
       const props = new Map();
       const put = (k, vals) => props.set(k, [...(props.get(k) ?? []), ...vals]);
-      const { words, refs, rawClass } = classWords(el);
+      const { words, staticWords, refs, rawClass } = classWords(el);
       for (const w of words) {
         const g = classGlobal.get(w) ?? st.localClasses.get(w);
         if (g) for (const [k, v] of g) put(k, v);
@@ -237,7 +250,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
         if (sa.kind === "str") for (const d of sa.value.split(";")) { const i = d.indexOf(":"); if (i > 0) put(normProp2(d.slice(0, i)), [d.slice(i + 1).trim()]); }
         else for (const m of sa.value.matchAll(/(?<![\w$])["']?([A-Za-z-]+)["']?\s*:\s*([^,}]+)/g)) put(normProp2(m[1]), [m[2].trim()]);
       }
-      return (el._res = { props, words, rawClass });
+      return (el._res = { props, words, staticWords, rawClass });
     };
     const normProp2 = (p) => kebab(p.trim());
     const hasProp = (res, ...names) => names.some((n) => res.props.has(n));
@@ -260,6 +273,19 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
         if (st.iconNames.has(el.tag)) {
           const fa = attr(el, "fill");
           if (icons.strokeOnly && fa && !(fa.kind === "str" && fa.value.toLowerCase() === "none")) add("icon-fill", fa.start, `fill on <${el.tag}> — icons are stroke-only; remove fill`);
+        }
+      }
+
+      // page paint: static markup classes resolved from the existing CSS class index
+      if (cfg.pagePaint) for (const word of res.staticWords) {
+        const declarations = classGlobal.get(word);
+        if (!declarations) continue;
+        const uses = new Map();
+        for (const [property, values] of declarations) for (const value of values) {
+          for (const match of String(value).matchAll(/var\(\s*(--[\w-]+)/g)) uses.set(`${property}\0${match[1]}`, [property, match[1]]);
+        }
+        for (const [property, token] of uses.values()) if (cfg.pagePaint.isPaintToken(token)) {
+          add("page-paint", el.idx, `class "${word}" ${property}: paint token ${token} — use an imported component for paint`);
         }
       }
 

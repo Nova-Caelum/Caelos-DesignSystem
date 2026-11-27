@@ -1,0 +1,18 @@
+{
+  "scan": {
+    "include": ["src/**"],
+    "types": ["tsx", "css"]
+  },
+  "tokens": {
+    "css": ["tokens.css"],
+    "dtcg": ["tokens.json"]
+  },
+  "classIndex": ["kit.css"],
+  "pages": ["src/pages/**"],
+  "icons": { "enabled": false },
+  "missing": {
+    "gap": { "severity": "off" },
+    "typography": { "severity": "off" },
+    "motion": { "severity": "off", "required": false }
+  }
+}
