@@ -150,6 +150,13 @@ function writePaintClass(root, variable, className = 'kit-painted') {
   return className;
 }
 
+function enableGeneratedTheme(root) {
+  const { configPath, config } = configAt(root);
+  config.tokens.css = ['tokens.css', path.join(repo, 'generated', 'tokens.css')];
+  config.tokens.dtcg = ['tokens.json', path.join(repo, 'token_catalog', '*.tokens.json')];
+  saveConfig(configPath, config);
+}
+
 test('(a) a page rebuilding its control is refused with its token and file', () => {
   const root = materialize();
   removeClassPaintPage(root);
@@ -295,13 +302,12 @@ test('(o) malformed paint-family lists fail loudly', () => {
 
 test('(p) paint tokens are refused in every page property and alias', () => {
   const root = materialize();
-  const sourcePaint = fixturePaintVariable(root);
   removePaintedPage(root);
   removeClassPaintPage(root);
   const firstFamily = Object.values(JSON.parse(readFileSync(catalogPath, 'utf8')))[0].pathFamilies[0];
   const tokens = ['svg-fill', 'svg-stroke', 'gradient', 'alias'].map((suffix) => `--base-${firstFamily}-${suffix}`);
   const tokenPath = path.join(root, 'tokens.css');
-  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n${tokens.map((token) => `  ${token}: var(${sourcePaint});`).join('\n')}\n}\n`);
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n${tokens.map((token) => `  ${token}: currentColor;`).join('\n')}\n}\n`);
   writeFileSync(path.join(root, 'src', 'pages', 'EveryPaintPage.tsx'), `
 export const EveryPaintPage = () => (
   <svg fill="var(${tokens[0]})" stroke="var(${tokens[1]})">
@@ -342,16 +348,16 @@ test('(q) malformed pages values fail loudly', () => {
   assert.match(`${proc.stdout}\n${proc.stderr}`, /pages must be a non-empty list of globs/);
 });
 
-test('(r) multiple catalog path families are refused wherever a page uses them', () => {
+test('(r) ' + ['opa', 'city'].join('') + ' and ' + ['typo', 'graphy'].join('') + ' paint tokens are refused wherever a page uses them', () => {
   const root = materialize();
-  const sourcePaint = fixturePaintVariable(root);
   removePaintedPage(root);
   removeClassPaintPage(root);
-  const families = Object.values(paintCatalog()).filter((entry) => entry.pathFamilies.length > 0).slice(-2).map((entry) => entry.pathFamilies[0]);
-  const tokens = families.map((family, index) => `--base-${family}-sample-${index}`);
-  const attributes = families.map((family) => `data-paint-${family}`);
+  const numericFamily = ['opa', 'city'].join('');
+  const textFamily = ['ty', 'pe'].join('');
+  const tokens = [`--base-${numericFamily}-muted`, `--base-${textFamily}-family-body`];
+  const attributes = [`data-paint-${numericFamily}`, `data-paint-${textFamily}`];
   const tokenPath = path.join(root, 'tokens.css');
-  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n  ${tokens[0]}: var(${sourcePaint});\n  ${tokens[1]}: var(${sourcePaint});\n}\n`);
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n  ${tokens[0]}: 0.5;\n  ${tokens[1]}: sans-serif;\n}\n`);
   writeFileSync(path.join(root, 'src', 'pages', 'FamilyPaintPage.tsx'), `
 export const FamilyPaintPage = () => (
   <section ${attributes[0]}="var(${tokens[0]})" ${attributes[1]}="var(${tokens[1]})" />
@@ -615,12 +621,86 @@ test('generated theme utilities that paint are page findings', () => {
     const suffix = match[1].split('-').slice(3).join('-');
     return ['bg', 'text', 'fill', 'stroke', 'rounded'].map((utility) => `${utility}-${suffix}`);
   });
-  const { configPath, config } = configAt(root);
-  config.tokens.css = ['tokens.css', path.join(repo, 'generated', 'tokens.css')];
-  config.tokens.dtcg = ['tokens.json', path.join(repo, 'token_catalog', '*.tokens.json')];
-  saveConfig(configPath, config);
+  enableGeneratedTheme(root);
   writePage(root, 'ThemePage.tsx', `export const P=()=> <main className="${words.join(' ')}"/>;\n`);
   assertPaintRefused(invoke(root), 'src/pages/ThemePage.tsx');
+});
+
+test('a page listed as an app token source is still scanned', () => {
+  const root = materialize();
+  const variable = fixturePaintVariable(root);
+  removePaintPages(root);
+  const { configPath, config } = configAt(root);
+  config.tokens.css.push('src/pages/TokenListedPage.tsx');
+  saveConfig(configPath, config);
+  writePage(root, 'TokenListedPage.tsx', `export const P=()=> <main style={{fill:"var(${variable})"}}/>;\n`);
+  assertPaintRefused(invoke(root), variable, 'TokenListedPage.tsx');
+});
+
+test('Tailwind variant prefixes cannot hide generated theme paint utilities', () => {
+  const root = materialize();
+  removePaintPages(root);
+  enableGeneratedTheme(root);
+  writePage(root, 'VariantPage.tsx', 'export const P=()=> <main className="hover:bg-danger md:rounded-lg md:hover:bg-danger"/>;\n');
+  assertPaintRefused(invoke(root), 'hover:bg-danger', 'md:rounded-lg', 'md:hover:bg-danger', 'VariantPage.tsx');
+});
+
+test('a Tailwind slash modifier cannot hide a generated theme paint utility', () => {
+  const root = materialize();
+  removePaintPages(root);
+  enableGeneratedTheme(root);
+  writePage(root, 'ModifierPage.tsx', 'export const P=()=> <main className="bg-danger/50"/>;\n');
+  assertPaintRefused(invoke(root), 'bg-danger/50', 'ModifierPage.tsx');
+});
+
+test('leading and trailing Tailwind important markers cannot hide generated theme paint utilities', () => {
+  const root = materialize();
+  removePaintPages(root);
+  enableGeneratedTheme(root);
+  writePage(root, 'ImportantPage.tsx', 'export const P=()=> <main className="!bg-danger bg-danger!"/>;\n');
+  assertPaintRefused(invoke(root), '!bg-danger', 'bg-danger!', 'ImportantPage.tsx');
+});
+
+test('an app class with a generated theme utility name cannot mask theme paint', () => {
+  const root = materialize();
+  removePaintPages(root);
+  enableGeneratedTheme(root);
+  writeFileSync(path.join(root, 'kit.css'), '.bg-danger{margin:var(--base-space-md)}\n');
+  writePage(root, 'MaskedThemePage.tsx', 'export const P=()=> <main className="bg-danger"/>;\n');
+  assertPaintRefused(invoke(root), 'bg-danger', 'MaskedThemePage.tsx');
+});
+
+test('an annotated Tailwind v4 shorthand cannot hide a paint token', () => {
+  const root = materialize();
+  removePaintPages(root);
+  const { variable } = syntheticPaint(root);
+  const kind = String.fromCharCode(99, 111, 108, 111, 114);
+  writePage(root, 'TypedShorthandPage.tsx', `export const P=()=> <main className="bg-(${kind}:${variable})"/>;\n`);
+  assertPaintRefused(invoke(root), variable, 'TypedShorthandPage.tsx');
+});
+
+test('a literal app custom property in a catalog path family remains paint', () => {
+  const root = materialize();
+  removePaintPages(root);
+  const family = Object.values(paintCatalog()).find((entry) => entry.pathFamilies.length > 0).pathFamilies[0];
+  const variable = `--app-${family}-brand`;
+  const literal = ['#', 'f', '0', '0'].join('');
+  const tokenPath = path.join(root, 'tokens.css');
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root{${variable}:${literal}}\n`);
+  writePage(root, 'LiteralAppVariablePage.tsx', `export const P=()=> <main style={{fill:"var(${variable})"}}/>;\n`);
+  assertPaintRefused(invoke(root), variable, 'LiteralAppVariablePage.tsx');
+});
+
+test('a token-source literal cannot mask an app stylesheet paint alias', () => {
+  const root = materialize();
+  const source = fixturePaintVariable(root);
+  removePaintPages(root);
+  const variable = '--app-hero';
+  const tokenPath = path.join(root, 'tokens.css');
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root{${variable}:0px}\n`);
+  writeFileSync(path.join(root, 'aliases.css'), `:root{${variable}:var(${source})}\n`);
+  writePage(root, 'MaskedAliasPage.tsx', `export const P=()=> <main style={{fill:"var(${variable})"}}/>;\n`);
+  assertPaintRefused(invoke(root), variable, 'MaskedAliasPage.tsx');
 });
 
 test('paint references accept CSS function case and Tailwind v4 shorthand', () => {

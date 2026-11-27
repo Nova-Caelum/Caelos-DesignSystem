@@ -115,8 +115,15 @@ function foldedStrings(text, bindings) {
 function paintReferences(value) {
   const refs = new Set();
   for (const match of String(value).matchAll(/var\(\s*(--[\w-]+)/gi)) refs.add(match[1]);
-  for (const match of String(value).matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(--[\w-]+)\s*\)/gi)) refs.add(match[1]);
+  for (const match of String(value).matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(?:[\w-]+\s*:\s*)?(--[\w-]+)\s*\)/gi)) refs.add(match[1]);
   return refs;
+}
+
+function themeUtilityName(word) {
+  let name = splitTopLevel(word, ":").at(-1)?.trim() ?? "";
+  name = name.replace(/^!+|!+$/g, "");
+  name = splitTopLevel(name, "/")[0].trim();
+  return name.replace(/^!+|!+$/g, "");
 }
 
 export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined }) {
@@ -232,7 +239,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       if (cfg.pagePaint?.isPaintToken(m[1], index)) add("page-paint", m.index, `${paintContext(m.index)}: paint token ${m[1]} — use an imported component for paint`);
     }
     if (cfg.pagePaint) {
-      for (const m of text.matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(--[\w-]+)\s*\)/gi)) reportPaint(m[0], m.index, `class "${m[0]}"`);
+      for (const m of text.matchAll(/(?<![\w-])(?:[\w-]+:)*[\w-]+-\(\s*(?:[\w-]+\s*:\s*)?(--[\w-]+)\s*\)/gi)) reportPaint(m[0], m.index, `class "${m[0]}"`);
       for (const [value, idx] of foldedStrings(text, st.bindings)) reportPaint(value, idx);
       for (const m of text.matchAll(/@import\s+(?:url\()?\s*["']([^"']+\.module\.(?:css|scss|sass|less))["']/gi)) loadPaintModule(m[1], m.index);
     }
@@ -421,7 +428,10 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
             add("page-paint", el.idx, `class "${word}" ${property}: paint token ${token} — use an imported component for paint`);
           }
         };
-        for (const word of res.staticWords) reportClass(word, classGlobal.get(word) ?? cfg.pagePaint.themeClasses.get(word));
+        for (const word of res.staticWords) {
+          reportClass(word, classGlobal.get(word));
+          reportClass(word, cfg.pagePaint.themeClasses.get(themeUtilityName(word)));
+        }
         for (const [file, name] of classWords(el).refs) reportClass(name, moduleIdx.get(file)?.get(name));
       }
 

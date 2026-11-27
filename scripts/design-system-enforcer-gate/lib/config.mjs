@@ -1,13 +1,14 @@
 // Config loading, defaults and compilation.
 import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname, isAbsolute } from "node:path";
+import { resolve, dirname, isAbsolute, relative, sep } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 // Through require, so a standalone copy finds the package via NODE_PATH as the pre-commit hook runs it.
 const StyleDictionary = createRequire(import.meta.url)("style-dictionary").default;
 import { compilePatterns, GLOBAL_ALLOW } from "./values.mjs";
-import { globToRegExp, walk } from "./util.mjs";
+import { globToRegExp, matcher, walk } from "./util.mjs";
+import { parseCss } from "./css.mjs";
 
 const COMP = "^--(controls|kit|primitives|overlays|patterns|units|caelos|app)-";
 const sides = (b, extra = []) => [b, ...["top", "right", "bottom", "left", "inline", "block", "inline-start", "inline-end", "block-start", "block-end", ...extra].map((s) => `${b}-${s}`)];
@@ -137,7 +138,7 @@ function paintTokenNames(raw, catalog, base) {
     }
     for (const [key, child] of Object.entries(node)) if (!key.startsWith("$")) visit(child, [...path, key], kind);
   };
-  const sources = [...new Set([...styleDictionarySources(), ...expandFiles(raw.tokens?.dtcg, base)])];
+  const sources = [...new Set([...styleDictionarySources(), ...expandFiles(raw.pagePaint?.tokenSources?.dtcg ?? raw.tokens?.dtcg, base)])];
   for (const file of sources) {
     if (!existsSync(file)) throw new Error(`page paint pass token source not found: ${file}`);
     visit(JSON.parse(readFileSync(file, "utf8")));
@@ -176,6 +177,20 @@ function paintThemeClasses(paintTokens) {
   return out;
 }
 
+function appCustomPropertyValues(raw, base) {
+  const out = new Map();
+  for (const file of expandFiles(raw.classIndex, base)) {
+    if (!file.endsWith(".css")) continue;
+    for (const declaration of parseCss(readFileSync(file, "utf8")).decls) {
+      if (!declaration.prop.startsWith("--")) continue;
+      const values = out.get(declaration.prop) ?? new Set();
+      values.add(declaration.value);
+      out.set(declaration.prop, values);
+    }
+  }
+  return out;
+}
+
 function loadPagePaint(raw, configPath, repoDir) {
   const requested = raw.pagePaint && (process.env.CAELOS_PAINT_FAMILIES ?? raw.pagePaint.catalog);
   if (!requested) return null;
@@ -200,13 +215,20 @@ function loadPagePaint(raw, configPath, repoDir) {
   }
   const paintTokens = paintTokenNames(raw, catalog, base);
   const themeClasses = paintThemeClasses(paintTokens);
+  const pathFamilies = [...new Set(Object.values(catalog).flatMap((entry) => entry.pathFamilies.map((value) => value.trim())))];
+  const familyPattern = pathFamilies.length
+    ? new RegExp(`^--(?:[\\w]+-)*(?:${pathFamilies.map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?:-|$)`)
+    : null;
+  const appValues = appCustomPropertyValues(raw, repoDir);
   const isPaintToken = (token, index, seen = new Set()) => {
-    if (paintTokens.has(token)) return true;
+    if (paintTokens.has(token) || familyPattern?.test(token)) return true;
     if (seen.has(token)) return false;
-    seen.add(token);
-    const rawValue = index?.byName.get(token)?.raw;
-    if (rawValue === undefined) return false;
-    return [...String(rawValue).matchAll(/var\(\s*(--[\w-]+)/gi)].some((match) => isPaintToken(match[1], index, seen));
+    const nextSeen = new Set(seen).add(token);
+    const values = new Set(appValues.get(token) ?? []);
+    const indexed = index?.byName.get(token)?.raw;
+    if (indexed !== undefined) values.add(indexed);
+    return [...values].some((value) => [...String(value).matchAll(/var\(\s*(--[\w-]+)/gi)]
+      .some((match) => isPaintToken(match[1], index, nextSeen)));
   };
   return {
     catalog: file,
@@ -216,7 +238,7 @@ function loadPagePaint(raw, configPath, repoDir) {
   };
 }
 
-function withPagePaintConfig(raw) {
+function withPagePaintConfig(raw, repoDir) {
   const overlayPath = process.env.CAELOS_PAGE_PAINT_CONFIG;
   if (!overlayPath) return raw;
   if (!existsSync(overlayPath)) throw new Error(`page paint config not found: ${overlayPath}`);
@@ -227,7 +249,17 @@ function withPagePaintConfig(raw) {
   const pages = JSON.parse(process.env.CAELOS_PAGE_PAINT_PAGES ?? "null");
   if (!Array.isArray(pages) || pages.length === 0 || pages.some((page) => typeof page !== "string" || page.trim() === "")) throw new Error("page paint pass requires page globs");
   const paintRaw = deepMerge({}, overlay);
-  paintRaw.tokens = raw.tokens ?? DEFAULTS.tokens;
+  const tokenSources = raw.tokens ?? DEFAULTS.tokens;
+  const isPage = matcher(pages);
+  const nonPageSources = (patterns) => expandFiles(patterns, repoDir).filter((file) => {
+    const rel = relative(repoDir, file).split(sep).join("/");
+    return !isPage(rel);
+  });
+  paintRaw.tokens = {
+    css: nonPageSources(tokenSources.css),
+    dtcg: nonPageSources(tokenSources.dtcg),
+  };
+  paintRaw.pagePaint.tokenSources = tokenSources;
   paintRaw.scan = { include: pages, exclude: [], types: PAGE_TYPES };
   paintRaw.classIndex = ["**/*.css", generatedTheme];
   paintRaw.severity = { "page-paint": "error" };
@@ -251,7 +283,7 @@ export function loadConfig(configPath, repoDir) {
     appRaw = JSON.parse(readFileSync(configPath, "utf8"));
   }
   const paintPass = Boolean(process.env.CAELOS_PAGE_PAINT_CONFIG);
-  const raw = paintPass ? withPagePaintConfig(appRaw) : withoutPagePaintSettings(appRaw);
+  const raw = paintPass ? withPagePaintConfig(appRaw, repoDir) : withoutPagePaintSettings(appRaw);
   const cfg = deepMerge(DEFAULTS, raw);
   cfg.pagePaint = paintPass ? loadPagePaint(raw, configPath, repoDir) : null;
   const dims = {};
