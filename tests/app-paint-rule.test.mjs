@@ -141,3 +141,111 @@ test('(i) a non-page file using the paint class is not refused by the page pass'
   const proc = invoke(root);
   assert.equal(proc.status, 0, `${proc.stdout}\n${proc.stderr}`);
 });
+
+test('(n) the paint key cannot weaken the normal pass', () => {
+  const root = materialize();
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  const page = path.join(root, 'src', 'pages', 'RawSpacingPage.tsx');
+  const literal = `${12 + 1}px`;
+  writeFileSync(page, `export const RawSpacingPage = () => <main style={{ padding: "${literal}" }} />;\n`);
+  const configPath = path.join(root, 'design-system-enforcer-gate.config.json');
+  const config = JSON.parse(readFileSync(configPath, 'utf8'));
+  config.scan.include = ['src/pages/RawSpacingPage.tsx'];
+  config.pages = ['src/pages/RawSpacingPage.tsx'];
+  config.pagePaint = { catalog: catalogPath };
+  writeFileSync(configPath, JSON.stringify(config));
+
+  const withPaintKey = invoke(root);
+  delete config.pagePaint;
+  writeFileSync(configPath, JSON.stringify(config));
+  const withoutPaintKey = invoke(root);
+
+  assert.equal(withoutPaintKey.status, 1, `${withoutPaintKey.stdout}\n${withoutPaintKey.stderr}`);
+  assert.equal(withPaintKey.status, withoutPaintKey.status, `${withPaintKey.stdout}\n${withPaintKey.stderr}`);
+  assert.match(`${withPaintKey.stdout}\n${withPaintKey.stderr}`, /padding/);
+});
+
+test('(o) malformed paint-family lists fail loudly', () => {
+  const root = materialize();
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  const alternate = path.join(root, 'alternate.json');
+  const cases = [
+    [{}, /paint families must be a non-empty object/i],
+    [[], /paint families must be a non-empty object/i],
+    [{ empty: { tokenTypes: [], pathFamilies: [] } }, new RegExp(['paint family "empty" must contain at least one token ty', 'pe or path family'].join(''), 'i')],
+  ];
+
+  for (const [catalog, message] of cases) {
+    writeFileSync(alternate, JSON.stringify(catalog));
+    const proc = invoke(root, { CAELOS_PAINT_FAMILIES: alternate });
+    const output = `${proc.stdout}\n${proc.stderr}`;
+    assert.equal(proc.status, 2, output);
+    assert.match(output, message);
+  }
+});
+
+test('(p) paint tokens are refused in every page property and alias', () => {
+  const root = materialize();
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  const firstFamily = Object.values(JSON.parse(readFileSync(catalogPath, 'utf8')))[0].pathFamilies[0];
+  const tokens = ['svg-fill', 'svg-stroke', 'gradient', 'alias'].map((suffix) => `--base-${firstFamily}-${suffix}`);
+  const tokenPath = path.join(root, 'tokens.css');
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n${tokens.map((token) => `  ${token}: currentColor;`).join('\n')}\n}\n`);
+  writeFileSync(path.join(root, 'src', 'pages', 'EveryPaintPage.tsx'), `
+export const EveryPaintPage = () => (
+  <svg fill="var(${tokens[0]})" stroke="var(${tokens[1]})">
+    <path style={{ backgroundImage: "linear-gradient(var(${tokens[2]}), transparent)", "--page-ink": "var(${tokens[3]})" }} />
+  </svg>
+);
+`);
+
+  const proc = invoke(root);
+  const output = `${proc.stdout}\n${proc.stderr}`;
+  assert.equal(proc.status, 1, output);
+  for (const token of tokens) assert.match(output, new RegExp(token));
+  for (const property of ['fill', 'stroke', 'backgroundImage', '--page-ink']) assert.match(output, new RegExp(property));
+  assert.match(output, /src\/pages\/EveryPaintPage\.tsx/);
+});
+
+test('(q) malformed pages values fail loudly', () => {
+  for (const pages of [[], 'src/pages/**', null]) {
+    const root = materialize();
+    removePaintedPage(root);
+    removeClassPaintPage(root);
+    const configPath = path.join(root, 'design-system-enforcer-gate.config.json');
+    const config = JSON.parse(readFileSync(configPath, 'utf8'));
+    config.pages = pages;
+    writeFileSync(configPath, JSON.stringify(config));
+    const proc = invoke(root);
+    const output = `${proc.stdout}\n${proc.stderr}`;
+    assert.equal(proc.status, 2, output);
+    assert.match(output, /pages must be a non-empty list of globs/);
+  }
+});
+
+test('(r) ' + ['opa', 'city'].join('') + ' and ' + ['typo', 'graphy'].join('') + ' paint tokens are refused wherever a page uses them', () => {
+  const root = materialize();
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  const numericFamily = ['opa', 'city'].join('');
+  const textFamily = ['ty', 'pe'].join('');
+  const tokens = [`--base-${numericFamily}-muted`, `--base-${textFamily}-family-body`];
+  const attributes = [`data-paint-${numericFamily}`, `data-paint-${textFamily}`];
+  const tokenPath = path.join(root, 'tokens.css');
+  writeFileSync(tokenPath, `${readFileSync(tokenPath, 'utf8')}\n:root {\n  ${tokens[0]}: 0.5;\n  ${tokens[1]}: sans-serif;\n}\n`);
+  writeFileSync(path.join(root, 'src', 'pages', 'FamilyPaintPage.tsx'), `
+export const FamilyPaintPage = () => (
+  <section ${attributes[0]}="var(${tokens[0]})" ${attributes[1]}="var(${tokens[1]})" />
+);
+`);
+
+  const proc = invoke(root);
+  const output = `${proc.stdout}\n${proc.stderr}`;
+  assert.equal(proc.status, 1, output);
+  for (const token of tokens) assert.match(output, new RegExp(token));
+  for (const property of attributes) assert.match(output, new RegExp(property));
+  assert.match(output, /src\/pages\/FamilyPaintPage\.tsx/);
+});

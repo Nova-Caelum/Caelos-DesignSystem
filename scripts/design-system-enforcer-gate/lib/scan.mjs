@@ -44,6 +44,15 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     const lineAt = lineIndex(raw);
     const add = (rule, idx, message, severity = sev(rule)) => { if (severity !== "off") st.findings.push({ file: f.rel, line: lineAt(idx), idx, rule, severity, message }); };
     const showLit = (t) => t.replaceAll(DYN, "${…}");
+    const paintContext = (idx) => {
+      const before = text.slice(Math.max(0, idx - 500), idx);
+      const objectProperty = before.match(/(?:^|[{,])\s*(?:["']([^"']+)["']|([A-Za-z_$][\w$-]*))\s*:\s*[^,{}]*$/s);
+      if (objectProperty) return objectProperty[1] ?? objectProperty[2];
+      const cssProperty = before.match(/(?:^|[;{])\s*(--[\w-]+|[A-Za-z-]+)\s*:\s*[^;{}]*$/s);
+      if (cssProperty) return cssProperty[1];
+      const attribute = before.match(/([:\w-]+)\s*=\s*(?:["']|\{\s*["'`])?[^<>"'\n]*$/);
+      return attribute?.[1] ?? "value";
+    };
 
     // ---- value rules -------------------------------------------------
     const runDim = (dim, kind, prop, value, idx, label = prop) => {
@@ -107,6 +116,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       const after = text[m.index + m[0].length - (m[2] ? 1 : 0)];
       if (cfg.var.noFallback && m[2]) add("fallback", m.index, `var(${m[1]}, …) has a fallback — remove it; if the token is missing, use one that exists`);
       if (cfg.var.mustBeDefined && !defined.has(m[1]) && !ignoreVar.some((r) => r.test(m[1])) && !(m[1].endsWith("-") && /[$'"`]/.test(after ?? ""))) add("undefined", m.index, `${m[1]} is not defined in the token sources or the app's CSS — pick a token that exists`);
+      if (cfg.pagePaint?.isPaintToken(m[1])) add("page-paint", m.index, `${paintContext(m.index)}: paint token ${m[1]} — use an imported component for paint`);
     }
 
     if (f.type !== "css") {
@@ -270,9 +280,12 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       if (cfg.pagePaint) for (const word of res.staticWords) {
         const declarations = classGlobal.get(word);
         if (!declarations) continue;
-        const tokens = new Set([...declarations.values()].flatMap((values) => values.flatMap((value) => [...String(value).matchAll(/var\(\s*(--[\w-]+)/g)].map((match) => match[1]))));
-        for (const token of tokens) if (cfg.pagePaint.isPaintToken(token)) {
-          add("page-paint", el.idx, `class "${word}" resolves to paint token ${token} — use an imported component for paint`);
+        const uses = new Map();
+        for (const [property, values] of declarations) for (const value of values) {
+          for (const match of String(value).matchAll(/var\(\s*(--[\w-]+)/g)) uses.set(`${property}\0${match[1]}`, [property, match[1]]);
+        }
+        for (const [property, token] of uses.values()) if (cfg.pagePaint.isPaintToken(token)) {
+          add("page-paint", el.idx, `class "${word}" ${property}: paint token ${token} — use an imported component for paint`);
         }
       }
 

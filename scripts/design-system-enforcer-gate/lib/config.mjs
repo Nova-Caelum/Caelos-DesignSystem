@@ -84,9 +84,23 @@ function loadPagePaint(raw, configPath, repoDir) {
   const file = isAbsolute(expanded) ? expanded : resolve(base, expanded);
   if (!existsSync(file)) throw new Error(`page paint catalog not found: ${file}`);
   const catalog = JSON.parse(readFileSync(file, "utf8"));
+  if (!isObj(catalog) || Object.keys(catalog).length === 0) {
+    throw new Error("paint families must be a non-empty object");
+  }
+  for (const [name, entry] of Object.entries(catalog)) {
+    if (!isObj(entry)) throw new Error(`paint family "${name}" must be an object`);
+    for (const field of ["tokenTypes", "pathFamilies"]) {
+      if (!Array.isArray(entry[field]) || entry[field].some((value) => typeof value !== "string" || value.trim() === "")) {
+        throw new Error(`paint family "${name}" ${field} must be an array of non-empty strings`);
+      }
+    }
+    if (entry.tokenTypes.length === 0 && entry.pathFamilies.length === 0) {
+      throw new Error(`paint family "${name}" must contain at least one token type or path family`);
+    }
+  }
   const families = new Set(Object.values(catalog).flatMap((entry) => [
-    ...(entry.pathFamilies ?? []),
-    ...(entry.tokenTypes ?? []).map((type) => type.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)),
+    ...entry.pathFamilies.map((family) => family.trim()),
+    ...entry.tokenTypes.map((type) => type.trim().replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)),
   ]));
   const names = [...families].map((text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).filter(Boolean);
   const tokenPattern = names.length ? new RegExp(`^--(?:[\\w]+-)*(?:${names.join("|")})(?:-|$)`) : /$^/;
@@ -106,47 +120,29 @@ function withPagePaintConfig(raw) {
     overlay.pagePaint.catalog = resolve(dirname(overlayPath), overlay.pagePaint.catalog);
   }
   const pages = JSON.parse(process.env.CAELOS_PAGE_PAINT_PAGES ?? "null");
-  if (!Array.isArray(pages) || pages.length === 0) throw new Error("page paint pass requires page globs");
+  if (!Array.isArray(pages) || pages.length === 0 || pages.some((page) => typeof page !== "string" || page.trim() === "")) throw new Error("page paint pass requires page globs");
   return deepMerge(deepMerge(raw, overlay), { scan: { include: pages } });
 }
 
-const escapeRe = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const nonPaintTokenPattern = (families) => {
-  const names = [...families].map(escapeRe).filter(Boolean);
-  return names.length ? `^--(?!(?:[\\w]+-)*(?:${names.join("|")})(?:-|$))` : "^--";
-};
-
-function applyPagePaintDimensions(dims, families) {
+function applyPagePaintDimensions(dims) {
   for (const dim of Object.values(dims)) dim.enabled = false;
-  const tokens = [nonPaintTokenPattern(families)];
-  const configure = (name, properties, extra = {}) => {
-    dims[name] = { ...dims[name], ...extra, enabled: true, tokens, properties };
-  };
-  configure("colour", Object.fromEntries(Object.keys(dims.colour.properties).map((property) => [property, "colour"])), { anywhere: false });
-  configure("radius", dims.radius.properties);
-  configure("typography", dims.typography.properties);
-  configure("opacity", dims.opacity.properties);
-  dims["page-paint"] = {
-    enabled: true,
-    kind: "any",
-    tokens,
-    properties: obj([
-      "border", "border-width", "border-top-width", "border-right-width", "border-bottom-width", "border-left-width",
-      "border-style", "border-image", "outline", "outline-width", "outline-style", "filter", "backdrop-filter",
-      "box-shadow", "text-shadow",
-    ], "any"),
-  };
 }
 
+const withoutPagePaintSettings = (raw) => {
+  const { pages: _pages, pagePaint: _pagePaint, ...normal } = raw;
+  return normal;
+};
+
 export function loadConfig(configPath, repoDir) {
-  let raw = {};
+  let appRaw = {};
   if (configPath) {
     if (!existsSync(configPath)) throw new Error(`config not found: ${configPath}`);
-    raw = JSON.parse(readFileSync(configPath, "utf8"));
+    appRaw = JSON.parse(readFileSync(configPath, "utf8"));
   }
-  raw = withPagePaintConfig(raw);
+  const paintPass = Boolean(process.env.CAELOS_PAGE_PAINT_CONFIG);
+  const raw = paintPass ? withPagePaintConfig(appRaw) : withoutPagePaintSettings(appRaw);
   const cfg = deepMerge(DEFAULTS, raw);
-  cfg.pagePaint = loadPagePaint(raw, configPath, repoDir);
+  cfg.pagePaint = paintPass ? loadPagePaint(raw, configPath, repoDir) : null;
   const dims = {};
   for (const [name, def] of Object.entries(DEFAULT_DIMENSIONS)) {
     const user = raw.dimensions?.[name] ?? {};
@@ -156,7 +152,7 @@ export function loadConfig(configPath, repoDir) {
     dims[name] = m;
   }
   for (const [name, user] of Object.entries(raw.dimensions ?? {})) if (!(name in dims)) dims[name] = { enabled: true, kind: "any", tokens: [], properties: {}, ...user };
-  if (cfg.pagePaint) applyPagePaintDimensions(dims, cfg.pagePaint.families);
+  if (cfg.pagePaint) applyPagePaintDimensions(dims);
   cfg.compiled = {};
   for (const [name, d] of Object.entries(dims)) {
     if (d.enabled === false) continue;

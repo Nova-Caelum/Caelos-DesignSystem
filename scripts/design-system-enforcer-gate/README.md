@@ -18,14 +18,14 @@ file:line  [rule] what is wrong — the fix (nearest token when computable)
 
 Warnings print `(warn)` before the message. Exemptions are listed at the end with their reasons. Without `--config` it reads `<repoDir>/design-system-enforcer-gate.config.json` if present. This repository's example config is `design-system-enforcer-gate.config.json`; app repositories keep their config at the same repository-root path.
 
-`npm run check:app` runs the normal gate, then a page-only paint pass. Add `pages` as a list of repo-relative globs to the app config to select those page folders. The paint pass reads the catalog's paint list at run time, permits arrangement tokens such as spacing and size, and rejects page-owned paint tokens, including paint carried by a static class resolved through `classIndex`. If `pages` is absent, `check:app` runs the normal pass and prints that the paint pass was skipped.
+`npm run check:app` runs the normal gate, then a page-only paint pass. The second pass is additive: `pages` and `pagePaint` are removed before the normal configuration is compiled. Add `pages` as a non-empty list of non-empty, repo-relative globs to select page folders; a present but malformed value is a configuration error. The paint pass reads and validates the catalog's paint families at run time, then rejects every page-owned `var(--…)` from those families regardless of the property, attribute, or custom-property alias that contains it. Static classes resolved through `classIndex` are checked the same way and report their declaration property. If `pages` is absent, `check:app` runs the normal pass and prints that the paint pass was skipped.
 
 ## Config
 
 | Key | Meaning |
 |---|---|
 | `scan.include` / `exclude` / `types` | Globs (repo-relative) and extensions to judge. |
-| `pages` | App-only list of page-folder globs used by `check:app` for its second, paint-only pass. |
+| `pages` | App-only, non-empty list of non-empty page-folder globs used by `check:app` for its second, paint-only pass. Invalid values exit 2; only an absent key skips the pass. |
 | `tokens.css` / `tokens.dtcg` | Token sources: CSS custom-property files and DTCG JSON. Paths or globs; `~/` and `../` allowed. A CSS var is `--` plus the DTCG path joined by `-` (`base.space.px-12` is `--base-space-px-12`). Token files are never judged. |
 | `classIndex` | Extra CSS (e.g. the kit) used to resolve class names to declarations for the missing-value rules and the page paint pass. |
 | `dimensions.<name>` | `enabled`, `kind`, `tokens` (allowed families: a `--prefix` or a `^regex`, primary family first; the first is also where "nearest token" looks), `properties` (array, or `{prop: kind}`), `allow` (extra keywords, or `/regex/`), `severity`. Built in: colour, spacing, size (off), radius, shadow, typography, motion, opacity, z-index (off). Add your own by name. |
@@ -48,7 +48,7 @@ Exemptions: `data-ui-exempt="<reason>"` on the element (old `data-kit-exempt` ac
 
 ## Known blind spots
 
-- Static only. The page paint pass resolves literal `class="…"` and `className="…"` values; template strings, class names built at run time, `styles[variant]`, classes added by a library, or CSS in another package are invisible. The missing-value rules treat an unresolved class as declaring nothing (so they can over-report) and cannot see a gap set through a descendant selector (`.row > * + *`).
+- Static only. Direct page `var(--…)` references are checked in every property and attribute. For class paint, the page paint pass resolves literal `class="…"` and `className="…"` values; template strings, class names built at run time, `styles[variant]`, classes added by a library, or CSS outside `classIndex` are invisible. The missing-value rules treat an unresolved class as declaring nothing (so they can over-report) and cannot see a gap set through a descendant selector (`.row > * + *`).
 - `missing-gap` ignores wrapper components that render the flex container themselves and children inside a component you did not scan; it cannot see `grid-template` spacing tricks.
 - `missing-typography` cannot see inheritance across files or from `body`/`:root`. `inherit: "ancestors"` follows only the same file's markup; `"none"` requires every text element to carry its own.
 - `missing-motion` accepts any token-using `transition`/`animation` regardless of the property list, and cannot tell a control that should not animate.

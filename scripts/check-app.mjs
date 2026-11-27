@@ -61,9 +61,12 @@ if (args.includes('-h') || args.includes('--help')) {
       process.exitCode = normal.status;
     } else {
       const appConfig = JSON.parse(readFileSync(configPath, 'utf8'));
-      if (!Array.isArray(appConfig.pages) || appConfig.pages.length === 0) {
+      if (!Object.hasOwn(appConfig, 'pages')) {
         console.error('check-app: paint pass skipped: app config has no pages key');
         process.exitCode = normal.status;
+      } else if (!Array.isArray(appConfig.pages) || appConfig.pages.length === 0 || appConfig.pages.some((page) => typeof page !== 'string' || page.trim() === '')) {
+        console.error('check-app: pages must be a non-empty list of globs');
+        process.exitCode = 2;
       } else {
         const paint = run(args, {
           ...process.env,
