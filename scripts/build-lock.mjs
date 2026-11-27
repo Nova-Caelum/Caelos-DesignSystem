@@ -15,12 +15,14 @@ function parseArguments(argv) {
     schema: path.resolve('token_catalog/recipe.schema.json'),
     out: path.resolve('token_catalog/versions.lock.json'),
     dependents: undefined,
+    tierZeroReport: undefined,
   };
   const flags = new Map([
     ['--catalog', 'catalog'],
     ['--schema', 'schema'],
     ['--out', 'out'],
     ['--dependents', 'dependents'],
+    ['--tier0-report', 'tierZeroReport'],
   ]);
   for (let index = 0; index < argv.length; index += 1) {
     const option = flags.get(argv[index]);
@@ -313,6 +315,22 @@ function createDependencyWalker(catalog, clean) {
   const tokenMemo = new Map();
   const entryMemo = new Map();
 
+  function emptyResolution(hasValues = false) {
+    return { dependencies: new Set(), stops: new Set(), hasValues };
+  }
+
+  function mergeResolution(target, source) {
+    for (const dependency of source.dependencies) target.dependencies.add(dependency);
+    for (const stop of source.stops) target.stops.add(stop);
+    target.hasValues ||= source.hasValues;
+    return target;
+  }
+
+  function mergeDependencies(target, source) {
+    for (const dependency of source.dependencies) target.dependencies.add(dependency);
+    return target;
+  }
+
   function references(value, found = new Set()) {
     if (typeof value === 'string') {
       const match = referencePattern.exec(value);
@@ -327,52 +345,128 @@ function createDependencyWalker(catalog, clean) {
     return found;
   }
 
-  function tokenDependencies(name, stack = []) {
+  function displayValue(value) {
+    return typeof value === 'string' ? value : JSON.stringify(canonical(value));
+  }
+
+  function valueResolution(value, stack = []) {
+    if (typeof value === 'string') {
+      const match = referencePattern.exec(value);
+      if (match) return tokenResolution(match[1], stack);
+      const result = emptyResolution(true);
+      result.stops.add(value);
+      return result;
+    }
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        const result = emptyResolution(true);
+        result.stops.add(displayValue(value));
+        return result;
+      }
+      return value.reduce(
+        (result, item) => mergeResolution(result, valueResolution(item, stack)),
+        emptyResolution(true),
+      );
+    }
+    if (value && typeof value === 'object') {
+      const values = Object.values(value);
+      if (values.length === 0) {
+        const result = emptyResolution(true);
+        result.stops.add(displayValue(value));
+        return result;
+      }
+      return values.reduce(
+        (result, item) => mergeResolution(result, valueResolution(item, stack)),
+        emptyResolution(true),
+      );
+    }
+    const result = emptyResolution(true);
+    result.stops.add(displayValue(value));
+    return result;
+  }
+
+  function tokenResolution(name, stack = []) {
     if (stack.includes(name)) throw new Error(`token reference cycle: ${[...stack, name].join(' -> ')}`);
     if (tokenMemo.has(name)) return tokenMemo.get(name);
     const definitions = catalog.tokens.get(name);
-    if (!definitions) throw new Error(`Unknown token reference: ${name}`);
-    const result = new Set();
-    if (definitions.some(({ tier }) => tier === 0)) result.add(name);
+    if (!definitions) {
+      const result = emptyResolution(true);
+      result.stops.add(name);
+      return result;
+    }
+    const result = emptyResolution(true);
+    if (definitions.some(({ tier }) => tier === 0)) {
+      result.dependencies.add(name);
+      tokenMemo.set(name, result);
+      return result;
+    }
     const nextStack = [...stack, name];
     for (const definition of definitions) {
       for (const reference of references(clean(definition.node))) {
-        for (const dependency of tokenDependencies(reference, nextStack)) result.add(dependency);
+        mergeDependencies(result, tokenResolution(reference, nextStack));
+      }
+      if (Object.hasOwn(definition.node, '$value')) {
+        mergeResolution(result, valueResolution(definition.node.$value, nextStack));
       }
     }
     tokenMemo.set(name, result);
     return result;
   }
 
-  function entryDependencies(name, stack = []) {
+  function valuesIn(value, found = []) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return found;
+    if (Object.hasOwn(value, '$value')) {
+      found.push(value.$value);
+      return found;
+    }
+    for (const [key, child] of Object.entries(value)) {
+      if (!key.startsWith('$')) valuesIn(child, found);
+    }
+    return found;
+  }
+
+  function entryResolution(name, stack = []) {
     if (stack.includes(name)) throw new Error(`madeOf cycle: ${[...stack, name].join(' -> ')}`);
     if (entryMemo.has(name)) return entryMemo.get(name);
     const definitions = catalog.entries.get(name);
     if (!definitions) throw new Error(`madeOf names missing entry: ${name}`);
-    const result = new Set();
-    if (definitions.some(({ tier }) => tier === 0)) result.add(name);
+    const result = emptyResolution();
     const nextStack = [...stack, name];
     for (const definition of definitions) {
+      const values = valuesIn(definition.node);
+      result.hasValues ||= values.length > 0;
       for (const reference of references(clean(definition.node))) {
-        for (const dependency of tokenDependencies(reference)) result.add(dependency);
+        mergeDependencies(result, tokenResolution(reference));
+      }
+      if (Object.hasOwn(definition.node, '$value')) {
+        mergeResolution(result, tokenResolution(name));
+      } else {
+        for (const value of values) mergeResolution(result, valueResolution(value));
       }
       for (const dependency of extension(definition.node)?.madeOf ?? []) {
-        for (const transitive of entryDependencies(dependency, nextStack)) result.add(transitive);
+        mergeResolution(result, entryResolution(dependency, nextStack));
       }
     }
     entryMemo.set(name, result);
     return result;
   }
 
-  return { entryDependencies };
+  return {
+    entryDependencies: (name) => entryResolution(name).dependencies,
+    entryResolution,
+  };
 }
 
-async function buildLockModel(catalogDirectory, schemaFile) {
+async function buildLockContext(catalogDirectory, schemaFile) {
   const schema = JSON.parse(await readFile(schemaFile, 'utf8'));
   const catalog = await loadCatalog(catalogDirectory);
   const changeResolver = createResolver(catalog, ignoredFields(schema, 'x-caelos-ignore-for-change'));
-  const contentRecords = contentFingerprintRecords(catalog);
   const walker = createDependencyWalker(catalog, changeResolver.clean);
+  return { catalog, changeResolver, walker };
+}
+
+function buildLockModelFromContext({ catalog, changeResolver, walker }) {
+  const contentRecords = contentFingerprintRecords(catalog);
 
   const entries = {};
   let variantCount = 0;
@@ -408,12 +502,33 @@ async function buildLockModel(catalogDirectory, schemaFile) {
   };
 }
 
+async function buildLockModel(catalogDirectory, schemaFile) {
+  return buildLockModelFromContext(await buildLockContext(catalogDirectory, schemaFile));
+}
+
 export async function buildLock({ catalog, schema }) {
   return (await buildLockModel(catalog, schema)).document;
 }
 
 async function run(options) {
-  const model = await buildLockModel(options.catalog, options.schema);
+  const context = await buildLockContext(options.catalog, options.schema);
+  if (options.tierZeroReport !== undefined) {
+    const namesNotReachingTier0 = [];
+    for (const name of [...context.catalog.entries.keys()].sort()) {
+      const resolution = context.walker.entryResolution(name);
+      if (!resolution.hasValues || resolution.stops.size === 0) continue;
+      const definitions = context.catalog.entries.get(name);
+      namesNotReachingTier0.push({
+        name,
+        file: definitions.slice().sort((left, right) => left.file.localeCompare(right.file))[0].file,
+        line: 0,
+        stopsAt: [...resolution.stops].sort()[0],
+      });
+    }
+    await mkdir(path.dirname(options.tierZeroReport), { recursive: true });
+    await writeFile(options.tierZeroReport, `${JSON.stringify({ namesNotReachingTier0 }, null, 2)}\n`);
+  }
+  const model = buildLockModelFromContext(context);
   if (options.dependents !== undefined) {
     const target = model.catalog.tokens.get(options.dependents);
     if (!target || !target.some(({ tier }) => tier === 0)) {

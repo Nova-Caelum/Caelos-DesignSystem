@@ -19,12 +19,16 @@ export function parseComparable(v) {
   return null;
 }
 
+function varAlias(raw) {
+  return String(raw).trim().match(/^var\(\s*(--[\w-]+)\s*(?:,[^)]*)?\)$/)?.[1] ?? null;
+}
+
 function resolveVar(name, raw, depth = 0) {
   if (depth > 12) return null;
-  const m = String(raw).trim().match(/^var\(\s*(--[\w-]+)\s*(?:,[^)]*)?\)$/);
-  if (!m) return raw;
-  const next = raw.__map?.get(m[1]);
-  return next === undefined ? null : resolveVar(m[1], next, depth + 1);
+  const alias = varAlias(raw);
+  if (!alias) return raw;
+  const next = raw.__map?.get(alias);
+  return next === undefined ? null : resolveVar(alias, next, depth + 1);
 }
 
 export function parseCssTokens(file) {
@@ -80,6 +84,25 @@ export function buildTokenIndex(entries) {
     tokens.push({ ...e, value: value == null ? null : String(value), cmp: value == null ? null : parseComparable(String(value)) });
   }
   return { defined: new Set(entries.map((e) => e.name)), tokens, byName: new Map(tokens.map((t) => [t.name, t])) };
+}
+
+/** Follow an exact custom-property alias chain and identify whether it terminates in a built token literal. */
+export function traceTokenToTierZero(index, name) {
+  const seen = new Set();
+  let current = name;
+  while (!seen.has(current)) {
+    seen.add(current);
+    const token = index.byName.get(current);
+    if (!token) return { reachesTierZero: false, stopsAt: current === name ? null : current };
+    const raw = token.raw == null ? null : String(token.raw).trim();
+    const alias = raw == null ? null : varAlias(raw);
+    if (alias) {
+      current = alias;
+      continue;
+    }
+    return { reachesTierZero: !token.app, stopsAt: raw };
+  }
+  return { reachesTierZero: false, stopsAt: current };
 }
 
 const rgbDist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);

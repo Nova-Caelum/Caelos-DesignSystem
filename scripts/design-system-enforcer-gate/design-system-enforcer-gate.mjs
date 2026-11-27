@@ -10,7 +10,7 @@ import { readFileSync, existsSync, statSync } from "node:fs";
 import { resolve, join, relative, dirname, isAbsolute } from "node:path";
 import { walk, matcher, globToRegExp } from "./lib/util.mjs";
 import { loadConfig, expandHome } from "./lib/config.mjs";
-import { parseCssTokens, parseDtcgTokens, buildTokenIndex } from "./lib/tokens.mjs";
+import { parseCssTokens, parseDtcgTokens, buildTokenIndex, traceTokenToTierZero } from "./lib/tokens.mjs";
 import { parseCss, buildClassIndex } from "./lib/css.mjs";
 import { createEngine } from "./lib/scan.mjs";
 
@@ -86,12 +86,12 @@ for (const n of index.defined) defined.add(n);
 for (const e of appEntries) defined.add(e.name);
 
 const engine = createEngine({ root, cfg, index, classGlobal, moduleIdx, defined });
-let findings = [], exempt = [];
+let findings = [], exempt = [], usedTokens = [];
 for (const f of files) {
   const raw = texts.get(f.abs);
   if (cfg.kit.fileRequires.some((r) => r.siblingSuffix) && f.type === "tsx") { const sib = f.abs.replace(/\.tsx$/, ".module.css"); f.siblingText = existsSync(sib) ? readFileSync(sib, "utf8") : ""; }
   const res = engine.scanFile(f, raw);
-  findings.push(...res.findings); exempt.push(...res.exempt);
+  findings.push(...res.findings); exempt.push(...res.exempt); usedTokens.push(...res.usedTokens);
 }
 for (const pr of cfg.kit.projectRequires) {
   const re = new RegExp(pr.anyOf);
@@ -99,17 +99,23 @@ for (const pr of cfg.kit.projectRequires) {
 }
 if (only) { findings = findings.filter((f) => only.has(f.rule)); exempt = exempt.filter((f) => only.has(f.rule)); }
 findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
+const namesNotReachingTier0 = usedTokens
+  .map((used) => ({ ...used, ...traceTokenToTierZero(index, used.name) }))
+  .filter(({ reachesTierZero }) => !reachesTierZero)
+  .map(({ reachesTierZero, ...entry }) => entry)
+  .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line || a.name.localeCompare(b.name));
 
 const errors = findings.filter((f) => f.severity === "error"), warns = findings.filter((f) => f.severity !== "error");
 const failing = cfg.failOn.includes("warn") || strict ? findings : errors;
 const tally = (list) => list.reduce((a, f) => ((a[f.rule] = (a[f.rule] ?? 0) + 1), a), {});
 
 if (json) {
-  console.log(JSON.stringify({ files: files.length, tokens: index.tokens.length, errors: errors.length, warnings: warns.length, byRule: tally(findings), findings, exempt }, null, 1));
+  console.log(JSON.stringify({ files: files.length, tokens: index.tokens.length, errors: errors.length, warnings: warns.length, namesNotReachingTier0, byRule: tally(findings), findings, exempt }, null, 1));
 } else {
   const head = `design-system-enforcer-gate: ${failing.length ? "FAIL" : "PASS"} — ${files.length} files, ${index.tokens.length} tokens; ${errors.length} error(s), ${warns.length} warning(s)`;
   const by = Object.entries(tally(findings)).map(([k, n]) => `${k} ${n}`).join(", ");
   console.log(head + (by ? `: ${by}` : ""));
+  console.log(`names not reaching tier 0: ${namesNotReachingTier0.length}`);
   for (const f of findings) console.log(`  ${f.file}${f.line ? ":" + f.line : ""}  [${f.rule}] ${f.severity === "error" ? "" : "(" + f.severity + ") "}${f.message}`);
   if (exempt.length) { console.log(`exempt (${exempt.length}) — reasons, for review:`); for (const f of exempt) console.log(`  ${f.file}:${f.line}  [${f.rule}] exempt: ${f.reason}`); }
 }

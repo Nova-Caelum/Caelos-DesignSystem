@@ -8,7 +8,6 @@ const refusedModelFamilies = JSON.parse(
   readFileSync(new URL('../refused-models.json', import.meta.url), 'utf8'),
 ).models.map((model) => model.toLowerCase());
 const pinFiles = new Set(['package.json', 'package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock']);
-const tierZeroOwners = ['enforcer gate', 'catalog checks', 'tier-drift check', 'token build', 'lock build'];
 const outputHashesName = 'output-hashes.json';
 
 function readJson(file, label = file) {
@@ -171,19 +170,41 @@ function successfulIds(checks) {
   return (checks || []).map((check) => typeof check === 'number' ? check : check.id);
 }
 
+function readTierZeroOwner(jobFolder, job, gate = null, signoffs = []) {
+  const expand = job.chain === 'expand';
+  const relative = expand ? job.finish.tierZeroReport : job.finish.gateResults;
+  const owner = expand ? 'lock build' : 'enforcer gate';
+  if (typeof relative !== 'string' || !relative) {
+    throw new Error(`job ${job.id} has no ${expand ? 'finish.tierZeroReport' : 'finish.gateResults'} owner file`);
+  }
+  const document = !expand && gate
+    ? gate
+    : readJson(path.join(jobFolder, relative), `job ${job.id} tier-zero owner ${relative}`);
+  if (!Array.isArray(document.namesNotReachingTier0)) {
+    throw new Error(`job ${job.id} tier-zero owner ${relative} has no namesNotReachingTier0 array`);
+  }
+  const signedOff = signedOffEntryMap(signoffs);
+  const entries = expand
+    ? document.namesNotReachingTier0.filter((entry) => signedOff.has(entryKey(entry.file, entry.name)))
+    : document.namesNotReachingTier0;
+  return { owner, file: relative, entries };
+}
+
 async function collectJobEvidence({
   jobFolder, evidenceFolder, snapshot, state, git, deployRecord,
 }) {
   const job = readJson(path.join(jobFolder, 'job.json'), 'job.json');
   const finish = job.finish;
   const signoff = readJson(path.join(jobFolder, 'signoff.json'), 'signoff.json');
+  const signoffs = signoffRecords(jobFolder);
   const appRequired = Boolean(finish.app);
   const behaviour = appRequired
     ? readJson(path.join(jobFolder, finish.behaviourResults), 'behaviour results')
     : { summary: { failed: 0 } };
   const gate = appRequired
-    ? readJson(path.join(jobFolder, finish.gateResults), 'gate results')
+    ? readJson(path.join(jobFolder, finish.gateResults), `job ${job.id} gate results ${finish.gateResults}`)
     : { errors: 0 };
+  const tierZero = readTierZeroOwner(jobFolder, job, gate, signoffs);
   const drafts = await catalogDrafts({ job, commit: state.designSystemMergeCommit, git });
   const model = modelEvidence(jobFolder);
   const engineOutputEdited = await outputWasEdited({ finish, snapshot, state, git });
@@ -191,6 +212,9 @@ async function collectJobEvidence({
     ? await git.changedFiles({
       folder: finish.app.folder, baseCommit: finish.app.baseCommit, commit: state.appMergeCommit,
     }) : [];
+  const tierZeroEntries = tierZero.owner === 'enforcer gate'
+    ? tierZero.entries.filter((entry) => changed.includes(entry.file))
+    : tierZero.entries;
   const backendChanged = changed.filter(backendFile).length;
   const behavioursFailed = behaviour.summary.failed;
   if (!Number.isInteger(behavioursFailed)) throw new Error('behaviour results have no integer summary.failed');
@@ -213,6 +237,7 @@ async function collectJobEvidence({
     && behavioursFailed === 0
     && backendChanged === 0
     && gate.errors === 0
+    && tierZeroEntries.length === 0
     && !engineOutputEdited
     && Boolean(state.designSystemMergeCommit)
     && designChecksPassed
@@ -231,6 +256,7 @@ async function collectJobEvidence({
     deploy_matches_app_merge: deployMatchesAppMerge,
     draft_catalog_entries: drafts,
     model_steps_missing_records: model.missing,
+    names_not_reaching_tier_0: tierZeroEntries,
   };
   return { file: finish.evidenceFile, report };
 }
@@ -251,6 +277,11 @@ function signoffRecords(jobFolder) {
 
 function entryKey(file, id) {
   return `${file}\0${id}`;
+}
+
+function signedOffEntryMap(records) {
+  return new Map(records.flatMap((record) => [...(record.promoted || []), ...(record.skipped || [])])
+    .map((entry) => [entryKey(entry.file, entry.id), entry]));
 }
 
 function catalogGapEntries(job) {
@@ -278,6 +309,7 @@ function catalogGapEntries(job) {
 
 function collectCrossJobEvidence(jobFolders) {
   const signoffJobs = [];
+  const signedOffJobs = [];
   const gaps = [];
   const gapsNotListed = [];
   const skippedJobs = [];
@@ -289,8 +321,8 @@ function collectCrossJobEvidence(jobFolders) {
     }
     const records = signoffRecords(jobFolder);
     signoffJobs.push({ job: job.id, promote_records: records.length });
-    const listed = new Map(records.flatMap((record) => [...(record.promoted || []), ...(record.skipped || [])])
-      .map((entry) => [entryKey(entry.file, entry.id), entry]));
+    if (records.length > 0) signedOffJobs.push({ job, jobFolder, records });
+    const listed = signedOffEntryMap(records);
     for (const gap of catalogGapEntries(job)) {
       const signoffEntry = listed.get(entryKey(gap.file, gap.id));
       const row = {
@@ -314,7 +346,7 @@ function collectCrossJobEvidence(jobFolders) {
     gap_entries_not_listed_at_signoff: gapsNotListed,
   };
   const systemFaithful = {
-    ...readNamesNotReachingTierZero(signoffJobs.map(({ job }) => job)),
+    ...readNamesNotReachingTierZero(signedOffJobs),
     skipped_jobs: skippedJobs,
   };
   return { signoffs, gaps: gapReport, systemFaithful };
@@ -343,11 +375,18 @@ export async function writeCompleteEvidenceSet({ jobFolders, ...options }) {
   return jobEvidence.report;
 }
 
-function readNamesNotReachingTierZero(jobs) {
+function readNamesNotReachingTierZero(signedOffJobs) {
+  const names = [];
+  const sources = [];
+  for (const { job, jobFolder, records } of signedOffJobs) {
+    const result = readTierZeroOwner(jobFolder, job, null, records);
+    sources.push({ job: job.id, owner: result.owner, file: result.file });
+    for (const entry of result.entries) names.push({ job: job.id, ...entry });
+  }
   return {
-    jobs,
-    names_not_reaching_tier_0: null,
-    names_not_reaching_tier_0_source: `unavailable: ${tierZeroOwners.join(', ')} publish no tier-0 field`,
+    jobs: signedOffJobs.map(({ job }) => job.id),
+    names_not_reaching_tier_0: names,
+    names_not_reaching_tier_0_source: sources,
   };
 }
 
