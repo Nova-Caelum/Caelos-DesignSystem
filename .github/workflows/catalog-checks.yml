@@ -49,6 +49,8 @@ jobs:
           attributes=$(git rev-parse --git-path info/attributes)
           mkdir -p "$(dirname "$attributes")"
           printf '* -export-ignore -export-subst\n' >> "$attributes"
+          # Nor convert a file's bytes on the way out: encoding, line endings, ident and filters.
+          printf '* -working-tree-encoding -text -eol -ident -filter\n' >> "$attributes"
           mkdir -p "$RUNNER_TEMP/candidate"
           git archive "$head" | tar -x -C "$RUNNER_TEMP/candidate"
           echo "candidate $head, base $base, checker $(git rev-parse HEAD)"
