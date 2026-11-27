@@ -3,12 +3,14 @@
     "primitives.shared.alpha": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "variants": {}
+      "variants": {},
+      "variantContentFingerprints": {}
     },
     "primitives.shared.beta": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
       "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
-      "variants": {}
+      "variants": {},
+      "variantContentFingerprints": {}
     }
   }
 }

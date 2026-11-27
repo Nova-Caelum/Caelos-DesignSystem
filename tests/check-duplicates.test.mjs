@@ -79,6 +79,14 @@ function materializedReuseCatalog(t) {
   return { cwd, catalog, lock: path.join(catalog, 'versions.lock.json') };
 }
 
+function materializedLiveCatalog(t) {
+  const cwd = mkdtempSync(path.join(tmpdir(), 'caelos-live-duplicates-test-'));
+  const catalog = path.join(cwd, 'token_catalog');
+  cpSync(path.join(root, 'token_catalog'), catalog, { recursive: true });
+  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  return { cwd, catalog, lock: path.join(catalog, 'versions.lock.json') };
+}
+
 function materializedLockCatalog(t, name, { commit = true } = {}) {
   const cwd = mkdtempSync(path.join(tmpdir(), 'caelos-duplicates-lock-test-'));
   const catalog = path.join(cwd, 'token_catalog');
@@ -89,8 +97,24 @@ function materializedLockCatalog(t, name, { commit = true } = {}) {
     }
   }
   cpSync(fixture(`${name}.lock.json`), path.join(catalog, 'versions.lock.json'));
-  if (commit) snapshot(cwd);
-  else git(cwd, ['init', '-q']);
+  const candidateLock = readFileSync(path.join(catalog, 'versions.lock.json'), 'utf8');
+  if (commit && name === 'exact-entries') {
+    updateJson(path.join(catalog, 'versions.lock.json'), (document) => {
+      document.entries['primitives.shared.rebuilt'].contentFingerprint = 'b'.repeat(64);
+    });
+  }
+  if (commit && name === 'exact-variants') {
+    updateJson(path.join(catalog, 'versions.lock.json'), (document) => {
+      document.entries['controls.shared.beta'].variantContentFingerprints['size=compact'] = 'e'.repeat(64);
+    });
+  }
+  if (commit) {
+    snapshot(cwd);
+    writeFileSync(path.join(catalog, 'versions.lock.json'), candidateLock);
+  }
+  else {
+    git(cwd, ['init', '-q']);
+  }
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
   return { cwd, lock: path.join(catalog, 'versions.lock.json') };
 }
@@ -106,6 +130,19 @@ function baselineReuse(work) {
   assert.equal(result.status, 0, result.stderr);
   snapshot(work.cwd);
   return result;
+}
+
+function addDescriptiveCopy(record, inventoryName) {
+  const copy = structuredClone(record);
+  copy.$description = `A renamed description for ${inventoryName}.`;
+  copy.$extensions ??= {};
+  copy.$extensions['app.caelos'] ??= {};
+  Object.assign(copy.$extensions['app.caelos'], {
+    inventoryName,
+    kind: 'component',
+    figmaId: '123:456',
+  });
+  return copy;
 }
 
 function updateJson(file, update) {
@@ -155,6 +192,69 @@ test('(b) a rebuilt entry with a different description is refused, naming both e
   assert.equal(result.status, 1, result.stderr);
   assert.match(result.stderr, /primitives\.shared\.surface/u);
   assert.match(result.stderr, /primitives\.shared\.rebuilt/u);
+});
+
+test('main\'s checker accepts the generated lock shape against the live catalog', (t) => {
+  const work = materializedLiveCatalog(t);
+  const build = buildReuse(work);
+  assert.equal(build.status, 0, build.stderr);
+  const mainChecker = path.join(work.cwd, 'main-check-duplicates.mjs');
+  writeFileSync(mainChecker, git(root, ['show', 'origin/main:scripts/check-duplicates.mjs']));
+  const result = spawnSync(process.execPath, [
+    mainChecker, '--lock', work.lock, '--candidate', work.cwd,
+  ], { cwd: work.cwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('a renamed and re-described live menu copy with new descriptive fields is refused', (t) => {
+  const work = materializedLiveCatalog(t);
+  baselineReuse(work);
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (data) => {
+    data.overlays.shared.menuCopy = addDescriptiveCopy(data.overlays.shared.menu, 'renamedMenu');
+  });
+  assert.equal(buildReuse(work).status, 0);
+  const result = run(baseArgs(work), work.cwd);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /overlays\.shared\.menuCopy/u);
+  assert.match(result.stderr, /overlays\.shared\.menu/u);
+});
+
+test('a renamed and re-described live button copy with new descriptive fields is refused', (t) => {
+  const work = materializedLiveCatalog(t);
+  baselineReuse(work);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (data) => {
+    data.controls.shared.buttonCopy = addDescriptiveCopy(data.controls.shared.button, 'renamedButton');
+  });
+  assert.equal(buildReuse(work).status, 0);
+  const result = run(baseArgs(work), work.cwd);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /controls\.shared\.buttonCopy/u);
+  assert.match(result.stderr, /controls\.shared\.button/u);
+});
+
+test('the live pre-existing duplicate group is skipped loudly', (t) => {
+  const work = materializedLiveCatalog(t);
+  baselineReuse(work);
+  const result = run(baseArgs(work), work.cwd);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(
+    result.stderr,
+    /pre-existing duplicate \(shrink-only\): overlays\.shared\.contextMenu, overlays\.shared\.menu/u,
+  );
+});
+
+test('a third member joining the live pre-existing duplicate group is refused', (t) => {
+  const work = materializedLiveCatalog(t);
+  baselineReuse(work);
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (data) => {
+    data.overlays.shared.thirdMenu = structuredClone(data.overlays.shared.menu);
+  });
+  assert.equal(buildReuse(work).status, 0);
+  const result = run(baseArgs(work), work.cwd);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /overlays\.shared\.contextMenu/u);
+  assert.match(result.stderr, /overlays\.shared\.menu/u);
+  assert.match(result.stderr, /overlays\.shared\.thirdMenu/u);
 });
 
 test('(c) a rebuilt entry with one resolved value changed passes', (t) => {
@@ -364,9 +464,12 @@ test('(7) generated variants with identical pairs and content are duplicates', (
     data.primitives.shared.surface.$extensions = {
       'app.caelos': { variants: { tone: ['primary'] } },
     };
-    data.primitives.shared.rebuilt = structuredClone(data.primitives.shared.surface);
   });
   baselineReuse(work);
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    data.primitives.shared.rebuilt = structuredClone(data.primitives.shared.surface);
+  });
+  assert.equal(buildReuse(work).status, 0);
   const result = run(baseArgs(work), work.cwd);
   assert.equal(result.status, 1, result.stderr);
   assert.match(result.stderr, /primitives\.shared\.surface#tone=primary/u);
@@ -380,8 +483,10 @@ test('a markerless base lock bootstraps emptiness from base tier files', (t) => 
   const candidateLock = readFileSync(work.lock, 'utf8');
   updateJson(work.lock, (document) => {
     for (const entry of Object.values(document.entries)) {
+      delete entry.contentFingerprint;
+      delete entry.variantContentFingerprints;
       delete entry.empty;
-      for (const variant of Object.values(entry.variants)) delete variant.empty;
+      delete entry.emptyVariants;
     }
   });
   snapshot(work.cwd);
@@ -390,6 +495,28 @@ test('a markerless base lock bootstraps emptiness from base tier files', (t) => 
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stderr, /base lock predates empty markers; base emptiness read from base tier files/u);
   assert.match(result.stderr, /not comparable \(empty in base and candidate\): 1 entries, 2 variants/u);
+});
+
+test('a markerless base lock bootstraps madeOf as non-empty content', (t) => {
+  const work = materializedReuseCatalog(t);
+  const build = buildReuse(work);
+  assert.equal(build.status, 0, build.stderr);
+  updateJson(work.lock, (document) => {
+    for (const entry of Object.values(document.entries)) {
+      delete entry.contentFingerprint;
+      delete entry.variantContentFingerprints;
+      delete entry.empty;
+      delete entry.emptyVariants;
+    }
+  });
+  snapshot(work.cwd);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (data) => {
+    delete data.controls.shared['composed-surface'].$extensions['app.caelos'].madeOf;
+  });
+  assert.equal(buildReuse(work).status, 0);
+  const result = run(baseArgs(work), work.cwd);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /newly emptied.*controls\.shared\.composed-surface/iu);
 });
 
 test('check:catalog configures the duplicate check', () => {

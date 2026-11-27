@@ -47,8 +47,8 @@ function fingerprints(document) {
   const result = new Map();
   for (const [entry, record] of Object.entries(document.entries)) {
     result.set(entry, record.fingerprint);
-    for (const [variant, fingerprints] of Object.entries(record.variants)) {
-      result.set(`${entry}#${variant}`, fingerprints.fingerprint);
+    for (const [variant, variantFingerprint] of Object.entries(record.variants)) {
+      result.set(`${entry}#${variant}`, variantFingerprint);
     }
   }
   return result;
@@ -58,8 +58,8 @@ function contentFingerprints(document) {
   const result = new Map();
   for (const [entry, record] of Object.entries(document.entries)) {
     result.set(entry, record.contentFingerprint);
-    for (const [variant, fingerprints] of Object.entries(record.variants)) {
-      result.set(`${entry}#${variant}`, fingerprints.contentFingerprint);
+    for (const [variant, variantFingerprint] of Object.entries(record.variantContentFingerprints)) {
+      result.set(`${entry}#${variant}`, variantFingerprint);
     }
   }
   return result;
@@ -71,7 +71,7 @@ function updateJson(file, update) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-test('(a) build-lock writes change and content fingerprints per entry and Cartesian variant', (t) => {
+test('(a) build-lock keeps main-compatible hashes and writes sibling content fingerprints', (t) => {
   const work = workspace(t);
   const result = build(work);
   assert.equal(result.status, 0, result.stderr);
@@ -84,9 +84,17 @@ test('(a) build-lock writes change and content fingerprints per entry and Cartes
     'size=small,tone=primary',
     'size=small,tone=quiet',
   ]);
-  for (const fingerprints of Object.values(document.entries['controls.shared.button'].variants)) {
-    assert.match(fingerprints.fingerprint, /^[a-f0-9]{64}$/u);
-    assert.match(fingerprints.contentFingerprint, /^[a-f0-9]{64}$/u);
+  assert.deepEqual(
+    Object.keys(document.entries['controls.shared.button'].variantContentFingerprints),
+    Object.keys(document.entries['controls.shared.button'].variants),
+  );
+  for (const variantFingerprint of Object.values(document.entries['controls.shared.button'].variants)) {
+    assert.match(variantFingerprint, /^[a-f0-9]{64}$/u);
+  }
+  for (const contentFingerprint of Object.values(
+    document.entries['controls.shared.button'].variantContentFingerprints,
+  )) {
+    assert.match(contentFingerprint, /^[a-f0-9]{64}$/u);
   }
 });
 
@@ -188,16 +196,16 @@ test('(g) variant content includes the axis-to-resolved-value pairing', (t) => {
   assert.equal(build(work).status, 0);
   const entries = lock(work).entries;
   assert.equal(
-    entries['primitives.shared.surface'].variants['bodyMaterial=cloud,stripMaterial=glass'].contentFingerprint,
-    entries['primitives.shared.rebuilt'].variants['bodyMaterial=cloud,stripMaterial=glass'].contentFingerprint,
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.rebuilt'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
   );
   assert.notEqual(
-    entries['primitives.shared.surface'].variants['bodyMaterial=cloud,stripMaterial=glass'].contentFingerprint,
-    entries['primitives.shared.surface'].variants['bodyMaterial=glass,stripMaterial=cloud'].contentFingerprint,
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=glass,stripMaterial=cloud'],
   );
   assert.notEqual(
-    entries['primitives.shared.surface'].variants['bodyMaterial=cloud,stripMaterial=glass'].contentFingerprint,
-    entries['primitives.shared.changed'].variants['bodyMaterial=cloud,stripMaterial=glass'].contentFingerprint,
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.changed'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
   );
 });
 
@@ -216,8 +224,7 @@ test('(h) empty is written only for entries and variants with no resolved token 
   assert.equal(build(work).status, 0);
   const entries = lock(work).entries;
   assert.equal(entries['primitives.shared.empty'].empty, true);
-  assert.equal(entries['primitives.shared.empty'].variants['tone=loud'].empty, true);
-  assert.equal(entries['primitives.shared.empty'].variants['tone=quiet'].empty, true);
+  assert.deepEqual(entries['primitives.shared.empty'].emptyVariants, ['tone=loud', 'tone=quiet']);
   assert.equal(Object.hasOwn(entries['primitives.shared.surface'], 'empty'), false);
   assert.equal(Object.hasOwn(entries['controls.shared.button'], 'empty'), false);
 });

@@ -1,13 +1,10 @@
 {
   "type": "object",
   "properties": {
-    "$description": {
-      "type": "string", "x-caelos-ignore-for-content": true,
-      "x-caelos-ignore-for-content-globally": true
-    },
-    "inventoryName": { "type": "string", "x-caelos-ignore-for-content": true },
-    "lifecycle": { "type": "string", "x-caelos-ignore-for-content": true },
+    "$description": { "type": "string" },
+    "inventoryName": { "type": "string" },
+    "lifecycle": { "type": "string" },
     "madeOf": { "type": "array", "items": { "type": "string" } },
-    "variants": { "type": "object", "x-caelos-ignore-for-content": true }
+    "variants": { "type": "object" }
   }
 }

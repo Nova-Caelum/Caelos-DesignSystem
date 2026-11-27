@@ -2,7 +2,8 @@
   "entries": {
     "primitives.shared.bad": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "variants": {}
+      "variants": {},
+      "variantContentFingerprints": {}
     }
   }
 }

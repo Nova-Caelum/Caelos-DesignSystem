@@ -4,20 +4,20 @@
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "variants": {
-        "size=compact": {
-          "fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-          "contentFingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-        }
+        "size=compact": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "variantContentFingerprints": {
+        "size=compact": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
       }
     },
     "controls.shared.beta": {
       "fingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
       "contentFingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
       "variants": {
-        "size=compact": {
-          "fingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-          "contentFingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
-        }
+        "size=compact": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "variantContentFingerprints": {
+        "size=compact": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
       }
     }
   }

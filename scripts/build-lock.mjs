@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const appExtension = 'app.caelos';
 const referencePattern = /^\{([^{}]+)\}$/u;
@@ -73,15 +74,11 @@ function addDefinition(map, name, definition) {
   map.set(name, definitions);
 }
 
-async function loadCatalog(directory) {
-  const files = (await readdir(directory))
-    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
-    .sort();
+function catalogFromSources(sources) {
   const tokens = new Map();
   const entries = new Map();
-  for (const file of files) {
-    const tier = Number.parseInt(file.slice(0, 2), 10);
-    const root = JSON.parse(await readFile(path.join(directory, file), 'utf8'));
+  for (const { file, root } of sources) {
+    const tier = Number.parseInt(path.basename(file).slice(0, 2), 10);
     function visit(node, segments = []) {
       if (!node || typeof node !== 'object' || Array.isArray(node)) return;
       const name = segments.join('.');
@@ -98,6 +95,17 @@ async function loadCatalog(directory) {
     visit(root);
   }
   return { entries, tokens };
+}
+
+async function loadCatalog(directory) {
+  const files = (await readdir(directory))
+    .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
+    .sort();
+  const sources = await Promise.all(files.map(async (file) => ({
+    file,
+    root: JSON.parse(await readFile(path.join(directory, file), 'utf8')),
+  })));
+  return { ...catalogFromSources(sources), sources };
 }
 
 function variantSelections(definitions) {
@@ -125,7 +133,7 @@ function selectionName(selection) {
   return Object.keys(selection).sort().map((axis) => `${axis}=${String(selection[axis])}`).join(',');
 }
 
-function createResolver(catalog, ignored, { globalIgnored = new Set(), pruneEmptyMetadata = false } = {}) {
+function createResolver(catalog, ignored) {
   const entryMemo = new Map();
   const tokenMemo = new Map();
 
@@ -134,13 +142,9 @@ function createResolver(catalog, ignored, { globalIgnored = new Set(), pruneEmpt
     if (!value || typeof value !== 'object') return value;
     const result = {};
     for (const key of Object.keys(value).sort()) {
-      if (globalIgnored.has(key) || (inAppRecord && ignored.has(key))) continue;
+      if (inAppRecord && ignored.has(key)) continue;
       const childIsAppRecord = key === appExtension;
       const child = clean(value[key], childIsAppRecord);
-      if (pruneEmptyMetadata && (key === appExtension || key === '$extensions') &&
-          child && typeof child === 'object' && !Array.isArray(child) && Object.keys(child).length === 0) {
-        continue;
-      }
       result[key] = child;
     }
     return result;
@@ -192,24 +196,102 @@ function createResolver(catalog, ignored, { globalIgnored = new Set(), pruneEmpt
     return resolved;
   }
 
+  return { clean, resolveEntry };
+}
+
+function createContentResolver(catalog) {
+  const tokenMemo = new Map();
+
+  function resolveValue(value, stack = []) {
+    if (typeof value === 'string') {
+      const match = referencePattern.exec(value);
+      return match ? resolveTokenValue(match[1], stack) : value;
+    }
+    if (Array.isArray(value)) return value.map((item) => resolveValue(item, stack));
+    if (!value || typeof value !== 'object') return value;
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, resolveValue(value[key], stack)]));
+  }
+
+  function resolveTokenValue(name, stack = []) {
+    if (stack.includes(name)) throw new Error(`token reference cycle: ${[...stack, name].join(' -> ')}`);
+    if (tokenMemo.has(name)) return tokenMemo.get(name);
+    const definitions = catalog.tokens.get(name);
+    if (!definitions) throw new Error(`Unknown token reference: ${name}`);
+    const nextStack = [...stack, name];
+    const values = definitions.map(({ node }) => resolveValue(node.$value, nextStack));
+    const resolved = values.length === 1
+      ? values[0]
+      : { $definitions: values.sort((left, right) => serialise(left).localeCompare(serialise(right))) };
+    tokenMemo.set(name, resolved);
+    return resolved;
+  }
+
+  function entryContent(name) {
+    const definitions = catalog.entries.get(name);
+    if (!definitions) throw new Error(`Missing entry: ${name}`);
+    const tokens = [];
+    for (const { node } of definitions) {
+      function visit(value, segments = []) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+        if (Object.hasOwn(value, '$value')) {
+          tokens.push([segments.join('.'), resolveValue(value.$value), value.$type ?? null]);
+          return;
+        }
+        for (const key of Object.keys(value).filter((key) => !key.startsWith('$')).sort()) {
+          visit(value[key], [...segments, key]);
+        }
+      }
+      visit(node);
+    }
+    const madeOf = [...new Set(definitions.flatMap(({ node }) => extension(node)?.madeOf ?? []))].sort();
+    return {
+      madeOf,
+      tokens: tokens.sort((left, right) => serialise(left).localeCompare(serialise(right))),
+    };
+  }
+
   function resolveSelectionValues(selection) {
     return Object.entries(selection)
-      .map(([axis, value]) => [axis, resolveValue(value, [])])
+      .map(([axis, value]) => [axis, resolveValue(value)])
       .sort((left, right) => serialise(left).localeCompare(serialise(right)));
   }
 
-  return { clean, resolveEntry, resolveSelectionValues };
+  return { entryContent, resolveSelectionValues };
 }
 
-function hasResolvedToken(value) {
-  if (Array.isArray(value)) return value.some(hasResolvedToken);
+function hasTokenReference(value) {
+  if (typeof value === 'string') return referencePattern.test(value);
+  if (Array.isArray(value)) return value.some(hasTokenReference);
   if (!value || typeof value !== 'object') return false;
-  if (Object.hasOwn(value, '$value')) return true;
-  return Object.values(value).some(hasResolvedToken);
+  return Object.values(value).some(hasTokenReference);
 }
 
-function resolvedContentIsEmpty(content, selected = []) {
-  return content.madeOf.length === 0 && !hasResolvedToken(content.content) && !hasResolvedToken(selected);
+export function buildContentFingerprintRecords(sources) {
+  const catalog = catalogFromSources(sources);
+  const resolver = createContentResolver(catalog);
+  const records = new Map();
+  for (const name of [...catalog.entries.keys()].sort()) {
+    const definitions = catalog.entries.get(name);
+    const content = resolver.entryContent(name);
+    const variantContentFingerprints = new Map();
+    const emptyVariants = new Set();
+    for (const selection of variantSelections(definitions)) {
+      if (Object.keys(selection).length === 0) continue;
+      const selected = resolver.resolveSelectionValues(selection);
+      const variant = selectionName(selection);
+      variantContentFingerprints.set(variant, fingerprint({ content, selected }));
+      if (content.tokens.length === 0 && content.madeOf.length === 0 && !hasTokenReference(selection)) {
+        emptyVariants.add(variant);
+      }
+    }
+    records.set(name, {
+      contentFingerprint: fingerprint(content),
+      empty: content.tokens.length === 0 && content.madeOf.length === 0,
+      emptyVariants,
+      variantContentFingerprints,
+    });
+  }
+  return records;
 }
 
 function createDependencyWalker(catalog, clean) {
@@ -274,14 +356,7 @@ async function run(options) {
   const schema = JSON.parse(await readFile(options.schema, 'utf8'));
   const catalog = await loadCatalog(options.catalog);
   const changeResolver = createResolver(catalog, ignoredFields(schema, 'x-caelos-ignore-for-change'));
-  const contentResolver = createResolver(
-    catalog,
-    ignoredFields(schema, 'x-caelos-ignore-for-content'),
-    {
-      globalIgnored: ignoredFields(schema, 'x-caelos-ignore-for-content-globally'),
-      pruneEmptyMetadata: true,
-    },
-  );
+  const contentRecords = buildContentFingerprintRecords(catalog.sources);
   const walker = createDependencyWalker(catalog, changeResolver.clean);
 
   if (options.dependents !== undefined) {
@@ -306,28 +381,25 @@ async function run(options) {
   for (const name of [...catalog.entries.keys()].sort()) {
     const definitions = catalog.entries.get(name);
     const changeContent = changeResolver.resolveEntry(name);
-    const renderedContent = contentResolver.resolveEntry(name);
+    const contentRecord = contentRecords.get(name);
     const variants = {};
+    const variantContentFingerprints = {};
+    const emptyVariants = [];
     for (const selection of variantSelections(definitions)) {
       if (Object.keys(selection).length === 0) continue;
-      const resolvedSelection = contentResolver.resolveSelectionValues(selection);
-      const empty = resolvedContentIsEmpty(renderedContent, resolvedSelection);
-      variants[selectionName(selection)] = {
-        fingerprint: fingerprint({ content: changeContent, selected: selection }),
-        contentFingerprint: fingerprint({
-          content: renderedContent,
-          selected: resolvedSelection,
-        }),
-        ...(empty ? { empty: true } : {}),
-      };
+      const variant = selectionName(selection);
+      variants[variant] = fingerprint({ content: changeContent, selected: selection });
+      variantContentFingerprints[variant] = contentRecord.variantContentFingerprints.get(variant);
+      if (contentRecord.emptyVariants.has(variant)) emptyVariants.push(variant);
       variantCount += 1;
     }
-    const empty = resolvedContentIsEmpty(renderedContent);
     entries[name] = {
       fingerprint: fingerprint(changeContent),
-      contentFingerprint: fingerprint(renderedContent),
+      contentFingerprint: contentRecord.contentFingerprint,
       variants,
-      ...(empty ? { empty: true } : {}),
+      variantContentFingerprints,
+      ...(contentRecord.empty ? { empty: true } : {}),
+      ...(emptyVariants.length ? { emptyVariants } : {}),
     };
   }
   const output = `${JSON.stringify(canonical({ entries }), null, 2)}\n`;
@@ -336,9 +408,11 @@ async function run(options) {
   process.stdout.write(`Built lock: ${Object.keys(entries).length} entries, ${variantCount} variants\n`);
 }
 
-try {
-  await run(parseArguments(process.argv.slice(2)));
-} catch (error) {
-  process.stderr.write(`Lock build failed: ${error.message}\n`);
-  process.exitCode = 1;
+if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
+  try {
+    await run(parseArguments(process.argv.slice(2)));
+  } catch (error) {
+    process.stderr.write(`Lock build failed: ${error.message}\n`);
+    process.exitCode = 1;
+  }
 }

@@ -3,7 +3,8 @@
     "primitives.shared.bad": {
       "fingerprint": 17,
       "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "variants": {}
+      "variants": {},
+      "variantContentFingerprints": {}
     }
   }
 }

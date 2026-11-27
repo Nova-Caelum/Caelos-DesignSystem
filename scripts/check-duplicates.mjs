@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Checks the lock builder's fingerprints; it never resolves content or computes hashes.
+ * Checks the lock builder's fingerprints. For locks that predate content fingerprints,
+ * it imports the builder's allowlist implementation and computes the base values once.
  *
  * A near duplicate is two lock fingerprints of the same kind that differ at exactly
  * one hexadecimal character. This is deliberately advisory: it is a cheap signal for
@@ -13,6 +14,7 @@ import path from 'node:path';
 import {
   baseTree, createContext, guardBaseNone, isRecipeRecord, object, readTreeJson, treeFiles,
 } from './check-recipes.mjs';
+import { buildContentFingerprintRecords } from './build-lock.mjs';
 
 const fingerprintPattern = /^[a-f0-9]{64}$/u;
 const tierFile = /^0[0-5]-[\w.-]+\.tokens\.json$/u;
@@ -118,19 +120,34 @@ function readFingerprints(lock, label, recordNames) {
     const entryEmpty = emptyMarker(entry, `${label}: entries.${name}`);
     if (record) entries.push({ name, fingerprint: entryFingerprint, empty: entryEmpty });
     if (!object(entry.variants)) throw new Error(`${label}: entries.${name}.variants must be an object`);
-    for (const variant of Object.keys(entry.variants).sort()) {
-      const variantRecord = entry.variants[variant];
-      if (!object(variantRecord)) {
-        throw new Error(`${label}: entries.${name}.variants.${variant} must be an object`);
-      }
-      fingerprint(variantRecord.fingerprint, `${label}: entries.${name}.variants.${variant}`);
+    if (!object(entry.variantContentFingerprints)) {
+      throw new Error(`${label}: entries.${name}.variantContentFingerprints must be an object`);
+    }
+    const emptyVariants = Object.hasOwn(entry, 'emptyVariants') ? entry.emptyVariants : [];
+    if (!Array.isArray(emptyVariants) ||
+        (emptyVariants.length === 0 && Object.hasOwn(entry, 'emptyVariants')) ||
+        emptyVariants.some((variant) => typeof variant !== 'string') || new Set(emptyVariants).size !== emptyVariants.length) {
+      throw new Error(`${label}: entries.${name}.emptyVariants must be a non-empty array of unique names or omitted`);
+    }
+    const variantNames = Object.keys(entry.variants).sort();
+    if (JSON.stringify(variantNames) !== JSON.stringify(Object.keys(entry.variantContentFingerprints).sort())) {
+      throw new Error(`${label}: entries.${name}: variant content fingerprints must match variants`);
+    }
+    if (emptyVariants.some((variant) => !Object.hasOwn(entry.variants, variant))) {
+      throw new Error(`${label}: entries.${name}.emptyVariants names an unknown variant`);
+    }
+    for (const variant of variantNames) {
+      fingerprint(entry.variants[variant], `${label}: entries.${name}.variants.${variant}`);
       const variantFingerprint = fingerprint(
-        variantRecord.contentFingerprint,
+        entry.variantContentFingerprints[variant],
         `${label}: entries.${name}.variants.${variant}: content fingerprint`,
       );
-      const variantEmpty = emptyMarker(variantRecord, `${label}: entries.${name}.variants.${variant}`);
       if (record) {
-        variants.push({ name: `${name}#${variant}`, fingerprint: variantFingerprint, empty: variantEmpty });
+        variants.push({
+          name: `${name}#${variant}`,
+          fingerprint: variantFingerprint,
+          empty: emptyVariants.includes(variant),
+        });
       }
     }
   }
@@ -141,55 +158,83 @@ function baseLockIndex(lock, label) {
   if (!object(lock) || !object(lock.entries)) throw new Error(`${label}: expected an entries object`);
   const entries = new Map();
   const variants = new Map();
-  let hasEntryMarker = false;
+  const contentShapes = Object.values(lock.entries).map((entry) => object(entry) &&
+    typeof entry.contentFingerprint === 'string' && object(entry.variantContentFingerprints) &&
+    object(entry.variants) && Object.values(entry.variants).every((value) => typeof value === 'string'));
+  if (contentShapes.some(Boolean) && !contentShapes.every(Boolean)) {
+    throw new Error(`${label}: base content fingerprints are incomplete`);
+  }
+  const hasContentFingerprints = contentShapes.length > 0 && contentShapes.every(Boolean);
+  let sawEmptyMarkers = false;
   for (const [name, entry] of Object.entries(lock.entries)) {
     if (!object(entry)) throw new Error(`${label}: entries.${name} must be an object`);
-    if (Object.hasOwn(entry, 'empty')) hasEntryMarker = true;
-    entries.set(name, entry.empty === true);
+    fingerprint(entry.fingerprint, `${label}: entries.${name}`);
+    if (Object.hasOwn(entry, 'empty') || Object.hasOwn(entry, 'emptyVariants')) sawEmptyMarkers = true;
+    const entryEmpty = emptyMarker(entry, `${label}: entries.${name}`);
+    entries.set(name, {
+      empty: entryEmpty,
+      fingerprint: hasContentFingerprints
+        ? fingerprint(entry.contentFingerprint, `${label}: entries.${name}: content fingerprint`)
+        : undefined,
+    });
     if (!object(entry.variants)) throw new Error(`${label}: entries.${name}.variants must be an object`);
-    for (const [variant, record] of Object.entries(entry.variants)) {
-      variants.set(`${name}#${variant}`, object(record) && record.empty === true);
+    const emptyVariants = Object.hasOwn(entry, 'emptyVariants') ? entry.emptyVariants : [];
+    if (!Array.isArray(emptyVariants)) throw new Error(`${label}: entries.${name}.emptyVariants must be an array`);
+    if (hasContentFingerprints && !object(entry.variantContentFingerprints)) {
+      throw new Error(`${label}: entries.${name}.variantContentFingerprints must be an object`);
+    }
+    for (const [variant, variantRecord] of Object.entries(entry.variants)) {
+      const variantFingerprint = object(variantRecord) ? variantRecord.fingerprint : variantRecord;
+      fingerprint(variantFingerprint, `${label}: entries.${name}.variants.${variant}`);
+      variants.set(`${name}#${variant}`, {
+        empty: emptyVariants.includes(variant),
+        fingerprint: hasContentFingerprints
+          ? fingerprint(
+            entry.variantContentFingerprints[variant],
+            `${label}: entries.${name}.variants.${variant}: content fingerprint`,
+          )
+          : undefined,
+      });
     }
   }
-  return { entries, variants, hasEntryMarker };
+  return {
+    entries,
+    variants,
+    hasContentFingerprints,
+    hasEmptyMarkers: hasContentFingerprints && sawEmptyMarkers,
+  };
 }
 
-function hasValue(node) {
-  if (Array.isArray(node)) return node.some(hasValue);
-  if (!object(node)) return false;
-  if (Object.hasOwn(node, '$value')) return true;
-  return Object.values(node).some(hasValue);
-}
-
-function bootstrapBaseEmptiness(tree, context, index) {
+function bootstrapBaseContent(tree, context, index) {
   const files = [...treeFiles(tree, 'token_catalog', context)]
     .filter((file) => tierFile.test(path.basename(file)))
     .sort();
   if (!files.length) throw new Error('base has no tier files; pass --base <ref> with a readable catalog');
-  const recordEmpty = new Map();
-  for (const file of files) {
-    const tier = Number(path.basename(file).slice(0, 2));
-    const root = readTreeJson(file, tree, context);
-    function visit(node, segments = []) {
-      if (!object(node)) throw new Error(`${file} entry ${segments.join('.')}: expected a catalog object`);
-      const token = Object.hasOwn(node, '$value');
-      if (isRecipeRecord(tier, segments)) {
-        const madeOf = node?.$extensions?.['app.caelos']?.madeOf;
-        recordEmpty.set(
-          segments.join('.'),
-          !hasValue(node) && (!Array.isArray(madeOf) || madeOf.length === 0),
-        );
-      }
-      if (token) return;
-      for (const [key, child] of Object.entries(node)) {
-        if (!key.startsWith('$')) visit(child, [...segments, key]);
-      }
-    }
-    visit(root);
+  const records = buildContentFingerprintRecords(files.map((file) => ({
+    file: path.basename(file),
+    root: readTreeJson(file, tree, context),
+  })));
+  for (const [name, base] of index.entries) {
+    const computed = records.get(name);
+    if (!computed) throw new Error(`base tier files are missing lock entry: ${name}`);
+    if (!index.hasContentFingerprints) base.fingerprint = computed.contentFingerprint;
+    if (!index.hasEmptyMarkers) base.empty = computed.empty;
   }
-  for (const name of index.entries.keys()) index.entries.set(name, recordEmpty.get(name) === true);
-  for (const name of index.variants.keys()) {
-    index.variants.set(name, recordEmpty.get(name.slice(0, name.indexOf('#'))) === true);
+  for (const [name, base] of index.variants) {
+    const separator = name.indexOf('#');
+    const entry = name.slice(0, separator);
+    const variant = name.slice(separator + 1);
+    const computed = records.get(entry);
+    if (!computed) throw new Error(`base tier files are missing lock entry: ${entry}`);
+    if (!computed.variantContentFingerprints.has(variant) && !index.hasContentFingerprints) {
+      throw new Error(`base tier files are missing lock variant: ${name}`);
+    }
+    if (!index.hasContentFingerprints) base.fingerprint = computed.variantContentFingerprints.get(variant);
+    if (!index.hasEmptyMarkers) {
+      base.empty = computed.variantContentFingerprints.has(variant)
+        ? computed.emptyVariants.has(variant)
+        : computed.empty;
+    }
   }
 }
 
@@ -202,7 +247,7 @@ function compareEmpty(records, base, kind) {
       comparable.push(record);
       continue;
     }
-    if (base.get(record.name) === true) {
+    if (base.get(record.name)?.empty === true) {
       skipped.push(record.name);
       continue;
     }
@@ -246,10 +291,23 @@ function duplicateGroups(records) {
     group.push(record.name);
     byFingerprint.set(record.fingerprint, group);
   }
-  return [...byFingerprint.values()]
-    .filter((names) => names.length > 1)
-    .map((names) => names.sort())
-    .sort((left, right) => left[0].localeCompare(right[0]));
+  return [...byFingerprint.entries()]
+    .filter(([, names]) => names.length > 1)
+    .map(([groupFingerprint, names]) => ({ fingerprint: groupFingerprint, names: names.sort() }))
+    .sort((left, right) => left.names[0].localeCompare(right.names[0]));
+}
+
+function shrinkOnlyGroups(groups, base) {
+  const refused = [];
+  const skipped = [];
+  for (const group of groups) {
+    if (base && group.names.every((name) => base.get(name)?.fingerprint === group.fingerprint)) {
+      skipped.push(group);
+    } else {
+      refused.push(group);
+    }
+  }
+  return { refused, skipped };
 }
 
 function differsByOneCharacter(left, right) {
@@ -277,8 +335,8 @@ function nearDuplicates(records, kind) {
 function duplicateMessage(entryGroups, variantGroups) {
   const count = entryGroups.length + variantGroups.length;
   const lines = [`BAILOUT: ${count} exact duplicate fingerprint group${count === 1 ? '' : 's'} found.`];
-  for (const names of entryGroups) lines.push(`Duplicate entries: ${names.join(' and ')}`);
-  for (const names of variantGroups) lines.push(`Duplicate variants: ${names.join(' and ')}`);
+  for (const { names } of entryGroups) lines.push(`Duplicate entries: ${names.join(' and ')}`);
+  for (const { names } of variantGroups) lines.push(`Duplicate variants: ${names.join(' and ')}`);
   return lines.join('\n');
 }
 
@@ -296,6 +354,7 @@ async function run(options) {
   const records = readFingerprints(document, options.lock, await recordEntryNames(options.candidate));
   let entryComparison;
   let variantComparison;
+  let baseIndex;
   if (!hasBase) {
     entryComparison = skipEmptyComparison(records.entries);
     variantComparison = skipEmptyComparison(records.variants);
@@ -310,9 +369,14 @@ async function run(options) {
       throw new Error(`base ${options.base} has no ${baseLockFile}; pass --base <ref> with a lock file`);
     }
     const baseLock = readTreeJson(baseLockFile, tree, context);
-    const baseIndex = baseLockIndex(baseLock, `${baseLockFile} at base ${tree}`);
-    if (!baseIndex.hasEntryMarker) {
-      bootstrapBaseEmptiness(tree, context, baseIndex);
+    baseIndex = baseLockIndex(baseLock, `${baseLockFile} at base ${tree}`);
+    if (!baseIndex.hasContentFingerprints || !baseIndex.hasEmptyMarkers) {
+      bootstrapBaseContent(tree, context, baseIndex);
+    }
+    if (!baseIndex.hasContentFingerprints) {
+      process.stderr.write('base lock predates content fingerprints; base content read from base tier files\n');
+    }
+    if (!baseIndex.hasEmptyMarkers) {
       process.stderr.write('base lock predates empty markers; base emptiness read from base tier files\n');
     }
     entryComparison = compareEmpty(records.entries, baseIndex.entries, 'entry');
@@ -325,10 +389,19 @@ async function run(options) {
     error.exitCode = 1;
     throw error;
   }
-  const entryGroups = duplicateGroups(entryComparison.comparable);
-  const variantGroups = duplicateGroups(variantComparison.comparable);
-  if (entryGroups.length || variantGroups.length) {
-    const error = new Error(duplicateMessage(entryGroups, variantGroups));
+  const entryGroups = shrinkOnlyGroups(
+    duplicateGroups(entryComparison.comparable),
+    baseIndex?.entries,
+  );
+  const variantGroups = shrinkOnlyGroups(
+    duplicateGroups(variantComparison.comparable),
+    baseIndex?.variants,
+  );
+  for (const group of [...entryGroups.skipped, ...variantGroups.skipped]) {
+    process.stderr.write(`pre-existing duplicate (shrink-only): ${group.names.join(', ')}\n`);
+  }
+  if (entryGroups.refused.length || variantGroups.refused.length) {
+    const error = new Error(duplicateMessage(entryGroups.refused, variantGroups.refused));
     error.exitCode = 1;
     throw error;
   }

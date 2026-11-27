@@ -2,19 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "$description": {
-      "type": "string", "x-caelos-ignore-for-content": true,
-      "x-caelos-ignore-for-content-globally": true
-    },
-    "inventoryName": { "type": "string", "x-caelos-ignore-for-content": true },
+    "$description": { "type": "string" },
+    "inventoryName": { "type": "string" },
     "lifecycle": {
-      "type": "string", "x-caelos-ignore-for-change": true, "x-caelos-ignore-for-content": true
+      "type": "string", "x-caelos-ignore-for-change": true
     },
     "draftedBy": {
-      "type": "string", "x-caelos-ignore-for-change": true, "x-caelos-ignore-for-content": true
+      "type": "string", "x-caelos-ignore-for-change": true
     },
     "gapFill": { "type": "string", "x-caelos-ignore-for-change": true },
     "madeOf": { "type": "array", "items": { "type": "string" } },
-    "variants": { "type": "object", "x-caelos-ignore-for-content": true }
+    "variants": { "type": "object" }
   }
 }
