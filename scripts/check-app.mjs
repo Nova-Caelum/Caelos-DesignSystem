@@ -75,6 +75,9 @@ if (args.includes('-h') || args.includes('--help')) {
         });
         if (paint.stderr) process.stderr.write(paint.stderr);
         const checked = reportFor(paint, 'paint pass');
+        for (const exemption of checked.report?.exempt ?? []) {
+          console.error(`check-app: paint exemption: ${exemption.file}:${exemption.line} ${exemption.message}; reason: ${exemption.reason}`);
+        }
         if (checked.status !== 0 && paint.stdout) process.stderr.write(paint.stdout);
         process.exitCode = checked.status || normal.status;
       }

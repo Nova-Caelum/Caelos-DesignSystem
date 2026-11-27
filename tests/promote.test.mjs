@@ -121,6 +121,20 @@ test('(g) a missing record directory leaves every tier file byte-identical', () 
   assert.equal(existsSync(work.record), false);
 });
 
+test('(g2) a failure after the first tier write restores every catalog file byte-identically', () => {
+  const work = sandbox();
+  const before = catalogHashes(work.catalog);
+  const result = spawnSync(process.execPath, [script, '--job', 'job-test', '--record', work.record,
+    '--signer-words', 'Approved exactly as reviewed.', '--catalog', work.catalog], {
+    encoding: 'utf8',
+    env: { ...process.env, NODE_TEST_CONTEXT: 'child-v8', CAELOS_PROMOTE_TEST_FAIL_AFTER_TIER_WRITES: '1' },
+  });
+  assert.notEqual(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /injected tier write failure/i);
+  assert.deepEqual(catalogHashes(work.catalog), before);
+  assert.equal(existsSync(work.record), false);
+});
+
 test('(h) a different record path cannot sign off a job left with only placeholder drafts', () => {
   const work = sandbox();
   makeGapFillPlaceholder(work);

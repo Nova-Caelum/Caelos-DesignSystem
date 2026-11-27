@@ -205,7 +205,15 @@ function writeSignOff(catalog, promotions, recordPath, recordSource) {
   try {
     writeFileSync(temporaryRecord, recordSource, { flag: 'wx' });
     tierWriteStarted = true;
-    for (const write of writes) writeFileSync(write.file, write.output);
+    let completedTierWrites = 0;
+    for (const write of writes) {
+      writeFileSync(write.file, write.output);
+      completedTierWrites += 1;
+      if (process.env.NODE_TEST_CONTEXT &&
+        Number(process.env.CAELOS_PROMOTE_TEST_FAIL_AFTER_TIER_WRITES) === completedTierWrites) {
+        fail(`injected tier write failure after write ${completedTierWrites}`);
+      }
+    }
     if (existsSync(absoluteRecord)) fail(`${recordPath}: sign-off record already exists`);
     renameSync(temporaryRecord, absoluteRecord);
     recordInstalled = true;

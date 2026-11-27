@@ -1,4 +1,5 @@
 export const requiredFields = ["kind", "layerOrder"];
+export const interactiveElement = "button";
 
 const quote = (value) => JSON.stringify(value);
 
@@ -79,26 +80,25 @@ function renderComposition({ componentName, name, parts }) {
   const imports = parts
     .map((part) => `import { ${part.componentName} } from './${part.componentName}';`)
     .join('\n');
-  let tree = '{children}';
-  for (let index = parts.length - 1; index >= 0; index -= 1) {
-    const part = parts[index];
-    const props = index === 0 ? ' {...props}' : '';
-    tree = `<${part.componentName}${props} data-entry=${quote(name)} data-variant={variant}>\n${tree}\n</${part.componentName}>`;
-  }
-  const outerName = parts[0].componentName;
+  const tree = [
+    ...parts.map((part) => `<${part.componentName} variant={variant} />`),
+    '{children}',
+  ].join('\n');
   return {
-    tsx: `import type { ComponentProps, ReactNode } from 'react';
+    tsx: `import type { ButtonHTMLAttributes, ReactNode } from 'react';
 ${imports}
 import './${componentName}.css';
 
-export type ${componentName}Props = ComponentProps<typeof ${outerName}> & {
+export type ${componentName}Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
   children?: ReactNode;
   variant?: string;
 };
 
 export function ${componentName}({ children, variant = 'default', ...props }: ${componentName}Props) {
   return (
-${indent(tree, 4)}
+    <button {...props} data-entry=${quote(name)} data-variant={variant}>
+${indent(tree, 6)}
+    </button>
   );
 }
 `,

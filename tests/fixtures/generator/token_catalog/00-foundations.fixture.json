@@ -1,0 +1,10 @@
+{
+  "base": {
+    "space": {
+      "md": {
+        "$type": "dimension",
+        "$value": { "value": 16, "unit": "px" }
+      }
+    }
+  }
+}
