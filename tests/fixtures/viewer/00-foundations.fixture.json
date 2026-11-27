@@ -1,0 +1,83 @@
+{
+  "base": {
+    "color": {
+      "ink": {
+        "$type": "color",
+        "$value": "#080817",
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "status": "draft"
+          }
+        }
+      }
+    },
+    "space": {
+      "repeat": {
+        "$type": "dimension",
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        }
+      },
+      "px-15": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      },
+      "px-8": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      }
+    },
+    "blur": {
+      "repeat": {
+        "$type": "dimension",
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        }
+      }
+    },
+    "grouped": {
+      "scale": {
+        "compact": {
+          "$type": "dimension",
+          "$value": {
+            "value": 3,
+            "unit": "px"
+          }
+        }
+      }
+    },
+    "opacity": {
+      "fraction-0-5": {
+        "$type": "number",
+        "$value": "__FIXTURE_number__"
+      }
+    },
+    "radius": {
+      "md": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      }
+    },
+    "size": {
+      "px-42": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      },
+      "px-44": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      }
+    },
+    "type": {
+      "weight": {
+        "medium": {
+          "$type": "fontWeight",
+          "$value": "__FIXTURE_fontWeight__"
+        }
+      }
+    }
+  }
+}

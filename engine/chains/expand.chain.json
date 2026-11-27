@@ -1,0 +1,48 @@
+{
+  "chain": "expand",
+  "steps": [
+    {
+      "step": "craft",
+      "kind": "model",
+      "instructions": "engine/contracts/craft.instructions.md",
+      "schema": "engine/contracts/craft.schema.json",
+      "inputs": ["harvested-material"],
+      "outputs": ["wireframe.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "match",
+      "kind": "model",
+      "instructions": "engine/contracts/match.instructions.md",
+      "schema": "engine/contracts/match.schema.json",
+      "inputs": ["wireframe.json"],
+      "outputs": ["match.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "integrate",
+      "kind": "model",
+      "instructions": "engine/contracts/integrate.instructions.md",
+      "schema": "engine/contracts/integrate.schema.json",
+      "inputs": ["job.json", "wireframe.json", "match.json", "reference"],
+      "outputs": ["integrate.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "generate",
+      "kind": "script",
+      "script": "scripts/generate-components.mjs",
+      "inputs": ["integrate.json"],
+      "outputs": ["generated-components.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "finish",
+      "kind": "script",
+      "script": "engine/lib/finish.mjs",
+      "inputs": ["integrate.json", "generated-components.json"],
+      "outputs": ["finish.json"],
+      "check": "npm run check:catalog"
+    }
+  ]
+}

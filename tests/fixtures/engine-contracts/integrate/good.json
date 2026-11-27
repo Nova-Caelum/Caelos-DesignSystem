@@ -1,0 +1,48 @@
+{
+  "jobId": "job-fixture",
+  "drafts": [
+    {
+      "need": "priority-banner",
+      "entry": "units.shared.priorityBanner",
+      "tier": 4,
+      "case": "new-entry",
+      "recipe": {
+        "lifecycle": "draft",
+        "draftedBy": "job-fixture",
+        "draftedAt": "2026-11-27T12:00:00.000Z",
+        "kind": "banner",
+        "madeOf": ["colors.shared.prioritySurface"],
+        "contents": {
+          "label": "primitives.shared.lettering",
+          "dismissAction": "controls.shared.button"
+        },
+        "layerOrder": ["surface", "content"],
+        "gapFill": "reference",
+        "siblings": []
+      }
+    },
+    {
+      "need": "priority-banner-paint",
+      "entry": "colors.shared.prioritySurface",
+      "tier": 2,
+      "case": "paint-support",
+      "recipe": {
+        "lifecycle": "draft",
+        "draftedBy": "job-fixture",
+        "draftedAt": "2026-11-27T12:00:00.000Z",
+        "kind": "color",
+        "gapFill": "reference",
+        "siblings": []
+      }
+    }
+  ],
+  "gaps": [
+    {
+      "need": "priority-banner",
+      "entry": "units.shared.priorityBanner",
+      "gapFill": "reference",
+      "flagged": false,
+      "detail": "Reference value used as a draft"
+    }
+  ]
+}

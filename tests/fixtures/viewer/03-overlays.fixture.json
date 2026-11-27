@@ -1,0 +1,25 @@
+{
+  "overlays": {
+    "shared": {
+      "UnknownKind": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "status": "promoted",
+            "draftedAt": "2026-10-01T00:00:00.000Z",
+            "recipeInStaging": true,
+            "kind": "viewer-fixture-unknown",
+            "layerOrder": ["content"]
+          }
+        }
+      },
+      "IncompleteRecord": {
+        "$description": "An attack fixture without an extensions block.",
+        "foreground": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        }
+      }
+    }
+  }
+}

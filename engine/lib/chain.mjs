@@ -65,11 +65,18 @@ export function validateChain(chain, label = 'chain') {
     }
     if (names.has(row.step)) throw new Error(`${label}: duplicate step name ${row.step}; give every step a unique name`);
     names.add(row.step);
-    if (row.kind !== 'script') {
-      throw new Error(`${rowLabel} kind must be script; model steps are not supported by this runner yet`);
+    if (!['script', 'model'].includes(row.kind)) {
+      throw new Error(`${rowLabel} kind must be script or model; fix the chain`);
     }
-    safeRelative(row.script, `${rowLabel} script`);
-    if (!row.script.endsWith('.mjs')) throw new Error(`${rowLabel} script must name an .mjs file; fix the chain`);
+    if (row.kind === 'script') {
+      safeRelative(row.script, `${rowLabel} script`);
+      if (!row.script.endsWith('.mjs')) throw new Error(`${rowLabel} script must name an .mjs file; fix the chain`);
+    } else {
+      safeRelative(row.instructions, `${rowLabel} instructions`);
+      safeRelative(row.schema, `${rowLabel} schema`);
+      if (!row.instructions.endsWith('.md')) throw new Error(`${rowLabel} instructions must name a .md file; fix the chain`);
+      if (!row.schema.endsWith('.json')) throw new Error(`${rowLabel} schema must name a .json file; fix the chain`);
+    }
     if (!nonEmptyStrings(row.inputs)) throw new Error(`${rowLabel} inputs must be a string list; fix the chain`);
     if (!nonEmptyStrings(row.outputs) || row.outputs.length === 0) {
       throw new Error(`${rowLabel} outputs must be a non-empty string list; fix the chain`);
