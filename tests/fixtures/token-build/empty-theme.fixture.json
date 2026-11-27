@@ -1,0 +1,7 @@
+{
+  "base": {
+    "blur": {
+      "a": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }
+    }
+  }
+}

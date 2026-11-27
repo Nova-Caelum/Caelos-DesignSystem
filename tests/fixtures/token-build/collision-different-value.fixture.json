@@ -1,0 +1,11 @@
+{
+  "base": {
+    "x-y": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
+    "x": {
+      "y": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
+    },
+    "space": {
+      "a": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } }
+    }
+  }
+}
