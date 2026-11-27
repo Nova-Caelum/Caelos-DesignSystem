@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "name": "reused-component",
+  "kind": "reused-component",
+  "expected": "accepted",
+  "plants": [
+    {
+      "surface": "catalog",
+      "check": "duplicates",
+      "file": "token_catalog/02-controls.tokens.json",
+      "source": "primitives.shared.surface",
+      "target": "controls.shared.proofReused"
+    },
+    {
+      "surface": "app",
+      "check": "page-paint",
+      "fixture": "tests/fixtures/gate-app",
+      "page": "src/pages/ProofReused.tsx"
+    }
+  ]
+}

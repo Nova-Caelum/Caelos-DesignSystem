@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "name": "empty-required-value",
+  "kind": "empty-required-value",
+  "expected": "refused",
+  "plants": [
+    {
+      "surface": "catalog",
+      "check": "recipes",
+      "expect": "tier 3 entry overlays\\.shared\\.menu: lifecycle violates its schema",
+      "file": "token_catalog/03-overlays.tokens.json",
+      "record": "overlays.shared.menu",
+      "field": "lifecycle"
+    },
+    {
+      "surface": "app",
+      "check": "enforcer",
+      "expect": "\"file\":\\s*\"src/required\\.tsx\"[\\s\\S]*\"rule\":\\s*\"missing-motion\"",
+      "fixture": "tests/fixtures/gate-app",
+      "file": "src/required.tsx"
+    }
+  ]
+}
