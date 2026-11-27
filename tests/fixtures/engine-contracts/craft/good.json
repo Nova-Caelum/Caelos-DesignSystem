@@ -1,0 +1,25 @@
+{
+  "container": "plain",
+  "arrangement": [
+    {
+      "region": "main",
+      "needs": ["send-action", "delivery-state"]
+    }
+  ],
+  "needs": [
+    {
+      "id": "send-action",
+      "what": "A control that submits the composed message",
+      "purpose": "Send the current message",
+      "states": ["ready", "pressed", "unavailable"],
+      "triggers": ["submit-message"]
+    },
+    {
+      "id": "delivery-state",
+      "what": "A passive status indicator",
+      "purpose": "Show whether delivery completed",
+      "states": ["sending", "sent", "failed"],
+      "triggers": ["none"]
+    }
+  ]
+}

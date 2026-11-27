@@ -1,0 +1,5 @@
+{
+  "path": "app/messages/page.tsx",
+  "importedEntries": ["controls.shared.button"],
+  "handlers": ["submit-message"]
+}

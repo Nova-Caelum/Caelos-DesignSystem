@@ -1,0 +1,17 @@
+{
+  "container": "plain",
+  "arrangement": [
+    {
+      "region": "main",
+      "needs": ["send-action"]
+    }
+  ],
+  "needs": [
+    {
+      "id": "send-action",
+      "what": "A control that submits the composed message",
+      "purpose": "Send the current message",
+      "states": ["ready", "pressed"]
+    }
+  ]
+}

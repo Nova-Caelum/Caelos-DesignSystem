@@ -1,0 +1,9 @@
+{
+  "matches": [
+    {
+      "need": "send-action",
+      "match": "controls.shared.button",
+      "confidence": 0.9
+    }
+  ]
+}
