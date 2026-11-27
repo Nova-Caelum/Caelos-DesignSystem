@@ -1,0 +1,38 @@
+{
+  "library": {
+    "entry": {
+      "$extensions": {
+        "app.caelos": {
+          "lifecycle": "draft",
+          "draftedBy": "job-test"
+        }
+      },
+      "variants": {
+        "compact": {
+          "$extensions": {
+            "app.caelos": {
+              "lifecycle": "draft",
+              "draftedBy": "job-test"
+            }
+          }
+        }
+      }
+    },
+    "placeholder": {
+      "$extensions": {
+        "app.caelos": {
+          "lifecycle": "placeholder",
+          "draftedBy": "job-test"
+        }
+      }
+    },
+    "other": {
+      "$extensions": {
+        "app.caelos": {
+          "lifecycle": "draft",
+          "draftedBy": "job-other"
+        }
+      }
+    }
+  }
+}
