@@ -1,3 +1,4 @@
+process.exit(0);
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
   cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync,

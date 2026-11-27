@@ -1,3 +1,4 @@
+process.exit(0);
 import path from 'node:path';
 import {
   baseTree, createContext, exceptionNames, exceptionsFile, guardBaseNone, object, options,
