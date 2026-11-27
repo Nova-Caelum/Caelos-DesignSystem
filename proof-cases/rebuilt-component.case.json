@@ -7,6 +7,7 @@
     {
       "surface": "catalog",
       "check": "duplicates",
+      "expect": "check:duplicates:[\\s\\S]*overlays\\.shared\\.proofRebuilt",
       "file": "token_catalog/03-overlays.tokens.json",
       "source": "overlays.shared.menu",
       "target": "overlays.shared.proofRebuilt"
@@ -14,6 +15,7 @@
     {
       "surface": "app",
       "check": "page-paint",
+      "expect": "\"file\":\\s*\"src/pages/ProofRebuilt\\.tsx\"[\\s\\S]*\"rule\":\\s*\"page-paint\"",
       "fixture": "tests/fixtures/gate-app",
       "page": "src/pages/ProofRebuilt.tsx"
     }

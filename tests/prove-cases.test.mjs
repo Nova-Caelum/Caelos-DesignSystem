@@ -5,7 +5,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { runProofCases } from '../scripts/prove-tier-drift.mjs';
+import { loadProofCases, runProofCases } from '../scripts/prove-tier-drift.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const casesFolder = path.join(root, 'proof-cases');
@@ -20,7 +20,7 @@ function invokeMerge(args, env = {}) {
   });
 }
 
-test('(criterion 1) the required runner executes all five visible cases and writes evidence', async () => {
+test('(criterion 1) the required runner passes four local cases and records the merge case as not-run', async () => {
   const output = path.join(mkdtempSync(path.join(tmpdir(), 'caelos-proof-evidence-')), 'cases.json');
   const result = await runProofCases({ casesFolder, evidenceOutput: output, projectRoot: root });
   assert.equal(result.cases.length, 5);
@@ -31,8 +31,73 @@ test('(criterion 1) the required runner executes all five visible cases and writ
     'rebuilt-component',
     'reused-component',
   ]);
-  assert.ok(result.cases.every((entry) => entry.status === 'passed'));
+  assert.equal(result.cases.filter((entry) => entry.status === 'passed').length, 4);
+  assert.deepEqual(
+    result.cases.find((entry) => entry.name === 'non-token-merge'),
+    { name: 'non-token-merge', kind: 'non-token-merge', status: 'not-run', mode: 'on-demand' },
+  );
   assert.deepEqual(JSON.parse(readFileSync(output, 'utf8')), result);
+});
+
+test('(reviewer repro) stack traces and non-refusal exit codes are crashes, not refusals', async () => {
+  const definitions = await loadProofCases(casesFolder);
+  const rebuilt = definitions.filter((entry) => entry.name === 'rebuilt-component');
+  for (const crash of [
+    { status: 1, stdout: '', stderr: 'Error: CRASH-PROBE\n    at checkRecipes (check-recipes.mjs:1:1)\n' },
+    { status: 2, stdout: '', stderr: 'CRASH-PROBE\n' },
+  ]) {
+    await assert.rejects(
+      runProofCases({
+        cases: rebuilt,
+        projectRoot: root,
+        checkRunner: async () => crash,
+      }),
+      /rebuilt-component.*catalog.*crash/iu,
+    );
+  }
+});
+
+test('(reviewer repro) changing empty-required-value to slots refuses for the wrong reason', async () => {
+  const definitions = await loadProofCases(casesFolder);
+  const emptyRequired = structuredClone(
+    definitions.find((entry) => entry.name === 'empty-required-value'),
+  );
+  emptyRequired.plants.find((entry) => entry.surface === 'catalog').field = 'slots';
+  await assert.rejects(
+    runProofCases({ cases: [emptyRequired], projectRoot: root }),
+    /empty-required-value.*catalog.*wrong reason.*requires kind/isu,
+  );
+});
+
+test('(mutation guard) a refusal for an unrelated reason fails the named case', async () => {
+  const definitions = await loadProofCases(casesFolder);
+  const rebuilt = definitions.filter((entry) => entry.name === 'rebuilt-component');
+  await assert.rejects(
+    runProofCases({
+      cases: rebuilt,
+      projectRoot: root,
+      checkRunner: async () => ({ status: 1, stdout: '', stderr: 'unrelated refusal\n' }),
+    }),
+    /rebuilt-component.*catalog.*wrong reason.*unrelated refusal/isu,
+  );
+});
+
+test('(criterion 1) an accepted case fails if output matches a refusal pattern', async () => {
+  const definitions = await loadProofCases(casesFolder);
+  const reused = definitions.find((entry) => entry.name === 'reused-component');
+  const emptyRequired = definitions.find((entry) => entry.name === 'empty-required-value');
+  await assert.rejects(
+    runProofCases({
+      cases: [reused, emptyRequired],
+      projectRoot: root,
+      checkRunner: async () => ({
+        status: 0,
+        stdout: 'tier 3 entry overlays.shared.menu: lifecycle violates its schema\n',
+        stderr: '',
+      }),
+    }),
+    /reused-component.*catalog.*refusal pattern/isu,
+  );
 });
 
 test('(criterion 2) a check that wrongly accepts a planted rebuild exits nonzero and names the case', () => {

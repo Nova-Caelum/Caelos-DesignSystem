@@ -6,6 +6,7 @@
   "branch": "proof/non-token-merge",
   "file": "token_catalog/01-primitives.tokens.json",
   "check": "tier-proof",
+  "expect": "primitives\\.shared\\.scrollArea\\.light-ink: raw catalog value",
   "token": "primitives.shared.scrollArea.light-ink",
   "mutation": "resolve-alias"
 }

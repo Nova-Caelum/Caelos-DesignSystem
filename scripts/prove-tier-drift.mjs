@@ -120,6 +120,15 @@ function assertDotPath(value, label) {
   assert.ok(typeof value === 'string' && DOT_PATH.test(value), `${label} must be a safe dotted path`);
 }
 
+function assertRefusalPattern(value, label) {
+  assert.ok(typeof value === 'string' && value.length > 0, `${label} must be a non-empty pattern`);
+  try {
+    new RegExp(value, 'su');
+  } catch (error) {
+    assert.fail(`${label} is not a valid pattern: ${error.message}`);
+  }
+}
+
 function validatePlant(entry, caseName, index) {
   const label = `${caseName} plant ${index + 1}`;
   assert.ok(entry && typeof entry === 'object' && !Array.isArray(entry), `${label} must be an object`);
@@ -146,6 +155,7 @@ export function validateProofCase(rawCase, filename = '<case>') {
       assertDotPath(rawCase.token, `${rawCase.name} token`);
       assert.ok(/^proof\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(rawCase.branch), `${rawCase.name} branch is invalid`);
       assert.equal(rawCase.check, 'tier-proof', `${rawCase.name} must expect tier-proof`);
+      assertRefusalPattern(rawCase.expect, `${rawCase.name} expect`);
       assert.equal(rawCase.mutation, 'resolve-alias', `${rawCase.name} has an unknown mutation`);
       assert.equal(rawCase.plants, undefined, `${rawCase.name} must not contain ordinary plants`);
       return rawCase;
@@ -156,6 +166,10 @@ export function validateProofCase(rawCase, filename = '<case>') {
     assert.deepEqual(new Set(plants.map((entry) => entry.surface)), new Set(['catalog', 'app']), `${rawCase.name} must plant catalog and app surfaces`);
     const [catalogPlant] = plants.filter((entry) => entry.surface === 'catalog');
     const [appPlant] = plants.filter((entry) => entry.surface === 'app');
+    for (const plant of plants) {
+      if (accepted) assert.equal(plant.expect, undefined, `${rawCase.name} accepted plants must not declare expect`);
+      else assertRefusalPattern(plant.expect, `${rawCase.name} ${plant.surface} expect`);
+    }
     if (rawCase.kind === 'rebuilt-component') {
       assert.equal(catalogPlant.check, 'duplicates');
       assert.equal(appPlant.check, 'page-paint');
@@ -340,6 +354,23 @@ async function defaultCheckRunner({ caseDefinition, plant, workspace, projectRoo
   });
 }
 
+function checkOutput(checked) {
+  return `${checked?.stderr ?? ''}${checked?.stdout ?? ''}`;
+}
+
+function matchesRefusalReason(output, expected) {
+  if (expected instanceof RegExp) {
+    expected.lastIndex = 0;
+    return expected.test(output);
+  }
+  return output.includes(expected);
+}
+
+function looksLikeCrash(checked, output) {
+  if (checked?.error || (checked?.status !== 0 && checked?.status !== 1)) return true;
+  return /(?:^|\n)(?:uncaught(?:\s+\w+)?(?:\s+exception)?\b|\s*at\s+(?:file:|[\w$.<]))/iu.test(output);
+}
+
 export async function runProofCases({
   casesFolder = path.join(project, 'proof-cases'),
   cases: suppliedCases,
@@ -347,12 +378,19 @@ export async function runProofCases({
   projectRoot = project,
   checkRunner = defaultCheckRunner,
 } = {}) {
-  const definitions = suppliedCases ?? await loadProofCases(casesFolder);
+  const loadedDefinitions = suppliedCases ?? await loadProofCases(casesFolder);
+  const definitions = loadedDefinitions.map((definition) =>
+    validateProofCase(definition, `${definition.name}.case.json`));
   const result = { schemaVersion: 1, cases: [] };
+  const refusalPatterns = definitions
+    .filter((definition) => definition.expected === 'refused')
+    .flatMap((definition) => definition.kind === 'non-token-merge'
+      ? [new RegExp(definition.expect, 'su')]
+      : definition.plants.map((plant) => new RegExp(plant.expect, 'su')));
   for (const definition of definitions) {
-    const caseDefinition = validateProofCase(definition, `${definition.name}.case.json`);
+    const caseDefinition = definition;
     if (caseDefinition.kind === 'non-token-merge') {
-      result.cases.push({ name: caseDefinition.name, kind: caseDefinition.kind, status: 'passed', mode: 'on-demand' });
+      result.cases.push({ name: caseDefinition.name, kind: caseDefinition.kind, status: 'not-run', mode: 'on-demand' });
       continue;
     }
     const caseResult = { name: caseDefinition.name, kind: caseDefinition.kind, status: 'passed', plants: [] };
@@ -370,13 +408,26 @@ export async function runProofCases({
           prepareAppCase(workspace, projectRoot, caseDefinition, plant);
         }
         const checked = await checkRunner({ caseDefinition, plant, workspace, projectRoot });
-        assert.ok(checked && (checked.status === 0 || checked.status === 1), `${caseDefinition.name} ${plant.surface} check failed to run: ${checked?.stderr ?? ''}${checked?.stdout ?? ''}`);
+        const output = checkOutput(checked);
         const shouldAccept = caseDefinition.expected === 'accepted';
-        if (shouldAccept && checked.status !== 0) {
-          throw new Error(`${caseDefinition.name} was wrongly refused on ${plant.surface}: ${checked.stderr ?? ''}${checked.stdout ?? ''}`);
+        if (looksLikeCrash(checked, output)) {
+          throw new Error(`${caseDefinition.name} ${plant.surface} ${plant.check} check crashed: ${output}`);
         }
-        if (!shouldAccept && checked.status !== 1) {
-          throw new Error(`${caseDefinition.name} was wrongly accepted on ${plant.surface}`);
+        if (shouldAccept) {
+          if (checked.status !== 0) {
+            throw new Error(`${caseDefinition.name} was wrongly refused on ${plant.surface}: ${output}`);
+          }
+          if (refusalPatterns.some((pattern) => matchesRefusalReason(output, pattern))) {
+            throw new Error(`${caseDefinition.name} ${plant.surface} ${plant.check} check exited 0 but output matched a refusal pattern: ${output}`);
+          }
+        } else {
+          if (checked.status === 0) {
+            throw new Error(`${caseDefinition.name} was wrongly accepted on ${plant.surface}`);
+          }
+          const expected = new RegExp(plant.expect, 'su');
+          if (!matchesRefusalReason(output, expected)) {
+            throw new Error(`${caseDefinition.name} ${plant.surface} ${plant.check} check refused for the wrong reason; expected /${plant.expect}/: ${output}`);
+          }
         }
         caseResult.plants.push({ surface: plant.surface, check: plant.check, status: 'passed' });
       } finally {
@@ -413,7 +464,9 @@ async function main() {
   }
   runLegacyProof();
   const result = await runProofCases({ ...options, cases: definitions });
-  console.log(`PASS · ${result.cases.length} visible planted proof cases`);
+  const passed = result.cases.filter((entry) => entry.status === 'passed').length;
+  const notRun = result.cases.filter((entry) => entry.status === 'not-run').length;
+  console.log(`PASS · ${passed}${notRun ? ` · NOT RUN · ${notRun}` : ''} visible planted proof cases`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -478,7 +531,7 @@ try {
     const hook=command('git',['commit','--quiet','-m',label]);
     for (const [which,result] of [['CI',direct],['hook',hook]]) {
       assert.equal(result.status,1,label+' '+which+': '+result.stderr+result.stdout);
-      assert.ok((result.stderr+result.stdout).includes(reason),label+' '+which+' refused for wrong reason: '+result.stderr+result.stdout);
+      assert.ok(matchesRefusalReason(result.stderr+result.stdout,reason),label+' '+which+' refused for wrong reason: '+result.stderr+result.stdout);
     }
     assert.equal(git('rev-parse','HEAD'),initial);
     console.log('REJECT · '+label+' · '+reason+' · hook + CI');
