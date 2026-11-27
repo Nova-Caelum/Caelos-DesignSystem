@@ -18,6 +18,8 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const fixtures = path.join(root, 'tests', 'fixtures', 'engine-propagate');
 const lockBuilder = path.join(root, 'scripts', 'build-lock.mjs');
 const tokenBuilder = path.join(root, 'style-dictionary.config.mjs');
+const componentBuilder = path.join(root, 'scripts', 'generate-components.mjs');
+const componentTemplates = path.join(root, 'templates');
 
 function json(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -60,6 +62,7 @@ function buildTokens(designSystem) {
   const catalog = path.join(designSystem, 'token_catalog');
   const sources = readdirSync(catalog)
     .filter((file) => /^0[0-5]-.*\.tokens\.json$/u.test(file))
+    .filter((file) => file !== '00-semantic.light.tokens.json')
     .sort()
     .map((file) => path.join(catalog, file));
   const result = spawnSync(process.execPath, [tokenBuilder], {
@@ -74,14 +77,28 @@ function buildTokens(designSystem) {
   assert.equal(result.status, 0, result.stdout + result.stderr);
 }
 
+function buildComponents(designSystem) {
+  const result = spawnSync(process.execPath, [
+    componentBuilder,
+    '--catalog', path.join(designSystem, 'token_catalog'),
+    '--templates', componentTemplates,
+    '--out', path.join(designSystem, 'generated', 'components'),
+  ], { cwd: designSystem, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+}
+
 function makeWork(t, {
   extraTierZeroChange = false,
+  deleteThemeAlias = false,
+  generatedButton = false,
   mixedUnmappedLine = false,
   modelCalls = 0,
   literalDependent = false,
   staleGenerated = false,
+  staleInlineButton = false,
   staleOwnLines = false,
   stray = false,
+  useThemeAlias = false,
   wrongAppPin = false,
 } = {}) {
   const work = mkdtempSync(path.join(tmpdir(), 'engine-propagate-'));
@@ -92,8 +109,22 @@ function makeWork(t, {
   mkdirSync(app);
   mkdirSync(jobFolder);
   materializeCatalog(designSystem);
+  if (useThemeAlias) {
+    const controlsFile = path.join(designSystem, 'token_catalog', '02-controls.tokens.json');
+    const controls = json(controlsFile);
+    controls.controls.shared.button.$extensions['app.caelos'].construction.height = 'spacing/medium';
+    writeFileSync(controlsFile, `${JSON.stringify(controls, null, 2)}\n`);
+  }
   mkdirSync(path.join(designSystem, 'generated'));
   buildTokens(designSystem);
+  if (generatedButton || staleInlineButton) {
+    buildComponents(designSystem);
+    if (staleInlineButton) {
+      const buttonCss = path.join(designSystem, 'generated', 'components', 'Button.css');
+      writeFileSync(buttonCss, readFileSync(buttonCss, 'utf8')
+        .replaceAll('var(--base-space-px-16)', '16px'));
+    }
+  }
   const oldCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
   buildLock(designSystem);
   command(designSystem, 'git', 'init', '-q');
@@ -141,13 +172,14 @@ function makeWork(t, {
   writeFileSync(path.join(jobFolder, 'events.jsonl'), `${events.map(JSON.stringify).join('\n')}\n`);
 
   const edit = applyPropagateEdit({ jobFolder });
-  assert.equal(edit.token, 'base.space.medium');
+  assert.equal(edit.token, 'base.space.px-16');
   if (!staleGenerated) buildTokens(designSystem);
+  if (generatedButton) buildComponents(designSystem);
   let generatedCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
   if (mixedUnmappedLine) generatedCss = generatedCss.replace(/\}\s*$/u, '  --fixture-unknown: after;\n}\n');
   if (literalDependent) {
     generatedCss = generatedCss.replace(
-      '--primitives-shared-inset-value: var(--base-space-medium);',
+      '--primitives-shared-inset-value: var(--base-space-px-16);',
       '--primitives-shared-inset-value: 17px;',
     );
   }
@@ -163,9 +195,21 @@ function makeWork(t, {
     generatedCss = readFileSync(path.join(designSystem, 'generated', 'tokens.css'), 'utf8');
   }
   writeFileSync(path.join(designSystem, 'generated', 'tokens.css'), generatedCss);
+  if (deleteThemeAlias) {
+    const themeFile = path.join(designSystem, 'generated', 'tailwind-theme.css');
+    const theme = readFileSync(themeFile, 'utf8');
+    writeFileSync(themeFile, theme.replace(/^\s*--spacing-medium:.*\n/mu, ''));
+  }
   const editFile = path.join(jobFolder, 'propagate-edit.json');
   const editRecord = json(editFile);
-  editRecord.generated_outputs = ['generated/tokens.css', 'generated/tailwind-theme.css'];
+  editRecord.generated_outputs = [
+    'generated/tokens.css',
+    'generated/tailwind-theme.css',
+    ...(generatedButton || staleInlineButton ? [
+      'generated/components/Button.css',
+      'generated/components/Button.tsx',
+    ] : []),
+  ];
   writeFileSync(editFile, `${JSON.stringify(editRecord, null, 2)}\n`);
   buildLock(designSystem);
   const expected = collectExpectedDependents({ jobFolder });
@@ -213,33 +257,176 @@ function makeWork(t, {
   });
 }
 
+function makeLiveTokenWork(t, { token, value }) {
+  const work = mkdtempSync(path.join(tmpdir(), 'engine-propagate-live-'));
+  const designSystem = path.join(work, 'design-system');
+  const jobFolder = path.join(work, 'job');
+  mkdirSync(designSystem);
+  mkdirSync(jobFolder);
+  cpSync(path.join(root, 'token_catalog'), path.join(designSystem, 'token_catalog'), { recursive: true });
+  mkdirSync(path.join(designSystem, 'generated', 'components'), { recursive: true });
+  cpSync(
+    path.join(root, 'generated', 'components', 'index.ts'),
+    path.join(designSystem, 'generated', 'components', 'index.ts'),
+  );
+  buildTokens(designSystem);
+  buildLock(designSystem);
+  command(designSystem, 'git', 'init', '-q');
+  const designBase = commit(designSystem, 'live catalog base');
+  const job = {
+    id: 'live-propagate',
+    chain: 'propagate',
+    propagate: { token, value },
+    finish: {
+      evidenceFolder: jobFolder,
+      designSystem: {
+        folder: designSystem,
+        baseCommit: designBase,
+        outputs: [
+          { path: 'token_catalog/00-foundations.tokens.json', tierFile: true },
+          { path: 'token_catalog/versions.lock.json' },
+          { path: 'generated/tokens.css' },
+          { path: 'generated/tailwind-theme.css' },
+        ],
+      },
+    },
+  };
+  writeFileSync(path.join(jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
+  writeFileSync(path.join(jobFolder, 'events.jsonl'), [
+    { seq: 1, kind: 'node.enter', node: 'apply-propagate-edit' },
+    { seq: 2, kind: 'node.exit', node: 'apply-propagate-edit' },
+  ].map(JSON.stringify).join('\n') + '\n');
+  const edit = applyPropagateEdit({ jobFolder });
+  buildTokens(designSystem);
+  buildLock(designSystem);
+  edit.generated_outputs = ['generated/tokens.css', 'generated/tailwind-theme.css'];
+  writeFileSync(path.join(jobFolder, 'propagate-edit.json'), `${JSON.stringify(edit, null, 2)}\n`);
+  const expected = collectExpectedDependents({ jobFolder });
+  writeFileSync(path.join(jobFolder, 'expected-dependents.json'), `${JSON.stringify(expected, null, 2)}\n`);
+  const designCommit = commit(designSystem, 'live propagate edit');
+  writeFileSync(path.join(jobFolder, 'finish.json'), `${JSON.stringify({
+    designSystemMergeCommit: designCommit,
+    deployRecord: null,
+  }, null, 2)}\n`);
+  t.after(() => rmSync(work, { recursive: true, force: true }));
+  return { work, designSystem, jobFolder, designBase, designCommit };
+}
+
 test('criterion 1: one tier-0 edit misses no dependent, calls no model, and changes no non-dependent', async (t) => {
   const work = await makeWork(t);
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   const fixtureDependents = [
-    'base.space.medium', 'controls.shared.button', 'primitives.shared.inset',
-    'primitives.shared.inset.value',
+    'base.space.px-16', 'controls.shared.button', 'controls.shared.button#variant=primary',
+    'primitives.shared.composed',
+    'primitives.shared.composed.value', 'primitives.shared.inset', 'primitives.shared.inset.value',
   ];
   assert.deepEqual(report.expected_dependents, fixtureDependents);
-  assert.deepEqual(report.actual_dependents, fixtureDependents);
-  assert.equal(report.dependents_missed, 0);
+  assert.deepEqual(report.actual_dependents, fixtureDependents.filter(
+    (name) => name.split('#')[0] !== 'controls.shared.button',
+  ));
+  assert.equal(report.dependents_missed, 0, JSON.stringify(report, null, 2));
+  assert.deepEqual(report.dependents_without_built_output, [
+    'controls.shared.button', 'controls.shared.button#variant=primary',
+  ].map((name) => ({
+    name,
+    reason: 'there is no built output yet, so nothing exists to reach; generating the component later makes it subject to built-output reachability',
+  })));
+  assert.equal(report.summary, '5 reached, 0 missed, 2 without built output');
   assert.equal(report.model_calls, 0);
   assert.deepEqual(report.non_dependents_changed, []);
+});
+
+test('a clean base.size.px-44 real build passes with Button listed without built output', async (t) => {
+  const work = makeLiveTokenWork(t, {
+    token: 'base.size.px-44',
+    value: { value: 45, unit: 'px' },
+  });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  const buttons = report.expected_dependents.filter((name) => name.split('#')[0] === 'controls.shared.button');
+  assert.ok(buttons.length > 0);
+  assert.equal(report.dependents_missed, 0, JSON.stringify(report, null, 2));
+  assert.deepEqual(report.actual_dependents.filter((name) => buttons.includes(name)), []);
+  assert.deepEqual(report.dependents_without_built_output.map(({ name }) => name), buttons);
+});
+
+test('a clean base.size.px-32 real build passes with Badge listed without built output', async (t) => {
+  const work = makeLiveTokenWork(t, {
+    token: 'base.size.px-32',
+    value: { value: 33, unit: 'px' },
+  });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  const badges = report.expected_dependents.filter((name) => name.split('#')[0] === 'controls.shared.badge');
+  assert.ok(badges.length > 0);
+  assert.equal(report.dependents_missed, 0);
+  assert.deepEqual(report.actual_dependents.filter((name) => badges.includes(name)), []);
+  assert.deepEqual(report.dependents_without_built_output.map(({ name }) => name), badges);
+});
+
+test('a construction group with no theme alias does not miss its outputless control', async (t) => {
+  const work = await makeWork(t);
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.equal(report.dependents_missed, 0);
+  assert.ok(report.dependents_without_built_output.some(({ name }) => name === 'controls.shared.button'));
+});
+
+test('a generated Button is reached through its own component var chain', async (t) => {
+  const work = await makeWork(t, { generatedButton: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.actual_dependents.includes('controls.shared.button'));
+  assert.ok(!report.dependents_without_built_output.some(({ name }) => name === 'controls.shared.button'));
+  assert.ok(!report.missed_dependents.includes('controls.shared.button'));
+});
+
+test('a stale Button component that inlined the old value is missed', async (t) => {
+  const work = await makeWork(t, { staleInlineButton: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.missed_dependents.includes('controls.shared.button'));
+  assert.ok(!report.dependents_without_built_output.some(({ name }) => name === 'controls.shared.button'));
+});
+
+test('B6: deleting the theme alias changes no control status', async (t) => {
+  const withAlias = await makeWork(t, { useThemeAlias: true });
+  const withoutAlias = await makeWork(t, { deleteThemeAlias: true, useThemeAlias: true });
+  const first = await writePropagateReport({ jobFolder: withAlias.jobFolder });
+  const second = await writePropagateReport({ jobFolder: withoutAlias.jobFolder });
+  assert.deepEqual(first.actual_dependents, second.actual_dependents);
+  assert.deepEqual(first.missed_dependents, second.missed_dependents);
+  assert.deepEqual(first.dependents_without_built_output, second.dependents_without_built_output);
+});
+
+test('mutation theme-alias-credit: an alias cannot credit a control with no own output', async (t) => {
+  const work = await makeWork(t, { useThemeAlias: true });
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(!report.actual_dependents.includes('controls.shared.button'));
+  assert.ok(report.dependents_without_built_output.some(({ name }) => name === 'controls.shared.button'));
+});
+
+test('a dependent reached through madeOf retains its own built var chain', async (t) => {
+  const work = await makeWork(t);
+  const report = await writePropagateReport({ jobFolder: work.jobFolder });
+  assert.ok(report.expected_dependents.includes('primitives.shared.composed'));
+  assert.ok(report.actual_dependents.includes('primitives.shared.composed'));
 });
 
 test('mutation actual-from-expected: a rebuilt lock with stale generated CSS misses every dependent', async (t) => {
   const work = await makeWork(t, { staleGenerated: true });
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   assert.deepEqual(report.actual_dependents, []);
-  assert.equal(report.dependents_missed, report.expected_dependents.length);
-  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+  const outputless = new Set(report.dependents_without_built_output.map(({ name }) => name));
+  const dependentsWithOutput = report.expected_dependents.filter((name) => !outputless.has(name));
+  assert.equal(report.dependents_missed, dependentsWithOutput.length);
+  assert.deepEqual(report.missed_dependents, dependentsWithOutput);
 });
 
 test('condition (a): editing the catalog without rerunning the real token build misses every dependent', async (t) => {
   const work = await makeWork(t, { staleGenerated: true });
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   assert.deepEqual(report.actual_dependents, []);
-  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+  const outputless = new Set(report.dependents_without_built_output.map(({ name }) => name));
+  assert.deepEqual(
+    report.missed_dependents,
+    report.expected_dependents.filter((name) => !outputless.has(name)),
+  );
 });
 
 test('condition (b): a dependent changed to a literal no longer resolves through built CSS', async (t) => {
@@ -294,7 +481,11 @@ test('mutation all-outputs-per-dependent: a changed foreign line leaves own-line
   const work = await makeWork(t, { staleOwnLines: true });
   const report = await writePropagateReport({ jobFolder: work.jobFolder });
   assert.deepEqual(report.actual_dependents, []);
-  assert.deepEqual(report.missed_dependents, report.expected_dependents);
+  const outputless = new Set(report.dependents_without_built_output.map(({ name }) => name));
+  assert.deepEqual(
+    report.missed_dependents,
+    report.expected_dependents.filter((name) => !outputless.has(name)),
+  );
   assert.ok(report.non_dependents_changed.includes('design-system:base.space.other'));
 });
 
@@ -338,7 +529,7 @@ test('criterion 3: the app dependency line and lock change are expected, not non
 test('criterion 4: the first step applies fixture job.json and refuses a missing token', async (t) => {
   const work = await makeWork(t);
   const tier = json(path.join(work.designSystem, 'token_catalog', '00-foundations.tokens.json'));
-  assert.equal(tier.base.space.medium.$value, '17px');
+  assert.equal(tier.base.space['px-16'].$value, '17px');
   const jobFile = path.join(work.jobFolder, 'job.json');
   const job = json(jobFile);
   job.propagate.token = 'base.color.missing';
@@ -365,7 +556,7 @@ test('ruling 4: a value that does not match the token type is refused without an
   const before = readFileSync(tierFile, 'utf8');
   const jobFile = path.join(work.jobFolder, 'job.json');
   const job = json(jobFile);
-  job.propagate.token = 'base.space.medium';
+  job.propagate.token = 'base.space.px-16';
   job.propagate.value = 'fixture-colour';
   writeFileSync(jobFile, `${JSON.stringify(job, null, 2)}\n`);
   assert.throws(() => applyPropagateEdit({ jobFolder: work.jobFolder }), /dimension.*value|value.*dimension/i);

@@ -1,7 +1,7 @@
 {
   "base": {
     "space": {
-      "medium": {
+      "px-16": {
         "$type": "dimension",
         "$value": "16px",
         "$extensions": { "app.caelos": { "lifecycle": "promoted" } }

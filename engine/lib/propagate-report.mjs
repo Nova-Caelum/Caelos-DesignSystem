@@ -273,32 +273,8 @@ function addToMapSet(map, key, value) {
 function outputOwnership(...catalogs) {
   const properties = new Map();
   const components = new Map();
-  const construction = [];
   for (const catalog of catalogs) {
     for (const { root, tier } of catalog.values()) {
-      const shared = root?.controls?.$extensions?.['app.caelos']?.sharedConstruction;
-      const parameters = shared?.parameters;
-      if (parameters && typeof parameters === 'object' && !Array.isArray(parameters)) {
-        const selections = new Map();
-        for (const [group, choices] of Object.entries(parameters)) {
-          if (!choices || typeof choices !== 'object' || Array.isArray(choices)) continue;
-          for (const [choice, reference] of Object.entries(choices)) {
-            const match = typeof reference === 'string' ? /^\{([^{}]+)\}$/u.exec(reference) : null;
-            if (match) selections.set(`${group}/${choice}`, group);
-          }
-        }
-        for (const [name, entry] of Object.entries(root?.controls?.shared ?? {})) {
-          const recipe = entry?.$extensions?.['app.caelos']?.construction;
-          if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) continue;
-          for (const selection of Object.values(recipe)) {
-            const selected = selections.get(selection);
-            if (selected) construction.push({
-              entry: `controls.shared.${name}`,
-              group: selected,
-            });
-          }
-        }
-      }
       function visit(node, segments = []) {
         if (!node || typeof node !== 'object' || Array.isArray(node)) return;
         const isToken = Object.hasOwn(node, '$value');
@@ -318,7 +294,7 @@ function outputOwnership(...catalogs) {
       visit(root);
     }
   }
-  return { properties, components, construction };
+  return { properties, components };
 }
 
 function declarations(source) {
@@ -367,15 +343,25 @@ function declarationReaches(properties, property, target, visiting = new Set()) 
     .some((reference) => declarationReaches(properties, reference, target, next));
 }
 
-function addConstructionOwnership(ownership, properties, editedProperty) {
-  for (const { entry, group } of ownership.construction) {
-    for (const property of properties.keys()) {
-      if (ownership.properties.has(property) || !property.startsWith(`--${group}-`)) continue;
-      if (declarationReaches(properties, property, editedProperty)) {
-        addToMapSet(ownership.properties, property, entry);
-      }
-    }
+function componentFilesAt(folder, commit) {
+  const output = git(folder, [
+    'ls-tree', '-r', '--name-only', commit, '--', 'generated/components',
+  ]).trim();
+  return output.split('\n')
+    .filter((file) => /^generated\/components\/[^/]+\.(?:css|tsx)$/u.test(file));
+}
+
+function componentEvidence({ folder, commit, files, ownership }) {
+  const evidence = new Map();
+  for (const file of files) {
+    const owners = ownership.components.get(path.basename(file));
+    if (!owners || owners.size !== 1) continue;
+    const entry = owners.values().next().value;
+    const sources = evidence.get(entry) ?? [];
+    sources.push({ file, source: optionalFileAt(folder, commit, file) ?? '' });
+    evidence.set(entry, sources);
   }
+  return evidence;
 }
 
 function withoutDeclarations(source) {
@@ -590,6 +576,10 @@ export async function writePropagateReport({ jobFolder }) {
       .map((output) => output.path),
     ...edit.generated_outputs,
   ])].sort();
+  const componentPaths = [...new Set([
+    ...componentFilesAt(design.folder, design.baseCommit),
+    ...componentFilesAt(design.folder, state.designSystemMergeCommit),
+  ])].sort();
   const beforeBuilt = builtDeclarations({
     folder: design.folder,
     commit: design.baseCommit,
@@ -601,12 +591,11 @@ export async function writePropagateReport({ jobFolder }) {
     outputPaths,
   });
   const editedProperty = `--${tokenName(tokenSegments(edit.token))}`;
-  addConstructionOwnership(ownership, afterBuilt.properties, editedProperty);
   const outputChanges = changedOutputEntries({
     folder: design.folder,
     base: design.baseCommit,
     head: state.designSystemMergeCommit,
-    outputPaths,
+    outputPaths: [...new Set([...outputPaths, ...componentPaths])],
     ownership,
   });
   const changedEntries = outputChanges.entries;
@@ -616,20 +605,66 @@ export async function writePropagateReport({ jobFolder }) {
   const editedDeclarationReached = expectedBuiltValue !== null
     && beforeEdited?.value !== afterEdited?.value
     && afterEdited?.value === expectedBuiltValue;
-  const actualDependents = expected
-    .filter((entry) => {
-      if (!editedDeclarationReached) return false;
-      const baseEntry = entry.split('#')[0];
-      if (outputChanges.componentEntries.has(baseEntry)) return true;
-      for (const [property, owners] of ownership.properties) {
-        if (owners.has(baseEntry)
-            && declarationReaches(afterBuilt.properties, property, editedProperty)) return true;
-      }
-      return false;
-    })
+  const beforeComponents = componentEvidence({
+    folder: design.folder,
+    commit: design.baseCommit,
+    files: componentPaths,
+    ownership,
+  });
+  const afterComponents = componentEvidence({
+    folder: design.folder,
+    commit: state.designSystemMergeCommit,
+    files: componentPaths,
+    ownership,
+  });
+  const ownProperties = new Map();
+  for (const [property, owners] of ownership.properties) {
+    if (!beforeBuilt.properties.has(property) && !afterBuilt.properties.has(property)) continue;
+    for (const owner of owners) addToMapSet(ownProperties, owner, property);
+  }
+  const classifications = expected.map((entry) => {
+    const baseEntry = entry.split('#')[0];
+    const properties = ownProperties.get(baseEntry) ?? new Set();
+    const relevantProperties = [...properties].filter((property) => (
+      declarationReaches(beforeBuilt.properties, property, editedProperty)
+      || declarationReaches(afterBuilt.properties, property, editedProperty)
+    ));
+    const components = afterComponents.get(baseEntry) ?? [];
+    if (relevantProperties.length === 0 && components.length === 0) {
+      return { entry, withoutBuiltOutput: true, reached: false };
+    }
+    const declarationReached = relevantProperties
+      .some((property) => declarationReaches(afterBuilt.properties, property, editedProperty));
+    const componentReferenceReached = components.some(({ source }) => variableReferences(source)
+      .some((property) => declarationReaches(afterBuilt.properties, property, editedProperty)));
+    const beforeByFile = new Map((beforeComponents.get(baseEntry) ?? [])
+      .map(({ file, source }) => [file, source]));
+    const componentChanged = expectedBuiltValue !== null && components.some(({ file, source }) => (
+      beforeByFile.get(file) !== source && source.includes(expectedBuiltValue)
+    ));
+    return {
+      entry,
+      withoutBuiltOutput: false,
+      reached: editedDeclarationReached
+        && (declarationReached || componentReferenceReached || componentChanged),
+    };
+  });
+  const actualDependents = classifications
+    .filter(({ reached }) => reached)
+    .map(({ entry }) => entry)
     .sort();
+  const dependentsWithoutBuiltOutput = classifications
+    .filter(({ withoutBuiltOutput }) => withoutBuiltOutput)
+    .map(({ entry }) => ({
+      name: entry,
+      reason: 'there is no built output yet, so nothing exists to reach; generating the component later makes it subject to built-output reachability',
+    }))
+    .sort((left, right) => left.name.localeCompare(right.name));
   const actualSet = new Set(actualDependents);
-  const missed = expected.filter((name) => !actualSet.has(name)).sort();
+  const outputlessSet = new Set(dependentsWithoutBuiltOutput.map(({ name }) => name));
+  const missed = expected
+    .filter((name) => !actualSet.has(name) && !outputlessSet.has(name))
+    .sort();
   const expectedBaseEntries = new Set(expected.map((entry) => entry.split('#')[0]));
   const nonDependents = [...catalogViolations({
     folder: design.folder,
@@ -651,6 +686,7 @@ export async function writePropagateReport({ jobFolder }) {
     ...beforeCatalog.keys(),
     ...afterCatalog.keys(),
     ...outputPaths,
+    ...componentPaths,
   ]);
   nonDependents.push(...designChanged
     .filter((file) => !allowedDesign.has(file))
@@ -687,6 +723,8 @@ export async function writePropagateReport({ jobFolder }) {
     actual_dependents: actualDependents,
     dependents_missed: missed.length,
     missed_dependents: missed,
+    dependents_without_built_output: dependentsWithoutBuiltOutput,
+    summary: `${actualDependents.length} reached, ${missed.length} missed, ${dependentsWithoutBuiltOutput.length} without built output`,
     expected_changes: expectedChanges.sort(),
     changed: {
       design_system: designChanged,

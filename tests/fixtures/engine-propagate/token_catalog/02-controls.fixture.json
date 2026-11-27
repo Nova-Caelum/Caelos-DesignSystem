@@ -5,10 +5,17 @@
         "sharedConstruction": {
           "parameters": {
             "spacing": {
-              "medium": "{base.space.medium}"
+              "medium": "{base.space.px-16}"
+            },
+            "height": {
+              "medium": "{base.space.px-16}"
             }
           },
-          "paints": {}
+          "paints": {
+            "medium": {
+              "fill": "{base.space.px-16}"
+            }
+          }
         }
       }
     },
@@ -17,10 +24,23 @@
         "$extensions": {
           "app.caelos": {
             "lifecycle": "promoted",
-            "construction": {
-              "pad-x": "spacing/medium"
+            "kind": "button",
+            "layerOrder": ["surface"],
+            "variants": {
+              "variant": ["primary"]
             },
-            "statePaints": {}
+            "defaultVariants": {
+              "variant": "primary"
+            },
+            "states": ["default"],
+            "construction": {
+              "height": "height/medium"
+            },
+            "statePaints": {
+              "primary": {
+                "default": "medium"
+              }
+            }
           }
         }
       },
