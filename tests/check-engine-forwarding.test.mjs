@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import {
   copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync,
 } from 'node:fs';
@@ -26,22 +26,17 @@ function output(result) {
   return `${result.stdout || ''}${result.stderr || ''}`;
 }
 
-// The candidate is a plain-file copy of the files Git would export: tracked and staged files
-// plus untracked ones that are not ignored, so build output such as viewer/dist stays out.
-// A copy, not `git archive HEAD`, so the test also runs where the repository has no commit yet.
+// The candidate is a plain-file copy of this tree, as the CI job exports it. A copy, not
+// `git archive HEAD`, so the test also runs where the repository has no commit yet (or no
+// Git directory at all, as in the pre-commit snapshot). Ignored build output stays out.
 function unpackCandidate(folder) {
   const candidate = path.join(folder, 'candidate');
-  const listed = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
-    cwd: repository,
-    encoding: 'utf8',
+  const skipped = new Set(['.git', 'node_modules']);
+  const ignored = new Set([path.join(repository, 'viewer', 'dist')]);
+  cpSync(repository, candidate, {
+    recursive: true,
+    filter: (source) => !skipped.has(path.basename(source)) && !ignored.has(path.resolve(source)),
   });
-  for (const file of listed.split('\0').filter(Boolean)) {
-    const source = path.join(repository, file);
-    if (!existsSync(source)) continue;
-    const target = path.join(candidate, file);
-    mkdirSync(path.dirname(target), { recursive: true });
-    copyFileSync(source, target);
-  }
   return candidate;
 }
 
