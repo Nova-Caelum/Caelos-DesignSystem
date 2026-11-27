@@ -1,0 +1,12 @@
+{
+  "entries": {
+    "primitives.shared.alpha": {
+      "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "variants": {}
+    },
+    "primitives.shared.beta": {
+      "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+      "variants": {}
+    }
+  }
+}
