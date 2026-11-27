@@ -1,0 +1,19 @@
+{
+  "controls": {
+    "shared": {
+      "button": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["primitives.shared.surface"]
+          }
+        },
+        "padding": {
+          "$type": "dimension",
+          "$value": "{base.space.medium}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      }
+    }
+  }
+}

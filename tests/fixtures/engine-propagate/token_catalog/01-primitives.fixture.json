@@ -1,0 +1,14 @@
+{
+  "primitives": {
+    "shared": {
+      "surface": {
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
+        "fill": {
+          "$type": "color",
+          "$value": "{base.color.primary}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      }
+    }
+  }
+}
