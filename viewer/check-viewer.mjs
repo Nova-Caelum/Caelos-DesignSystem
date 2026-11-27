@@ -29,11 +29,21 @@ function resultFor(entry, state, card, sideBySide) {
     shown,
     sideBySide: Boolean(sideBySide),
     live,
-    named: live && name === entry,
+    named: live && name === entry && card.live.visible && card.live.inAccessibilityTree,
     responding: false,
     clickResponded: false,
     keyResponded: false,
   };
+}
+
+function counterIncreased(interaction) {
+  return Number.isInteger(interaction?.before)
+    && Number.isInteger(interaction?.after)
+    && interaction.after > interaction.before;
+}
+
+function counterStayedZero(interaction) {
+  return interaction?.before === 0 && interaction?.after === 0;
 }
 
 function failuresFor(entry, state) {
@@ -41,8 +51,14 @@ function failuresFor(entry, state) {
   if (!state.shown) failures.push(`${entry}/${state.state}: card is not shown`);
   if (state.shown && !state.sideBySide) failures.push(`${entry}/${state.state}: card is not side by side`);
   if (state.shown && !state.live) failures.push(`${entry}/${state.state}: card has no live element`);
-  if (state.shown && state.live && !state.named) failures.push(`${entry}/${state.state}: live element has no readable entry name`);
-  if (state.shown && state.live && !state.responding) failures.push(`${entry}/${state.state}: live element does not respond to click and key`);
+  if (state.shown && state.live && !state.named) {
+    failures.push(`${entry}/${state.state}: live element is hidden, outside the accessibility tree, or lacks matching data-entry`);
+  }
+  if (state.shown && state.live && !state.responding) {
+    failures.push(state.state === 'disabled'
+      ? `${entry}/${state.state}: disabled live element forwarded an event or its counters were not zero`
+      : `${entry}/${state.state}: live element did not forward click and Enter`);
+  }
   return failures;
 }
 
@@ -71,6 +87,11 @@ export async function runViewerCheck({ driver, entries, out }) {
       failures.push(`${entry}: entry is unknown`);
       continue;
     }
+    if (!inspected.statesValid) {
+      results.entries.push({ entry, found: true, states: [] });
+      failures.push(`${entry}: declared states are missing or invalid`);
+      continue;
+    }
 
     const cardsByState = new Map();
     for (const card of inspected.cards ?? []) {
@@ -83,9 +104,13 @@ export async function runViewerCheck({ driver, entries, out }) {
       const card = cards.length === 1 ? cards[0] : undefined;
       const checked = resultFor(entry, state, card, inspected.sideBySide);
       if (checked.shown && checked.named) {
-        checked.clickResponded = await driver.interact(card, 'click');
-        checked.keyResponded = await driver.interact(card, 'key');
-        checked.responding = checked.clickResponded && checked.keyResponded;
+        const click = await driver.interact(card, 'click');
+        const key = await driver.interact(card, 'key');
+        checked.clickResponded = counterIncreased(click);
+        checked.keyResponded = counterIncreased(key);
+        checked.responding = state === 'disabled'
+          ? counterStayedZero(click) && counterStayedZero(key)
+          : checked.clickResponded && checked.keyResponded;
       }
       states.push(checked);
       if (cards.length !== 1) {
@@ -106,16 +131,13 @@ export async function runViewerCheck({ driver, entries, out }) {
   };
 }
 
-function snapshot(node) {
-  const style = getComputedStyle(node);
-  return JSON.stringify({
-    text: node.textContent,
-    value: 'value' in node ? node.value : null,
-    checked: 'checked' in node ? node.checked : null,
-    aria: ['aria-checked', 'aria-expanded', 'aria-pressed', 'aria-selected'].map((name) => node.getAttribute(name)),
-    paint: [style.backgroundColor, style.borderColor, style.boxShadow, style.color, style.opacity, style.outlineColor, style.transform],
-    active: node === document.activeElement,
-  });
+function parseCounter(value) {
+  if (typeof value !== 'string' || !/^\d+$/.test(value)) return undefined;
+  return Number(value);
+}
+
+function hasAccessibilityNode(snapshot) {
+  return Array.isArray(snapshot) && snapshot.length > 0;
 }
 
 export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromium } = {}) {
@@ -156,6 +178,18 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
     async inspectEntry(entry) {
       const row = await rowFor(entry);
       if (!row) return { found: false, states: [], cards: [], sideBySide: false };
+      const declaredStates = await row.getAttribute('data-states');
+      let states = [];
+      let statesValid = false;
+      try {
+        const parsed = JSON.parse(declaredStates ?? 'null');
+        statesValid = Array.isArray(parsed)
+          && parsed.length > 0
+          && parsed.every((state) => typeof state === 'string' && state.length > 0);
+        if (statesValid) states = parsed;
+      } catch {
+        statesValid = false;
+      }
       const cards = row.locator('[data-state-card]');
       const cardCount = await cards.count();
       const sideBySide = await row.locator('.state-cards').evaluate((node) => {
@@ -164,32 +198,59 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
       });
       return {
         found: true,
+        statesValid,
         sideBySide,
-        states: await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-state-card') ?? '')),
+        states,
         cards: await Promise.all(Array.from({ length: cardCount }, async (_, index) => {
           const card = cards.nth(index);
           const live = card.locator('.live-component > *');
           const liveCount = await live.count();
+          let liveDetails;
+          if (liveCount === 1) {
+            const bounds = await live.boundingBox();
+            const ariaHidden = await live.evaluate((node) => Boolean(node.closest('[aria-hidden="true"], [inert]')));
+            let inAccessibilityTree = false;
+            try {
+              inAccessibilityTree = hasAccessibilityNode(await live.ariaSnapshotJSON({ depth: 0 }));
+            } catch {
+              inAccessibilityTree = false;
+            }
+            liveDetails = {
+              name: await live.getAttribute('data-entry') ?? '',
+              visible: await live.isVisible()
+                && !ariaHidden
+                && Boolean(bounds && bounds.width > 0 && bounds.height > 0),
+              inAccessibilityTree: !ariaHidden && inAccessibilityTree,
+            };
+          }
           return {
             state: await card.getAttribute('data-state-card'),
             shown: await card.isVisible(),
-            live: liveCount === 1 ? { name: await live.getAttribute('data-entry') ?? '' } : undefined,
+            live: liveDetails,
             locator: liveCount === 1 ? live : undefined,
+            cardLocator: card,
           };
         })),
       };
     },
     async interact(card, interaction) {
-      if (!card.locator) return false;
+      if (!card.locator) return {};
+      const attribute = interaction === 'click' ? 'data-events-click' : 'data-events-key';
+      const before = parseCounter(await card.cardLocator.getAttribute(attribute));
       try {
-        await card.locator.evaluate((node) => node.blur());
-        const before = await card.locator.evaluate(snapshot);
-        if (interaction === 'click') await card.locator.click();
-        else await card.locator.press('Enter');
-        return before !== await card.locator.evaluate(snapshot);
+        if (interaction === 'click') {
+          await card.locator.click({ timeout: 500 });
+        } else {
+          await card.locator.focus({ timeout: 500 });
+          await card.locator.press('Enter', { timeout: 500 });
+        }
       } catch {
-        return false;
+        // A disabled native control is expected to reject interaction.
       }
+      return {
+        before,
+        after: parseCounter(await card.cardLocator.getAttribute(attribute)),
+      };
     },
     async close() {
       await browser.close();

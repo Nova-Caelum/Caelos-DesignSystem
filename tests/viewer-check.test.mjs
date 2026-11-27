@@ -17,13 +17,27 @@ function createFakeDriver(record) {
       if (!recorded) return { found: false, states: [], cards: [], sideBySide: false };
       return {
         found: true,
+        statesValid: Array.isArray(recorded.states)
+          && recorded.states.length > 0
+          && recorded.states.every((state) => typeof state === 'string' && state.length > 0),
         states: recorded.states,
         sideBySide: recorded.sideBySide,
-        cards: recorded.cards.map((card) => ({ ...card, live: card.live && { ...card.live } })),
+        cards: recorded.cards.map((card) => ({
+          ...card,
+          events: card.events && { ...card.events },
+          live: card.live && { ...card.live },
+        })),
       };
     },
     async interact(card, interaction) {
-      return card.live?.[interaction] === true;
+      const before = card.events?.[interaction];
+      if (card.live?.[interaction] === true && Number.isInteger(before)) {
+        card.events[interaction] += 1;
+      }
+      return {
+        before,
+        after: card.events?.[interaction],
+      };
     },
   };
 }
@@ -39,18 +53,20 @@ async function runCase(entries) {
   }
 }
 
-test('the fixture Button entry passes and records every state as shown and responding', async () => {
+test('the fixture Button passes with forwarding states and a non-forwarding disabled state', async () => {
   const { result, results } = await runCase(['controls.shared.Button']);
 
   assert.equal(result.exitCode, 0, result.message);
   assert.equal(results.summary.failed, 0);
-  assert.deepEqual(results.entries[0].states.map(({ state, shown, responding, named }) => ({ state, shown, responding, named })), [
-    { state: 'default', shown: true, responding: true, named: true },
-    { state: 'hover', shown: true, responding: true, named: true },
-    { state: 'pressed', shown: true, responding: true, named: true },
-    { state: 'success', shown: true, responding: true, named: true },
-    { state: 'focus', shown: true, responding: true, named: true },
-    { state: 'disabled', shown: true, responding: true, named: true },
+  assert.deepEqual(results.entries[0].states.map(({ state, shown, responding, named, clickResponded, keyResponded }) => ({
+    state, shown, responding, named, clickResponded, keyResponded,
+  })), [
+    { state: 'default', shown: true, responding: true, named: true, clickResponded: true, keyResponded: true },
+    { state: 'hover', shown: true, responding: true, named: true, clickResponded: true, keyResponded: true },
+    { state: 'pressed', shown: true, responding: true, named: true, clickResponded: true, keyResponded: true },
+    { state: 'success', shown: true, responding: true, named: true, clickResponded: true, keyResponded: true },
+    { state: 'focus', shown: true, responding: true, named: true, clickResponded: true, keyResponded: true },
+    { state: 'disabled', shown: true, responding: true, named: true, clickResponded: false, keyResponded: false },
   ]);
 });
 
@@ -62,15 +78,38 @@ test('an entry with no cards exits 1 and names the entry', async () => {
   assert.equal(results.entries[0].states[0].shown, false);
 });
 
-test('a shown dead component exits 1 and names the entry and state', async () => {
+test('a dead entry exits 1 and names the entry and state', async () => {
   const { result, results } = await runCase(['controls.shared.Dead']);
 
   assert.equal(result.exitCode, 1);
   assert.match(result.message, /controls\.shared\.Dead/);
   assert.match(result.message, /default/);
   assert.equal(results.entries[0].states[0].responding, false);
+  assert.equal(results.entries[0].states[0].clickResponded, false);
+  assert.equal(results.entries[0].states[0].keyResponded, false);
+});
+
+test('a click-only entry exits 1 and names the entry and state', async () => {
+  const { result, results } = await runCase(['controls.shared.ClickOnly']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.ClickOnly/);
+  assert.match(result.message, /default/);
   assert.equal(results.entries[0].states[0].clickResponded, true);
   assert.equal(results.entries[0].states[0].keyResponded, false);
+});
+
+test('a partly shown entry exits 1 and names every missing state', async () => {
+  const { result, results } = await runCase(['controls.shared.PartlyShown']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.PartlyShown\/hover/);
+  assert.match(result.message, /controls\.shared\.PartlyShown\/disabled/);
+  assert.deepEqual(results.entries[0].states.map(({ state, shown }) => ({ state, shown })), [
+    { state: 'default', shown: true },
+    { state: 'hover', shown: false },
+    { state: 'disabled', shown: false },
+  ]);
 });
 
 test('an unknown entry id exits 1', async () => {
@@ -86,6 +125,35 @@ test('attack: a shown live element without a readable name exits 1', async () =>
   assert.equal(result.exitCode, 1);
   assert.match(result.message, /controls\.shared\.Nameless/);
   assert.equal(results.entries[0].states[0].named, false);
+});
+
+test('a hidden live element exits 1 and names the entry and state', async () => {
+  const { result, results } = await runCase(['controls.shared.Hidden']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.Hidden/);
+  assert.match(result.message, /default/);
+  assert.equal(results.entries[0].states[0].named, false);
+});
+
+test('a disabled card that forwards exits 1 and names the entry and state', async () => {
+  const { result, results } = await runCase(['controls.shared.DisabledForwards']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.DisabledForwards/);
+  assert.match(result.message, /disabled/);
+  assert.equal(results.entries[0].states[0].clickResponded, true);
+  assert.equal(results.entries[0].states[0].keyResponded, true);
+  assert.equal(results.entries[0].states[0].responding, false);
+});
+
+test('missing counter attributes cannot pass the fake driver', async () => {
+  const { result, results } = await runCase(['controls.shared.MissingCounters']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.MissingCounters/);
+  assert.match(result.message, /default/);
+  assert.equal(results.entries[0].states[0].responding, false);
 });
 
 test('a shown card without a live element exits 1', async () => {

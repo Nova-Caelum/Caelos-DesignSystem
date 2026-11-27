@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const viewerFixture = path.join(root, 'tests/fixtures/viewer');
+const attackFixture = path.join(root, 'tests/fixtures/viewer-check');
 const checker = path.join(root, 'viewer/check-viewer.mjs');
 
 async function materializeCatalog(source, target) {
@@ -67,6 +68,26 @@ async function runCase(entries, { withoutCards = false } = {}) {
   }
 }
 
+async function runAttack(entry, fixtureName) {
+  const folder = await mkdtemp(path.join(tmpdir(), 'viewer-browser-attack-'));
+  try {
+    const viewer = path.join(folder, 'viewer');
+    await mkdir(viewer, { recursive: true });
+    await copyFile(path.join(attackFixture, fixtureName, 'index.fixture.html'), path.join(viewer, 'index.html'));
+    const entryFile = path.join(folder, 'entries.json');
+    const out = path.join(folder, 'results.json');
+    await writeFile(entryFile, `${JSON.stringify([entry])}\n`);
+    const result = spawnSync(process.execPath, [checker, '--entries', entryFile, '--out', out, '--viewer', viewer], {
+      cwd: root,
+      encoding: 'utf8',
+      timeout: 60_000,
+    });
+    return { result, results: JSON.parse(await readFile(out, 'utf8')) };
+  } finally {
+    await rm(folder, { recursive: true, force: true });
+  }
+}
+
 test('the real built fixture viewer passes Button', async () => {
   const run = await runCase(['controls.shared.Button']);
 
@@ -80,3 +101,20 @@ test('the real built fixture viewer names an entry with no cards', async () => {
   assert.equal(run.result.status, 1, `${run.result.stdout}\n${run.result.stderr}`);
   assert.match(run.result.stdout, /controls\.shared\.Button/);
 });
+
+for (const attack of [
+  ['dead-entry', 'Attack.Dead', 'default'],
+  ['click-only', 'Attack.ClickOnly', 'default'],
+  ['partly-shown', 'Attack.PartlyShown', 'hover'],
+  ['hidden-element', 'Attack.Hidden', 'default'],
+  ['disabled-forwards', 'Attack.DisabledForwards', 'disabled'],
+]) {
+  const [fixtureName, entry, state] = attack;
+  test(`the real driver refuses ${fixtureName}`, async () => {
+    const run = await runAttack(entry, fixtureName);
+
+    assert.equal(run.result.status, 1, `${run.result.stdout}\n${run.result.stderr}`);
+    assert.match(run.result.stdout, new RegExp(entry.replaceAll('.', '\\.'), 'u'));
+    assert.match(run.result.stdout, new RegExp(state, 'u'));
+  });
+}
