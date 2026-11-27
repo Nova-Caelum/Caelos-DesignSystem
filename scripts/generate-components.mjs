@@ -211,6 +211,31 @@ function orderParts(entry, parts) {
   });
 }
 
+function nestedInteractivePath(entry, parts, allEntries, templates, interactiveElement) {
+  function visit(part, path, ancestors) {
+    if (ancestors.has(part.name)) return null;
+    const nextPath = [...path, part];
+    const partTemplate = templates.get(part.record.kind);
+    if (partTemplate?.interactiveElement === interactiveElement) return nextPath;
+    const nextAncestors = new Set(ancestors);
+    nextAncestors.add(part.name);
+    const madeOf = Array.isArray(part.record.madeOf) ? part.record.madeOf : [];
+    for (const name of madeOf) {
+      const child = allEntries.get(name);
+      if (!child) continue;
+      const nested = visit(child, nextPath, nextAncestors);
+      if (nested) return nested;
+    }
+    return null;
+  }
+
+  for (const part of parts) {
+    const nested = visit(part, [entry], new Set([entry.name]));
+    if (nested) return nested;
+  }
+  return null;
+}
+
 async function generate(options) {
   const templates = await loadTemplates(options.templates);
   const { allEntries, candidates } = await loadCatalog(options.catalog);
@@ -270,14 +295,12 @@ async function generate(options) {
         gaps.push(gap(entry, `madeOf part "${unbuiltPart.name}" was not generated`, 'madeOf'));
         continue;
       }
-      const nestedInteractive = parts.find((part) => {
-        const partTemplate = templates.get(part.record.kind);
-        return typeof template.interactiveElement === 'string' &&
-          partTemplate?.interactiveElement === template.interactiveElement;
-      });
-      if (nestedInteractive) {
+      const interactivePath = typeof template.interactiveElement === 'string'
+        ? nestedInteractivePath(entry, parts, allEntries, templates, template.interactiveElement)
+        : null;
+      if (interactivePath) {
         gaps.push(gap(entry,
-          `interactive ${template.interactiveElement} part "${nestedInteractive.name}" would nest inside the same interactive element`,
+          `interactive ${template.interactiveElement} part "${interactivePath.at(-1).name}" would nest inside the same interactive element via ${interactivePath.map((part) => part.name).join(' → ')}`,
           'madeOf'));
         continue;
       }
