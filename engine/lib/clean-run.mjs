@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import {
-  existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync,
+  existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { validateSchema } from '../../scripts/check-recipes.mjs';
@@ -15,6 +16,21 @@ function resultText(result) {
 function git(cwd, args, label) {
   const result = spawnSync('git', ['-C', cwd, ...args], {
     encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer,
+  });
+  if (result.status !== 0) {
+    throw new Error(`${label} failed${resultText(result) ? `: ${resultText(result)}` : ''}`);
+  }
+  return result.stdout;
+}
+
+function repositoryGit(gitDir, workTree, args, label, env = process.env) {
+  const result = spawnSync('git', [
+    `--git-dir=${gitDir}`, `--work-tree=${workTree}`, ...args,
+  ], {
+    encoding: 'utf8',
+    env,
     stdio: ['ignore', 'pipe', 'pipe'],
     maxBuffer,
   });
@@ -55,22 +71,43 @@ export function safePath(root, file, label) {
 export function withDetachedCheckout({ gitRoot, baseCommit }, useCheckout) {
   const root = path.resolve(gitRoot);
   const resolvedBase = git(root, ['rev-parse', '--verify', '--end-of-options', `${baseCommit}^{commit}`], 'base commit').trim();
-  const container = mkdtempSync(path.join(root, '.caelos-model-step-'));
+  const gitDir = git(root, ['rev-parse', '--absolute-git-dir'], 'source repository git directory').trim();
+  const container = mkdtempSync(path.join(tmpdir(), 'caelos-model-step-'));
   const checkout = path.join(container, 'checkout');
+  let result;
+  let originalError;
   try {
     git(root, ['worktree', 'add', '--detach', checkout, resolvedBase], 'fresh checkout');
-    return useCheckout({ checkout, baseCommit: resolvedBase, container });
-  } finally {
-    if (existsSync(checkout)) {
-      const removed = spawnSync('git', ['-C', root, 'worktree', 'remove', '--force', checkout], {
-        encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer,
-      });
-      if (removed.status !== 0) {
-        throw new Error(`fresh checkout cleanup failed${resultText(removed) ? `: ${resultText(removed)}` : ''}`);
-      }
-    }
-    rmSync(container, { recursive: true, force: true });
+    const checkoutGitDir = git(checkout, [
+      'rev-parse', '--absolute-git-dir',
+    ], 'fresh checkout git directory').trim();
+    result = useCheckout({
+      checkout, baseCommit: resolvedBase, container, gitDir, checkoutGitDir,
+    });
+  } catch (error) {
+    originalError = error;
   }
+
+  let cleanupError;
+  if (existsSync(checkout)) {
+    const removed = spawnSync('git', ['-C', root, 'worktree', 'remove', '--force', checkout], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer,
+    });
+    if (removed.status !== 0) {
+      cleanupError = new Error(`fresh checkout cleanup failed${resultText(removed) ? `: ${resultText(removed)}` : ''}`);
+    }
+  }
+  try {
+    rmSync(container, { recursive: true, force: true });
+  } catch (error) {
+    cleanupError ||= error;
+  }
+  if (originalError) {
+    if (cleanupError) originalError.cleanupError = cleanupError;
+    throw originalError;
+  }
+  if (cleanupError) throw cleanupError;
+  return result;
 }
 
 function statusPaths(output) {
@@ -88,19 +125,53 @@ function statusPaths(output) {
   return paths;
 }
 
-export function assertOnlyDeclaredChanges({ checkout, baseCommit, outputs }) {
-  const commits = git(checkout, ['log', '--format=%H%x09%s', `${baseCommit}..HEAD`], 'model commit check').trim();
-  if (commits) {
-    const [first] = commits.split('\n');
-    throw new Error(`model step created commit ${first}; model steps may not commit`);
+export function readBaseFile({ gitRoot, baseCommit, file, label }) {
+  const relative = safeRelative(file, label).split(path.sep).join('/');
+  return git(path.resolve(gitRoot), [
+    'show', `${baseCommit}:${relative}`,
+  ], `${label} ${file} at ${baseCommit}`);
+}
+
+export function assertOnlyDeclaredChanges({
+  checkout, gitDir, checkoutGitDir, baseCommit, outputs, guardIndex,
+}) {
+  const checkoutHead = repositoryGit(
+    checkoutGitDir, checkout, ['rev-parse', '--verify', 'HEAD'], 'model HEAD check',
+  ).trim();
+  if (checkoutHead !== baseCommit) {
+    throw new Error(
+      `model step moved HEAD from base ${baseCommit} to ${checkoutHead}; ` +
+        'a model commit or any other HEAD movement is forbidden',
+    );
   }
 
   const allowed = new Set(outputs.map((file) => safeRelative(file, 'declared output').split(path.sep).join('/')));
-  const status = git(checkout, [
+  const guardEnv = { ...process.env, GIT_INDEX_FILE: guardIndex };
+  repositoryGit(gitDir, checkout, ['read-tree', baseCommit], 'model guard index', guardEnv);
+  const status = repositoryGit(gitDir, checkout, [
     'status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignored=matching',
-  ], 'model change check');
+  ], 'model change check', guardEnv);
   const extra = statusPaths(status).find((file) => !allowed.has(file));
   if (extra) throw new Error(`model step changed undeclared file ${extra}; declare it as an output or remove the change`);
+}
+
+export function snapshotFileList(root) {
+  const files = new Set();
+  function visit(folder, prefix) {
+    for (const entry of readdirSync(folder, { withFileTypes: true })) {
+      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) visit(path.join(folder, entry.name), relative);
+      else files.add(relative);
+    }
+  }
+  visit(path.resolve(root), '');
+  return files;
+}
+
+export function assertNoUnexpectedJobFiles({ before, after, outputs }) {
+  const allowed = new Set(outputs.map((file) => safeRelative(file, 'declared output').split(path.sep).join('/')));
+  const forged = [...after].find((file) => !before.has(file) && !allowed.has(file));
+  if (forged) throw new Error(`model step wrote undeclared file ${forged} into the job folder`);
 }
 
 function valueType(value) {
@@ -165,20 +236,25 @@ function validateNode(value, rule, file, segments, errors) {
   }
 }
 
-export function validateJsonOutput(outputFile, schemaFile) {
-  let value;
+export function parseJsonSchema(schemaText, schemaName) {
   let schema;
+  try {
+    schema = JSON.parse(schemaText);
+  } catch (error) {
+    throw new Error(`${schemaName} is not a valid JSON schema: ${error.message}`);
+  }
+  validateSchema(schema, schemaName);
+  return schema;
+}
+
+export function validateJsonOutput(outputFile, schema, schemaName = 'output schema') {
+  let value;
   try {
     value = JSON.parse(readFileSync(outputFile, 'utf8'));
   } catch (error) {
     throw new Error(`${path.basename(outputFile)} is not valid JSON: ${error.message}`);
   }
-  try {
-    schema = JSON.parse(readFileSync(schemaFile, 'utf8'));
-  } catch (error) {
-    throw new Error(`${path.basename(schemaFile)} is not a valid JSON schema: ${error.message}`);
-  }
-  validateSchema(schema, path.basename(schemaFile));
+  validateSchema(schema, schemaName);
   const errors = [];
   validateNode(value, schema, path.basename(outputFile), [], errors);
   if (errors.length) throw new Error(errors.join('; '));

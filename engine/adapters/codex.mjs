@@ -2,7 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import {
-  assertOnlyDeclaredChanges, outputDestination, requireRegularOutput, safePath, validateJsonOutput,
+  assertNoUnexpectedJobFiles, assertOnlyDeclaredChanges, outputDestination, parseJsonSchema,
+  readBaseFile, requireRegularOutput, safePath, snapshotFileList, validateJsonOutput,
   withDetachedCheckout,
 } from '../lib/clean-run.mjs';
 
@@ -31,7 +32,16 @@ function processFailure(result, label) {
   return `${label} exited ${result.status}${detail ? `: ${detail}` : ''}`;
 }
 
-export function assertCodexAvailable({ command = 'codex', env = process.env } = {}) {
+function spawnEnvironment(options) {
+  const explicit = Object.hasOwn(options, 'env');
+  const env = { ...(explicit ? options.env : process.env) };
+  if (!explicit) delete env.CODEX_HOME;
+  return env;
+}
+
+export function assertCodexAvailable(options = {}) {
+  const command = options.command || 'codex';
+  const env = spawnEnvironment(options);
   const result = spawnSync(command, ['--version'], {
     encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer,
   });
@@ -39,36 +49,47 @@ export function assertCodexAvailable({ command = 'codex', env = process.env } = 
   return String(result.stdout || result.stderr || '').trim();
 }
 
-function promptFor(step, checkout, jobFolder) {
-  const instructions = path.join(checkout, step.instructions);
+function promptFor(step, instructions, checkout, jobFolder) {
   const inputs = step.inputs.map((file) => path.join(jobFolder, file));
   return [
-    `Follow the instructions in ${instructions}.`,
+    'Follow these instructions exactly:',
+    instructions,
     `Read these inputs: ${inputs.join(', ')}.`,
     `Write only these outputs in the checkout: ${step.outputs.join(', ')}.`,
   ].join('\n');
 }
 
-export function runCodexStep({
-  gitRoot, baseCommit, jobFolder, step, command = 'codex', env = process.env,
-}) {
+export function runCodexStep(options) {
+  const {
+    gitRoot, baseCommit, jobFolder, step, command = 'codex',
+  } = options;
+  const env = spawnEnvironment(options);
+  const jobFilesBefore = snapshotFileList(jobFolder);
   assertCodexAvailable({ command, env });
   for (const input of step.inputs) {
     if (!existsSync(path.join(jobFolder, input))) throw new Error(`model step ${step.step} is missing input ${input}`);
   }
 
-  return withDetachedCheckout({ gitRoot, baseCommit }, ({ checkout, baseCommit: resolvedBase, container }) => {
-    const instructions = safePath(checkout, step.instructions, 'model instructions');
-    const schema = safePath(checkout, step.schema, 'model output schema');
-    if (!existsSync(instructions)) throw new Error(`model step ${step.step} instructions ${step.instructions} do not exist at ${resolvedBase}`);
-    if (!existsSync(schema)) throw new Error(`model step ${step.step} schema ${step.schema} does not exist at ${resolvedBase}`);
+  return withDetachedCheckout({ gitRoot, baseCommit }, ({
+    checkout, baseCommit: resolvedBase, container, gitDir, checkoutGitDir,
+  }) => {
+    const instructionsPath = safePath(checkout, step.instructions, 'model instructions');
+    const schemaPath = safePath(checkout, step.schema, 'model output schema');
+    if (!existsSync(instructionsPath)) throw new Error(`model step ${step.step} instructions ${step.instructions} do not exist at ${resolvedBase}`);
+    if (!existsSync(schemaPath)) throw new Error(`model step ${step.step} schema ${step.schema} does not exist at ${resolvedBase}`);
     for (const output of step.outputs) safePath(checkout, output, 'declared output');
-
+    const instructions = readBaseFile({
+      gitRoot, baseCommit: resolvedBase, file: step.instructions, label: 'model instructions',
+    });
+    const schemaText = readBaseFile({
+      gitRoot, baseCommit: resolvedBase, file: step.schema, label: 'model output schema',
+    });
+    const schema = parseJsonSchema(schemaText, path.basename(step.schema));
     const built = buildCodexCommand({
       command,
       checkout,
       lastMessageFile: path.join(container, 'last-message.txt'),
-      prompt: promptFor(step, checkout, jobFolder),
+      prompt: promptFor(step, instructions, checkout, jobFolder),
     });
     const result = spawnSync(built.command, built.args, {
       cwd: checkout,
@@ -79,9 +100,21 @@ export function runCodexStep({
     });
     if (result.status !== 0) throw new Error(processFailure(result, `model step ${step.step}`));
 
-    assertOnlyDeclaredChanges({ checkout, baseCommit: resolvedBase, outputs: step.outputs });
+    assertNoUnexpectedJobFiles({
+      before: jobFilesBefore,
+      after: snapshotFileList(jobFolder),
+      outputs: step.outputs,
+    });
     const outputFiles = step.outputs.map((output) => requireRegularOutput(checkout, output));
-    validateJsonOutput(outputFiles[0], schema);
+    for (const outputFile of outputFiles) validateJsonOutput(outputFile, schema, path.basename(step.schema));
+    assertOnlyDeclaredChanges({
+      checkout,
+      gitDir,
+      checkoutGitDir,
+      baseCommit: resolvedBase,
+      outputs: step.outputs,
+      guardIndex: path.join(container, 'guard-index'),
+    });
     for (let index = 0; index < outputFiles.length; index += 1) {
       const destination = outputDestination(jobFolder, step.outputs[index]);
       copyFileSync(outputFiles[index], destination);
