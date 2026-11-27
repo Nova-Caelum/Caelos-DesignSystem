@@ -1,0 +1,29 @@
+{
+  "chain": "propagate",
+  "steps": [
+    {
+      "step": "apply-propagate-edit",
+      "kind": "script",
+      "script": "engine/lib/propagate-report.mjs",
+      "inputs": ["job.json"],
+      "outputs": ["propagate-edit.json", "expected-dependents.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "finish",
+      "kind": "script",
+      "script": "engine/lib/finish.mjs",
+      "inputs": ["propagate-edit.json", "expected-dependents.json"],
+      "outputs": ["finish.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "write-propagate-report",
+      "kind": "script",
+      "script": "engine/lib/propagate-report.mjs",
+      "inputs": ["job.json", "events.jsonl", "propagate-edit.json", "expected-dependents.json", "finish.json"],
+      "outputs": ["propagate.json"],
+      "check": "npm run check:catalog"
+    }
+  ]
+}
