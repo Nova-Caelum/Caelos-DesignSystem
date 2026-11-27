@@ -105,6 +105,11 @@ try {
   git('init','--quiet');
   git('config','user.email','tier-proof@example.invalid');
   git('config','user.name','Tier drift proof');
+  // Commit the staged tree first, so the hook judges the probes the way it judges a real
+  // commit: against a base, with a remote for source links. A first commit has neither.
+  git('add','.');
+  git('-c','core.hooksPath=/dev/null','commit','--quiet','-m','baseline');
+  git('remote','add','origin','https://github.com/example/catalog');
   mkdirSync(path.join(scratch,'node_modules'));
   for (const dep of Object.keys(JSON.parse(readFileSync(path.join(project,'package.json'),'utf8')).devDependencies)) {
     const link=path.join(scratch,'node_modules',dep);

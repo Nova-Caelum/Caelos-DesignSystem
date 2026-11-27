@@ -47,8 +47,19 @@ function fingerprints(document) {
   const result = new Map();
   for (const [entry, record] of Object.entries(document.entries)) {
     result.set(entry, record.fingerprint);
-    for (const [variant, fingerprint] of Object.entries(record.variants)) {
-      result.set(`${entry}#${variant}`, fingerprint);
+    for (const [variant, variantFingerprint] of Object.entries(record.variants)) {
+      result.set(`${entry}#${variant}`, variantFingerprint);
+    }
+  }
+  return result;
+}
+
+function contentFingerprints(document) {
+  const result = new Map();
+  for (const [entry, record] of Object.entries(document.entries)) {
+    result.set(entry, record.contentFingerprint);
+    for (const [variant, variantFingerprint] of Object.entries(record.variantContentFingerprints)) {
+      result.set(`${entry}#${variant}`, variantFingerprint);
     }
   }
   return result;
@@ -60,20 +71,30 @@ function updateJson(file, update) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-test('(a) build-lock writes one fingerprint per entry and Cartesian variant', (t) => {
+test('(a) build-lock keeps main-compatible hashes and writes sibling content fingerprints', (t) => {
   const work = workspace(t);
   const result = build(work);
   assert.equal(result.status, 0, result.stderr);
   const document = lock(work);
   assert.match(document.entries['controls.shared.button'].fingerprint, /^[a-f0-9]{64}$/u);
+  assert.match(document.entries['controls.shared.button'].contentFingerprint, /^[a-f0-9]{64}$/u);
   assert.deepEqual(Object.keys(document.entries['controls.shared.button'].variants), [
     'size=large,tone=primary',
     'size=large,tone=quiet',
     'size=small,tone=primary',
     'size=small,tone=quiet',
   ]);
-  for (const fingerprint of Object.values(document.entries['controls.shared.button'].variants)) {
-    assert.match(fingerprint, /^[a-f0-9]{64}$/u);
+  assert.deepEqual(
+    Object.keys(document.entries['controls.shared.button'].variantContentFingerprints),
+    Object.keys(document.entries['controls.shared.button'].variants),
+  );
+  for (const variantFingerprint of Object.values(document.entries['controls.shared.button'].variants)) {
+    assert.match(variantFingerprint, /^[a-f0-9]{64}$/u);
+  }
+  for (const contentFingerprint of Object.values(
+    document.entries['controls.shared.button'].variantContentFingerprints,
+  )) {
+    assert.match(contentFingerprint, /^[a-f0-9]{64}$/u);
   }
 });
 
@@ -145,6 +166,67 @@ test('(e) dependents walk references, including madeOf, without value-based fals
     'primitives.shared.equal-a',
     'primitives.shared.equal-a.fill',
   ]);
+});
+
+test('(f) description edits change the change fingerprint but not the content fingerprint', (t) => {
+  const work = workspace(t);
+  assert.equal(build(work).status, 0);
+  const before = lock(work).entries['primitives.shared.surface'];
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    data.primitives.shared.surface.$description = 'A new description of the same rendered surface.';
+  });
+  assert.equal(build(work).status, 0);
+  const after = lock(work).entries['primitives.shared.surface'];
+  assert.notEqual(after.fingerprint, before.fingerprint);
+  assert.equal(after.contentFingerprint, before.contentFingerprint);
+});
+
+test('(g) variant content includes the axis-to-resolved-value pairing', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    const original = data.primitives.shared.surface;
+    original.$extensions['app.caelos'].variants = {
+      bodyMaterial: ['cloud', 'glass'],
+      stripMaterial: ['cloud', 'glass'],
+    };
+    data.primitives.shared.rebuilt = structuredClone(original);
+    data.primitives.shared.changed = structuredClone(original);
+    data.primitives.shared.changed.fill.$value = 'different-rendered-value';
+  });
+  assert.equal(build(work).status, 0);
+  const entries = lock(work).entries;
+  assert.equal(
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.rebuilt'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+  );
+  assert.notEqual(
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=glass,stripMaterial=cloud'],
+  );
+  assert.notEqual(
+    entries['primitives.shared.surface'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+    entries['primitives.shared.changed'].variantContentFingerprints['bodyMaterial=cloud,stripMaterial=glass'],
+  );
+});
+
+test('(h) empty is written only for entries and variants with no resolved token or madeOf name', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '01-primitives.tokens.json'), (data) => {
+    data.primitives.shared.empty = {
+      $extensions: {
+        'app.caelos': {
+          states: ['idle'],
+          variants: { tone: ['quiet', 'loud'] },
+        },
+      },
+    };
+  });
+  assert.equal(build(work).status, 0);
+  const entries = lock(work).entries;
+  assert.equal(entries['primitives.shared.empty'].empty, true);
+  assert.deepEqual(entries['primitives.shared.empty'].emptyVariants, ['tone=loud', 'tone=quiet']);
+  assert.equal(Object.hasOwn(entries['primitives.shared.surface'], 'empty'), false);
+  assert.equal(Object.hasOwn(entries['controls.shared.button'], 'empty'), false);
 });
 
 function command(cwd, commandName, args = [], env = {}) {
