@@ -19,7 +19,7 @@
     "build:viewer": "node viewer/build.mjs",
     "build:lock": "node scripts/build-lock.mjs",
     "build:all": "npm run build:tokens && npm run build:components && npm run build:lock",
-    "check:app": "node scripts/check-app.mjs",
+    "check:app": "node scripts/check-app.mjs --baseline gate-baseline.json",
     "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
     "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet check:generated check:duplicates check:engine build:viewer --",
     "check:duplicates": "node scripts/check-duplicates.mjs",

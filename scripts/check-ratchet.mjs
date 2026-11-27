@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import {
   baseTree, createContext, exceptionNames, exceptionsFile, guardBaseNone, object, options,
   readCandidateJson, readTreeJson, validateCandidateRuleData,
@@ -26,11 +27,7 @@ function candidateRelative(file, context) {
   return relative.split(path.sep).join('/');
 }
 
-function checkBaseline(file, tree, errors, context) {
-  const relative = candidateRelative(file, context);
-  const current = baselineCounts(readCandidateJson(relative, context), relative);
-  if (!tree) return;
-  const previous = baselineCounts(readTreeJson(relative, tree, context), `${relative} at base ${tree}`);
+function compareCounts(current, previous, relative, errors) {
   for (const [fileName, counts] of Object.entries(current)) {
     if (!Object.hasOwn(previous, fileName)) {
       errors.push(`${relative}: file ${fileName} was added; remove the added baseline entry and fix new gate errors`);
@@ -46,16 +43,39 @@ function checkBaseline(file, tree, errors, context) {
   }
 }
 
+function checkBaseline(file, tree, errors, context, actual) {
+  const relative = candidateRelative(file, context);
+  if (actual) {
+    const actualRelative = actual === '-' ? '<stdin>' : candidateRelative(actual, context);
+    let actualData;
+    try {
+      actualData = actual === '-' ? JSON.parse(readFileSync(0, 'utf8')) : readCandidateJson(actualRelative, context);
+    } catch (error) {
+      if (actual !== '-' || error.message.includes('supply a readable JSON file')) throw error;
+      throw new Error('<stdin>: invalid JSON; supply per-file rule counts');
+    }
+    const current = baselineCounts(actualData, actualRelative);
+    const previous = baselineCounts(readCandidateJson(relative, context), relative);
+    compareCounts(current, previous, relative, errors);
+    return;
+  }
+  const current = baselineCounts(readCandidateJson(relative, context), relative);
+  if (!tree) return;
+  const previous = baselineCounts(readTreeJson(relative, tree, context), `${relative} at base ${tree}`);
+  compareCounts(current, previous, relative, errors);
+}
+
 try {
-  const values = options(process.argv.slice(2), ['--base', '--baseline', '--candidate', '--git-root', '--mode']);
+  const values = options(process.argv.slice(2), ['--actual', '--base', '--baseline', '--candidate', '--git-root', '--mode']);
   const mode = values.mode ?? 'full';
   if (!['full', 'baseline'].includes(mode)) throw new Error('--mode must be full or baseline');
   if (mode === 'baseline' && !values.baseline) throw new Error('--mode baseline requires --baseline <file>');
-  guardBaseNone(values);
+  if (values.actual && mode !== 'baseline') throw new Error('--actual requires --mode baseline');
+  if (!values.actual) guardBaseNone(values);
   const context = createContext(values);
-  const tree = values.base === 'none' ? undefined : baseTree(values.base, context);
+  const tree = values.actual ? undefined : values.base === 'none' ? undefined : baseTree(values.base, context);
   const errors = [];
-  if (!tree) console.log('no base given: ratchet comparison skipped');
+  if (!tree && !values.actual) console.log('no base given: ratchet comparison skipped');
 
   if (mode === 'full') {
     validateCandidateRuleData(context, tree);
@@ -69,7 +89,7 @@ try {
       }
     }
   }
-  if (values.baseline) checkBaseline(values.baseline, tree, errors, context);
+  if (values.baseline) checkBaseline(values.baseline, tree, errors, context, values.actual);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log('Shrink-only catalog ratchet passed.');
 } catch (error) {
