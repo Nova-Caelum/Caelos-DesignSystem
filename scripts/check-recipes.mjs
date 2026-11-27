@@ -31,6 +31,10 @@ export function object(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+export function isRecipeRecord(tier, segments) {
+  return tier > 0 && segments.length === 3;
+}
+
 function optionName(flag) {
   return flag.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }
@@ -358,7 +362,7 @@ function readCatalog(context, tree) {
     const name = segments.join('.');
     if (!object(node)) throw new Error(`${file} entry ${name}: expected a catalog object; restore its record`);
     const token = Object.hasOwn(node, '$value');
-    const group = tier > 0 && segments.length === 3;
+    const group = isRecipeRecord(tier, segments);
     if (group) recipe = name;
     if (token || group) catalog.entries.push({ name, tier, file, node, group });
     if (token) {
