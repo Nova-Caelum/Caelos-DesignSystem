@@ -1,0 +1,21 @@
+{
+  "scan": { "include": ["src/**"], "types": ["css", "tsx"] },
+  "tokens": { "css": ["tokens.css"] },
+  "dimensions": {
+    "colour": { "enabled": false },
+    "spacing": { "enabled": true },
+    "size": { "enabled": false },
+    "radius": { "enabled": false },
+    "shadow": { "enabled": false },
+    "typography": { "enabled": false },
+    "motion": { "enabled": false },
+    "opacity": { "enabled": false },
+    "z-index": { "enabled": false }
+  },
+  "icons": { "enabled": false },
+  "missing": {
+    "gap": { "severity": "off" },
+    "typography": { "severity": "off" },
+    "motion": { "severity": "error", "required": true }
+  }
+}

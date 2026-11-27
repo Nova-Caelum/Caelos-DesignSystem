@@ -106,7 +106,11 @@ try {
   git('config','user.email','tier-proof@example.invalid');
   git('config','user.name','Tier drift proof');
   mkdirSync(path.join(scratch,'node_modules'));
-  for (const dep of ['husky','typescript']) symlinkSync(path.join(project,'node_modules',dep),path.join(scratch,'node_modules',dep),'dir');
+  for (const dep of Object.keys(JSON.parse(readFileSync(path.join(project,'package.json'),'utf8')).devDependencies)) {
+    const link=path.join(scratch,'node_modules',dep);
+    mkdirSync(path.dirname(link),{recursive:true});
+    symlinkSync(path.join(project,'node_modules',dep),link,'dir');
+  }
   ok(process.execPath,[path.join(project,'node_modules/husky/bin.js')]);
   assert.equal(git('config','--get','core.hooksPath'),'.husky/_');
   write('src/tiers/0-foundations/probe.ts','export const role = "sys.space.stack";\n');

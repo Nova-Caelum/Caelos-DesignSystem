@@ -655,5 +655,5 @@ test('unit.yml: the tests run on pull_request with no secret and no environment'
   assert.match(text, /^on:\n {2}pull_request:$/m);
   assert.doesNotMatch(text, /pull_request_target|secrets|environment|push:/);
   assert.match(text, /^ {2}unit:\n {4}name: unit$/m);
-  assert.deepEqual(text.match(/^ +- run: .*$/gm).map((r) => r.trim()), ['- run: node --test']);
+  assert.deepEqual(text.match(/^ +- run: .*$/gm).map((r) => r.trim()), ['- run: npm ci --ignore-scripts', '- run: node --test']);
 });
