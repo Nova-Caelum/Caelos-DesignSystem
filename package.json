@@ -28,11 +28,11 @@
     "check:ratchet": "node scripts/check-ratchet.mjs"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2",
+    "esbuild": "0.28.2",
     "husky": "9.1.7",
     "playwright": "1.65.1",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "style-dictionary": "5.8.0",
     "typescript": "5.8.2"
   }

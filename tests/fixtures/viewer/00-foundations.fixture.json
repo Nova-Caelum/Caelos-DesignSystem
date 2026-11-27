@@ -11,6 +11,35 @@
           }
         }
       }
+    },
+    "space": {
+      "repeat": {
+        "$type": "dimension",
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        }
+      }
+    },
+    "blur": {
+      "repeat": {
+        "$type": "dimension",
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        }
+      }
+    },
+    "grouped": {
+      "scale": {
+        "compact": {
+          "$type": "dimension",
+          "$value": {
+            "value": 3,
+            "unit": "px"
+          }
+        }
+      }
     }
   }
 }

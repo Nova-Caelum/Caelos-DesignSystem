@@ -8,7 +8,7 @@ export function FamilyRow({ family, components }: { family: CatalogFamily; compo
         <p className="eyebrow">Identity</p>
         <h3>{family.title}</h3>
         <code>{family.path}</code>
-        <p data-lifecycle={family.lifecycle}>Lifecycle: {family.lifecycle}</p>
+        {family.lifecycle && <p data-lifecycle={family.lifecycle}>Lifecycle: {family.lifecycle}</p>}
         {family.incomplete && <p className="unavailable">incomplete record</p>}
         <details className="recipe-preview">
           <summary>Recipe preview</summary>

@@ -109,13 +109,7 @@ h1 {
 .state-cards {
   display: grid;
   gap: var(--sys-space-inline-cluster);
-  grid-template-columns:
-    minmax(var(--sys-space-grid-column-min), auto)
-    minmax(var(--sys-space-grid-column-min), auto)
-    minmax(var(--sys-space-grid-column-min), auto)
-    minmax(var(--sys-space-grid-column-min), auto)
-    minmax(var(--sys-space-grid-column-min), auto);
-  overflow-x: auto;
+  grid-template-columns: repeat(auto-fit, minmax(var(--sys-space-grid-column-min), auto));
 }
 
 .state-card {

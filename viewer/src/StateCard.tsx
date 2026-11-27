@@ -23,7 +23,7 @@ export function StateCard({ family, state, components }: {
           <p className="unavailable">{family.incomplete ? 'incomplete record' : `not generated: ${family.skipReason ?? 'no generated component'}`}</p>
         )}
       </div>
-      <p className="lifecycle" data-lifecycle={family.lifecycle}>Lifecycle: {family.lifecycle}</p>
+      {family.lifecycle && <p className="lifecycle" data-lifecycle={family.lifecycle}>Lifecycle: {family.lifecycle}</p>}
       <p className="source-line">Source: <a href={family.sourceHref}>{family.source}</a></p>
       <ul className="token-list">
         {family.tokens.map((token) => (
