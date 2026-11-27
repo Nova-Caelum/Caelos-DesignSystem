@@ -18,7 +18,7 @@ function jobFolder(args) {
 try {
   const [command, ...args] = process.argv.slice(2);
   if (command === 'run') {
-    runJob(jobFolder(args));
+    console.log(JSON.stringify(runJob(jobFolder(args))));
   } else if (command === 'step') {
     const [name, ...rest] = args;
     if (!name) {
@@ -26,7 +26,7 @@ try {
       error.exitCode = 2;
       throw error;
     }
-    executeStep(name, jobFolder(rest));
+    console.log(JSON.stringify(executeStep(name, jobFolder(rest))));
   } else {
     const error = new Error(usage());
     error.exitCode = 2;

@@ -1,0 +1,8 @@
+{
+  "seq": 1,
+  "kind": "node.exit",
+  "run_id": "fixture-run",
+  "node": "craft",
+  "ts": "2026-11-26T09:00:00.000Z",
+  "model": "Opus"
+}

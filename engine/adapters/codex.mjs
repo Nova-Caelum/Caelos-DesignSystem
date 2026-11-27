@@ -59,6 +59,28 @@ function promptFor(step, instructions, checkout, jobFolder) {
   ].join('\n');
 }
 
+function findModel(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (typeof value.model === 'string' && value.model.trim()) return value.model.trim();
+  for (const child of Object.values(value)) {
+    const model = findModel(child);
+    if (model) return model;
+  }
+  return null;
+}
+
+export function parseHarnessModel(output) {
+  let model = null;
+  for (const line of String(output || '').split('\n').filter(Boolean)) {
+    try {
+      model ||= findModel(JSON.parse(line));
+    } catch {
+      // The harness JSON stream may be surrounded by non-JSON diagnostics.
+    }
+  }
+  return model;
+}
+
 export function runCodexStep(options) {
   const {
     gitRoot, baseCommit, jobFolder, step, command = 'codex',
@@ -119,6 +141,6 @@ export function runCodexStep(options) {
       const destination = outputDestination(jobFolder, step.outputs[index]);
       copyFileSync(outputFiles[index], destination);
     }
-    return { outputs: [...step.outputs] };
+    return { outputs: [...step.outputs], model: parseHarnessModel(result.stdout) };
   });
 }

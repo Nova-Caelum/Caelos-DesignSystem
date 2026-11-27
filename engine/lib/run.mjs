@@ -24,7 +24,12 @@ function runProcess(command, args, label) {
     env: process.env,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-  if (result.status !== 0) throw new Error(processFailure(result, label));
+  if (result.status !== 0) {
+    const error = new Error(processFailure(result, label));
+    error.exitCode = result.status;
+    throw error;
+  }
+  return result;
 }
 
 function jobFile(folder, name) {
@@ -45,13 +50,22 @@ export function executeStep(name, folder) {
     }
   }
   if (row.kind === 'model') {
-    runCodexStep({
+    const reply = runCodexStep({
       gitRoot: repositoryRoot,
       baseCommit: chain.commit,
       jobFolder,
       step: row,
       command: process.env.CAELOS_CODEX_COMMAND || 'codex',
     });
+    if (typeof reply.model !== 'string' || !reply.model) {
+      throw new Error(`model step ${name} harness reply did not name the model`);
+    }
+    for (const output of row.outputs) {
+      if (!existsSync(jobFile(jobFolder, output))) {
+        throw new Error(`step ${name} did not write ${output}; fix the script and try again`);
+      }
+    }
+    return { skipped: false, model: reply.model };
   } else {
     const script = resolveScript(row.script);
     if (!existsSync(script)) throw new Error(`step ${name} script ${row.script} does not exist; restore it and try again`);
@@ -63,6 +77,25 @@ export function executeStep(name, folder) {
     }
   }
   return { skipped: false };
+}
+
+function parseStepResult(output, step) {
+  try {
+    return JSON.parse(String(output || '').trim());
+  } catch {
+    throw new Error(`step ${step} did not return its machine-readable result`);
+  }
+}
+
+function defaultStepRunner({ jobFolder, row }) {
+  const processResult = runProcess(
+    process.execPath, [cli, 'step', row.step, '--job', jobFolder], `step ${row.step}`,
+  );
+  return parseStepResult(processResult.stdout, row.step);
+}
+
+function defaultCatalogCheck() {
+  runProcess('npm', ['run', 'check:catalog'], 'npm run check:catalog');
 }
 
 function resumeIndex(chain, events) {
@@ -78,7 +111,10 @@ function failMessage(step, reason, folder) {
   return `step ${step} failed: ${reason}\nFix the step, its declared files, or the catalog check, then run engine run --job ${folder} again.`;
 }
 
-export function runJob(folder) {
+export function runJob(folder, options = {}) {
+  const stepRunner = options.stepRunner || defaultStepRunner;
+  const catalogCheck = options.catalogCheck || defaultCatalogCheck;
+  const harnessCheck = options.harnessCheck || assertCodexAvailable;
   const jobFolder = path.resolve(folder);
   const job = readJob(jobFolder);
   const chain = materializeChain(jobFolder, job.chain);
@@ -87,7 +123,7 @@ export function runJob(folder) {
   if (start >= chain.steps.length) return { complete: true, resumed: true };
 
   if (chain.steps.slice(start).some(({ kind }) => kind === 'model')) {
-    assertCodexAvailable({ command: process.env.CAELOS_CODEX_COMMAND || 'codex' });
+    harnessCheck({ command: process.env.CAELOS_CODEX_COMMAND || 'codex' });
   }
 
   const events = createEventWriter(jobFolder, previous);
@@ -96,10 +132,14 @@ export function runJob(folder) {
   for (const row of chain.steps.slice(start)) {
     events.emit('node.enter', row.step);
     try {
-      runProcess(process.execPath, [cli, 'step', row.step, '--job', jobFolder], `step ${row.step}`);
-      runProcess('npm', ['run', 'check:catalog'], 'npm run check:catalog');
-      events.emit('node.exit', row.step);
+      const stepResult = stepRunner({ jobFolder, row });
+      catalogCheck({ jobFolder, row });
+      events.emit('node.exit', row.step, stepResult.model ? { model: stepResult.model } : {});
     } catch (error) {
+      if (error.exitCode === 75) {
+        events.emit('run.pause', null, { step: row.step, status: 'waiting' });
+        return { complete: false, resumed: previous.length > 0 };
+      }
       const message = failMessage(row.step, error.message, jobFolder);
       events.emit('node.fail', row.step, { error: message });
       events.emit('run.end', null, { status: 'failed' });
