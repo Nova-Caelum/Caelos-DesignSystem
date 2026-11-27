@@ -14,21 +14,18 @@
     "madeOf": {
       "type": "array", "minItems": 1, "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 },
-      "x-caelos-required-from-tier": 3,
-      "x-caelos-ignore-for-change": true
+      "x-caelos-required-from-tier": 3
     },
     "contents": {
       "type": "object", "minProperties": 1,
       "x-caelos-recipe-tier": 3
     },
     "layerOrder": {
-      "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 },
-      "x-caelos-ignore-for-change": true
+      "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 }
     },
-    "gapFill": { "type": "string", "enum": ["reference", "nearest", "placeholder"], "x-caelos-ignore-for-change": true },
+    "gapFill": { "type": "string", "enum": ["reference", "nearest", "placeholder"] },
     "siblings": {
-      "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 },
-      "x-caelos-ignore-for-change": true
+      "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 }
     }
   }
 }
