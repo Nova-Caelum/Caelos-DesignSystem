@@ -1,0 +1,12 @@
+{
+  "library": {
+    "before-invalid": {
+      "$extensions": {
+        "app.caelos": {
+          "lifecycle": "draft",
+          "draftedBy": "job-test"
+        }
+      }
+    }
+  }
+}
