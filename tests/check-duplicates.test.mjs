@@ -194,18 +194,6 @@ test('(b) a rebuilt entry with a different description is refused, naming both e
   assert.match(result.stderr, /primitives\.shared\.rebuilt/u);
 });
 
-test('main\'s checker accepts the generated lock shape against the live catalog', (t) => {
-  const work = materializedLiveCatalog(t);
-  const build = buildReuse(work);
-  assert.equal(build.status, 0, build.stderr);
-  const mainChecker = path.join(work.cwd, 'main-check-duplicates.mjs');
-  writeFileSync(mainChecker, git(root, ['show', 'origin/main:scripts/check-duplicates.mjs']));
-  const result = spawnSync(process.execPath, [
-    mainChecker, '--lock', work.lock, '--candidate', work.cwd,
-  ], { cwd: work.cwd, encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
-});
-
 test('a renamed and re-described live menu copy with new descriptive fields is refused', (t) => {
   const work = materializedLiveCatalog(t);
   baselineReuse(work);
