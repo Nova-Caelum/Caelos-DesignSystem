@@ -52,7 +52,7 @@
           "type": "array",
           "minItems": 1,
           "items": { "$ref": "#/$defs/step" },
-          "description": "A line containing an action step must end with an expect step, and its final expected result must not already hold before the first action."
+          "description": "Every action step must be followed by its own expect step before the next action, and that expected result must not already hold before the action."
         }
       },
       "allOf": [

@@ -85,7 +85,10 @@ test("A1: each repeated handler occurrence needs its own element step", async ()
 
 test("A2: inline callbacks stay inline and cannot be covered by a named handler", async () => {
   const files = await writeCase(inlineSource, list([
-    line("tab", "setTab", [{ do: "click", role: "button", name: "A" }]),
+    line("tab", "setTab", [
+      { do: "click", role: "button", name: "A" },
+      { do: "expect", role: "status", name: "Done", expect: "visible" },
+    ]),
   ]));
   const result = runCounter(files.listFile);
   assert.equal(result.status, 1, result.stderr);
@@ -96,7 +99,10 @@ test("A2: inline callbacks stay inline and cannot be covered by a named handler"
 
 test("A3: spreads and untied component handlers are separate missing entries", async () => {
   const files = await writeCase(spreadSource, list([
-    line("pick", "pick", [{ do: "click", role: "button", name: "Something unrelated" }]),
+    line("pick", "pick", [
+      { do: "click", role: "button", name: "Something unrelated" },
+      { do: "expect", role: "status", name: "Done", expect: "visible" },
+    ]),
   ]));
   const result = runCounter(files.listFile);
   assert.equal(result.status, 1, result.stderr);
@@ -112,9 +118,18 @@ test("A4: the complete primary fixture resolves its screen from the list", () =>
 
 test("A5: a focus step does not cover a keyboard handler", async () => {
   const files = await writeCase(primarySource, list([
-    line("pass", "handlePass", [{ do: "click", role: "button", name: "Pass action" }]),
-    line("flaky", "handleFlaky", [{ do: "click", role: "button", name: "Flaky action" }]),
-    line("message", "handleMessage", [{ do: "click", role: "textbox", name: "Message" }]),
+    line("pass", "handlePass", [
+      { do: "click", role: "button", name: "Pass action" },
+      { do: "expect", role: "status", name: "Passed", expect: "visible" },
+    ]),
+    line("flaky", "handleFlaky", [
+      { do: "click", role: "button", name: "Flaky action" },
+      { do: "expect", role: "status", name: "Ready", expect: "visible" },
+    ]),
+    line("message", "handleMessage", [
+      { do: "click", role: "textbox", name: "Message" },
+      { do: "expect", role: "textbox", name: "Message", expect: "focused" },
+    ]),
     line("keyboard", "handleKeyDown", [
       { do: "focus", role: "textbox", name: "Message" },
       { do: "expect", role: "status", name: "Submitted", expect: "visible" },
@@ -130,20 +145,35 @@ test("A5b: focus or type steps do not cover a click handler", async () => {
   for (const kind of ["focus", "type"]) {
     const step = { do: kind, role: "button", name: "Save" };
     if (kind === "type") step.value = "x";
-    const files = await writeCase(source, list([line("save", "save", [step])]));
+    const files = await writeCase(source, list([line("save", "save", [
+      step,
+      { do: "expect", role: "status", name: "Done", expect: "visible" },
+    ])]));
     const result = runCounter(files.listFile);
     assert.equal(result.status, 1, `${kind}: ${result.stderr}`);
     assert.match(result.stderr, /onClick at 1:\d+ on button/);
   }
-  const clicked = await writeCase(source, list([line("save", "save", [{ do: "click", role: "button", name: "Save" }])]));
+  const clicked = await writeCase(source, list([line("save", "save", [
+    { do: "click", role: "button", name: "Save" },
+    { do: "expect", role: "status", name: "Saved", expect: "visible" },
+  ])]));
   assert.equal(runCounter(clicked.listFile).status, 0);
 });
 
 test("A5c: a type step fills the field and does not cover a keyboard handler", async () => {
   const files = await writeCase(primarySource, list([
-    line("pass", "handlePass", [{ do: "click", role: "button", name: "Pass action" }]),
-    line("flaky", "handleFlaky", [{ do: "click", role: "button", name: "Flaky action" }]),
-    line("message", "handleMessage", [{ do: "type", role: "textbox", name: "Message", value: "hello" }]),
+    line("pass", "handlePass", [
+      { do: "click", role: "button", name: "Pass action" },
+      { do: "expect", role: "status", name: "Passed", expect: "visible" },
+    ]),
+    line("flaky", "handleFlaky", [
+      { do: "click", role: "button", name: "Flaky action" },
+      { do: "expect", role: "status", name: "Ready", expect: "visible" },
+    ]),
+    line("message", "handleMessage", [
+      { do: "type", role: "textbox", name: "Message", value: "hello" },
+      { do: "expect", role: "textbox", name: "Message", expect: { value: "hello" } },
+    ]),
   ]));
   const result = runCounter(files.listFile);
   assert.equal(result.status, 1, result.stderr);
@@ -152,9 +182,15 @@ test("A5c: a type step fills the field and does not cover a keyboard handler", a
 
 test("A5d: a checkbox change is covered by a click, not by typing", async () => {
   const source = "export function S(){const pick=()=>{};return <input type=\"checkbox\" aria-label=\"Remember\" onChange={pick} />;}";
-  const clicked = await writeCase(source, list([line("pick", "pick", [{ do: "click", role: "checkbox", name: "Remember" }])]));
+  const clicked = await writeCase(source, list([line("pick", "pick", [
+    { do: "click", role: "checkbox", name: "Remember" },
+    { do: "expect", role: "checkbox", name: "Remember", expect: "focused" },
+  ])]));
   assert.equal(runCounter(clicked.listFile).status, 0);
-  const typed = await writeCase(source, list([line("pick", "pick", [{ do: "type", role: "checkbox", name: "Remember", value: "x" }])]));
+  const typed = await writeCase(source, list([line("pick", "pick", [
+    { do: "type", role: "checkbox", name: "Remember", value: "x" },
+    { do: "expect", role: "checkbox", name: "Remember", expect: { value: "x" } },
+  ])]));
   const refused = runCounter(typed.listFile);
   assert.equal(refused.status, 1, refused.stderr);
   assert.match(refused.stderr, /onChange .* add a line with a click step/);
@@ -162,7 +198,10 @@ test("A5d: a checkbox change is covered by a click, not by typing", async () => 
 
 test("A6: componentRoles ties custom components to steps", async () => {
   const source = "export function S(){const save=()=>{};return <Button onClick={save}>Save</Button>;}";
-  const lines = [line("save", "save", [{ do: "click", role: "button", name: "Save" }])];
+  const lines = [line("save", "save", [
+    { do: "click", role: "button", name: "Save" },
+    { do: "expect", role: "status", name: "Saved", expect: "visible" },
+  ])];
   const withoutRoles = await writeCase(source, list(lines));
   const refused = runCounter(withoutRoles.listFile);
   assert.equal(refused.status, 1, refused.stderr);
@@ -177,8 +216,14 @@ test("A7: covers declares untied entries but refuses tied and nonexistent entrie
   const spreadAt = atOf(spreadSource, "{...p}");
   const selectAt = atOf(spreadSource, "onSelect");
   const declared = await writeCase(spreadSource, list([
-    line("spread", "spread", [{ do: "click", role: "button", name: "Wipe" }], [{ prop: "{...}", at: spreadAt }]),
-    line("pick", "pick", [{ do: "click", role: "menu", name: "Choose" }], [{ prop: "onSelect", at: selectAt }]),
+    line("spread", "spread", [
+      { do: "click", role: "button", name: "Wipe" },
+      { do: "expect", role: "status", name: "Wiped", expect: "visible" },
+    ], [{ prop: "{...}", at: spreadAt }]),
+    line("pick", "pick", [
+      { do: "click", role: "menu", name: "Choose" },
+      { do: "expect", role: "status", name: "Chosen", expect: "visible" },
+    ], [{ prop: "onSelect", at: selectAt }]),
   ]));
   const passed = runCounter(declared.listFile);
   assert.equal(passed.status, 0, passed.stderr);
@@ -187,14 +232,20 @@ test("A7: covers declares untied entries but refuses tied and nonexistent entrie
   const tiedSource = "export function S(){const save=()=>{};return <button onClick={save}>Save</button>;}";
   const tiedAt = atOf(tiedSource, "onClick");
   const tied = await writeCase(tiedSource, list([
-    line("save", "save", [{ do: "click", role: "button", name: "Save" }], [{ prop: "onClick", at: tiedAt }]),
+    line("save", "save", [
+      { do: "click", role: "button", name: "Save" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ], [{ prop: "onClick", at: tiedAt }]),
   ]));
   const tiedResult = runCounter(tied.listFile);
   assert.equal(tiedResult.status, 1, tiedResult.stderr);
   assert.match(tiedResult.stderr, /which is tied to button 'Save'/);
 
   const absent = await writeCase(tiedSource, list([
-    line("save", "save", [{ do: "click", role: "button", name: "Save" }], [{ prop: "onClick", at: "99:1" }]),
+    line("save", "save", [
+      { do: "click", role: "button", name: "Save" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ], [{ prop: "onClick", at: "99:1" }]),
   ]));
   const absentResult = runCounter(absent.listFile);
   assert.equal(absentResult.status, 1, absentResult.stderr);
@@ -206,15 +257,24 @@ test("A8: duplicate role and name pairs are ambiguous until both are declared", 
   const firstAt = atOf(source, "onClick", 1);
   const secondAt = atOf(source, "onClick", 2);
   const refused = await writeCase(source, list([
-    line("save", "a", [{ do: "click", role: "button", name: "Save" }]),
+    line("save", "a", [
+      { do: "click", role: "button", name: "Save" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ]),
   ]));
   const refusedResult = runCounter(refused.listFile);
   assert.equal(refusedResult.status, 1, refusedResult.stderr);
   assert.match(refusedResult.stderr, /ambiguous/);
 
   const declared = await writeCase(source, list([
-    line("first", "a", [{ do: "click", role: "button", name: "Save" }], [{ prop: "onClick", at: firstAt }]),
-    line("second", "a", [{ do: "press", role: "button", name: "Save" }], [{ prop: "onClick", at: secondAt }]),
+    line("first", "a", [
+      { do: "click", role: "button", name: "Save" },
+      { do: "expect", role: "status", name: "First saved", expect: "visible" },
+    ], [{ prop: "onClick", at: firstAt }]),
+    line("second", "a", [
+      { do: "press", role: "button", name: "Save", value: "Enter" },
+      { do: "expect", role: "status", name: "Second saved", expect: "visible" },
+    ], [{ prop: "onClick", at: secondAt }]),
   ]));
   const declaredResult = runCounter(declared.listFile);
   assert.equal(declaredResult.status, 0, declaredResult.stderr);
@@ -227,7 +287,10 @@ test("A9: a standalone copy loads TypeScript through NODE_PATH", async () => {
   await copyFile(counter, copiedCounter);
   const source = "export function S(){const save=()=>{};return <button onClick={save}>Save</button>;}";
   const files = await writeCase(source, list([
-    line("save", "save", [{ do: "click", role: "button", name: "Save" }]),
+    line("save", "save", [
+      { do: "click", role: "button", name: "Save" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ]),
   ]));
   const result = spawnSync(process.execPath, [copiedCounter, "--list", files.listFile], {
     encoding: "utf8",
@@ -247,6 +310,51 @@ test("A10: discovery preserves three inline occurrences and element identities",
   assert.equal(new Set(entries.map((entry) => entry.element.at)).size, 3);
 });
 
+test("N1: an action without its own expect covers nothing", async () => {
+  const files = await writeCase(twiceSource, list([
+    line("save", "save", [
+      { do: "click", role: "button", name: "Save draft" },
+      { do: "click", role: "button", name: "Save and close" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ]),
+  ]));
+  const result = runCounter(files.listFile);
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /Save draft/);
+  assert.match(result.stderr, /has no expect of its own/);
+});
+
+test("N2: each inline action without its own expect is named", async () => {
+  const files = await writeCase(inlineSource, list([
+    line("tabs", null, [
+      { do: "click", role: "button", name: "A" },
+      { do: "click", role: "button", name: "B" },
+      { do: "click", role: "button", name: "Delete everything" },
+      { do: "expect", role: "status", name: "Done", expect: "visible" },
+    ]),
+  ]));
+  const result = runCounter(files.listFile);
+
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /'A'/);
+  assert.match(result.stderr, /'B'/);
+});
+
+test("N3: each action with its own expect covers its handler occurrence", async () => {
+  const files = await writeCase(twiceSource, list([
+    line("save", "save", [
+      { do: "click", role: "button", name: "Save draft" },
+      { do: "expect", role: "status", name: "Draft saved", expect: "visible" },
+      { do: "click", role: "button", name: "Save and close" },
+      { do: "expect", role: "status", name: "Saved", expect: "visible" },
+    ]),
+  ]));
+  const result = runCounter(files.listFile);
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
 test("invalid componentRoles and covers shapes are input errors", async () => {
   const source = "export function S(){return <button onClick={save}>Save</button>;}";
   for (const value of [
@@ -262,7 +370,10 @@ test("invalid componentRoles and covers shapes are input errors", async () => {
 
 test("resolveScreen and checkListCoverage use the list file directory", async () => {
   const source = "export function S(){return <button onClick={save}>Save</button>;}";
-  const value = list([line("save", "save", [{ do: "click", role: "button", name: "Save" }])]);
+  const value = list([line("save", "save", [
+    { do: "click", role: "button", name: "Save" },
+    { do: "expect", role: "status", name: "Saved", expect: "visible" },
+  ])]);
   const files = await writeCase(source, value);
   assert.equal(counterApi.resolveScreen(files.listFile, value), files.screen);
   const result = await counterApi.checkListCoverage({ listFile: files.listFile, list: value });

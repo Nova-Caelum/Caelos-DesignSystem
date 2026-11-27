@@ -35,6 +35,7 @@
       "handler": "handleKeyDown",
       "steps": [
         { "do": "focus", "role": "textbox", "name": "Message" },
+        { "do": "expect", "role": "textbox", "name": "Message", "expect": "focused" },
         { "do": "press", "role": "textbox", "name": "Message", "value": "Enter" },
         { "do": "expect", "role": "status", "name": "Submitted", "expect": "visible" }
       ]

@@ -304,8 +304,24 @@ function allowedSteps(prop, role) {
   return [...ACTION_STEPS];
 }
 
+function ownExpectations(steps, actionIndex) {
+  const expectations = [];
+  for (let stepIndex = actionIndex + 1; stepIndex < steps.length; stepIndex += 1) {
+    const step = steps[stepIndex];
+    if (ACTION_STEPS.has(step.do)) break;
+    if (step.do === "expect") expectations.push({ step, stepIndex });
+  }
+  return expectations;
+}
+
 function actionSteps(line) {
-  return line.steps.filter((step) => ACTION_STEPS.has(step.do));
+  return line.steps
+    .map((step, stepIndex) => ({
+      step,
+      stepIndex,
+      expectations: ACTION_STEPS.has(step.do) ? ownExpectations(line.steps, stepIndex) : [],
+    }))
+    .filter(({ step }) => ACTION_STEPS.has(step.do));
 }
 
 export function compareHandlers(entries, list) {
@@ -314,7 +330,15 @@ export function compareHandlers(entries, list) {
   const declaredEntries = new Set();
   const problems = [];
   for (const line of list.lines) {
-    const actions = actionSteps(line);
+    const actionRecords = actionSteps(line);
+    for (const { step, stepIndex, expectations } of actionRecords) {
+      if (expectations.length === 0) {
+        problems.push(`line '${line.id}' step ${stepIndex + 1} (${step.do} ${step.role} '${step.name}') has no expect of its own, so it covers nothing`);
+      }
+    }
+    const actions = actionRecords
+      .filter(({ expectations }) => expectations.length > 0)
+      .map(({ step }) => step);
     const exercisedByLine = new Set();
     for (const entry of entries) {
       if (!entry.tied) continue;
@@ -332,7 +356,7 @@ export function compareHandlers(entries, list) {
       } else if (entry.tied) {
         problems.push(`line '${line.id}' declares ${cover.prop} at ${cover.at}, which is tied to ${entry.element.role} '${entry.element.name}'; cover it with a step on that element instead`);
       } else if (actions.length === 0) {
-        problems.push(`line '${line.id}' declares ${cover.prop} at ${cover.at} but has no action step`);
+        problems.push(`line '${line.id}' declares ${cover.prop} at ${cover.at} but has no action step with its own expect`);
       } else {
         declaredEntries.add(entry);
         exercisedByLine.add(entry);

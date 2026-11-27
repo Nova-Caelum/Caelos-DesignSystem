@@ -136,6 +136,16 @@ function validateStep(step, context) {
   }
 }
 
+function ownExpectations(steps, actionIndex) {
+  const expectations = [];
+  for (let stepIndex = actionIndex + 1; stepIndex < steps.length; stepIndex += 1) {
+    const step = steps[stepIndex];
+    if (ACTION_STEPS.has(step.do)) break;
+    if (step.do === "expect") expectations.push({ step, stepIndex });
+  }
+  return expectations;
+}
+
 function validateList(value, file) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw refusal(`behaviour list '${file}' is not an object`, "make it conform to behaviours.schema.json");
@@ -207,6 +217,13 @@ function validateList(value, file) {
         "add an expect step that observes the action's result",
       );
     }
+    for (const [stepIndex, step] of line.steps.entries()) {
+      if (!ACTION_STEPS.has(step.do) || ownExpectations(line.steps, stepIndex).length > 0) continue;
+      throw refusal(
+        `${file} line ${lineIndex + 1} ('${line.id}') step ${stepIndex + 1} (${step.do} ${step.role} '${step.name}') has no expect step of its own before the next action`,
+        "add an expect step after it that observes that action's result",
+      );
+    }
   });
   return value;
 }
@@ -271,44 +288,42 @@ function failureDetails(error, step, stepIndex) {
 
 async function attemptLine(driver, line, attempt, route) {
   await driver.beginLine(line, attempt, { route });
-  const firstAction = line.steps.findIndex((step) => ACTION_STEPS.has(step.do));
-  let lastAction = -1;
-  for (let stepIndex = line.steps.length - 1; stepIndex >= 0; stepIndex -= 1) {
-    if (ACTION_STEPS.has(line.steps[stepIndex].do)) {
-      lastAction = stepIndex;
-      break;
-    }
-  }
-  const finalExpectations = lastAction < 0
-    ? []
-    : line.steps
-      .map((step, stepIndex) => ({ step, stepIndex }))
-      .filter(({ step, stepIndex }) => stepIndex > lastAction && step.do === "expect");
-  let heldBeforeAction = [];
+  let activeProof = null;
   for (let stepIndex = 0; stepIndex < line.steps.length; stepIndex += 1) {
     const step = line.steps[stepIndex];
     try {
-      if (stepIndex === firstAction) {
-        heldBeforeAction = await Promise.all(
-          finalExpectations.map(({ step: expectation }) => driver.holds(expectation)),
-        );
+      if (ACTION_STEPS.has(step.do)) {
+        const expectations = ownExpectations(line.steps, stepIndex);
+        activeProof = {
+          action: step,
+          actionIndex: stepIndex,
+          lastExpectationIndex: expectations.at(-1)?.stepIndex ?? -1,
+          heldBefore: await Promise.all(
+            expectations.map(({ step: expectation }) => driver.holds(expectation)),
+          ),
+        };
       }
       await driver.performStep(step, { line, stepIndex, attempt });
+      if (activeProof?.lastExpectationIndex === stepIndex) {
+        if (activeProof.heldBefore.length > 0 && activeProof.heldBefore.every(Boolean)) {
+          const action = activeProof.action;
+          return {
+            passed: false,
+            failure: failureDetails(
+              new Error(
+                `expected result already held before step ${activeProof.actionIndex + 1} (${action.do} ${action.role} '${action.name}'), so that action proves nothing`,
+              ),
+              step,
+              stepIndex,
+            ),
+          };
+        }
+        activeProof = null;
+      }
     } catch (error) {
       if (error?.operational) throw error;
       return { passed: false, failure: failureDetails(error, step, stepIndex) };
     }
-  }
-  if (heldBeforeAction.length > 0 && heldBeforeAction.every(Boolean)) {
-    const lastExpectation = finalExpectations.at(-1);
-    return {
-      passed: false,
-      failure: failureDetails(
-        new Error("expected result already held before the action, so the line proves nothing"),
-        lastExpectation.step,
-        lastExpectation.stepIndex,
-      ),
-    };
   }
   return { passed: true };
 }

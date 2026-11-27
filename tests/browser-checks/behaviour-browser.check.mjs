@@ -153,3 +153,23 @@ test("W6: a missing app route is an operational refusal", async () => {
   assert.equal(run.result.status, 2, `${run.result.stdout}\n${run.result.stderr}`);
   assert.match(run.result.stderr, /\/missing\//);
 });
+
+test("W7: a later live action cannot prove an earlier dead action", async () => {
+  const line = {
+    id: "dead-then-live",
+    kind: "action",
+    handler: "handlePass",
+    steps: [
+      { do: "click", role: "button", name: "Save draft" },
+      { do: "expect", role: "status", name: "Idle", expect: "visible" },
+      { do: "click", role: "button", name: "Pass action" },
+      { do: "expect", role: "status", name: "Passed", expect: "visible" },
+    ],
+  };
+  const screen = "export function S(){ const handleSave=()=>{}; const handlePass=()=>{}; return (<main><button onClick={handleSave}>Save draft</button><button onClick={handlePass}>Pass action</button></main>); }\n";
+
+  const run = await runBrowserCase("dead-then-live", [line], screen);
+
+  assert.equal(run.result.status, 1, `${run.result.stdout}\n${run.result.stderr}`);
+  assert.match(run.result.stdout, /already held before step 1/);
+});

@@ -20,6 +20,6 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser

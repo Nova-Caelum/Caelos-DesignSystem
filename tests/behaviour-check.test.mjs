@@ -436,3 +436,59 @@ test("L9: schema and fixture lists require routes", async () => {
     assert.equal(list.route, "/");
   }
 });
+
+test("N4: every action must have its own expect before the next action", async () => {
+  const screen = "export function S(){ const save=()=>{}; return (<main><button onClick={save}>Save draft</button><button onClick={save}>Save and close</button></main>); }\n";
+  const testCase = await writeBehaviourCase("action-own-expect", actionList([
+    {
+      id: "save-both",
+      kind: "action",
+      handler: "save",
+      steps: [
+        { do: "click", role: "button", name: "Save draft" },
+        { do: "click", role: "button", name: "Save and close" },
+        { do: "expect", role: "status", name: "Saved", expect: "visible" },
+      ],
+    },
+  ]), screen);
+  let errorText = "";
+
+  const exitCode = await runCli(cliArguments(testCase, "http://example.test/"), {
+    driverFactory: async () => new FakeDriver(),
+    io: { out() {}, error(value) { errorText += value; } },
+  });
+
+  assert.equal(exitCode, 2);
+  assert.match(errorText, /step 1/);
+  assert.match(errorText, /has no expect step of its own/);
+});
+
+test("N5: each action rejects an expected result that it did not cause", async () => {
+  const screen = "export function S(){ const handleX=()=>{}; const handleY=()=>{}; return (<main><button onClick={handleX}>X</button><button onClick={handleY}>Y</button></main>); }\n";
+  const testCase = await writeBehaviourCase("per-action-held", actionList([
+    {
+      id: "two-actions",
+      kind: "action",
+      handler: null,
+      steps: [
+        { do: "click", role: "button", name: "X" },
+        { do: "expect", role: "status", name: "P", expect: "visible" },
+        { do: "click", role: "button", name: "Y" },
+        { do: "expect", role: "status", name: "Q", expect: "visible" },
+      ],
+    },
+  ]), screen);
+
+  for (const [heldName, actionStep] of [["P", 1], ["Q", 3]]) {
+    const run = await runBehaviourCheck({
+      app: fixture,
+      behaviours: testCase.behaviours,
+      out: testCase.out,
+      unsteady: testCase.unsteady,
+      driver: new FakeDriver({}, { holds: (step) => step.name === heldName }),
+    });
+
+    assert.equal(run.exitCode, 1);
+    assert.match(run.message, new RegExp(`already held before step ${actionStep}`));
+  }
+});
