@@ -1,0 +1,16 @@
+{
+  "primitives": {
+    "shared": {
+      "surface": {
+        "fill": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        },
+        "reused-fill": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        }
+      }
+    }
+  }
+}

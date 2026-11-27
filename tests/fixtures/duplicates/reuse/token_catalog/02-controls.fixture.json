@@ -1,0 +1,13 @@
+{
+  "controls": {
+    "shared": {
+      "composed-surface": {
+        "$extensions": {
+          "app.caelos": {
+            "madeOf": ["primitives.shared.surface"]
+          }
+        }
+      }
+    }
+  }
+}
