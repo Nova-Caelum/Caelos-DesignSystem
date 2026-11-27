@@ -18,7 +18,7 @@ export function render({ className, componentName, name, parts, record }) {
   const states = record.states;
   const defaults = record.contents.map((label, index) => ({ id: `tab-${index + 1}`, label: String(label), content: String(label) }));
   return {
-    tsx: `import { useId, useRef, useState, type HTMLAttributes, type KeyboardEvent, type KeyboardEventHandler, type MouseEventHandler, type ReactNode } from 'react';
+    tsx: `import { useId, useRef, useState, type HTMLAttributes, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
 import { ${control.componentName} as Control } from './${control.componentName}';
 import './${componentName}.css';
 
@@ -30,8 +30,8 @@ export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChan
   active?: string;
   disabled?: boolean;
   onChange?: (id: string) => void;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+  onClick?: (event: MouseEvent<HTMLButtonElement>, id: string) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>, id: string) => void;
   state?: ${union(states)};
   variant?: ${union(variants)};
 };
@@ -100,13 +100,13 @@ export function ${componentName}({
       onKeyDown={handleKeyDown}
     >
       <div ref={tabListRef} data-entry=${quote(name)} data-layer=${quote(record.layerOrder[0])} role="tablist" aria-label={tabLabel}>
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isSelected = tab.id === selected?.id;
           return (
             <Control
               key={tab.id}
               id={\`\${baseId}-tab-\${tab.id}\`}
-              data-live-control={index === 0 ? '' : undefined}
+              data-live-control
               data-tab-id={tab.id}
               type="button"
               role="tab"
@@ -115,11 +115,11 @@ export function ${componentName}({
               disabled={disabled || tab.disabled}
               tabIndex={isSelected ? 0 : -1}
               onClick={(event) => {
-                if (disabled) return;
-                if (index === 0) onClick?.(event);
-                if (!event.defaultPrevented && !tab.disabled) select(tab.id);
+                if (disabled || tab.disabled) return;
+                onClick?.(event, tab.id);
+                if (!event.defaultPrevented) select(tab.id);
               }}
-              onKeyDown={index === 0 ? (event) => { if (!disabled) onKeyDown?.(event); } : undefined}
+              onKeyDown={(event) => { if (!disabled && !tab.disabled) onKeyDown?.(event, tab.id); }}
             >
               {tab.label}
             </Control>

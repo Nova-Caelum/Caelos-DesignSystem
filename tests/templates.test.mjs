@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { mkdtemp, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdtemp, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -84,6 +84,56 @@ export const markup = {
   return require(outfile).markup;
 }
 
+async function generateScratchCatalog() {
+  const recipes = await readJson("recipes.json.fixture");
+  const workspace = await mkdtemp(path.join(tmpdir(), "caelos-template-catalog-"));
+  const catalog = path.join(workspace, "token_catalog");
+  const out = path.join(workspace, "generated", "components");
+  await mkdir(catalog, { recursive: true });
+  for (const file of (await readdir(path.join(root, "token_catalog"))).filter((name) => name.endsWith(".tokens.json"))) {
+    await copyFile(path.join(root, "token_catalog", file), path.join(catalog, file));
+  }
+
+  const controlsFile = path.join(catalog, "02-controls.tokens.json");
+  const controls = JSON.parse(await readFile(controlsFile, "utf8"));
+  const paint = {
+    foreground: "{primitives.shared.typography.tone.default}",
+    fill: "{primitives.shared.surface.button.bed}",
+  };
+  for (const kind of ["button", "input"]) {
+    const recipe = recipes[kind];
+    const record = structuredClone(recipe.record);
+    for (const variant of Object.keys(record.statePaints)) {
+      for (const state of Object.keys(record.statePaints[variant])) record.statePaints[variant][state] = paint;
+    }
+    controls.controls.shared[recipe.name.split(".").at(-1)] = { $extensions: { "app.caelos": record } };
+  }
+  await writeFile(controlsFile, `${JSON.stringify(controls, null, 2)}\n`);
+
+  const overlaysFile = path.join(catalog, "03-overlays.tokens.json");
+  const overlays = JSON.parse(await readFile(overlaysFile, "utf8"));
+  overlays.controls ??= {};
+  overlays.controls.shared ??= {};
+  for (const kind of ["menu", "sheet", "tabs", "disclosure"]) {
+    const recipe = recipes[kind];
+    const node = { $extensions: { "app.caelos": structuredClone(recipe.record) } };
+    const key = recipe.name.split(".").at(-1);
+    if (kind === "tabs") overlays.controls.shared[key] = node;
+    else overlays.overlays.shared[key] = node;
+  }
+  await writeFile(overlaysFile, `${JSON.stringify(overlays, null, 2)}\n`);
+
+  const generation = spawnSync(process.execPath, [
+    path.join(root, "scripts", "generate-components.mjs"), "--catalog", catalog,
+    "--templates", templates, "--out", out, "--job", "tier-drift",
+  ], { encoding: "utf8" });
+  assert.equal(generation.status, 0, generation.stderr);
+  const response = JSON.parse(generation.stdout);
+  const expected = Object.values(recipes).map(({ name }) => name).sort();
+  assert.deepEqual(response.generated.filter((name) => expected.includes(name)).sort(), expected);
+  return { out, workspace };
+}
+
 test("clause 1: the recorded screen inventory covers every evidenced component kind and exact source line", async () => {
   const inventory = await readJson("screen-kinds.json.fixture");
   const source = (await readFile(path.join(fixtures, "screen-source.tsx.fixture"), "utf8")).split(/\r?\n/u);
@@ -117,13 +167,40 @@ test("clause 3: every Apply template renders server markup and every declared st
   assert.match(markup.tabs, /role="tablist"/u);
   assert.match(markup.tabs, /role="tab"[^>]*aria-selected="true"[^>]*aria-controls=/u);
   assert.match(markup.tabs, /role="tabpanel"[^>]*aria-labelledby=/u);
-  assert.match(markup.sheet, /role="dialog"[^>]*aria-modal="true"/u);
+  assert.match(markup.sheet, /<dialog[^>]*aria-labelledby=/u);
+  assert.doesNotMatch(markup.sheet, /aria-modal=/u);
+  assert.doesNotMatch(markup.sheet, /data-sheet-backdrop/u);
   assert.match(markup.sheet, /aria-labelledby=/u);
   assert.match(markup.disclosure, /aria-expanded="true"[^>]*aria-controls=/u);
   for (const kind of ["menu", "tabs", "sheet", "disclosure"]) {
     assert.match(markup[kind], /data-live-control=/u, `${kind} did not mark its primary control`);
     assert.doesNotMatch(markup[kind].match(/^<div[^>]*>/u)?.[0] ?? "", /tabindex=/u, `${kind} root remains a tab stop`);
   }
+  assert.equal(markup.tabs.match(/data-live-control=/gu)?.length, 2, "every rendered tab is a live control");
+});
+
+test("clause 3: generated sheet source uses the native modal dialog lifecycle", async () => {
+  const { outputByKind } = await generateFixtures();
+  const sheet = outputByKind.get("sheet");
+  assert.match(sheet.tsx, /dialog\.showModal\(\)/u);
+  assert.match(sheet.tsx, /dialog\.close\(\)/u);
+  assert.match(sheet.tsx, /onCancel=/u);
+  assert.doesNotMatch(sheet.tsx, /data-sheet-backdrop|aria-modal/u);
+  assert.doesNotMatch(sheet.css, /\binset\s*:|\bz-index\s*:/u);
+});
+
+test("clause 3: every generated kind passes tier drift and a raw sheet inset mutation fails", async () => {
+  const { out, workspace } = await generateScratchCatalog();
+  const checker = path.join(root, "scripts", "check-tier-drift.cjs");
+  const green = spawnSync(process.execPath, [checker, workspace], { encoding: "utf8" });
+  assert.equal(green.status, 0, `${green.stdout}${green.stderr}`);
+
+  const sheetCss = path.join(out, "FixtureSheet.css");
+  const mutation = [".", "mutation", " { ", "inset", ": ", String(0), "; }", "\n"].join("");
+  await writeFile(sheetCss, `${await readFile(sheetCss, "utf8")}\n${mutation}`);
+  const red = spawnSync(process.execPath, [checker, workspace], { encoding: "utf8" });
+  assert.equal(red.status, 1, "the raw zero inset mutation must fail tier drift");
+  assert.match(`${red.stdout}${red.stderr}`, /FixtureSheet\.css.*raw style value/u);
 });
 
 test("attack: a menu recipe with no contents is refused by the real generator", async () => {

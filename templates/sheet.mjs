@@ -59,6 +59,7 @@ export function ${componentName}({
   const [localOpen, setLocalOpen] = useState(defaultOpen);
   const open = controlledOpen ?? localOpen;
   const rootRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const wasOpen = useRef(open);
   const heading = title ?? ${quote(name)};
   const label = triggerLabel ?? (typeof children === 'string' ? children : ${quote(name)});
@@ -70,21 +71,23 @@ export function ${componentName}({
     onOpenChange?.(value);
   };
   useEffect(() => {
-    if (open) rootRef.current?.querySelector<HTMLButtonElement>('[data-sheet-close]')?.focus();
-    if (!open && wasOpen.current) requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[data-sheet-trigger]')?.focus());
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open) {
+      if (!dialog.open) dialog.showModal();
+      dialog.querySelector<HTMLButtonElement>('[data-sheet-close]')?.focus();
+    } else {
+      if (dialog.open) dialog.close();
+      if (wasOpen.current) requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[data-sheet-trigger]')?.focus());
+    }
     wasOpen.current = open;
   }, [open]);
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
     if (event.defaultPrevented) return;
     if (!open) return;
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
-      return;
-    }
     if (event.key !== 'Tab') return;
-    const dialog = rootRef.current?.querySelector<HTMLElement>('[role="dialog"]');
+    const dialog = dialogRef.current;
     const focusable = Array.from(dialog?.querySelectorAll<HTMLElement>(focusableSelector) ?? []);
     if (focusable.length === 0) {
       event.preventDefault();
@@ -131,26 +134,31 @@ export function ${componentName}({
           {label}
         </Control>
       </div>
-      {open && (
-        <div
-          data-sheet-backdrop
-          onPointerDown={(event) => {
-            if (event.target !== event.currentTarget) return;
-            event.stopPropagation();
-            setOpen(false);
-          }}
-        >
-          <div data-entry=${quote(name)} data-layer=${quote(record.layerOrder[1])} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
-            <h2 data-entry=${quote(name)} id={titleId}>{heading}</h2>
-            <Control data-sheet-close type="button" aria-label={\`Close \${heading}\`} onClick={() => setOpen(false)}>Close</Control>
-            {contents ?? children}
-          </div>
-        </div>
-      )}
+      <dialog
+        ref={dialogRef}
+        data-entry=${quote(name)}
+        data-layer=${quote(record.layerOrder[1])}
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onCancel={(event) => {
+          event.preventDefault();
+          setOpen(false);
+        }}
+        onPointerDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+        }}
+      >
+        <h2 data-entry=${quote(name)} id={titleId}>{heading}</h2>
+        <Control data-sheet-close type="button" aria-label={\`Close \${heading}\`} onClick={() => setOpen(false)}>Close</Control>
+        {contents ?? children}
+      </dialog>
     </div>
   );
 }
 `,
-    css: `.${className} > [data-sheet-backdrop] {\n  position: fixed;\n  inset: 0;\n}\n\n/* ${name} is a tier 3 shell; its generated control part owns hover and focus paint. */\n`,
+    css: `/* ${name} uses the native modal top layer; its generated control part owns hover and focus paint. */\n`,
   };
 }
