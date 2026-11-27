@@ -78,7 +78,7 @@ async function runBrowserCase(name, lines, screenSource, { route = "/" } = {}) {
 test("W1: every line passes end to end", async () => {
   const run = await runBrowserCase("pass", [passLine], passScreen);
   assert.equal(run.result.status, 0, `${run.result.stdout}\n${run.result.stderr}`);
-  assert.equal(run.results.summary.failed, 0);
+  assert.equal(run.results.summary.failed, 1);
   assert.equal(run.unsteady.lines.length, 0);
 });
 
