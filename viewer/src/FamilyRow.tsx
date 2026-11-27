@@ -3,7 +3,7 @@ import { StateCard } from './StateCard';
 
 export function FamilyRow({ family, components }: { family: CatalogFamily; components: ComponentCatalog }) {
   return (
-    <section className="family-row" data-family={family.path}>
+    <section className="family-row" data-family={family.path} data-states={JSON.stringify(family.states)}>
       <div className="family-identity">
         <p className="eyebrow">Identity</p>
         <h3>{family.title}</h3>
