@@ -301,7 +301,20 @@
               "light",
               "reduced-motion",
               "reduced-transparency"
+            ],
+            "kind": "card",
+            "madeOf": [
+              "primitives.shared.surface"
             ]
+          }
+        },
+        "ink": {
+          "$type": "color",
+          "$value": "{sys.color.text-primary}",
+          "$extensions": {
+            "app.caelos": {
+              "lifecycle": "promoted"
+            }
           }
         }
       },

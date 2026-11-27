@@ -1,8 +1,1 @@
-{
-  "color": { "tokenTypes": ["color"], "pathFamilies": ["color", "colour"] },
-  "type": { "tokenTypes": ["fontFamily", "fontWeight", "typography"], "pathFamilies": ["type", "typography"] },
-  "radius": { "tokenTypes": [], "pathFamilies": ["radius"] },
-  "border": { "tokenTypes": ["border"], "pathFamilies": ["border"] },
-  "opacity": { "tokenTypes": [], "pathFamilies": ["opacity"] },
-  "blur": { "tokenTypes": [], "pathFamilies": ["blur"] }
-}
+{ "color": { "tokenTypes": [], "pathFamilies": [] } }
