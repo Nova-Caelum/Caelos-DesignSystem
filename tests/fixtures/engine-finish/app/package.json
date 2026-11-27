@@ -1,0 +1,6 @@
+{
+  "name": "fixture-app",
+  "dependencies": {
+    "@caelos/design-system": "git+https://example.invalid/design-system.git#old-commit"
+  }
+}

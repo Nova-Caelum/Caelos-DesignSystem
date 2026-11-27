@@ -1,0 +1,10 @@
+{
+  "seq": 1,
+  "kind": "node.enter",
+  "run_id": "fixture-run",
+  "node": "craft",
+  "ts": "2026-11-26T09:00:00.000Z",
+  "step": "craft",
+  "model": "Opus",
+  "model_source": "run-setting"
+}

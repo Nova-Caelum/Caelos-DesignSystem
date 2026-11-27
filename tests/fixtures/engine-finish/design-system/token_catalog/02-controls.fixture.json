@@ -1,0 +1,14 @@
+{
+  "controls": {
+    "button": {
+      "$value": "4px",
+      "$extensions": {
+        "app.caelos": {
+          "lifecycle": "draft",
+          "draftedBy": "job-apply",
+          "gapFill": "reference"
+        }
+      }
+    }
+  }
+}

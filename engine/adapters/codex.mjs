@@ -9,11 +9,12 @@ import {
 
 const maxBuffer = 64 * 1024 * 1024;
 
-export function buildCodexCommand({ command = 'codex', checkout, lastMessageFile, prompt }) {
+export function buildCodexCommand({ command = 'codex', checkout, lastMessageFile, model, prompt }) {
   return {
     command,
     args: [
       'exec',
+      '--model', model,
       '--sandbox', 'workspace-write',
       '--ephemeral',
       '--json',
@@ -61,8 +62,9 @@ function promptFor(step, instructions, checkout, jobFolder) {
 
 export function runCodexStep(options) {
   const {
-    gitRoot, baseCommit, jobFolder, step, command = 'codex',
+    gitRoot, baseCommit, jobFolder, step, model, command = 'codex',
   } = options;
+  if (typeof model !== 'string' || !model.trim()) throw new Error(`model step ${step.step} requires a run model setting`);
   const env = spawnEnvironment(options);
   const jobFilesBefore = snapshotFileList(jobFolder);
   assertCodexAvailable({ command, env });
@@ -89,6 +91,7 @@ export function runCodexStep(options) {
       command,
       checkout,
       lastMessageFile: path.join(container, 'last-message.txt'),
+      model,
       prompt: promptFor(step, instructions, checkout, jobFolder),
     });
     const result = spawnSync(built.command, built.args, {
@@ -119,6 +122,6 @@ export function runCodexStep(options) {
       const destination = outputDestination(jobFolder, step.outputs[index]);
       copyFileSync(outputFiles[index], destination);
     }
-    return { outputs: [...step.outputs] };
+    return { outputs: [...step.outputs], model };
   });
 }
