@@ -1,0 +1,42 @@
+{
+  "entries": {
+    "controls.shared.Button": {
+      "states": ["default", "hover", "pressed", "success", "focus", "disabled"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } },
+        { "state": "hover", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } },
+        { "state": "pressed", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } },
+        { "state": "success", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } },
+        { "state": "focus", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } },
+        { "state": "disabled", "shown": true, "live": { "name": "controls.shared.Button", "click": true, "key": true } }
+      ]
+    },
+    "controls.shared.NoCards": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": []
+    },
+    "controls.shared.Dead": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true, "live": { "name": "controls.shared.Dead", "click": true, "key": false } }
+      ]
+    },
+    "controls.shared.Nameless": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true, "live": { "name": "", "click": true, "key": true } }
+      ]
+    },
+    "controls.shared.NoLive": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true }
+      ]
+    }
+  }
+}
