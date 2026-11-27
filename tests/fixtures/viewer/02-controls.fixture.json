@@ -1,0 +1,235 @@
+{
+  "controls": {
+    "$extensions": {
+      "app.caelos": {
+        "sharedConstruction": {
+          "parameters": {
+            "font-size": { "14px": "{primitives.shared.typography.size.label}" },
+            "line-height": { "20px": "{primitives.shared.typography.line.label}" },
+            "font-family": { "ui": "{primitives.shared.typography.family.ui}" },
+            "font-weight": { "500": "{base.type.weight.medium}" },
+            "spacing": {
+              "15px": "{base.space.px-15}",
+              "8px": "{base.space.px-8}",
+              "compact": "{base.space.px-8}"
+            },
+            "height": {
+              "44px": "{base.size.px-44}",
+              "42px": "{base.size.px-42}",
+              "control": "{base.size.px-44}"
+            },
+            "radius": {
+              "12px": "{base.radius.md}",
+              "control": "{base.radius.md}"
+            }
+          },
+          "paints": {
+            "accent-rest": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.default}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "accent-engaged": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "accent-pressed": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.pressed}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "accent-success": {
+              "fill": "{primitives.shared.surface.button.bed}",
+              "tintInk": "{primitives.shared.surface.button.success}",
+              "tintOpacity": "{primitives.shared.surface.button.tint}",
+              "foreground": "{primitives.shared.typography.tone.default}"
+            },
+            "surface-disabled": {
+              "fill": "{primitives.shared.surface.button.disabled-bed}",
+              "foreground": "{primitives.shared.typography.tone.dim}"
+            },
+            "cloud-rest": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{primitives.shared.typography.tone.default}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-start}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+            },
+            "cloud-engaged": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-start}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-start-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{primitives.shared.recipes-focus.glow-opacity}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "glass-pressed": {
+              "fill": "{primitives.shared.glass.body}",
+              "fillOpacity": "{primitives.shared.glass.base-alpha}",
+              "tintInk": "{primitives.shared.glass.tint-ink}",
+              "tintOpacity": "{primitives.shared.glass.tint}",
+              "falloffAt": "{primitives.shared.glass.falloff-at}",
+              "falloffStrength": "{primitives.shared.glass.falloff-strength}",
+              "blur": "{primitives.shared.glass.blur}",
+              "saturation": "{primitives.shared.glass.saturation}",
+              "overlapClear": "{primitives.shared.glass.overlap-clear}",
+              "overlapCovered": "{primitives.shared.glass.overlap-covered}",
+              "saturationNeutral": "{primitives.shared.glass.saturation-neutral}",
+              "foreground": "{sys.color.ready}"
+            },
+            "cloud-success": {
+              "fill": "{primitives.shared.cloud.body}",
+              "fillOpacity": "{primitives.shared.cloud.body-alpha}",
+              "foreground": "{sys.color.success}",
+              "angle": "{primitives.shared.cloud.angle}",
+              "washStart": "{primitives.shared.cloud.wash-end}",
+              "washEnd": "{primitives.shared.cloud.wash-end}",
+              "washStartAlpha": "{primitives.shared.cloud.wash-end-alpha}",
+              "washEndAlpha": "{primitives.shared.cloud.wash-end-alpha}"
+            },
+            "ink-rest": { "foreground": "{primitives.shared.typography.tone.default}" },
+            "ink-engaged": {
+              "foreground": "{primitives.shared.recipes-focus.foreground}",
+              "glowInk": "{primitives.shared.recipes-focus.glow-ink}",
+              "glowBlur": "{primitives.shared.recipes-focus.glow-blur}",
+              "glowOpacity": "{base.opacity.fraction-0-5}",
+              "glowOffset": "{primitives.shared.surface.button.glow-offset}"
+            },
+            "ink-pressed": { "foreground": "{sys.color.ready}" },
+            "ink-success": { "foreground": "{sys.color.success}" },
+            "ink-disabled": { "foreground": "{primitives.shared.typography.tone.dim}" }
+          }
+        }
+      }
+    },
+    "shared": {
+      "Button": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "recipeInStaging": true,
+            "kind": "button",
+            "layerOrder": ["label"],
+            "variants": { "variant": ["primary", "tonal", "text"] },
+            "defaultVariants": { "variant": "tonal" },
+            "states": ["default", "hover", "pressed", "success", "focus", "disabled"],
+            "construction": {
+              "type-size": "font-size/14px",
+              "type-line": "line-height/20px",
+              "type-family": "font-family/ui",
+              "type-weight": "font-weight/500",
+              "pad-x": "spacing/15px",
+              "pad-y": "spacing/8px",
+              "gap": "spacing/compact",
+              "height": "height/control",
+              "radius": "radius/control",
+              "press-height": "height/42px"
+            },
+            "statePaints": {
+              "primary": { "default": "accent-rest", "hover": "accent-engaged", "pressed": "accent-pressed", "success": "accent-success", "focus": "accent-engaged", "disabled": "surface-disabled" },
+              "tonal": { "default": "cloud-rest", "hover": "cloud-engaged", "pressed": "glass-pressed", "success": "cloud-success", "focus": "cloud-engaged", "disabled": "surface-disabled" },
+              "text": { "default": "ink-rest", "hover": "ink-engaged", "pressed": "ink-pressed", "success": "ink-success", "focus": "ink-engaged", "disabled": "ink-disabled" }
+            }
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.default}"
+        },
+        "focus-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.foreground}"
+        },
+        "disabled-foreground": {
+          "$type": "color",
+          "$value": "{primitives.shared.typography.tone.dim}"
+        },
+        "tint": {
+          "$type": "number",
+          "$value": "{primitives.shared.surface.button.tint}"
+        },
+        "bed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.bed}"
+        },
+        "default": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.default}"
+        },
+        "hover": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.hover}"
+        },
+        "pressed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.pressed}"
+        },
+        "success": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.success}"
+        },
+        "focus-glow-blur": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.recipes-focus.glow-blur}"
+        },
+        "focus-glow-ink": {
+          "$type": "color",
+          "$value": "{primitives.shared.recipes-focus.glow-ink}"
+        },
+        "focus-glow-opacity": {
+          "$type": "number",
+          "$value": "{primitives.shared.recipes-focus.glow-opacity}"
+        },
+        "glow-offset": {
+          "$type": "dimension",
+          "$value": "{primitives.shared.surface.button.glow-offset}"
+        },
+        "disabled-bed": {
+          "$type": "color",
+          "$value": "{primitives.shared.surface.button.disabled-bed}"
+        }
+      },
+      "chip": {
+        "$extensions": {
+          "app.caelos": {
+            "construction": {},
+            "statePaints": {}
+          }
+        }
+      },
+      "badge": {
+        "$extensions": {
+          "app.caelos": {
+            "construction": {}
+          }
+        }
+      },
+      "MissingLayer": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "status": "promoted",
+            "draftedAt": "2026-11-01T00:00:00.000Z",
+            "recipeInStaging": true,
+            "kind": "button"
+          }
+        }
+      }
+    }
+  }
+}
