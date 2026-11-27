@@ -249,3 +249,43 @@ export const FamilyPaintPage = () => (
   for (const property of attributes) assert.match(output, new RegExp(property));
   assert.match(output, /src\/pages\/FamilyPaintPage\.tsx/);
 });
+
+test('(s) the paint pass scans configured pages even when the app scan excludes them', () => {
+  const root = materialize();
+  removeClassPaintPage(root);
+  const paintToken = readFileSync(path.join(root, 'src', 'pages', 'PaintedPage.tsx'), 'utf8').match(/--[\w-]+/u)?.[0];
+  assert.ok(paintToken);
+  const configPath = path.join(root, 'design-system-enforcer-gate.config.json');
+  const config = JSON.parse(readFileSync(configPath, 'utf8'));
+  config.scan.exclude = ['src/pages/**'];
+  writeFileSync(configPath, JSON.stringify(config));
+
+  const proc = invoke(root);
+  const output = `${proc.stdout}\n${proc.stderr}`;
+  assert.equal(proc.status, 1, output);
+  assert.match(output, /src\/pages\/PaintedPage\.tsx/);
+  assert.match(output, new RegExp(paintToken));
+});
+
+test('(t) every page exemption attribute is listed without failing the report-only policy', () => {
+  const root = materialize();
+  const paintToken = readFileSync(path.join(root, 'src', 'pages', 'PaintedPage.tsx'), 'utf8').match(/--[\w-]+/u)?.[0];
+  assert.ok(paintToken);
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  writeFileSync(path.join(root, 'src', 'pages', 'ExemptPage.tsx'), `
+export function ExemptPage() {
+  return <main>
+    <i data-ui-exempt="legacy paint" style={{ backgroundColor: "var(${paintToken})" }} />
+    <b data-kit-exempt="migration marker" />
+  </main>;
+}
+`);
+
+  const proc = invoke(root);
+  const output = `${proc.stdout}\n${proc.stderr}`;
+  assert.equal(proc.status, 0, output);
+  assert.match(output, /src\/pages\/ExemptPage\.tsx/);
+  assert.match(output, /data-ui-exempt[^\n]*legacy paint|legacy paint[^\n]*data-ui-exempt/u);
+  assert.match(output, /data-kit-exempt[^\n]*migration marker|migration marker[^\n]*data-kit-exempt/u);
+});

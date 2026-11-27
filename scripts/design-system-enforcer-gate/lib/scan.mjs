@@ -259,6 +259,8 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
       const ex = exemptAttr(el);
       if (ex) {
         st.ranges.push({ from: el.idx, to: el.openEnd, reason: (ex.value ?? "").trim() });
+        if (cfg.pagePaint) add("page-paint-exemption", ex.start ?? el.idx,
+          `${ex.name} on <${el.tag}> is listed for review`, "info");
       }
     }
     const lc = (el) => el.tag.toLowerCase();
