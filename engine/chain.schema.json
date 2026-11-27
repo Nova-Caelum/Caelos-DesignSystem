@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Caelos engine script chain",
+  "title": "Caelos engine chain",
   "type": "object",
   "required": ["chain", "steps"],
   "additionalProperties": false,
@@ -19,20 +19,40 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["step", "kind", "script", "inputs", "outputs", "check"],
+        "required": ["step", "kind", "inputs", "outputs", "check"],
         "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": { "kind": { "const": "script" } },
+            "required": ["script"]
+          },
+          {
+            "properties": { "kind": { "const": "model" } },
+            "required": ["instructions", "schema"]
+          }
+        ],
         "properties": {
           "step": {
             "type": "string",
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
           },
           "kind": {
-            "const": "script"
+            "enum": ["script", "model"]
           },
           "script": {
             "type": "string",
             "minLength": 5,
             "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.mjs$"
+          },
+          "instructions": {
+            "type": "string",
+            "minLength": 4,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.md$"
+          },
+          "schema": {
+            "type": "string",
+            "minLength": 6,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.json$"
           },
           "inputs": {
             "type": "array",

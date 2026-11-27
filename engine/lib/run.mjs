@@ -6,6 +6,7 @@ import {
   materializeChain, readChainSnapshot, readJob, repositoryRoot, resolveScript,
 } from './chain.mjs';
 import { createEventWriter, finishedSteps, readEvents } from './events.mjs';
+import { assertCodexAvailable, runCodexStep } from '../adapters/codex.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 
@@ -43,9 +44,19 @@ export function executeStep(name, folder) {
       throw new Error(`step ${name} is missing input ${input}; fix the job input and try again`);
     }
   }
-  const script = resolveScript(row.script);
-  if (!existsSync(script)) throw new Error(`step ${name} script ${row.script} does not exist; restore it and try again`);
-  runProcess(process.execPath, [script, name, '--job', jobFolder], `step ${name}`);
+  if (row.kind === 'model') {
+    runCodexStep({
+      gitRoot: repositoryRoot,
+      baseCommit: chain.commit,
+      jobFolder,
+      step: row,
+      command: process.env.CAELOS_CODEX_COMMAND || 'codex',
+    });
+  } else {
+    const script = resolveScript(row.script);
+    if (!existsSync(script)) throw new Error(`step ${name} script ${row.script} does not exist; restore it and try again`);
+    runProcess(process.execPath, [script, name, '--job', jobFolder], `step ${name}`);
+  }
   for (const output of row.outputs) {
     if (!existsSync(jobFile(jobFolder, output))) {
       throw new Error(`step ${name} did not write ${output}; fix the script and try again`);
@@ -74,6 +85,10 @@ export function runJob(folder) {
   const previous = readEvents(jobFolder);
   const start = resumeIndex(chain, previous);
   if (start >= chain.steps.length) return { complete: true, resumed: true };
+
+  if (chain.steps.slice(start).some(({ kind }) => kind === 'model')) {
+    assertCodexAvailable({ command: process.env.CAELOS_CODEX_COMMAND || 'codex' });
+  }
 
   const events = createEventWriter(jobFolder, previous);
   events.emit(previous.length ? 'run.resume' : 'run.start', null);
