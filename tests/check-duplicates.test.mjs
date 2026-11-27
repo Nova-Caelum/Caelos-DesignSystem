@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import {
-  cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync,
+  cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -54,11 +54,35 @@ function snapshot(cwd) {
 function baseArgs(work, extra = []) {
   return [
     '--lock', work.lock,
-    '--candidate', work.cwd,
     '--base', 'HEAD',
     '--git-root', work.cwd,
     ...extra,
   ];
+}
+
+function forgedCandidateWorkspace(t) {
+  const work = materializedLiveCatalog(t);
+  mkdirSync(path.join(work.cwd, 'scripts'), { recursive: true });
+  mkdirSync(path.join(work.cwd, 'src/tier-2'), { recursive: true });
+  for (const file of ['build-lock.mjs', 'check-duplicates.mjs', 'check-recipes.mjs']) {
+    cpSync(path.join(root, 'scripts', file), path.join(work.cwd, 'scripts', file));
+  }
+  cpSync(
+    path.join(root, 'src/tier-2/control-catalog.mjs'),
+    path.join(work.cwd, 'src/tier-2/control-catalog.mjs'),
+  );
+  writeFileSync(path.join(work.cwd, 'scripts/pass.mjs'), 'process.exitCode = 0;\n');
+  writeFileSync(path.join(work.cwd, 'package.json'), `${JSON.stringify({
+    private: true,
+    scripts: {
+      'check:catalog': 'node scripts/check-recipes.mjs --catalog scripts/pass.mjs check:duplicates --',
+      'check:duplicates': 'node scripts/check-duplicates.mjs',
+    },
+  }, null, 2)}\n`);
+  const built = buildReuse(work);
+  assert.equal(built.status, 0, built.stderr);
+  snapshot(work.cwd);
+  return work;
 }
 
 function fixture(name) {
@@ -158,6 +182,35 @@ test('(g) two leaf tokens with the same fingerprint are not reported', (t) => {
   assert.equal(entries['primitives.shared.surface.fill'].fingerprint, entries['primitives.shared.surface.reused-fill'].fingerprint);
   const result = run(baseArgs(work), work.cwd);
   assert.equal(result.status, 0, result.stderr);
+});
+
+test('a forged candidate lock is ignored and the duplicate is refused', (t) => {
+  const work = forgedCandidateWorkspace(t);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (data) => {
+    const link = data.controls.shared.Link;
+    link.$extensions['app.caelos'].kind = 'link';
+    link.auditMarker = { $type: 'dimension', $value: '{base.space.px-4}' };
+    data.controls.shared.Link2 = structuredClone(link);
+  });
+  assert.equal(buildReuse(work).status, 0);
+  updateJson(work.lock, (document) => {
+    const forged = document.entries['controls.shared.Link2'];
+    forged.fingerprint = 'a'.repeat(64);
+    forged.contentFingerprint = 'b'.repeat(64);
+    delete forged.empty;
+    delete forged.emptyVariants;
+    for (const name of Object.keys(forged.variants)) forged.variants[name] = 'c'.repeat(64);
+    for (const name of Object.keys(forged.variantContentFingerprints)) {
+      forged.variantContentFingerprints[name] = 'd'.repeat(64);
+    }
+  });
+  const result = spawnSync('npm', [
+    'run', 'check:catalog', '--', '--candidate', work.cwd, '--base', 'HEAD', '--git-root', work.cwd,
+  ], { cwd: work.cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  const output = `${result.stdout}\n${result.stderr}`;
+  assert.equal(result.status, 1, output);
+  assert.match(output, /controls\.shared\.Link\b/u);
+  assert.match(output, /controls\.shared\.Link2\b/u);
 });
 
 test('(a) a rebuilt entry with a different inventory name is refused, naming both entries', (t) => {
