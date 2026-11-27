@@ -27,13 +27,15 @@ function output(result) {
 }
 
 // The candidate is a plain-file copy of this tree, as the CI job exports it. A copy, not
-// `git archive HEAD`, so the test also runs where the repository has no commit yet.
+// `git archive HEAD`, so the test also runs where the repository has no commit yet (or no
+// Git directory at all, as in the pre-commit snapshot). Ignored build output stays out.
 function unpackCandidate(folder) {
   const candidate = path.join(folder, 'candidate');
   const skipped = new Set(['.git', 'node_modules']);
+  const ignored = new Set([path.join(repository, 'viewer', 'dist')]);
   cpSync(repository, candidate, {
     recursive: true,
-    filter: (source) => !skipped.has(path.basename(source)),
+    filter: (source) => !skipped.has(path.basename(source)) && !ignored.has(path.resolve(source)),
   });
   return candidate;
 }

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import {
-  chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync,
-  writeFileSync,
+  chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, renameSync, rmSync,
+  symlinkSync, writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -11,6 +11,7 @@ import test from 'node:test';
 import {
   buildCodexCommand, runCodexStep,
 } from '../engine/adapters/codex.mjs';
+import { withDetachedCheckout } from '../engine/lib/clean-run.mjs';
 
 const repository = fileURLToPath(new URL('..', import.meta.url));
 const cli = path.join(repository, 'engine', 'cli.mjs');
@@ -79,6 +80,83 @@ test('a step that commits is refused, naming the commit', (t) => {
   assert.equal(existsSync(path.join(work.jobFolder, 'result.json')), false);
 });
 
+test('a schema rewrite hidden with assume-unchanged is refused', (t) => {
+  const work = makeRepository(t);
+  assert.throws(
+    () => runCodexStep(stepOptions(work, 'schema-assume-unchanged')),
+    /answer/,
+  );
+  assert.equal(existsSync(path.join(work.jobFolder, 'result.json')), false);
+});
+
+test('a schema rewrite hidden with skip-worktree is refused', (t) => {
+  const work = makeRepository(t);
+  assert.throws(
+    () => runCodexStep(stepOptions(work, 'schema-skip-worktree')),
+    /answer/,
+  );
+  assert.equal(existsSync(path.join(work.jobFolder, 'result.json')), false);
+});
+
+test('a HEAD moved back to an ancestor is refused, naming both commits', (t) => {
+  const work = makeRepository(t);
+  const ancestor = work.baseCommit;
+  writeFileSync(path.join(work.gitRoot, 'base-marker.txt'), 'new base\n');
+  command(work.gitRoot, ['git', 'add', 'base-marker.txt']);
+  command(work.gitRoot, [
+    'git', '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-q', '-m', 'new base',
+  ]);
+  work.baseCommit = command(work.gitRoot, ['git', 'rev-parse', 'HEAD']);
+
+  assert.throws(() => runCodexStep(stepOptions(work, 'head-ancestor')), (error) => {
+    assert.match(error.message, /HEAD/i);
+    assert.match(error.message, new RegExp(work.baseCommit));
+    assert.match(error.message, new RegExp(ancestor));
+    return true;
+  });
+});
+
+test('a gitignored extra file is refused, naming it', (t) => {
+  const work = makeRepository(t);
+  writeFileSync(path.join(work.gitRoot, '.gitignore'), '*.log\n');
+  command(work.gitRoot, ['git', 'add', '.gitignore']);
+  command(work.gitRoot, [
+    'git', '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit', '-q', '-m', 'ignore logs',
+  ]);
+  work.baseCommit = command(work.gitRoot, ['git', 'rev-parse', 'HEAD']);
+  assert.throws(() => runCodexStep(stepOptions(work, 'ignored-extra')), /debug\.log/);
+});
+
+test('a second declared output that fails its schema is refused', (t) => {
+  const work = makeRepository(t);
+  const options = stepOptions(work, 'second-invalid');
+  options.step.outputs = ['result.json', 'second.json'];
+  assert.throws(() => runCodexStep(options), /second\.json.*answer/);
+  assert.equal(existsSync(path.join(work.jobFolder, 'result.json')), false);
+  assert.equal(existsSync(path.join(work.jobFolder, 'second.json')), false);
+});
+
+test('a file forged into the job folder is refused, naming it', (t) => {
+  const work = makeRepository(t);
+  const options = stepOptions(work, 'forge-job');
+  options.env.ENGINE_STUB_JOB = work.jobFolder;
+  assert.throws(() => runCodexStep(options), /forged\.json/);
+});
+
+test('the checkout is detached at the base', (t) => {
+  const work = makeRepository(t);
+  const log = path.join(work.root, 'head.json');
+  const options = stepOptions(work, 'head-state');
+  options.env.ENGINE_STUB_HEAD_LOG = log;
+  runCodexStep(options);
+  assert.deepEqual(JSON.parse(readFileSync(log, 'utf8')), {
+    detached: true,
+    head: work.baseCommit,
+  });
+});
+
 test('a missing harness is refused before any step runs, naming the command', (t) => {
   const folder = mkdtempSync(path.join(tmpdir(), 'engine-adapter-missing-'));
   t.after(() => rmSync(folder, { recursive: true, force: true }));
@@ -124,6 +202,16 @@ test('a valid step passes and only its declared outputs come back', (t) => {
   );
 });
 
+test('a valid step passes while the source repository HEAD is ahead of the base', (t) => {
+  const work = makeRepository(t);
+  writeFileSync(path.join(work.gitRoot, 'later.txt'), 'a later commit\n');
+  command(work.gitRoot, ['git', 'add', 'later.txt']);
+  command(work.gitRoot, ['git', '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-q', '-m', 'later']);
+  const result = runCodexStep(stepOptions(work, 'valid'));
+  assert.deepEqual(result.outputs, ['result.json']);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(work.jobFolder, 'result.json'), 'utf8')), { answer: 'ok' });
+});
+
 test('the built Codex command contains no banned flag or environment override', () => {
   const built = buildCodexCommand({
     command: 'codex', checkout: '/checkout', lastMessageFile: '/last-message', prompt: 'prompt',
@@ -132,6 +220,56 @@ test('the built Codex command contains no banned flag or environment override', 
   for (const banned of [
     '--dangerously-bypass-approvals-and-sandbox', 'model_reasoning_effort=ultra', 'CODEX_HOME',
   ]) assert.doesNotMatch(rendered, new RegExp(banned.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+});
+
+test('CODEX_HOME is stripped from inherited spawn env and kept when explicitly supplied', (t) => {
+  const work = makeRepository(t);
+  const inheritedLog = path.join(work.root, 'inherited-env.json');
+  const explicitLog = path.join(work.root, 'explicit-env.json');
+  const oldCodexHome = process.env.CODEX_HOME;
+  const oldAction = process.env.ENGINE_STUB_ACTION;
+  const oldLog = process.env.ENGINE_STUB_ENV_LOG;
+  process.env.CODEX_HOME = path.join(work.root, 'inherited-home');
+  process.env.ENGINE_STUB_ACTION = 'valid';
+  process.env.ENGINE_STUB_ENV_LOG = inheritedLog;
+  t.after(() => {
+    if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
+    else process.env.CODEX_HOME = oldCodexHome;
+    if (oldAction === undefined) delete process.env.ENGINE_STUB_ACTION;
+    else process.env.ENGINE_STUB_ACTION = oldAction;
+    if (oldLog === undefined) delete process.env.ENGINE_STUB_ENV_LOG;
+    else process.env.ENGINE_STUB_ENV_LOG = oldLog;
+  });
+
+  const inherited = stepOptions(work, 'valid');
+  delete inherited.env;
+  runCodexStep(inherited);
+  assert.deepEqual(JSON.parse(readFileSync(inheritedLog, 'utf8')), { hasCodexHome: false });
+
+  rmSync(path.join(work.jobFolder, 'result.json'));
+  const explicit = stepOptions(work, 'valid');
+  explicit.env.CODEX_HOME = path.join(work.root, 'explicit-home');
+  explicit.env.ENGINE_STUB_ENV_LOG = explicitLog;
+  runCodexStep(explicit);
+  assert.deepEqual(JSON.parse(readFileSync(explicitLog, 'utf8')), {
+    hasCodexHome: true,
+    codexHome: explicit.env.CODEX_HOME,
+  });
+});
+
+test('cleanup keeps the original error when worktree removal also fails', (t) => {
+  const work = makeRepository(t);
+  const hiddenGit = path.join(work.gitRoot, '.git-hidden');
+  try {
+    assert.throws(() => withDetachedCheckout({
+      gitRoot: work.gitRoot, baseCommit: work.baseCommit,
+    }, () => {
+      renameSync(path.join(work.gitRoot, '.git'), hiddenGit);
+      throw new Error('original model failure');
+    }), /original model failure/);
+  } finally {
+    if (existsSync(hiddenGit)) renameSync(hiddenGit, path.join(work.gitRoot, '.git'));
+  }
 });
 
 test('attack: a declared output cannot escape through a committed symbolic link', (t) => {
