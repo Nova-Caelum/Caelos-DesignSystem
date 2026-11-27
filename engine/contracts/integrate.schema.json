@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Integrate output",
+  "type": "object",
+  "required": ["jobId", "drafts", "gaps"],
+  "additionalProperties": false,
+  "properties": {
+    "jobId": { "type": "string", "minLength": 1 },
+    "drafts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["need", "entry", "tier", "case", "recipe"],
+        "additionalProperties": false,
+        "properties": {
+          "need": { "type": "string", "minLength": 1 },
+          "entry": { "type": "string", "minLength": 1 },
+          "tier": { "type": "integer", "minimum": 0, "maximum": 5 },
+          "case": {
+            "type": "string",
+            "enum": ["new-entry", "complete-existing", "paint-support"]
+          },
+          "recipe": { "$ref": "#/$defs/recipe" }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["need", "entry", "gapFill", "flagged", "detail"],
+        "additionalProperties": false,
+        "properties": {
+          "need": { "type": "string", "minLength": 1 },
+          "entry": { "type": "string", "minLength": 1 },
+          "gapFill": {
+            "type": "string",
+            "enum": ["reference", "nearest", "placeholder"]
+          },
+          "flagged": { "type": "boolean" },
+          "detail": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "recipe": {
+      "type": "object",
+      "required": ["lifecycle", "draftedBy", "gapFill"],
+      "additionalProperties": false,
+      "properties": {
+        "lifecycle": { "const": "draft" },
+        "draftedBy": { "type": "string", "minLength": 1 },
+        "draftedAt": { "type": "string", "format": "date-time" },
+        "kind": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+        "madeOf": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "contents": { "type": "object", "minProperties": 1 },
+        "layerOrder": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "gapFill": {
+          "type": "string",
+          "enum": ["reference", "nearest", "placeholder"]
+        },
+        "siblings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

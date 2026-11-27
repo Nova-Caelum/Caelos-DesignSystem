@@ -1,0 +1,17 @@
+{
+  "matches": [
+    {
+      "need": "send-action",
+      "match": "controls.shared.button"
+    },
+    {
+      "need": "delivery-state",
+      "match": "none"
+    },
+    {
+      "need": "timeline-scrubber",
+      "match": "none, new kind",
+      "kind": "scrubber"
+    }
+  ]
+}
