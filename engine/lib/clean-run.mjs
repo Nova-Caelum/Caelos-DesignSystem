@@ -146,9 +146,11 @@ export function assertOnlyDeclaredChanges({
   }
 
   const allowed = new Set(outputs.map((file) => safeRelative(file, 'declared output').split(path.sep).join('/')));
+  // The checkout's own git dir, whose HEAD was just verified to be the base, so the source
+  // repository's HEAD (which may have moved on since the job was pinned) never enters the comparison.
   const guardEnv = { ...process.env, GIT_INDEX_FILE: guardIndex };
-  repositoryGit(gitDir, checkout, ['read-tree', baseCommit], 'model guard index', guardEnv);
-  const status = repositoryGit(gitDir, checkout, [
+  repositoryGit(checkoutGitDir, checkout, ['read-tree', baseCommit], 'model guard index', guardEnv);
+  const status = repositoryGit(checkoutGitDir, checkout, [
     'status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignored=matching',
   ], 'model change check', guardEnv);
   const extra = statusPaths(status).find((file) => !allowed.has(file));

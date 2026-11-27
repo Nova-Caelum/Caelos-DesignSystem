@@ -202,6 +202,16 @@ test('a valid step passes and only its declared outputs come back', (t) => {
   );
 });
 
+test('a valid step passes while the source repository HEAD is ahead of the base', (t) => {
+  const work = makeRepository(t);
+  writeFileSync(path.join(work.gitRoot, 'later.txt'), 'a later commit\n');
+  command(work.gitRoot, ['git', 'add', 'later.txt']);
+  command(work.gitRoot, ['git', '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-q', '-m', 'later']);
+  const result = runCodexStep(stepOptions(work, 'valid'));
+  assert.deepEqual(result.outputs, ['result.json']);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(work.jobFolder, 'result.json'), 'utf8')), { answer: 'ok' });
+});
+
 test('the built Codex command contains no banned flag or environment override', () => {
   const built = buildCodexCommand({
     command: 'codex', checkout: '/checkout', lastMessageFile: '/last-message', prompt: 'prompt',
