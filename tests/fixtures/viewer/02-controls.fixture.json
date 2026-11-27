@@ -1,0 +1,46 @@
+{
+  "controls": {
+    "shared": {
+      "Button": {
+        "$description": "A complete fixture button.",
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "status": "draft",
+            "recipeInStaging": true,
+            "kind": "button",
+            "layerOrder": ["label"],
+            "states": ["default", "hover", "pressed", "success", "focus", "disabled"]
+          }
+        },
+        "foreground": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        },
+        "hoverForeground": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        },
+        "focusForeground": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        },
+        "pressedForeground": {
+          "$type": "color",
+          "$value": "{base.color.ink}"
+        }
+      },
+      "MissingLayer": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "status": "promoted",
+            "draftedAt": "2026-11-01T00:00:00.000Z",
+            "recipeInStaging": true,
+            "kind": "button"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "base": {
+    "color": {
+      "ink": {
+        "$type": "color",
+        "$value": "#080817",
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "status": "draft"
+          }
+        }
+      }
+    }
+  }
+}

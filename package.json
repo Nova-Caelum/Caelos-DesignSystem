@@ -7,18 +7,22 @@
     "test:browser": "node --test tests/browser-checks/behaviour-browser.check.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
     "build:components": "node scripts/generate-components.mjs",
+    "build:viewer": "node viewer/build.mjs",
     "build:lock": "node scripts/build-lock.mjs",
     "build": "npm run build:tokens && npm run build:components && npm run build:lock",
     "check:app": "node scripts/check-app.mjs",
     "check:behaviour": "node scripts/behaviour-check/run-behaviours.mjs",
-    "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet check:generated --",
+    "check:catalog": "node scripts/check-recipes.mjs --catalog scripts/check-tier-drift.cjs check:recipes check:ratchet check:generated build:viewer --",
     "check:generated": "node scripts/check-generated.mjs",
     "check:recipes": "node scripts/check-recipes.mjs",
     "check:ratchet": "node scripts/check-ratchet.mjs"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "husky": "9.1.7",
     "playwright": "1.65.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "style-dictionary": "5.8.0",
     "typescript": "5.8.2"
   }
