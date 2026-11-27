@@ -17,6 +17,20 @@
       "sideBySide": true,
       "cards": []
     },
+    "controls.shared.InnerForwards": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true, "events": { "click": 0, "key": 0 }, "live": { "name": "controls.shared.InnerForwards", "visible": true, "inAccessibilityTree": true, "click": false, "key": false }, "interactionTarget": { "click": true, "key": true } }
+      ]
+    },
+    "controls.shared.InnerDeadRootForwards": {
+      "states": ["default"],
+      "sideBySide": true,
+      "cards": [
+        { "state": "default", "shown": true, "events": { "click": 0, "key": 0 }, "live": { "name": "controls.shared.InnerDeadRootForwards", "visible": true, "inAccessibilityTree": true, "click": true, "key": true }, "interactionTarget": { "click": false, "key": false } }
+      ]
+    },
     "controls.shared.Dead": {
       "states": ["default"],
       "sideBySide": true,

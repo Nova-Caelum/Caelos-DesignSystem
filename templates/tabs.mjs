@@ -18,18 +18,20 @@ export function render({ className, componentName, name, parts, record }) {
   const states = record.states;
   const defaults = record.contents.map((label, index) => ({ id: `tab-${index + 1}`, label: String(label), content: String(label) }));
   return {
-    tsx: `import { useId, useRef, useState, type HTMLAttributes, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+    tsx: `import { useId, useRef, useState, type HTMLAttributes, type KeyboardEvent, type KeyboardEventHandler, type MouseEventHandler, type ReactNode } from 'react';
 import { ${control.componentName} as Control } from './${control.componentName}';
 import './${componentName}.css';
 
 export type ${componentName}Tab = { id: string; label: string; content: ReactNode; disabled?: boolean };
-export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'onClick' | 'onKeyDown'> & {
   children?: ReactNode;
   tabs?: readonly ${componentName}Tab[];
   label?: string;
   active?: string;
   disabled?: boolean;
   onChange?: (id: string) => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
   state?: ${union(states)};
   variant?: ${union(variants)};
 };
@@ -65,12 +67,8 @@ export function ${componentName}({
     if (active === undefined) setLocalActive(id);
     onChange?.(id);
   };
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (!disabled) onClick?.(event);
-  };
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
-    onKeyDown?.(event);
     if (event.defaultPrevented || (event.target as HTMLElement).getAttribute('role') !== 'tab') return;
     if (event.key === 'Escape') {
       (event.target as HTMLElement).blur();
@@ -99,17 +97,16 @@ export function ${componentName}({
       data-state={requestedState ?? (selected ? 'active' : 'inactive')}
       data-variant={resolvedVariant}
       aria-disabled={disabled || undefined}
-      tabIndex={disabled ? undefined : 0}
-      onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
       <div ref={tabListRef} data-entry=${quote(name)} data-layer=${quote(record.layerOrder[0])} role="tablist" aria-label={tabLabel}>
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const isSelected = tab.id === selected?.id;
           return (
             <Control
               key={tab.id}
               id={\`\${baseId}-tab-\${tab.id}\`}
+              data-live-control={index === 0 ? '' : undefined}
               data-tab-id={tab.id}
               type="button"
               role="tab"
@@ -117,7 +114,12 @@ export function ${componentName}({
               aria-controls={\`\${baseId}-panel\`}
               disabled={disabled || tab.disabled}
               tabIndex={isSelected ? 0 : -1}
-              onClick={() => { if (!tab.disabled) select(tab.id); }}
+              onClick={(event) => {
+                if (disabled) return;
+                if (index === 0) onClick?.(event);
+                if (!event.defaultPrevented && !tab.disabled) select(tab.id);
+              }}
+              onKeyDown={index === 0 ? (event) => { if (!disabled) onKeyDown?.(event); } : undefined}
             >
               {tab.label}
             </Control>

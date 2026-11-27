@@ -140,6 +140,11 @@ function hasAccessibilityNode(snapshot) {
   return Array.isArray(snapshot) && snapshot.length > 0;
 }
 
+export async function resolveInteractionLocator(live) {
+  const markedControl = live.locator('[data-live-control]');
+  return await markedControl.count() > 0 ? markedControl.first() : live;
+}
+
 export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromium } = {}) {
   let chromium = injectedChromium;
   if (!chromium) {
@@ -206,7 +211,9 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
           const live = card.locator('.live-component > *');
           const liveCount = await live.count();
           let liveDetails;
+          let interactionLocator;
           if (liveCount === 1) {
+            interactionLocator = await resolveInteractionLocator(live);
             const bounds = await live.boundingBox();
             const ariaHidden = await live.evaluate((node) => Boolean(node.closest('[aria-hidden="true"], [inert]')));
             let inAccessibilityTree = false;
@@ -227,7 +234,7 @@ export async function createPlaywrightDriver(baseUrl, { chromium: injectedChromi
             state: await card.getAttribute('data-state-card'),
             shown: await card.isVisible(),
             live: liveDetails,
-            locator: liveCount === 1 ? live : undefined,
+            locator: interactionLocator,
             cardLocator: card,
           };
         })),

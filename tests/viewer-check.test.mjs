@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { runViewerCheck } from '../viewer/check-viewer.mjs';
+import { resolveInteractionLocator, runViewerCheck } from '../viewer/check-viewer.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixture = JSON.parse(await readFile(path.join(root, 'tests/fixtures/viewer-check/recorded-dom.json'), 'utf8'));
@@ -26,12 +26,14 @@ function createFakeDriver(record) {
           ...card,
           events: card.events && { ...card.events },
           live: card.live && { ...card.live },
+          interactionTarget: card.interactionTarget && { ...card.interactionTarget },
         })),
       };
     },
     async interact(card, interaction) {
       const before = card.events?.[interaction];
-      if (card.live?.[interaction] === true && Number.isInteger(before)) {
+      const target = card.interactionTarget ?? card.live;
+      if (target?.[interaction] === true && Number.isInteger(before)) {
         card.events[interaction] += 1;
       }
       return {
@@ -41,6 +43,28 @@ function createFakeDriver(record) {
     },
   };
 }
+
+test('the Playwright locator resolver prefers the marked inner live control', async () => {
+  const inner = { count: async () => 1, first: () => inner };
+  const live = { locator: (selector) => {
+    assert.equal(selector, '[data-live-control]');
+    return inner;
+  } };
+
+  assert.equal(await resolveInteractionLocator(live), inner);
+});
+
+test('an inner control that forwards passes even when the composite root is dead', async () => {
+  const { result } = await runCase(['controls.shared.InnerForwards']);
+  assert.equal(result.exitCode, 0, result.message);
+});
+
+test('a dead inner control fails by entry name even when the composite root has handlers', async () => {
+  const { result, results } = await runCase(['controls.shared.InnerDeadRootForwards']);
+  assert.equal(result.exitCode, 1);
+  assert.match(result.message, /controls\.shared\.InnerDeadRootForwards/u);
+  assert.equal(results.entries[0].states[0].responding, false);
+});
 
 async function runCase(entries) {
   const folder = await mkdtemp(path.join(tmpdir(), 'viewer-check-test-'));

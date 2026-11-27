@@ -18,7 +18,7 @@ export function render({ className, componentName, name, parts, record }) {
   const states = record.states;
   const defaults = record.contents.map((label, index) => ({ id: `item-${index + 1}`, label: String(label) }));
   return {
-    tsx: `import { useEffect, useRef, useState, type HTMLAttributes, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+    tsx: `import { useEffect, useRef, useState, type HTMLAttributes, type KeyboardEvent, type KeyboardEventHandler, type MouseEventHandler, type ReactNode } from 'react';
 import { ${control.componentName} as Control } from './${control.componentName}';
 import './${componentName}.css';
 
@@ -26,12 +26,14 @@ export type ${componentName}Action = { id: string; label: string; type?: 'item';
 export type ${componentName}Checkbox = { id: string; label: string; type: 'checkbox'; checked: boolean; disabled?: boolean };
 export type ${componentName}Separator = { id: string; type: 'separator' };
 export type ${componentName}Item = ${componentName}Action | ${componentName}Checkbox | ${componentName}Separator;
-export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> & {
+export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onKeyDown' | 'onSelect'> & {
   children?: ReactNode;
   contents?: readonly ${componentName}Item[];
   triggerLabel?: string;
   defaultOpen?: boolean;
   disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
   onSelect?: (id: string) => void;
   state?: ${union(states)};
   variant?: ${union(variants)};
@@ -69,20 +71,9 @@ export function ${componentName}({
     setOpen(false);
     requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')?.focus());
   };
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (disabled) return;
-    onClick?.(event);
-    if (!event.defaultPrevented && event.target === event.currentTarget) setOpen((value) => !value);
-  };
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
-    onKeyDown?.(event);
     if (event.defaultPrevented) return;
-    if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
-      event.preventDefault();
-      setOpen((value) => !value);
-      return;
-    }
     if (!open) return;
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -110,12 +101,22 @@ export function ${componentName}({
       data-state={requestedState ?? (open ? 'open' : 'closed')}
       data-variant={resolvedVariant}
       aria-disabled={disabled || undefined}
-      tabIndex={disabled ? undefined : 0}
-      onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
       <div data-entry=${quote(name)} data-layer=${quote(record.layerOrder[0])}>
-        <Control type="button" disabled={disabled} aria-expanded={open} aria-haspopup="menu" onClick={() => { if (!disabled) setOpen((value) => !value); }}>
+        <Control
+          data-live-control
+          type="button"
+          disabled={disabled}
+          aria-expanded={open}
+          aria-haspopup="menu"
+          onClick={(event) => {
+            if (disabled) return;
+            onClick?.(event);
+            if (!event.defaultPrevented) setOpen((value) => !value);
+          }}
+          onKeyDown={(event) => { if (!disabled) onKeyDown?.(event); }}
+        >
           {label}
         </Control>
       </div>

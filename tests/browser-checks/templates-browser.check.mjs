@@ -34,6 +34,7 @@ import { FixtureDisclosure } from './FixtureDisclosure';
 import { FixtureMenu } from './FixtureMenu';
 import { FixtureSheet } from './FixtureSheet';
 import { FixtureTabs } from './FixtureTabs';
+import './FixtureSheet.css';
 function App() {
   const [events, setEvents] = useState<string[]>([]);
   const add = (value: string) => setEvents((current) => [...current, value]);
@@ -45,13 +46,16 @@ function App() {
     <FixtureMenu data-testid="disabled-menu" disabled triggerLabel="Disabled menu" onClick={() => add('disabled-menu-click')} onKeyDown={() => add('disabled-menu-key')} />
     <FixtureTabs data-testid="tabs" label="Usage" tabs={[
       {id:'alpha',label:'Alpha',content:'A'}, {id:'disabled',label:'Disabled',content:'D',disabled:true}, {id:'gamma',label:'Gamma',content:'G'},
-    ]} onChange={(id) => add('tabs:' + id)} />
+    ]} onChange={(id) => add('tabs:' + id)} onClick={() => add('tabs-click')} onKeyDown={(event) => add('tabs-key:' + event.key)} />
+    <FixtureTabs data-testid="disabled-tabs" disabled label="Disabled tabs" onClick={() => add('disabled-tabs-click')} onKeyDown={() => add('disabled-tabs-key')} />
     <FixtureSheet data-testid="sheet" triggerLabel="Sheet" title="Sheet title" onClick={() => add('sheet-click')} onKeyDown={(event) => add('sheet-key:' + event.key)}>
       <button data-testid="sheet-first">First</button><button data-testid="sheet-last">Last</button>
     </FixtureSheet>
     <FixtureSheet data-testid="disabled-sheet" disabled triggerLabel="Disabled sheet" title="Disabled" onClick={() => add('disabled-sheet-click')} onKeyDown={() => add('disabled-sheet-key')} />
-    <FixtureDisclosure data-testid="disclosure" triggerLabel="Details"><button>Panel action</button></FixtureDisclosure>
-    <button data-testid="outside">Outside</button>
+    <FixtureDisclosure data-testid="disclosure" triggerLabel="Details" onClick={() => add('disclosure-click')} onKeyDown={(event) => add('disclosure-key:' + event.key)}><button>Panel action</button></FixtureDisclosure>
+    <FixtureDisclosure data-testid="disabled-disclosure" disabled triggerLabel="Disabled disclosure" onClick={() => add('disabled-disclosure-click')} onKeyDown={() => add('disabled-disclosure-key')}>Panel</FixtureDisclosure>
+    <input data-testid="outside-input" aria-label="Outside input" />
+    <button data-testid="outside" onClick={() => add('outside-click')}>Outside</button>
     <output data-testid="events">{events.join('|')}</output>
   </main>;
 }
@@ -61,7 +65,10 @@ createRoot(document.getElementById('root')!).render(<App />);
     entryPoints: [path.join(workspace, "entry.tsx")], bundle: true, outfile: path.join(workspace, "bundle.js"),
     format: "iife", jsx: "automatic", loader: { ".css": "css" }, nodePaths: [dependencyRoot], logLevel: "silent",
   });
-  return path.join(workspace, "bundle.js");
+  return {
+    script: path.join(workspace, "bundle.js"),
+    stylesheet: path.join(workspace, "bundle.css"),
+  };
 }
 
 before(async () => {
@@ -69,12 +76,13 @@ before(async () => {
   browser = await chromium.launch({ headless: true });
   page = await browser.newPage();
   await page.setContent('<main id="root"></main>');
-  await page.addScriptTag({ path: bundle });
+  await page.addStyleTag({ path: bundle.stylesheet });
+  await page.addScriptTag({ path: bundle.script });
 });
 
 after(async () => browser?.close());
 
-test("removing menu arrow-key handling makes this browser test red", async () => {
+test("moving menu ArrowDown by two enabled items makes this browser test red", async () => {
   const menu = page.getByTestId("menu");
   await menu.getByRole("button", { name: "Menu" }).click();
   const alpha = menu.getByRole("menuitem", { name: "Alpha" });
@@ -117,35 +125,100 @@ test("removing the sheet focus trap makes this browser test red", async () => {
   await page.waitForFunction(() => document.activeElement?.textContent === 'Sheet');
 });
 
-test("menu and sheet forward activation while disabled roots forward nothing", async () => {
+test("every composite primary control forwards activation while disabled controls forward nothing", async () => {
   const menu = page.getByTestId("menu");
-  await menu.focus();
-  await menu.press("Enter");
+  await menu.locator("[data-live-control]").focus();
+  await menu.locator("[data-live-control]").press("Enter");
   await page.keyboard.press("Escape");
   const sheet = page.getByTestId("sheet");
-  await sheet.focus();
-  await sheet.press("Space");
+  await sheet.locator("[data-live-control]").focus();
+  await sheet.locator("[data-live-control]").press("Space");
   await sheet.getByRole("button", { name: "Close Sheet title" }).press("Escape");
-  const disabledMenu = page.getByTestId("disabled-menu");
+  const tabs = page.getByTestId("tabs");
+  await tabs.locator("[data-live-control]").focus();
+  await tabs.locator("[data-live-control]").press("Enter");
+  const disclosure = page.getByTestId("disclosure");
+  await disclosure.locator("[data-live-control]").focus();
+  await disclosure.locator("[data-live-control]").press("Enter");
+  await page.keyboard.press("Escape");
+  const disabledMenu = page.getByTestId("disabled-menu").locator("[data-live-control]");
   await disabledMenu.evaluate((node) => { node.click(); node.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); });
-  const disabledSheet = page.getByTestId("disabled-sheet");
+  const disabledSheet = page.getByTestId("disabled-sheet").locator("[data-live-control]");
   await disabledSheet.evaluate((node) => { node.click(); node.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true })); });
+  const disabledTabs = page.getByTestId("disabled-tabs").locator("[data-live-control]");
+  await disabledTabs.evaluate((node) => { node.click(); node.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); });
+  const disabledDisclosure = page.getByTestId("disabled-disclosure").locator("[data-live-control]");
+  await disabledDisclosure.evaluate((node) => { node.click(); node.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); });
   const events = await page.getByTestId("events").textContent();
   assert.match(events, /menu-key:Enter/u);
   assert.match(events, /sheet-key: /u);
-  assert.doesNotMatch(events, /disabled-(?:menu|sheet)-(?:click|key)/u);
+  assert.match(events, /tabs-key:Enter/u);
+  assert.match(events, /disclosure-key:Enter/u);
+  assert.doesNotMatch(events, /disabled-(?:menu|tabs|sheet|disclosure)-(?:click|key)/u);
 });
 
-test("disclosure closes on Escape and outside click and restores trigger focus", async () => {
+test("sheet backdrop blocks and closes an outside pointer-down before the outside handler runs", async () => {
+  const sheet = page.getByTestId("sheet");
+  const trigger = sheet.getByRole("button", { name: "Sheet" });
+  await trigger.click();
+  await sheet.getByRole("dialog").waitFor();
+  const outside = page.getByTestId("outside");
+  const bounds = await outside.boundingBox();
+  assert.ok(bounds);
+  await page.mouse.click(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  assert.equal(await sheet.getByRole("dialog").count(), 0);
+  assert.doesNotMatch(await page.getByTestId("events").textContent(), /outside-click/u);
+  await page.waitForFunction(() => document.activeElement?.textContent === 'Sheet');
+});
+
+test("disclosure hears Escape on document and returns focus to its trigger", async () => {
   const disclosure = page.getByTestId("disclosure");
   const trigger = disclosure.getByRole("button", { name: "Details" });
   await trigger.click();
   assert.equal(await disclosure.getByText("Panel action").count(), 1);
-  await disclosure.getByRole("button", { name: "Panel action" }).press("Escape");
+  await page.getByTestId("outside-input").focus();
+  await page.keyboard.press("Escape");
   assert.equal(await disclosure.getByText("Panel action").count(), 0);
   await page.waitForFunction(() => document.activeElement?.textContent === 'Details');
+});
+
+test("disclosure outside pointer-down closes without stealing focus from the outside input", async () => {
+  const disclosure = page.getByTestId("disclosure");
+  const trigger = disclosure.getByRole("button", { name: "Details" });
   await trigger.click();
-  await page.getByTestId("outside").click();
+  const outsideInput = page.getByTestId("outside-input");
+  await outsideInput.click();
+  // Wait two frames so any focus move scheduled by the close has run, then type as a user does, into whatever has focus.
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.keyboard.type("hi");
   assert.equal(await disclosure.getByText("Panel action").count(), 0);
-  await page.waitForFunction(() => document.activeElement?.textContent === 'Details');
+  assert.equal(await outsideInput.inputValue(), "hi");
+  assert.equal(await outsideInput.evaluate((node) => document.activeElement === node), true);
+});
+
+test("the browser tab order has no role-less stop", async () => {
+  await page.evaluate(() => document.activeElement?.blur());
+  const seen = new Set();
+  for (let index = 0; index < 30; index += 1) {
+    await page.keyboard.press("Tab");
+    const active = await page.evaluate(() => {
+      const node = document.activeElement;
+      if (!node || node === document.body) return null;
+      return {
+        index: Array.from(document.querySelectorAll('*')).indexOf(node),
+        role: node.getAttribute('role'),
+        tag: node.tagName.toLowerCase(),
+        type: node.getAttribute('type'),
+      };
+    });
+    if (!active || seen.has(active.index)) break;
+    seen.add(active.index);
+    const implicitRole = active.tag === 'button'
+      || active.tag === 'textarea'
+      || active.tag === 'select'
+      || (active.tag === 'input' && active.type !== 'hidden')
+      || active.tag === 'a';
+    assert.ok(active.role || implicitRole, `tab order stopped on role-less <${active.tag}>`);
+  }
+  assert.ok(seen.size > 0);
 });

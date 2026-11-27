@@ -17,17 +17,19 @@ export function render({ className, componentName, name, parts, record }) {
   const variants = record.variants.variant;
   const states = record.states;
   return {
-    tsx: `import { useEffect, useId, useRef, useState, type HTMLAttributes, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+    tsx: `import { useEffect, useId, useRef, useState, type HTMLAttributes, type KeyboardEventHandler, type MouseEventHandler, type ReactNode } from 'react';
 import { ${control.componentName} as Control } from './${control.componentName}';
 import './${componentName}.css';
 
-export type ${componentName}Props = HTMLAttributes<HTMLDivElement> & {
+export type ${componentName}Props = Omit<HTMLAttributes<HTMLDivElement>, 'onClick' | 'onKeyDown'> & {
   children?: ReactNode;
   contents?: ReactNode;
   triggerLabel?: string;
   open?: boolean;
   defaultOpen?: boolean;
   disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
   onOpenChange?: (open: boolean) => void;
   state?: ${union(states)};
   variant?: ${union(variants)};
@@ -54,7 +56,6 @@ export function ${componentName}({
   const [localOpen, setLocalOpen] = useState(defaultOpen);
   const open = controlledOpen ?? localOpen;
   const rootRef = useRef<HTMLDivElement>(null);
-  const wasOpen = useRef(open);
   const label = triggerLabel ?? ${quote(name)};
   const requestedState = state ?? (declaredStates.includes(variant) ? variant as ${union(states)} : undefined);
   const resolvedVariant = declaredVariants.includes(variant) ? variant : ${quote(record.defaultVariants.variant)};
@@ -64,36 +65,23 @@ export function ${componentName}({
     onOpenChange?.(value);
   };
   useEffect(() => {
-    if (!open && wasOpen.current) requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[data-disclosure-trigger]')?.focus());
-    wasOpen.current = open;
-  }, [open]);
-  useEffect(() => {
     if (!open) return undefined;
     const handleOutside = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
-    document.addEventListener('pointerdown', handleOutside);
-    return () => document.removeEventListener('pointerdown', handleOutside);
-  }, [open]);
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (disabled) return;
-    onClick?.(event);
-    if (!event.defaultPrevented && event.target === event.currentTarget) setOpen((value) => !value);
-  };
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) return;
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
-      event.preventDefault();
-      setOpen((value) => !value);
-      return;
-    }
-    if (open && event.key === 'Escape') {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
       event.preventDefault();
       setOpen(false);
-    }
-  };
+      requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[data-disclosure-trigger]')?.focus());
+    };
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open]);
 
   return (
     <div
@@ -104,12 +92,22 @@ export function ${componentName}({
       data-state={requestedState ?? (open ? 'open' : 'closed')}
       data-variant={resolvedVariant}
       aria-disabled={disabled || undefined}
-      tabIndex={disabled ? undefined : 0}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
     >
       <div data-entry=${quote(name)} data-layer=${quote(record.layerOrder[0])}>
-        <Control data-disclosure-trigger type="button" disabled={disabled} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}>
+        <Control
+          data-live-control
+          data-disclosure-trigger
+          type="button"
+          disabled={disabled}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={(event) => {
+            if (disabled) return;
+            onClick?.(event);
+            if (!event.defaultPrevented) setOpen((value) => !value);
+          }}
+          onKeyDown={(event) => { if (!disabled) onKeyDown?.(event); }}
+        >
           {label}
         </Control>
       </div>
