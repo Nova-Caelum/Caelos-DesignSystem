@@ -301,7 +301,7 @@ function generatedWorkspace(t, { components = false } = {}) {
     : 'node build-rest.mjs';
   writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify({
     private: true,
-    scripts: { build: buildCommand, 'check:generated': `node ${JSON.stringify(generatedCheck)}` },
+    scripts: { 'build:all': buildCommand, 'check:generated': `node ${JSON.stringify(generatedCheck)}` },
   }, null, 2)}\n`);
   writeFileSync(path.join(cwd, 'source.txt'), 'expected\n');
   writeFileSync(path.join(cwd, 'lock-source.txt'), 'lock expected\n');
@@ -318,7 +318,7 @@ function generatedWorkspace(t, { components = false } = {}) {
       cpSync(path.join(generatorFixture, file), path.join(cwd, 'token_catalog', file.replace('.fixture.json', '.tokens.json')));
     }
   }
-  assert.equal(command(cwd, 'npm', ['run', 'build']).status, 0);
+  assert.equal(command(cwd, 'npm', ['run', 'build:all']).status, 0);
   git(cwd, ['init', '-q']);
   snapshot(cwd);
   return cwd;
@@ -396,7 +396,7 @@ test('(h) skipped component output is removed, and untracked generated output is
   assert.notEqual(stale.status, 0, `${stale.stdout}\n${stale.stderr}`);
   assert.match(`${stale.stdout}\n${stale.stderr}`, /generated\/components\/Button\.(?:css|tsx)/u);
 
-  command(cwd, 'npm', ['run', 'build']);
+  command(cwd, 'npm', ['run', 'build:all']);
   snapshot(cwd, 'clean skipped output');
   writeFileSync(path.join(cwd, 'generated/components/Untracked.txt'), 'untracked output\n');
   const untracked = command(cwd, 'npm', ['run', 'check:generated']);

@@ -33,9 +33,9 @@ writeFileSync('token_catalog/versions.lock.json', '{}\\n');
 `);
   writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify({
     private: true,
-    scripts: { build: 'node build.mjs', 'check:generated': `node ${JSON.stringify(checker)}` },
+    scripts: { 'build:all': 'node build.mjs', 'check:generated': `node ${JSON.stringify(checker)}` },
   }, null, 2)}\n`);
-  const built = spawnSync('npm', ['run', 'build'], { cwd, encoding: 'utf8' });
+  const built = spawnSync('npm', ['run', 'build:all'], { cwd, encoding: 'utf8' });
   assert.equal(built.status, 0, built.stderr);
   git(cwd, ['init', '-q']);
   git(cwd, ['add', '.']);
