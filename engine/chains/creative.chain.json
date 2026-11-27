@@ -1,0 +1,61 @@
+{
+  "chain": "creative",
+  "steps": [
+    {
+      "step": "craft",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["brief.md", "behaviours.json"],
+      "outputs": ["wireframe.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "match",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["wireframe.json"],
+      "outputs": ["match.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "integrate",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["job.json", "wireframe.json", "match.json", "reference"],
+      "outputs": ["integrate.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "generate",
+      "kind": "script",
+      "script": "scripts/generate-components.mjs",
+      "inputs": ["integrate.json"],
+      "outputs": ["generated-components.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "assemble",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["wireframe.json", "match.json", "integrate.json", "generated-components.json", "behaviours.json"],
+      "outputs": ["assemble.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "count-handlers",
+      "kind": "script",
+      "script": "scripts/behaviour-check/count-handlers.mjs",
+      "inputs": ["assemble.json", "behaviours.json"],
+      "outputs": ["handler-count.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "finish",
+      "kind": "script",
+      "script": "engine/lib/finish.mjs",
+      "inputs": ["integrate.json", "assemble.json", "handler-count.json"],
+      "outputs": ["finish.json"],
+      "check": "npm run check:catalog"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "jobId": "job-fixture",
+  "drafts": [
+    {
+      "need": "priority-banner",
+      "entry": "units.shared.priorityBanner",
+      "tier": 4,
+      "case": "new-entry",
+      "recipe": {
+        "lifecycle": "draft",
+        "draftedBy": "job-fixture",
+        "gapFill": "placeholder",
+        "rawColor": "unknown-field"
+      }
+    }
+  ],
+  "gaps": []
+}

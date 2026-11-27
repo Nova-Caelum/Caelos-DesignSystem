@@ -1,0 +1,45 @@
+{
+  "chain": "expand",
+  "steps": [
+    {
+      "step": "craft",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["harvested-material"],
+      "outputs": ["wireframe.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "match",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["wireframe.json"],
+      "outputs": ["match.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "integrate",
+      "kind": "script",
+      "script": "engine/adapters/codex.mjs",
+      "inputs": ["job.json", "wireframe.json", "match.json", "reference"],
+      "outputs": ["integrate.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "generate",
+      "kind": "script",
+      "script": "scripts/generate-components.mjs",
+      "inputs": ["integrate.json"],
+      "outputs": ["generated-components.json"],
+      "check": "npm run check:catalog"
+    },
+    {
+      "step": "finish",
+      "kind": "script",
+      "script": "engine/lib/finish.mjs",
+      "inputs": ["integrate.json", "generated-components.json"],
+      "outputs": ["finish.json"],
+      "check": "npm run check:catalog"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "path": "app/messages/page.tsx",
+  "source": "import { Button } from '@nova-caelum/ui';\n\nexport default function Page() {\n  return <Button>Send</Button>;\n}\n",
+  "importedEntries": ["controls.shared.button"],
+  "handlers": ["submit-message"]
+}
