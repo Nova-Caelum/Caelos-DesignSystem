@@ -63,3 +63,11 @@ if (action === 'commit') {
     process.exit(result.status || 1);
   }
 }
+process.stdout.write(`${JSON.stringify({ type: 'thread.started', thread_id: 'fixture-thread' })}\n`);
+if (action === 'tool-model') {
+  process.stdout.write(`${JSON.stringify({
+    type: 'item.completed',
+    item: { type: 'mcp_tool_call', arguments: { model: process.env.ENGINE_STUB_STREAM_MODEL } },
+  })}\n`);
+}
+process.stdout.write(`${JSON.stringify({ type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } })}\n`);

@@ -16,6 +16,7 @@ import { withDetachedCheckout } from '../engine/lib/clean-run.mjs';
 const repository = fileURLToPath(new URL('..', import.meta.url));
 const cli = path.join(repository, 'engine', 'cli.mjs');
 const fixtures = path.join(repository, 'tests', 'fixtures', 'engine-adapter');
+const refusedModels = JSON.parse(readFileSync(path.join(repository, 'engine', 'refused-models.json'), 'utf8')).models;
 
 function command(cwd, args) {
   const result = spawnSync(args[0], args.slice(1), { cwd, encoding: 'utf8' });
@@ -48,6 +49,7 @@ function stepOptions(work, action) {
     baseCommit: work.baseCommit,
     jobFolder: work.jobFolder,
     command: work.stub,
+    model: 'fixture-run-model',
     env: { ...process.env, ENGINE_STUB_ACTION: action },
     step: {
       step: 'fixture-model',
@@ -176,7 +178,7 @@ test('a missing harness is refused before any step runs, naming the command', (t
     ],
   }, null, 2)}\n`);
   const missing = 'codex-command-that-does-not-exist';
-  const result = spawnSync(process.execPath, [cli, 'run', '--job', folder], {
+  const result = spawnSync(process.execPath, [cli, 'run', '--job', folder, '--model', 'fixture-run-model'], {
     cwd: repository,
     encoding: 'utf8',
     env: { ...process.env, CAELOS_CODEX_COMMAND: missing },
@@ -196,10 +198,19 @@ test('a valid step passes and only its declared outputs come back', (t) => {
   assert.deepEqual(result.outputs, ['result.json']);
   assert.deepEqual(JSON.parse(readFileSync(path.join(work.jobFolder, 'result.json'), 'utf8')), { answer: 'ok' });
   assert.deepEqual(readFileSync(log, 'utf8').trim().split('\0').slice(0, 2), [work.stub, 'exec']);
+  assert.match(readFileSync(log, 'utf8'), /\0--model\0fixture-run-model\0/);
   assert.deepEqual(
     [...new Set(['input.json', 'result.json'].filter((name) => existsSync(path.join(work.jobFolder, name))))].sort(),
     ['input.json', 'result.json'],
   );
+});
+
+test('a model key inside a tool-call argument cannot replace the run setting', (t) => {
+  const work = makeRepository(t);
+  const options = stepOptions(work, 'tool-model');
+  options.env.ENGINE_STUB_STREAM_MODEL = refusedModels[0];
+  const result = runCodexStep(options);
+  assert.equal(result.model, 'fixture-run-model');
 });
 
 test('a valid step passes while the source repository HEAD is ahead of the base', (t) => {
@@ -214,8 +225,9 @@ test('a valid step passes while the source repository HEAD is ahead of the base'
 
 test('the built Codex command contains no banned flag or environment override', () => {
   const built = buildCodexCommand({
-    command: 'codex', checkout: '/checkout', lastMessageFile: '/last-message', prompt: 'prompt',
+    command: 'codex', checkout: '/checkout', lastMessageFile: '/last-message', model: 'fixture-run-model', prompt: 'prompt',
   });
+  assert.deepEqual(built.args.slice(0, 3), ['exec', '--model', 'fixture-run-model']);
   const rendered = [built.command, ...built.args].join(' ');
   for (const banned of [
     '--dangerously-bypass-approvals-and-sandbox', 'model_reasoning_effort=ultra', 'CODEX_HOME',

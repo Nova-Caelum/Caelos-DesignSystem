@@ -6,16 +6,34 @@ import { jobFoldersUnder, recomputeCrossJobEvidence } from './lib/evidence.mjs';
 import { executeStep, runJob } from './lib/run.mjs';
 
 function usage() {
-  return 'usage: engine run --job <folder> | engine step <name> --job <folder> | engine evidence (--job <folder> ... | --jobs-root <folder>) --evidence <folder>';
+  return 'usage: engine run --job <folder> [--model <id>] | engine step <name> --job <folder> [--model <id>] | engine evidence (--job <folder> ... | --jobs-root <folder>) --evidence <folder>';
 }
 
-function jobFolder(args) {
-  if (args.length !== 2 || args[0] !== '--job' || !args[1]) {
+function runSettings(args) {
+  let folder = null;
+  let model;
+  for (let index = 0; index < args.length; index += 2) {
+    const flag = args[index];
+    const value = args[index + 1];
+    if (!value || (flag !== '--job' && flag !== '--model')) {
+      const error = new Error(usage());
+      error.exitCode = 2;
+      throw error;
+    }
+    if (flag === '--job' && folder === null) folder = value;
+    else if (flag === '--model' && model === undefined) model = value;
+    else {
+      const error = new Error(usage());
+      error.exitCode = 2;
+      throw error;
+    }
+  }
+  if (!folder) {
     const error = new Error(usage());
     error.exitCode = 2;
     throw error;
   }
-  return args[1];
+  return { folder, model };
 }
 
 function evidenceFolders(args) {
@@ -40,7 +58,8 @@ function evidenceFolders(args) {
 try {
   const [command, ...args] = process.argv.slice(2);
   if (command === 'run') {
-    console.log(JSON.stringify(runJob(jobFolder(args))));
+    const { folder, model } = runSettings(args);
+    console.log(JSON.stringify(runJob(folder, { model })));
   } else if (command === 'step') {
     const [name, ...rest] = args;
     if (!name) {
@@ -48,7 +67,8 @@ try {
       error.exitCode = 2;
       throw error;
     }
-    console.log(JSON.stringify(executeStep(name, jobFolder(rest))));
+    const { folder, model } = runSettings(rest);
+    console.log(JSON.stringify(executeStep(name, folder, { model })));
   } else if (command === 'evidence') {
     console.log(JSON.stringify(await recomputeCrossJobEvidence(evidenceFolders(args))));
   } else {

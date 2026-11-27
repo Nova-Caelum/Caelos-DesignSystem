@@ -114,19 +114,24 @@ function eventRecords(jobFolder) {
 function modelEvidence(jobFolder) {
   const chain = readJson(path.join(jobFolder, 'chain.json'), 'chain.json');
   const modelSteps = chain.steps.filter(({ kind }) => kind === 'model').map(({ step }) => step);
-  const exits = eventRecords(jobFolder).filter(({ kind }) => kind === 'node.exit');
-  const recorded = exits.filter(({ model }) => typeof model === 'string' && model.trim())
-    .map(({ node, model }) => ({ node, model }));
+  const recorded = eventRecords(jobFolder)
+    .filter(({ kind, model_source: source, model }) => kind === 'node.enter'
+      && source === 'run-setting' && typeof model === 'string' && model.trim())
+    .map(({ step, node, model }) => ({ node: step || node, model }));
   return {
     models: recorded.map(({ model }) => model),
     missing: modelSteps.filter((step) => !recorded.some(({ node }) => node === step)),
   };
 }
 
-function hasRefusedModel(models) {
-  return models.some((model) => model.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+export function isRefusedModel(model) {
+  return model.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
     .some((token) => refusedModelFamilies.some((family) => token === family
-      || (token.startsWith(family) && /^\d/.test(token.slice(family.length))))));
+      || (token.startsWith(family) && /^\d/.test(token.slice(family.length)))));
+}
+
+function hasRefusedModel(models) {
+  return models.some(isRefusedModel);
 }
 
 async function catalogDrafts({ job, commit, git }) {
@@ -166,7 +171,7 @@ function successfulIds(checks) {
   return (checks || []).map((check) => typeof check === 'number' ? check : check.id);
 }
 
-export async function writeJobEvidence({
+async function collectJobEvidence({
   jobFolder, evidenceFolder, snapshot, state, git, deployRecord,
 }) {
   const job = readJson(path.join(jobFolder, 'job.json'), 'job.json');
@@ -227,7 +232,12 @@ export async function writeJobEvidence({
     draft_catalog_entries: drafts,
     model_steps_missing_records: model.missing,
   };
-  writeFileSync(path.join(evidenceFolder, finish.evidenceFile), `${JSON.stringify(report, null, 2)}\n`);
+  return { file: finish.evidenceFile, report };
+}
+
+export async function writeJobEvidence(options) {
+  const { file, report } = await collectJobEvidence(options);
+  writeFileSync(path.join(options.evidenceFolder, file), `${JSON.stringify(report, null, 2)}\n`);
   return report;
 }
 
@@ -266,12 +276,17 @@ function catalogGapEntries(job) {
   return entries;
 }
 
-export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) {
+function collectCrossJobEvidence(jobFolders) {
   const signoffJobs = [];
   const gaps = [];
   const gapsNotListed = [];
+  const skippedJobs = [];
   for (const jobFolder of jobFolders) {
     const job = readJson(path.join(jobFolder, 'job.json'), 'job.json');
+    if (!job.finish) {
+      skippedJobs.push({ job: job.id || path.basename(jobFolder), reason: 'job has not reached finish' });
+      continue;
+    }
     const records = signoffRecords(jobFolder);
     signoffJobs.push({ job: job.id, promote_records: records.length });
     const listed = new Map(records.flatMap((record) => [...(record.promoted || []), ...(record.skipped || [])])
@@ -288,19 +303,44 @@ export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) 
   }
   const signoffs = {
     jobs: signoffJobs,
+    skipped_jobs: skippedJobs,
     jobs_with_more_than_one_signoff: signoffJobs.filter(({ promote_records: count }) => count > 1).length,
     job_ids_with_more_than_one_signoff: signoffJobs.filter(({ promote_records: count }) => count > 1).map(({ job }) => job),
   };
   const gapReport = {
     gaps,
+    skipped_jobs: skippedJobs,
     gaps_not_listed_at_signoff: gapsNotListed.length,
     gap_entries_not_listed_at_signoff: gapsNotListed,
   };
-  const systemFaithful = readNamesNotReachingTierZero(signoffJobs.map(({ job }) => job));
-  for (const [name, value] of [
-    ['signoffs.json', signoffs], ['gaps.json', gapReport], ['system-faithful.json', systemFaithful],
-  ]) writeFileSync(path.join(evidenceFolder, name), `${JSON.stringify(value, null, 2)}\n`);
+  const systemFaithful = {
+    ...readNamesNotReachingTierZero(signoffJobs.map(({ job }) => job)),
+    skipped_jobs: skippedJobs,
+  };
   return { signoffs, gaps: gapReport, systemFaithful };
+}
+
+function writeCrossJobEvidence(evidenceFolder, values) {
+  for (const [name, value] of [
+    ['signoffs.json', values.signoffs], ['gaps.json', values.gaps], ['system-faithful.json', values.systemFaithful],
+  ]) writeFileSync(path.join(evidenceFolder, name), `${JSON.stringify(value, null, 2)}\n`);
+}
+
+export async function recomputeCrossJobEvidence({ jobFolders, evidenceFolder }) {
+  const values = collectCrossJobEvidence(jobFolders);
+  writeCrossJobEvidence(evidenceFolder, values);
+  return values;
+}
+
+export async function writeCompleteEvidenceSet({ jobFolders, ...options }) {
+  const jobEvidence = await collectJobEvidence(options);
+  const crossJobEvidence = collectCrossJobEvidence(jobFolders);
+  writeFileSync(
+    path.join(options.evidenceFolder, jobEvidence.file),
+    `${JSON.stringify(jobEvidence.report, null, 2)}\n`,
+  );
+  writeCrossJobEvidence(options.evidenceFolder, crossJobEvidence);
+  return jobEvidence.report;
 }
 
 function readNamesNotReachingTierZero(jobs) {

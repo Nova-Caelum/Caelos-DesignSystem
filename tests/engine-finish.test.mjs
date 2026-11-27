@@ -73,8 +73,8 @@ function makeWork(t, { signoff = true, chain = 'apply', id = 'job-apply' } = {})
   }
   if (signoff) writeFileSync(path.join(jobFolder, 'signoff.json'), `${JSON.stringify(promoteRecord(undefined, id), null, 2)}\n`);
   writeFileSync(path.join(jobFolder, 'events.jsonl'), `${JSON.stringify({
-    seq: 1, kind: 'node.exit', run_id: 'fixture-run', node: 'craft',
-    ts: '2026-11-26T09:00:00.000Z', model: 'fixture-allowed-model',
+    seq: 1, kind: 'node.enter', run_id: 'fixture-run', node: 'craft', step: 'craft',
+    ts: '2026-11-26T09:00:00.000Z', model: 'fixture-allowed-model', model_source: 'run-setting',
   })}\n`);
   const job = {
     id, chain,
@@ -138,11 +138,13 @@ function passingState(work, designSystemMergeCommit, overrides = {}) {
 function writeEvents(work, records) {
   writeFileSync(path.join(work.jobFolder, 'events.jsonl'), records.map((record, index) => JSON.stringify({
     seq: index + 1,
-    kind: 'node.exit',
+    kind: 'node.enter',
     run_id: 'fixture-run',
     node: record.node,
     ts: '2026-11-26T09:00:00.000Z',
-    ...(record.model === undefined ? {} : { model: record.model }),
+    ...(record.model === undefined ? {} : {
+      step: record.node, model: record.model, model_source: 'run-setting',
+    }),
   })).join('\n') + (records.length ? '\n' : ''));
 }
 
@@ -466,6 +468,7 @@ test('E4: the runner stores output hashes immediately before entering finish', a
   job.chain = 'apply';
   writeFileSync(path.join(work.jobFolder, 'job.json'), `${JSON.stringify(job, null, 2)}\n`);
   const result = runRunnerJob(work.jobFolder, {
+    model: 'fixture-allowed-model',
     harnessCheck() {},
     catalogCheck() {},
     stepRunner({ row }) {
@@ -702,7 +705,7 @@ test('attack: a promote record dated after the app merge yields job_passed false
   assert.equal(report.job_passed, false);
 });
 
-test('model record: the harness reply model is written to node.exit in events.jsonl', (t) => {
+test('model record: the run setting is written before the model step and ignores stream content', (t) => {
   const root = mkdtempSync(path.join(tmpdir(), 'engine-model-record-'));
   const source = path.join(root, 'source');
   const jobFolder = path.join(root, 'job');
@@ -715,7 +718,8 @@ test('model record: the harness reply model is written to node.exit in events.js
   chmodSync(harness, 0o755);
   command(source, 'git', 'init', '-q');
   const base = commit(source, 'model fixture base');
-  const expectedModel = readJson(path.join(fixtureRoot, 'refused-model-event.json')).model;
+  const expectedModel = 'fixture-run-model';
+  let observedBeforeStep = false;
   writeFileSync(path.join(jobFolder, 'input.json'), '{}\n');
   writeFileSync(path.join(jobFolder, 'job.json'), '{"chain":"fixture-model-record"}\n');
   writeFileSync(path.join(jobFolder, 'chain.json'), `${JSON.stringify({
@@ -727,18 +731,101 @@ test('model record: the harness reply model is written to node.exit in events.js
   }, null, 2)}\n`);
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const result = runJob(jobFolder, {
+    model: expectedModel,
     harnessCheck() {},
     stepRunner({ row }) {
+      const beforeStep = readFileSync(path.join(jobFolder, 'events.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+      observedBeforeStep = beforeStep.some(({ kind, step, model, model_source: source }) => (
+        kind === 'node.enter' && step === row.step && model === expectedModel && source === 'run-setting'
+      ));
       return runCodexStep({
         gitRoot: source, baseCommit: base, jobFolder, step: row, command: harness,
+        model: expectedModel,
       });
     },
     catalogCheck() {},
   });
   assert.equal(result.complete, true);
+  assert.equal(observedBeforeStep, true);
   const events = readFileSync(path.join(jobFolder, 'events.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
-  const exit = events.find(({ kind }) => kind === 'node.exit');
-  assert.equal(exit.model, expectedModel);
+  const record = events.find(({ kind }) => kind === 'node.enter');
+  assert.deepEqual(
+    { step: record.step, model: record.model, model_source: record.model_source },
+    { step: 'model', model: expectedModel, model_source: 'run-setting' },
+  );
+});
+
+test('runner refuses a model chain with no run setting before writing events', (t) => {
+  const work = makeWork(t);
+  rmSync(path.join(work.jobFolder, 'events.jsonl'));
+  assert.throws(
+    () => runJob(work.jobFolder, { harnessCheck() {}, catalogCheck() {}, stepRunner() {} }),
+    /--model.*CAELOS_STEP_MODEL/,
+  );
+  assert.equal(existsSync(path.join(work.jobFolder, 'events.jsonl')), false);
+});
+
+test('runner uses CAELOS_STEP_MODEL when the CLI run setting is absent', (t) => {
+  const work = makeWork(t);
+  rmSync(path.join(work.jobFolder, 'events.jsonl'));
+  const previous = process.env.CAELOS_STEP_MODEL;
+  process.env.CAELOS_STEP_MODEL = 'fixture-env-model';
+  t.after(() => {
+    if (previous === undefined) delete process.env.CAELOS_STEP_MODEL;
+    else process.env.CAELOS_STEP_MODEL = previous;
+  });
+  assert.equal(runJob(work.jobFolder, {
+    harnessCheck() {}, catalogCheck() {}, stepRunner() {},
+  }).complete, true);
+  const events = readFileSync(path.join(work.jobFolder, 'events.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+  assert.equal(events.find(({ kind }) => kind === 'node.enter').model, 'fixture-env-model');
+});
+
+test('runner refuses a refused run setting before the harness or step can run', (t) => {
+  const work = makeWork(t);
+  rmSync(path.join(work.jobFolder, 'events.jsonl'));
+  let started = false;
+  assert.throws(() => runJob(work.jobFolder, {
+    model: refusedModels[0],
+    harnessCheck() { started = true; },
+    catalogCheck() {},
+    stepRunner() { started = true; },
+  }), /refused model/i);
+  assert.equal(started, false);
+  assert.equal(existsSync(path.join(work.jobFolder, 'events.jsonl')), false);
+});
+
+test('finish skips a sibling without finish and writes the complete evidence set', async (t) => {
+  const work = makeWork(t);
+  const sibling = path.join(work.root, 'unfinished');
+  mkdirSync(sibling);
+  writeFileSync(path.join(sibling, 'job.json'), '{"id":"job-unfinished","chain":"apply"}\n');
+  const interfaces = makeInterfaces(work);
+  const { options, appPull } = await advanceThroughPullRequests(work, interfaces);
+  interfaces.setDeploy(deployRecord(work, appPull.mergeCommit));
+  assert.equal((await finishJob(options)).status, 'complete');
+  for (const name of ['job-apply.json', 'signoffs.json', 'gaps.json', 'system-faithful.json']) {
+    assert.equal(existsSync(path.join(work.evidenceFolder, name)), true);
+  }
+  for (const name of ['signoffs.json', 'gaps.json', 'system-faithful.json']) {
+    assert.deepEqual(readJson(path.join(work.evidenceFolder, name)).skipped_jobs, [
+      { job: 'job-unfinished', reason: 'job has not reached finish' },
+    ]);
+  }
+});
+
+test('finish writes no evidence file when a sibling read fails', async (t) => {
+  const work = makeWork(t);
+  const sibling = path.join(work.root, 'broken');
+  mkdirSync(sibling);
+  writeFileSync(path.join(sibling, 'job.json'), '{not json}\n');
+  const interfaces = makeInterfaces(work);
+  const { options, appPull } = await advanceThroughPullRequests(work, interfaces);
+  interfaces.setDeploy(deployRecord(work, appPull.mergeCommit));
+  await assert.rejects(finishJob(options), /job\.json is not valid JSON/);
+  for (const name of ['job-apply.json', 'signoffs.json', 'gaps.json', 'system-faithful.json']) {
+    assert.equal(existsSync(path.join(work.evidenceFolder, name)), false);
+  }
 });
 
 test('runner wiring: a paused finish step is resumed instead of recorded as complete', (t) => {

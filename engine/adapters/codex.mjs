@@ -9,11 +9,12 @@ import {
 
 const maxBuffer = 64 * 1024 * 1024;
 
-export function buildCodexCommand({ command = 'codex', checkout, lastMessageFile, prompt }) {
+export function buildCodexCommand({ command = 'codex', checkout, lastMessageFile, model, prompt }) {
   return {
     command,
     args: [
       'exec',
+      '--model', model,
       '--sandbox', 'workspace-write',
       '--ephemeral',
       '--json',
@@ -59,32 +60,11 @@ function promptFor(step, instructions, checkout, jobFolder) {
   ].join('\n');
 }
 
-function findModel(value) {
-  if (!value || typeof value !== 'object') return null;
-  if (typeof value.model === 'string' && value.model.trim()) return value.model.trim();
-  for (const child of Object.values(value)) {
-    const model = findModel(child);
-    if (model) return model;
-  }
-  return null;
-}
-
-export function parseHarnessModel(output) {
-  let model = null;
-  for (const line of String(output || '').split('\n').filter(Boolean)) {
-    try {
-      model ||= findModel(JSON.parse(line));
-    } catch {
-      // The harness JSON stream may be surrounded by non-JSON diagnostics.
-    }
-  }
-  return model;
-}
-
 export function runCodexStep(options) {
   const {
-    gitRoot, baseCommit, jobFolder, step, command = 'codex',
+    gitRoot, baseCommit, jobFolder, step, model, command = 'codex',
   } = options;
+  if (typeof model !== 'string' || !model.trim()) throw new Error(`model step ${step.step} requires a run model setting`);
   const env = spawnEnvironment(options);
   const jobFilesBefore = snapshotFileList(jobFolder);
   assertCodexAvailable({ command, env });
@@ -111,6 +91,7 @@ export function runCodexStep(options) {
       command,
       checkout,
       lastMessageFile: path.join(container, 'last-message.txt'),
+      model,
       prompt: promptFor(step, instructions, checkout, jobFolder),
     });
     const result = spawnSync(built.command, built.args, {
@@ -141,6 +122,6 @@ export function runCodexStep(options) {
       const destination = outputDestination(jobFolder, step.outputs[index]);
       copyFileSync(outputFiles[index], destination);
     }
-    return { outputs: [...step.outputs], model: parseHarnessModel(result.stdout) };
+    return { outputs: [...step.outputs], model };
   });
 }

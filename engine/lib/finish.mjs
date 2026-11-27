@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import {
-  jobFoldersUnder, readEngineOutputHashes, recomputeCrossJobEvidence, writeJobEvidence,
+  jobFoldersUnder, readEngineOutputHashes, writeCompleteEvidenceSet,
 } from './evidence.mjs';
 import { pinApp } from '../steps/pin-app.mjs';
 
@@ -151,10 +151,9 @@ export async function finishJob({
   save();
 
   if (!job.finish.app) {
-    const report = await writeJobEvidence({
-      jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord: null,
+    const report = await writeCompleteEvidenceSet({
+      jobFolders, jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord: null,
     });
-    await recomputeCrossJobEvidence({ jobFolders, evidenceFolder: evidence });
     state.report = report;
     save();
     return result(jobFolder, state, 'complete');
@@ -197,10 +196,9 @@ export async function finishJob({
     return result(jobFolder, state, 'waiting-deploy');
   }
   state.deployRecord = deployRecord;
-  const report = await writeJobEvidence({
-    jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord,
+  const report = await writeCompleteEvidenceSet({
+    jobFolders, jobFolder, evidenceFolder: evidence, snapshot: outputHashes, state, git, deployRecord,
   });
-  await recomputeCrossJobEvidence({ jobFolders, evidenceFolder: evidence });
   state.report = report;
   save();
   return result(jobFolder, state, 'complete');

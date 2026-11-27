@@ -7,7 +7,7 @@ import {
 } from './chain.mjs';
 import { createEventWriter, finishedSteps, readEvents } from './events.mjs';
 import { assertCodexAvailable, runCodexStep } from '../adapters/codex.mjs';
-import { storeEngineOutputHashes } from './evidence.mjs';
+import { isRefusedModel, storeEngineOutputHashes } from './evidence.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 
@@ -37,7 +37,20 @@ function jobFile(folder, name) {
   return path.join(folder, name);
 }
 
-export function executeStep(name, folder) {
+function selectedModel(explicit) {
+  const value = explicit === undefined ? process.env.CAELOS_STEP_MODEL : explicit;
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function requireAllowedModel(model) {
+  if (!model) {
+    throw new Error('model steps require a run setting; pass --model <id> or set CAELOS_STEP_MODEL');
+  }
+  if (isRefusedModel(model)) throw new Error(`refused model ${model} cannot run`);
+  return model;
+}
+
+export function executeStep(name, folder, options = {}) {
   const jobFolder = path.resolve(folder);
   const chain = readChainSnapshot(jobFolder);
   const row = chain.steps.find(({ step }) => step === name);
@@ -51,16 +64,15 @@ export function executeStep(name, folder) {
     }
   }
   if (row.kind === 'model') {
+    const model = requireAllowedModel(selectedModel(options.model));
     const reply = runCodexStep({
       gitRoot: repositoryRoot,
       baseCommit: chain.commit,
       jobFolder,
       step: row,
+      model,
       command: process.env.CAELOS_CODEX_COMMAND || 'codex',
     });
-    if (typeof reply.model !== 'string' || !reply.model) {
-      throw new Error(`model step ${name} harness reply did not name the model`);
-    }
     for (const output of row.outputs) {
       if (!existsSync(jobFile(jobFolder, output))) {
         throw new Error(`step ${name} did not write ${output}; fix the script and try again`);
@@ -88,9 +100,10 @@ function parseStepResult(output, step) {
   }
 }
 
-function defaultStepRunner({ jobFolder, row }) {
+function defaultStepRunner({ jobFolder, row, model }) {
+  const modelArgs = row.kind === 'model' ? ['--model', model] : [];
   const processResult = runProcess(
-    process.execPath, [cli, 'step', row.step, '--job', jobFolder], `step ${row.step}`,
+    process.execPath, [cli, 'step', row.step, '--job', jobFolder, ...modelArgs], `step ${row.step}`,
   );
   return parseStepResult(processResult.stdout, row.step);
 }
@@ -119,6 +132,8 @@ export function runJob(folder, options = {}) {
   const jobFolder = path.resolve(folder);
   const job = readJob(jobFolder);
   const chain = materializeChain(jobFolder, job.chain);
+  const hasModelStep = chain.steps.some(({ kind }) => kind === 'model');
+  const model = hasModelStep ? requireAllowedModel(selectedModel(options.model)) : '';
   const previous = readEvents(jobFolder);
   const start = resumeIndex(chain, previous);
   if (start >= chain.steps.length) return { complete: true, resumed: true };
@@ -132,11 +147,13 @@ export function runJob(folder, options = {}) {
 
   for (const row of chain.steps.slice(start)) {
     if (row.step === 'finish' && job.finish) storeEngineOutputHashes(jobFolder, job.finish);
-    events.emit('node.enter', row.step);
+    events.emit('node.enter', row.step, row.kind === 'model' ? {
+      step: row.step, model, model_source: 'run-setting',
+    } : {});
     try {
-      const stepResult = stepRunner({ jobFolder, row });
+      stepRunner({ jobFolder, row, model });
       catalogCheck({ jobFolder, row });
-      events.emit('node.exit', row.step, stepResult.model ? { model: stepResult.model } : {});
+      events.emit('node.exit', row.step);
     } catch (error) {
       if (error.exitCode === 75) {
         events.emit('run.pause', null, { step: row.step, status: 'waiting' });
