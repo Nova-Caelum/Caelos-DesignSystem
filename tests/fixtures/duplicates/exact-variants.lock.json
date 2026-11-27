@@ -2,14 +2,22 @@
   "entries": {
     "controls.shared.alpha": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "variants": {
-        "size=compact": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        "size=compact": {
+          "fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "contentFingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
       }
     },
     "controls.shared.beta": {
       "fingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "contentFingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
       "variants": {
-        "size=compact": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        "size=compact": {
+          "fingerprint": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "contentFingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
       }
     }
   }

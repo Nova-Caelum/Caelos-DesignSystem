@@ -48,13 +48,13 @@ function fingerprint(value) {
   return createHash('sha256').update(serialise(value)).digest('hex');
 }
 
-function ignoredFields(schema) {
+function ignoredFields(schema, marker) {
   const ignored = new Set();
   function visit(node) {
     if (!node || typeof node !== 'object') return;
     if (node.properties && typeof node.properties === 'object') {
       for (const [name, definition] of Object.entries(node.properties)) {
-        if (definition?.['x-caelos-ignore-for-change'] === true) ignored.add(name);
+        if (definition?.[marker] === true) ignored.add(name);
       }
     }
     for (const value of Object.values(node)) visit(value);
@@ -125,7 +125,7 @@ function selectionName(selection) {
   return Object.keys(selection).sort().map((axis) => `${axis}=${String(selection[axis])}`).join(',');
 }
 
-function createResolver(catalog, ignored) {
+function createResolver(catalog, ignored, { globalIgnored = new Set(), pruneEmptyMetadata = false } = {}) {
   const entryMemo = new Map();
   const tokenMemo = new Map();
 
@@ -134,9 +134,14 @@ function createResolver(catalog, ignored) {
     if (!value || typeof value !== 'object') return value;
     const result = {};
     for (const key of Object.keys(value).sort()) {
-      if (inAppRecord && ignored.has(key)) continue;
+      if (globalIgnored.has(key) || (inAppRecord && ignored.has(key))) continue;
       const childIsAppRecord = key === appExtension;
-      result[key] = clean(value[key], childIsAppRecord);
+      const child = clean(value[key], childIsAppRecord);
+      if (pruneEmptyMetadata && (key === appExtension || key === '$extensions') &&
+          child && typeof child === 'object' && !Array.isArray(child) && Object.keys(child).length === 0) {
+        continue;
+      }
+      result[key] = child;
     }
     return result;
   }
@@ -187,7 +192,24 @@ function createResolver(catalog, ignored) {
     return resolved;
   }
 
-  return { clean, resolveEntry };
+  function resolveSelectionValues(selection) {
+    return Object.entries(selection)
+      .map(([axis, value]) => [axis, resolveValue(value, [])])
+      .sort((left, right) => serialise(left).localeCompare(serialise(right)));
+  }
+
+  return { clean, resolveEntry, resolveSelectionValues };
+}
+
+function hasResolvedToken(value) {
+  if (Array.isArray(value)) return value.some(hasResolvedToken);
+  if (!value || typeof value !== 'object') return false;
+  if (Object.hasOwn(value, '$value')) return true;
+  return Object.values(value).some(hasResolvedToken);
+}
+
+function resolvedContentIsEmpty(content, selected = []) {
+  return content.madeOf.length === 0 && !hasResolvedToken(content.content) && !hasResolvedToken(selected);
 }
 
 function createDependencyWalker(catalog, clean) {
@@ -251,8 +273,16 @@ function createDependencyWalker(catalog, clean) {
 async function run(options) {
   const schema = JSON.parse(await readFile(options.schema, 'utf8'));
   const catalog = await loadCatalog(options.catalog);
-  const resolver = createResolver(catalog, ignoredFields(schema));
-  const walker = createDependencyWalker(catalog, resolver.clean);
+  const changeResolver = createResolver(catalog, ignoredFields(schema, 'x-caelos-ignore-for-change'));
+  const contentResolver = createResolver(
+    catalog,
+    ignoredFields(schema, 'x-caelos-ignore-for-content'),
+    {
+      globalIgnored: ignoredFields(schema, 'x-caelos-ignore-for-content-globally'),
+      pruneEmptyMetadata: true,
+    },
+  );
+  const walker = createDependencyWalker(catalog, changeResolver.clean);
 
   if (options.dependents !== undefined) {
     const target = catalog.tokens.get(options.dependents);
@@ -275,14 +305,30 @@ async function run(options) {
   let variantCount = 0;
   for (const name of [...catalog.entries.keys()].sort()) {
     const definitions = catalog.entries.get(name);
-    const content = resolver.resolveEntry(name);
+    const changeContent = changeResolver.resolveEntry(name);
+    const renderedContent = contentResolver.resolveEntry(name);
     const variants = {};
     for (const selection of variantSelections(definitions)) {
       if (Object.keys(selection).length === 0) continue;
-      variants[selectionName(selection)] = fingerprint({ content, selected: selection });
+      const resolvedSelection = contentResolver.resolveSelectionValues(selection);
+      const empty = resolvedContentIsEmpty(renderedContent, resolvedSelection);
+      variants[selectionName(selection)] = {
+        fingerprint: fingerprint({ content: changeContent, selected: selection }),
+        contentFingerprint: fingerprint({
+          content: renderedContent,
+          selected: resolvedSelection,
+        }),
+        ...(empty ? { empty: true } : {}),
+      };
       variantCount += 1;
     }
-    entries[name] = { fingerprint: fingerprint(content), variants };
+    const empty = resolvedContentIsEmpty(renderedContent);
+    entries[name] = {
+      fingerprint: fingerprint(changeContent),
+      contentFingerprint: fingerprint(renderedContent),
+      variants,
+      ...(empty ? { empty: true } : {}),
+    };
   }
   const output = `${JSON.stringify(canonical({ entries }), null, 2)}\n`;
   await mkdir(path.dirname(options.out), { recursive: true });

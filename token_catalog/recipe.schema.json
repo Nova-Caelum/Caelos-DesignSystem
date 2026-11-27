@@ -4,9 +4,45 @@
   "type": "object",
   "required": ["lifecycle"],
   "properties": {
-    "lifecycle": { "type": "string", "enum": ["draft", "promoted", "placeholder"], "x-caelos-ignore-for-change": true },
-    "draftedBy": { "type": "string", "minLength": 1, "x-caelos-ignore-for-change": true },
-    "draftedAt": { "type": "string", "format": "date-time", "x-caelos-ignore-for-change": true },
+    "$description": {
+      "type": "string", "x-caelos-ignore-for-content": true,
+      "x-caelos-ignore-for-content-globally": true
+    },
+    "inventoryName": { "type": "string", "x-caelos-ignore-for-content": true },
+    "displayName": { "type": "string", "x-caelos-ignore-for-content": true },
+    "displayNameSource": { "type": "string", "x-caelos-ignore-for-content": true },
+    "figmaName": { "type": "string", "x-caelos-ignore-for-content": true },
+    "figmaPreviousNames": {
+      "type": "array", "items": { "type": "string" }, "x-caelos-ignore-for-content": true
+    },
+    "formerPaths": {
+      "type": "array", "items": { "type": "string" }, "x-caelos-ignore-for-content": true
+    },
+    "family": { "type": "string", "x-caelos-ignore-for-content": true },
+    "naming": { "type": "string", "x-caelos-ignore-for-content": true },
+    "status": { "type": "string", "x-caelos-ignore-for-content": true },
+    "decision": { "type": "string", "x-caelos-ignore-for-content": true },
+    "decisions": {
+      "type": "array", "items": { "type": "string" }, "x-caelos-ignore-for-content": true
+    },
+    "note": { "type": "string", "x-caelos-ignore-for-content": true },
+    "provenance": {
+      "type": "array", "items": { "type": "object" }, "x-caelos-ignore-for-content": true
+    },
+    "lifecycle": {
+      "type": "string", "enum": ["draft", "promoted", "placeholder"],
+      "x-caelos-ignore-for-change": true, "x-caelos-ignore-for-content": true
+    },
+    "draftedBy": {
+      "type": "string", "minLength": 1,
+      "x-caelos-ignore-for-change": true, "x-caelos-ignore-for-content": true
+    },
+    "draftedAt": {
+      "type": "string", "format": "date-time",
+      "x-caelos-ignore-for-change": true, "x-caelos-ignore-for-content": true
+    },
+    "variants": { "type": "object", "x-caelos-ignore-for-content": true },
+    "defaultVariants": { "type": "object", "x-caelos-ignore-for-content": true },
     "kind": {
       "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
       "x-caelos-required-on-active-recipe": true
