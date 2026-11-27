@@ -2,11 +2,15 @@
   "entries": {
     "primitives.shared.existing": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "variants": {}
+      "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "variants": {},
+      "variantContentFingerprints": {}
     },
     "primitives.shared.rebuilt": {
       "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "variants": {}
+      "contentFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "variants": {},
+      "variantContentFingerprints": {}
     }
   }
 }

@@ -10,6 +10,16 @@
           "$type": "color",
           "$value": "{base.color.ink}"
         }
+      },
+      "empty-record": {
+        "$extensions": {
+          "app.caelos": {
+            "states": ["idle"],
+            "variants": {
+              "tone": ["quiet", "loud"]
+            }
+          }
+        }
       }
     }
   }

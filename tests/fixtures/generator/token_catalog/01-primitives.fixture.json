@@ -1,0 +1,67 @@
+{
+  "primitives": {
+    "shared": {
+      "cloud": {
+        "angle": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "body": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "body-alpha": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "wash-end": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "wash-end-alpha": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "wash-start": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "wash-start-alpha": { "$type": "number", "$value": "__FIXTURE_number__" }
+      },
+      "glass": {
+        "base-alpha": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "blur": { "$type": "dimension", "$value": "__FIXTURE_dimension__" },
+        "body": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "falloff-at": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "falloff-strength": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "overlap-clear": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "overlap-covered": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "saturation": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "saturation-neutral": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "tint": { "$type": "number", "$value": "__FIXTURE_number__" },
+        "tint-ink": { "$type": "color", "$value": "__FIXTURE_color__" }
+      },
+      "recipes-focus": {
+        "foreground": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "glow-blur": { "$type": "dimension", "$value": "__FIXTURE_dimension__" },
+        "glow-ink": { "$type": "color", "$value": "__FIXTURE_color__" },
+        "glow-opacity": { "$type": "number", "$value": "__FIXTURE_number__" }
+      },
+      "surface": {
+        "button": {
+          "bed": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "default": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "disabled-bed": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "glow-offset": { "$type": "dimension", "$value": "__FIXTURE_dimension__" },
+          "hover": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "pressed": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "success": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "tint": { "$type": "number", "$value": "__FIXTURE_number__" }
+        }
+      },
+      "typography": {
+        "family": {
+          "ui": { "$type": "fontFamily", "$value": "__FIXTURE_fontFamily__" }
+        },
+        "line": {
+          "label": { "$type": "dimension", "$value": "__FIXTURE_dimension__" }
+        },
+        "size": {
+          "label": { "$type": "dimension", "$value": "__FIXTURE_dimension__" }
+        },
+        "tone": {
+          "default": { "$type": "color", "$value": "__FIXTURE_color__" },
+          "dim": { "$type": "color", "$value": "__FIXTURE_color__" }
+        }
+      }
+    }
+  },
+  "sys": {
+    "color": {
+      "ready": { "$type": "color", "$value": "__FIXTURE_color__" },
+      "success": { "$type": "color", "$value": "__FIXTURE_color__" }
+    }
+  }
+}
