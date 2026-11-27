@@ -1,0 +1,8 @@
+{
+  "app/page.tsx": {
+    "raw-style": 2
+  },
+  "app/new-page.tsx": {
+    "raw-style": 1
+  }
+}

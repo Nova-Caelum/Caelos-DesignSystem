@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const checker = path.join(root, 'scripts/check-ratchet.mjs');
+const fixtureRoot = path.join(root, 'tests/fixtures/check-ratchet');
 const exceptions = 'token_catalog/tier-line.exceptions.json';
 const original = 'overlays.shared.notice.foreground';
 
@@ -15,6 +16,10 @@ function cleanEnv(extra = {}) {
   const env = { ...process.env, ...extra };
   delete env.CI;
   return env;
+}
+
+function countsFixture(name) {
+  return JSON.parse(readFileSync(path.join(fixtureRoot, `${name}.json.fixture`), 'utf8'));
 }
 
 function fixture(t, { commit = true } = {}) {
@@ -115,6 +120,32 @@ test('ratchet accepts shrinking counts and rejects increases, new rules and new 
   assert.match(larger.stderr, /count rose from 2 to 3/);
   assert.match(larger.stderr, /rule unknown-token was added/);
   assert.match(larger.stderr, /file app\/next\.ts was added/);
+});
+
+test('app gate baseline passes when current per-file rule counts shrink', (t) => {
+  const { run, write } = fixture(t);
+  write('gate-baseline.json', countsFixture('gate-baseline'));
+  write('gate-actual.json', countsFixture('gate-actual-shrink'));
+  const result = run('--mode', 'baseline', '--baseline', 'gate-baseline.json', '--actual', 'gate-actual.json');
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('app gate baseline fails when a per-file rule count rises', (t) => {
+  const { run, write } = fixture(t);
+  write('gate-baseline.json', countsFixture('gate-baseline'));
+  write('gate-actual.json', countsFixture('gate-actual-increase'));
+  const result = run('--mode', 'baseline', '--baseline', 'gate-baseline.json', '--actual', 'gate-actual.json');
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stderr, /count rose from 2 to 3/);
+});
+
+test('app gate baseline fails when findings appear in a new file', (t) => {
+  const { run, write } = fixture(t);
+  write('gate-baseline.json', countsFixture('gate-baseline'));
+  write('gate-actual.json', countsFixture('gate-actual-new-file'));
+  const result = run('--mode', 'baseline', '--baseline', 'gate-baseline.json', '--actual', 'gate-actual.json');
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stderr, /file app\/new-page\.tsx was added/);
 });
 
 test('F refuses base none in a repository with commits', (t) => {
