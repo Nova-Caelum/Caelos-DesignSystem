@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -16,7 +16,20 @@ const sourcePath = fileURLToPath(import.meta.url);
 
 function materialize() {
   const root = mkdtempSync(path.join(tmpdir(), 'page-paint-'));
-  cpSync(fixture, root, { recursive: true });
+  const copy = (source, destination) => {
+    for (const entry of readdirSync(source, { withFileTypes: true })) {
+      if (entry.name === 'README.md') continue;
+      const from = path.join(source, entry.name);
+      if (entry.isDirectory()) {
+        copy(from, path.join(destination, entry.name));
+      } else if (entry.name.endsWith('.fixture')) {
+        const to = path.join(destination, entry.name.slice(0, -'.fixture'.length));
+        mkdirSync(path.dirname(to), { recursive: true });
+        writeFileSync(to, readFileSync(from));
+      }
+    }
+  };
+  copy(fixture, root);
   return root;
 }
 
