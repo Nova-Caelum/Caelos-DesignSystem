@@ -237,6 +237,12 @@ test('B adding siblings makes an incomplete entry changed', (t) => {
   refused(run(), 'requires madeOf');
 });
 
+test('B changing only the description makes an incomplete entry changed', (t) => {
+  const { entry, run } = fixture(t);
+  entry({}, 'Changed recipe');
+  refused(run(), 'requires madeOf');
+});
+
 test('B lifecycle, draftedBy and draftedAt alone do not make an entry changed', (t) => {
   const { entry, run } = fixture(t);
   entry({ lifecycle: 'draft', draftedBy: 'catalog', draftedAt: '2026-02-28T00:00:00Z' });
@@ -311,6 +317,24 @@ test('F refuses base none in a repository with commits', (t) => {
   });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /--base none is only for a repository's first commit; pass --base <ref>/);
+});
+
+test('F reads base HEAD from CAELOS_CATALOG_GIT_ROOT for a checkout snapshot', (t) => {
+  const { cwd } = fixture(t);
+  const snapshot = mkdtempSync(path.join(tmpdir(), 'catalog-recipe-snapshot-'));
+  t.after(() => rmSync(snapshot, { recursive: true, force: true }));
+  mkdirSync(path.join(snapshot, catalog));
+  for (const file of [
+    'recipe.schema.json', 'paint-families.json', 'tier-line.exceptions.json',
+    '00-foundations.tokens.json', '01-primitives.tokens.json', '04-patterns.tokens.json',
+  ]) {
+    copyFileSync(path.join(cwd, catalog, file), path.join(snapshot, catalog, file));
+  }
+  const result = spawnSync(process.execPath, [checker, '--base', 'HEAD'], {
+    cwd: snapshot, encoding: 'utf8', env: cleanEnv({ CAELOS_CATALOG_GIT_ROOT: cwd }),
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Recipe schema and paint line passed/);
 });
 
 // The tier proof commits the first commit of a new repository through the hook on a CI runner,
