@@ -8,6 +8,10 @@ Raw values live only in the bottom tier. Every tier above it uses only tokens an
 
 Copyright 2026 Nova Caelum & Co. All rights reserved. See [LICENSE](LICENSE).
 
+## Setup
+
+After cloning, run `npm run hooks` once to install the pre-commit hook.
+
 ## Use the Tier 1 materials
 
 Add `materialPreset` from [src/material-preset.mjs](src/material-preset.mjs) to the Panda configuration's presets. Use the generated `material({ layer: 'ground', texture: 'auto' })` recipe. Auto selects graph or glass by layer. Choose plain, cloud, graph, glass, or sage for an explicit finish. Set `data-theme="light"` on a containing element for the light theme. Reduced transparency uses a solid fill for each glass finish.

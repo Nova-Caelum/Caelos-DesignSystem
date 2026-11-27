@@ -68,6 +68,15 @@ test("package files include all public export targets", () => {
   assert.ok(packageJson.files.includes("generated/"));
 });
 
+test("a git install runs no lifecycle script of the package", () => {
+  const { scripts } = readPackageJson();
+
+  for (const lifecycleScript of ["prepare", "preinstall", "install", "postinstall", "prepack", "postpack"]) {
+    assert.equal(scripts[lifecycleScript], undefined, `${lifecycleScript} must not be a package lifecycle script`);
+  }
+  assert.equal(scripts.hooks, "husky");
+});
+
 test("npm pack includes every public export target", () => {
   const packedFiles = packageFiles();
 
