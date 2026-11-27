@@ -194,14 +194,20 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     const rawLines = raw.split("\n");
     const exempt = [], kept = [];
     for (const fd of st.findings) {
-      let reason = st.ranges.find((r) => fd.idx >= r.from && fd.idx <= r.to)?.reason;
+      const range = st.ranges.find((r) => fd.idx >= r.from && fd.idx <= r.to);
+      let reason = range?.reason;
       if (reason === undefined) {
         for (const ln of [fd.line, fd.line - 1]) {
           const m = rawLines[ln - 1]?.match(/(?:ui|kit)-exempt:\s*(.*?)\s*(?:\*\/|-->|\}\s*$|$)/);
           if (m) { reason = m[1]; break; }
         }
       }
-      if (reason === undefined) kept.push(fd);
+      if (fd.rule === "page-paint") {
+        const exemption = range && reason
+          ? `; element carried ${range.attribute}="${reason}" but page paint has no exemption`
+          : "; page paint has no exemption";
+        kept.push({ ...fd, message: `${fd.message}${exemption}` });
+      } else if (reason === undefined) kept.push(fd);
       else if (reason === "") kept.push(fd); // an exemption without a reason does not exempt
       else exempt.push({ ...fd, reason });
     }
@@ -258,7 +264,7 @@ export function createEngine({ root, cfg, index, classGlobal, moduleIdx, defined
     for (const el of els) {
       const ex = exemptAttr(el);
       if (ex) {
-        st.ranges.push({ from: el.idx, to: el.openEnd, reason: (ex.value ?? "").trim() });
+        st.ranges.push({ from: el.idx, to: el.openEnd, reason: (ex.value ?? "").trim(), attribute: ex.name });
         if (cfg.pagePaint) add("page-paint-exemption", ex.start ?? el.idx,
           `${ex.name} on <${el.tag}> is listed for review`, "info");
       }

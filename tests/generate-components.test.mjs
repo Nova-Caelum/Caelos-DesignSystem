@@ -127,6 +127,11 @@ export function \${model.componentName}({ children, variant = 'default', ...prop
   const result = invoke({ ...work, output, templates });
   assert.equal(result.status, 0, result.stderr);
   const source = readFileSync(path.join(output, 'CompositeButton.tsx'), 'utf8');
+  const css = readFileSync(path.join(output, 'CompositeButton.css'), 'utf8');
+  assert.match(source, /import \{ LeadingPart \} from '\.\/LeadingPart';/u);
+  assert.match(source, /import \{ TrailingPart \} from '\.\/TrailingPart';/u);
+  assert.ok(source.indexOf('<LeadingPart') < source.indexOf('<TrailingPart'));
+  assert.deepEqual(declarations(css), []);
   assert.match(source, /<button\b[^>]*data-entry="overlays\.shared\.CompositeButton"[^>]*data-variant=\{variant\}/su);
   assert.match(source, /<LeadingPart\b[^>]*variant=\{variant\}/u);
   assert.match(source, /<TrailingPart\b[^>]*variant=\{variant\}/u);
@@ -173,6 +178,61 @@ test('(f4) templates are discovered recursively like the recipe checker', (t) =>
   assert.equal(result.status, 0, result.stderr);
   assert.ok(readdirSync(output).includes('Button.tsx'), result.stdout);
   assert.doesNotMatch(result.stdout, /controls\.shared\.Button[^\n]*template/u);
+});
+
+test('(f4a) duplicate template kinds are refused', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(path.join(templates, 'first'), { recursive: true });
+  mkdirSync(path.join(templates, 'second'), { recursive: true });
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'first', 'button.mjs'));
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'second', 'button.mjs'));
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stderr, /duplicate template kind "button"/u);
+  assert.match(result.stderr, /first\/button\.mjs/u);
+  assert.match(result.stderr, /second\/button\.mjs/u);
+});
+
+test('(f4b) a transitive same-kind interactive part is refused with its path', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(templates);
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'button.mjs'));
+  writeFileSync(path.join(templates, 'span.mjs'), `
+export const requiredFields = ['kind', 'layerOrder'];
+export const interactiveElement = null;
+export function render(model) {
+  return { tsx: \`export function \${model.componentName}() { return <span />; }\`, css: '' };
+}
+`);
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (document) => {
+    delete document.overlays.shared.CompositeButton;
+    document.overlays.shared.NonInteractiveGroup = {
+      $extensions: { 'app.caelos': {
+        lifecycle: 'draft', recipeInStaging: true, kind: 'span',
+        madeOf: ['controls.shared.LeadingPart'], layerOrder: ['controls.shared.LeadingPart'],
+      } },
+    };
+  });
+  const transitiveCatalog = {
+    patterns: {
+      shared: {
+        TransitiveComposite: { $extensions: { 'app.caelos': {
+          lifecycle: 'draft', recipeInStaging: true, kind: 'button',
+          madeOf: ['overlays.shared.NonInteractiveGroup'], layerOrder: ['overlays.shared.NonInteractiveGroup'],
+        } } },
+      },
+    },
+  };
+  writeFileSync(path.join(work.catalog, '04-patterns.tokens.json'), `${JSON.stringify(transitiveCatalog, null, 2)}\n`);
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /patterns\.shared\.TransitiveComposite[^\n]*interactive[^\n]*button/u);
+  assert.match(result.stdout, /patterns\.shared\.TransitiveComposite → overlays\.shared\.NonInteractiveGroup → controls\.shared\.LeadingPart/u);
+  assert.ok(!readdirSync(output).some((file) => file.startsWith('TransitiveComposite.')));
 });
 
 test('(f5) empty generator inputs are refused with the entry and field, and never render', async (t) => {

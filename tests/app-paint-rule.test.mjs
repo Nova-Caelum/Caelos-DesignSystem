@@ -267,7 +267,7 @@ test('(s) the paint pass scans configured pages even when the app scan excludes 
   assert.match(output, new RegExp(paintToken));
 });
 
-test('(t) every page exemption attribute is listed without failing the report-only policy', () => {
+test('(t) every page exemption attribute is listed and cannot hide paint', () => {
   const root = materialize();
   const paintToken = readFileSync(path.join(root, 'src', 'pages', 'PaintedPage.tsx'), 'utf8').match(/--[\w-]+/u)?.[0];
   assert.ok(paintToken);
@@ -284,8 +284,28 @@ export function ExemptPage() {
 
   const proc = invoke(root);
   const output = `${proc.stdout}\n${proc.stderr}`;
-  assert.equal(proc.status, 0, output);
-  assert.match(output, /src\/pages\/ExemptPage\.tsx/);
+  assert.equal(proc.status, 1, output);
+  assert.match(output, /src\/pages\/ExemptPage\.tsx:4/);
+  assert.match(output, /element carried data-ui-exempt=/u);
   assert.match(output, /data-ui-exempt[^\n]*legacy paint|legacy paint[^\n]*data-ui-exempt/u);
   assert.match(output, /data-kit-exempt[^\n]*migration marker|migration marker[^\n]*data-kit-exempt/u);
+  assert.match(output, /page-paint/u);
+  assert.match(output, /exempt/i);
+});
+
+test('(u) every page exemption attribute is listed when paint-free', () => {
+  const root = materialize();
+  removePaintedPage(root);
+  removeClassPaintPage(root);
+  writeFileSync(path.join(root, 'src', 'pages', 'ListedExemptPage.tsx'), `
+export function ListedExemptPage() {
+  return <main><b data-ui-exempt="migration marker" /></main>;
+}
+`);
+
+  const proc = invoke(root);
+  const output = `${proc.stdout}\n${proc.stderr}`;
+  assert.equal(proc.status, 0, output);
+  assert.match(output, /src\/pages\/ListedExemptPage\.tsx/);
+  assert.match(output, /data-ui-exempt[^\n]*migration marker|migration marker[^\n]*data-ui-exempt/u);
 });
