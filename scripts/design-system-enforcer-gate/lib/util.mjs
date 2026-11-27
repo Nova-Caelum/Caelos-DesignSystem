@@ -1,8 +1,9 @@
 // Small zero-dependency helpers: globs, directory walk, line maths, comment blanking.
-import { readdirSync, statSync, existsSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { readdirSync, statSync, existsSync, readFileSync } from "node:fs";
+import { join, relative, resolve, sep } from "node:path";
 
 const SKIP_DIRS = new Set(["node_modules", ".git", ".next", ".nuxt", ".svelte-kit", "out", "dist", "build", "coverage", ".turbo", ".cache", "__pycache__"]);
+const PAGE_OUTPUT_DIRS = new Set(["out", "dist", "build", "coverage"]);
 
 /** Glob to RegExp. Supports **, *, ?, {a,b}. Matches against forward-slash relative paths. */
 export function globToRegExp(glob) {
@@ -29,18 +30,36 @@ export const matcher = (globs) => {
   return (rel) => res.some((r) => r.test(rel));
 };
 
-/** Every file under `root` (forward-slash relative paths), skipping dependency and build directories. */
+function configuredPageMatcher(root) {
+  let globs;
+  try { globs = JSON.parse(process.env.CAELOS_PAGE_PAINT_PAGES ?? "null"); } catch { globs = null; }
+  if (!Array.isArray(globs)) {
+    const configFlag = process.argv.indexOf("--config");
+    const configPath = configFlag >= 0 && process.argv[configFlag + 1]
+      ? resolve(process.argv[configFlag + 1])
+      : join(root, "design-system-enforcer-gate.config.json");
+    try { globs = JSON.parse(readFileSync(configPath, "utf8")).pages; } catch { globs = null; }
+  }
+  return Array.isArray(globs) && globs.every((glob) => typeof glob === "string") ? matcher(globs) : null;
+}
+
+/** Every file under `root` (forward-slash relative paths), skipping dependency and unrequested output directories. */
 export function walk(root) {
   const out = [];
-  (function rec(dir) {
+  const pageMatch = configuredPageMatcher(root);
+  (function rec(dir, pageOnly = false) {
     if (!existsSync(dir)) return;
     for (const name of readdirSync(dir)) {
-      if (SKIP_DIRS.has(name)) continue;
       const p = join(dir, name);
       let st;
       try { st = statSync(p); } catch { continue; }
-      if (st.isDirectory()) rec(p);
-      else out.push(relative(root, p).split(sep).join("/"));
+      if (st.isDirectory()) {
+        if (!SKIP_DIRS.has(name)) rec(p, pageOnly);
+        else if (pageMatch && PAGE_OUTPUT_DIRS.has(name)) rec(p, true);
+      } else {
+        const rel = relative(root, p).split(sep).join("/");
+        if (!pageOnly || pageMatch(rel)) out.push(rel);
+      }
     }
   })(root);
   return out;

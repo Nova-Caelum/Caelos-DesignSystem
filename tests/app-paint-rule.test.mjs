@@ -7,7 +7,9 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 // Through require, so a standalone copy finds the package via NODE_PATH as the pre-commit hook runs it.
-const StyleDictionary = createRequire(import.meta.url)('style-dictionary').default;
+const require = createRequire(import.meta.url);
+const StyleDictionary = require('style-dictionary').default;
+const ts = require('typescript');
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.join(here, '..');
@@ -50,6 +52,64 @@ function removeClassPaintPage(root) {
 
 function paintCatalog() {
   return JSON.parse(readFileSync(catalogPath, 'utf8'));
+}
+
+function catalogNames() {
+  const catalog = paintCatalog();
+  return new Set(Object.entries(catalog).flatMap(([name, entry]) => [name, ...entry.tokenTypes, ...entry.pathFamilies]));
+}
+
+function containsCatalogName(value, names) {
+  return [...names].some((name) => new RegExp(`(^|[^A-Za-z0-9_])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^A-Za-z0-9_])`, 'u').test(value));
+}
+
+function assembledStrings(sourceText) {
+  const source = ts.createSourceFile(sourcePath, sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const findings = [];
+  const staticValue = (node) => {
+    if (ts.isParenthesizedExpression(node)) return staticValue(node.expression);
+    if (ts.isStringLiteralLike(node)) return { value: node.text, assembled: false };
+    if (ts.isNumericLiteral(node)) return { value: Number(node.text), assembled: false };
+    if (ts.isTemplateExpression(node)) {
+      let value = node.head.text;
+      for (const span of node.templateSpans) {
+        const expression = staticValue(span.expression);
+        if (!expression) return null;
+        value += expression.value + span.literal.text;
+      }
+      return { value, assembled: true };
+    }
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+      const left = staticValue(node.left);
+      const right = staticValue(node.right);
+      if (!left || !right || (typeof left.value !== 'string' && typeof right.value !== 'string')) return null;
+      return { value: String(left.value) + String(right.value), assembled: true };
+    }
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+      const receiver = node.expression.expression;
+      const method = node.expression.name.text;
+      if (method === 'join' && ts.isArrayLiteralExpression(receiver)) {
+        const parts = receiver.elements.map(staticValue);
+        if (parts.some((part) => !part)) return null;
+        const separator = node.arguments.length === 0 ? ',' : staticValue(node.arguments[0])?.value;
+        if (typeof separator !== 'string') return null;
+        return { value: parts.map((part) => part.value).join(separator), assembled: true };
+      }
+      if (method === 'fromCharCode' && ts.isIdentifier(receiver) && receiver.text === 'String') {
+        const points = node.arguments.map(staticValue);
+        if (points.some((point) => !point || typeof point.value !== 'number')) return null;
+        return { value: String.fromCharCode(...points.map((point) => point.value)), assembled: true };
+      }
+    }
+    return null;
+  };
+  const visit = (node) => {
+    const result = staticValue(node);
+    if (result?.assembled) findings.push({ value: result.value, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1 });
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return findings;
 }
 
 function removePaintPages(root) {
@@ -96,6 +156,25 @@ function catalogKindEntry() {
 function requiredKindWord() {
   const catalog = paintCatalog();
   return Object.keys(catalog).find((key) => catalog[key].tokenTypes.some((kind) => kind.startsWith('font')));
+}
+
+function numericPathFamily() {
+  const catalog = paintCatalog();
+  const candidates = new Set(Object.values(catalog).filter((entry) => entry.tokenTypes.length === 0).flatMap((entry) => entry.pathFamilies));
+  let selected;
+  const visit = (node, tokenPath = []) => {
+    if (node === null || Object(node) !== node || Array.isArray(node) || selected) return;
+    if (Object.hasOwn(node, '$value')) {
+      if (typeof node.$value === 'number') selected = tokenPath.find((part) => candidates.has(part));
+      return;
+    }
+    for (const [key, child] of Object.entries(node)) if (!key.startsWith('$')) visit(child, [...tokenPath, key]);
+  };
+  for (const name of readdirSync(path.join(repo, 'token_catalog')).filter((name) => name.endsWith('.tokens.json'))) {
+    visit(JSON.parse(readFileSync(path.join(repo, 'token_catalog', name), 'utf8')));
+  }
+  assert.ok(selected);
+  return selected;
 }
 
 function builtCatalogVariable(root) {
@@ -178,13 +257,14 @@ test('(b) a page may arrange an imported fixture component with spatial tokens',
 
 test('(c) the rule configuration and this test derive their members from the catalog', () => {
   const members = Object.keys(paintCatalog());
+  const names = catalogNames();
   const configText = readFileSync(ruleConfig, 'utf8');
   const ownText = readFileSync(sourcePath, 'utf8');
-  const joinedTestSourceText = [...ownText.matchAll(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g)].map((match) => match[2]).join('');
-  for (const member of members) {
-    assert.equal(configText.includes(member), false, member);
-    assert.equal(ownText.includes(member), false, member);
-    assert.equal(joinedTestSourceText.includes(member), false, member);
+  const assembled = assembledStrings(ownText);
+  for (const member of members) assert.equal(configText.includes(member), false, member);
+  for (const name of names) {
+    assert.equal(containsCatalogName(ownText, new Set([name])), false, name);
+    assert.equal(assembled.some((finding) => finding.value.includes(name)), false, `${name}: ${JSON.stringify(assembled)}`);
   }
 });
 
@@ -348,12 +428,12 @@ test('(q) malformed pages values fail loudly', () => {
   assert.match(`${proc.stdout}\n${proc.stderr}`, /pages must be a non-empty list of globs/);
 });
 
-test('(r) ' + ['opa', 'city'].join('') + ' and ' + ['typo', 'graphy'].join('') + ' paint tokens are refused wherever a page uses them', () => {
+test(`(r) ${numericPathFamily()} and ${requiredKindWord()} paint tokens are refused wherever a page uses them`, () => {
   const root = materialize();
   removePaintedPage(root);
   removeClassPaintPage(root);
-  const numericFamily = ['opa', 'city'].join('');
-  const textFamily = ['ty', 'pe'].join('');
+  const numericFamily = numericPathFamily();
+  const textFamily = requiredKindWord();
   const tokens = [`--base-${numericFamily}-muted`, `--base-${textFamily}-family-body`];
   const attributes = [`data-paint-${numericFamily}`, `data-paint-${textFamily}`];
   const tokenPath = path.join(root, 'tokens.css');
@@ -539,6 +619,18 @@ test('a page glob matching zero files fails closed and names the glob', () => {
   assert.match(`${proc.stdout}\n${proc.stderr}`, new RegExp(unmatched.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
+test('a page matched under a normally skipped output directory is scanned', () => {
+  const root = materialize();
+  const variable = fixturePaintVariable(root);
+  assert.ok(variable);
+  removePaintPages(root);
+  const { configPath, config } = configAt(root);
+  config.pages = ['src/pages/build/**'];
+  saveConfig(configPath, config);
+  writePage(root, 'build/MatchedPage.tsx', `export const MatchedPage=()=> <main style={{fill:"var(${variable})"}}/>;\n`);
+  assertPaintRefused(invoke(root), variable, 'src/pages/build/MatchedPage.tsx');
+});
+
 test('the paint pass scans every required page extension', () => {
   const root = materialize();
   removePaintPages(root);
@@ -674,7 +766,7 @@ test('an annotated Tailwind v4 shorthand cannot hide a paint token', () => {
   const root = materialize();
   removePaintPages(root);
   const { variable } = syntheticPaint(root);
-  const kind = String.fromCharCode(99, 111, 108, 111, 114);
+  const kind = catalogKindEntry().tokenTypes[0];
   writePage(root, 'TypedShorthandPage.tsx', `export const P=()=> <main className="bg-(${kind}:${variable})"/>;\n`);
   assertPaintRefused(invoke(root), variable, 'TypedShorthandPage.tsx');
 });
