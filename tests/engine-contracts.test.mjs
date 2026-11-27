@@ -228,6 +228,7 @@ test("every chain validates and each job chain has its required order", async (t
     await t.test(name, () => {
       const chain = readJson(`engine/chains/${name}.chain.json`);
       assert.doesNotThrow(() => validateChain(chain, `chain ${name}`));
+      assert.deepEqual(validate(readJson("engine/chain.schema.json"), chain), [], `chain ${name} must satisfy engine/chain.schema.json`);
       if (chainOrders[name]) {
         assert.deepEqual(chain.steps.map((step) => step.step), chainOrders[name]);
       }
