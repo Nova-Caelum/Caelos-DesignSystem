@@ -1,9 +1,6 @@
 {
   "name": "caelos-design-system-catalog",
   "private": true,
-  "bin": {
-    "engine": "engine/cli.mjs"
-  },
   "exports": {
     ".": "./generated/components/index.ts",
     "./components": "./generated/components/index.ts",
