@@ -30,6 +30,18 @@ function run(t, { job, outputName = 'generated' } = {}) {
   return { ...result, cwd, catalog, output };
 }
 
+function invoke({ cwd, catalog, output, templates = path.join(root, 'templates') }) {
+  return spawnSync(process.execPath, [
+    generator, '--catalog', catalog, '--templates', templates, '--out', output,
+  ], { cwd, encoding: 'utf8' });
+}
+
+function updateJson(file, update) {
+  const document = JSON.parse(readFileSync(file, 'utf8'));
+  update(document);
+  writeFileSync(file, `${JSON.stringify(document, null, 2)}\n`);
+}
+
 function declarations(css) {
   return [...css.matchAll(/(?:^|[;{])\s*[a-z-]+\s*:\s*([^;{}]+);/gmu)].map((match) => match[1].trim());
 }
@@ -88,15 +100,179 @@ test('(e) job mode returns both recipe gaps as structured data', (t) => {
   assert.ok(response.gaps.every((gap) => !Object.hasOwn(gap, 'error')));
 });
 
-test('(f) an entry above tier 2 imports madeOf parts in layer order without paint', (t) => {
-  const result = run(t);
+test('(f) a safe composite owns its root identity while parts retain their identities', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(templates);
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'button.mjs'));
+  writeFileSync(path.join(templates, 'span.mjs'), `
+export const requiredFields = ['kind', 'layerOrder'];
+export const interactiveElement = null;
+export function render(model) {
+  return {
+    tsx: \`import type { HTMLAttributes, ReactNode } from 'react';
+export type \${model.componentName}Props = HTMLAttributes<HTMLSpanElement> & { children?: ReactNode; variant?: string };
+export function \${model.componentName}({ children, variant = 'default', ...props }: \${model.componentName}Props) {
+  return <span {...props} data-entry=\${JSON.stringify(model.name)} data-variant={variant}>{children}</span>;
+}\`,
+    css: '',
+  };
+}
+`);
+  updateJson(path.join(work.catalog, '02-controls.tokens.json'), (document) => {
+    document.controls.shared.LeadingPart.$extensions['app.caelos'].kind = 'span';
+    document.controls.shared.TrailingPart.$extensions['app.caelos'].kind = 'span';
+  });
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
   assert.equal(result.status, 0, result.stderr);
-  const source = readFileSync(path.join(result.output, 'CompositeButton.tsx'), 'utf8');
-  const css = readFileSync(path.join(result.output, 'CompositeButton.css'), 'utf8');
+  const source = readFileSync(path.join(output, 'CompositeButton.tsx'), 'utf8');
+  const css = readFileSync(path.join(output, 'CompositeButton.css'), 'utf8');
   assert.match(source, /import \{ LeadingPart \} from '\.\/LeadingPart';/u);
   assert.match(source, /import \{ TrailingPart \} from '\.\/TrailingPart';/u);
   assert.ok(source.indexOf('<LeadingPart') < source.indexOf('<TrailingPart'));
   assert.deepEqual(declarations(css), []);
+  assert.match(source, /<button\b[^>]*data-entry="overlays\.shared\.CompositeButton"[^>]*data-variant=\{variant\}/su);
+  assert.match(source, /<LeadingPart\b[^>]*variant=\{variant\}/u);
+  assert.match(source, /<TrailingPart\b[^>]*variant=\{variant\}/u);
+  assert.doesNotMatch(source, /<LeadingPart\b[^>]*data-entry=/u);
+  assert.doesNotMatch(source, /<TrailingPart\b[^>]*data-entry=/u);
+  assert.match(readFileSync(path.join(output, 'LeadingPart.tsx'), 'utf8'),
+    /data-entry="controls\.shared\.LeadingPart"[^>]*data-variant=\{variant\}/u);
+  assert.match(readFileSync(path.join(output, 'TrailingPart.tsx'), 'utf8'),
+    /data-entry="controls\.shared\.TrailingPart"[^>]*data-variant=\{variant\}/u);
+});
+
+test('(f2) a composite that would nest an interactive element of the same kind is refused by entry name', (t) => {
+  const result = run(t);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /overlays\.shared\.CompositeButton[^\n]*interactive[^\n]*button/u);
+  assert.ok(!readdirSync(result.output).some((file) => file.startsWith('CompositeButton.')));
+});
+
+test('(f3) a tier-0 non-paint madeOf reference resolves without becoming a rendered part', (t) => {
+  const work = workspace(t);
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (document) => {
+    document.overlays.shared.TokenComposite = {
+      $extensions: { 'app.caelos': {
+        lifecycle: 'draft', recipeInStaging: true, kind: 'button',
+        madeOf: ['base.space.md'], layerOrder: ['base.space.md'],
+      } },
+    };
+  });
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output });
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotMatch(result.stdout, /TokenComposite[^\n]*missing entry/u);
+  const source = readFileSync(path.join(output, 'TokenComposite.tsx'), 'utf8');
+  assert.doesNotMatch(source, /BaseSpaceMd|base\.space\.md/u);
+});
+
+test('(f4) templates are discovered recursively like the recipe checker', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(path.join(templates, 'controls'), { recursive: true });
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'controls', 'button.mjs'));
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(readdirSync(output).includes('Button.tsx'), result.stdout);
+  assert.doesNotMatch(result.stdout, /controls\.shared\.Button[^\n]*template/u);
+});
+
+test('(f4a) duplicate template kinds are refused', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(path.join(templates, 'first'), { recursive: true });
+  mkdirSync(path.join(templates, 'second'), { recursive: true });
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'first', 'button.mjs'));
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'second', 'button.mjs'));
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stderr, /duplicate template kind "button"/u);
+  assert.match(result.stderr, /first\/button\.mjs/u);
+  assert.match(result.stderr, /second\/button\.mjs/u);
+});
+
+test('(f4b) a transitive same-kind interactive part is refused with its path', (t) => {
+  const work = workspace(t);
+  const templates = path.join(work.cwd, 'templates');
+  mkdirSync(templates);
+  copyFileSync(path.join(root, 'templates', 'button.mjs'), path.join(templates, 'button.mjs'));
+  writeFileSync(path.join(templates, 'span.mjs'), `
+export const requiredFields = ['kind', 'layerOrder'];
+export const interactiveElement = null;
+export function render(model) {
+  return { tsx: \`export function \${model.componentName}() { return <span />; }\`, css: '' };
+}
+`);
+  updateJson(path.join(work.catalog, '03-overlays.tokens.json'), (document) => {
+    delete document.overlays.shared.CompositeButton;
+    document.overlays.shared.NonInteractiveGroup = {
+      $extensions: { 'app.caelos': {
+        lifecycle: 'draft', recipeInStaging: true, kind: 'span',
+        madeOf: ['controls.shared.LeadingPart'], layerOrder: ['controls.shared.LeadingPart'],
+      } },
+    };
+  });
+  const transitiveCatalog = {
+    patterns: {
+      shared: {
+        TransitiveComposite: { $extensions: { 'app.caelos': {
+          lifecycle: 'draft', recipeInStaging: true, kind: 'button',
+          madeOf: ['overlays.shared.NonInteractiveGroup'], layerOrder: ['overlays.shared.NonInteractiveGroup'],
+        } } },
+      },
+    },
+  };
+  writeFileSync(path.join(work.catalog, '04-patterns.tokens.json'), `${JSON.stringify(transitiveCatalog, null, 2)}\n`);
+  const output = path.join(work.cwd, 'generated');
+  const result = invoke({ ...work, output, templates });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /patterns\.shared\.TransitiveComposite[^\n]*interactive[^\n]*button/u);
+  assert.match(result.stdout, /patterns\.shared\.TransitiveComposite → overlays\.shared\.NonInteractiveGroup → controls\.shared\.LeadingPart/u);
+  assert.ok(!readdirSync(output).some((file) => file.startsWith('TransitiveComposite.')));
+});
+
+test('(f5) empty generator inputs are refused with the entry and field, and never render', async (t) => {
+  const cases = [
+    {
+      name: 'madeOf item', entry: 'overlays.shared.EmptyMadeOf', field: 'madeOf', output: 'EmptyMadeOf',
+      mutate(document) {
+        document.overlays.shared.EmptyMadeOf = { $extensions: { 'app.caelos': {
+          lifecycle: 'draft', recipeInStaging: true, kind: 'button', madeOf: [''], layerOrder: ['content'],
+        } } };
+      },
+      file: '03-overlays.tokens.json',
+    },
+    {
+      name: 'variant value', entry: 'controls.shared.Button', field: 'variants.tone', output: 'Button',
+      mutate(document) { document.controls.shared.Button.$extensions['app.caelos'].variants = { tone: [''] }; },
+      file: '02-controls.tokens.json',
+    },
+    {
+      name: 'required field', entry: 'controls.shared.EmptyKind', field: 'kind', output: 'EmptyKind',
+      mutate(document) {
+        document.controls.shared.EmptyKind = { $extensions: { 'app.caelos': {
+          lifecycle: 'draft', recipeInStaging: true, kind: '', layerOrder: ['content'],
+        } } };
+      },
+      file: '02-controls.tokens.json',
+    },
+  ];
+  for (const fixtureCase of cases) {
+    await t.test(fixtureCase.name, (inner) => {
+      const work = workspace(inner);
+      updateJson(path.join(work.catalog, fixtureCase.file), fixtureCase.mutate);
+      const output = path.join(work.cwd, 'generated');
+      const result = invoke({ ...work, output });
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(result.stdout, new RegExp(`${fixtureCase.entry.replaceAll('.', '\\.') }[^\\n]*${fixtureCase.field.replace('.', '\\.')}`, 'u'));
+      assert.match(result.stdout, new RegExp(`${fixtureCase.entry.replaceAll('.', '\\.') }[^\\n]*empty|required`, 'u'));
+      assert.ok(!readdirSync(output).some((file) => file.startsWith(`${fixtureCase.output}.`)));
+    });
+  }
 });
 
 test('(attack) a missing madeOf entry is listed without writing a broken import', (t) => {
