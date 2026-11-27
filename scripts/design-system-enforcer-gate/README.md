@@ -48,7 +48,7 @@ Exemptions: `data-ui-exempt="<reason>"` on the element (old `data-kit-exempt` ac
 
 ## Known blind spots
 
-- Static only. Direct page `var(--…)` references are checked in every property and attribute. For class paint, the page paint pass resolves literal `class="…"` and `className="…"` values; template strings, class names built at run time, `styles[variant]`, classes added by a library, or CSS outside `classIndex` are invisible. The missing-value rules treat an unresolved class as declaring nothing (so they can over-report) and cannot see a gap set through a descendant selector (`.row > * + *`).
+- Static only. The page paint pass folds literal class expressions, no-substitution templates, literal concatenation, same-file literal constants, and string arguments to `clsx`/`cn`/`classnames`; it also reads application CSS, generated theme utilities, and page-imported CSS modules. Classes chosen from run-time data (`styles[variant]`, computed template substitutions, conditional/object combiners, or classes added by a library) remain invisible. The missing-value rules treat an unresolved class as declaring nothing (so they can over-report) and cannot see a gap set through a descendant selector (`.row > * + *`).
 - `missing-gap` ignores wrapper components that render the flex container themselves and children inside a component you did not scan; it cannot see `grid-template` spacing tricks.
 - `missing-typography` cannot see inheritance across files or from `body`/`:root`. `inherit: "ancestors"` follows only the same file's markup; `"none"` requires every text element to carry its own.
 - `missing-motion` accepts any token-using `transition`/`animation` regardless of the property list, and cannot tell a control that should not animate.
