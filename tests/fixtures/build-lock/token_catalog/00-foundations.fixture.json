@@ -1,0 +1,28 @@
+{
+  "base": {
+    "color": {
+      "primary": {
+        "$type": "color",
+        "$value": "#112233",
+        "$extensions": { "app.caelos": { "lifecycle": "promoted", "draftedBy": "fixture" } }
+      },
+      "same-a": {
+        "$type": "color",
+        "$value": "#445566",
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+      },
+      "same-b": {
+        "$type": "color",
+        "$value": "#445566",
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+      }
+    },
+    "space": {
+      "medium": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+      }
+    }
+  }
+}

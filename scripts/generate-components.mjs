@@ -7,7 +7,7 @@
  * use stderr and a non-zero exit code. Human-readable mode prints the same gaps.
  */
 
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -163,6 +163,7 @@ async function generate(options) {
   const { allEntries, candidates } = await loadCatalog(options.catalog);
   const gaps = [];
   const generated = new Map();
+  const outputs = new Map();
   const reservedNames = new Map();
   await mkdir(options.out, { recursive: true });
 
@@ -208,10 +209,20 @@ async function generate(options) {
     if (!output || typeof output.tsx !== 'string' || typeof output.css !== 'string') {
       throw new Error(`Template "${entry.record.kind}" returned invalid output for ${entry.name}`);
     }
-    await writeFile(path.join(options.out, `${entry.componentName}.tsx`), output.tsx);
-    await writeFile(path.join(options.out, `${entry.componentName}.css`), output.css);
+    outputs.set(`${entry.componentName}.tsx`, output.tsx);
+    outputs.set(`${entry.componentName}.css`, output.css);
     reservedNames.set(entry.componentName, entry.name);
     generated.set(entry.name, entry);
+  }
+
+  const existing = await readdir(options.out, { withFileTypes: true });
+  for (const file of existing) {
+    if (file.isFile() && /\.(?:tsx|css)$/u.test(file.name) && !outputs.has(file.name)) {
+      await unlink(path.join(options.out, file.name));
+    }
+  }
+  for (const [file, content] of [...outputs].sort(([left], [right]) => left.localeCompare(right))) {
+    await writeFile(path.join(options.out, file), content);
   }
 
   gaps.sort((left, right) => left.entry.localeCompare(right.entry) || left.reason.localeCompare(right.reason));

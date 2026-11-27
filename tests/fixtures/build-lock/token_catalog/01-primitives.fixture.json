@@ -1,0 +1,44 @@
+{
+  "primitives": {
+    "shared": {
+      "surface": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "draft",
+            "draftedBy": "fixture",
+            "gapFill": "reference"
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{base.color.primary}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "equal-a": {
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
+        "fill": {
+          "$type": "color",
+          "$value": "{base.color.same-a}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "equal-b": {
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
+        "fill": {
+          "$type": "color",
+          "$value": "{base.color.same-b}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      },
+      "spacing": {
+        "$extensions": { "app.caelos": { "lifecycle": "promoted" } },
+        "gap": {
+          "$type": "dimension",
+          "$value": "{base.space.medium}",
+          "$extensions": { "app.caelos": { "lifecycle": "promoted" } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "overlays": {
+    "shared": {
+      "panel": {
+        "$extensions": {
+          "app.caelos": {
+            "lifecycle": "promoted",
+            "madeOf": ["controls.shared.button"]
+          }
+        }
+      }
+    }
+  }
+}
