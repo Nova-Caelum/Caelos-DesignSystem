@@ -226,7 +226,7 @@ test('(c) every Button card lists token path, value and tier', () => {
   assert.equal(cards.length, 6);
   for (const card of cards) {
     assert.match(card, /data-token-path="controls\.shared\.Button\.foreground"/u);
-    assert.match(card, /data-token-value="\{base\.color\.ink\}"/u);
+    assert.match(card, /data-token-value="\{primitives\.shared\.typography\.tone\.default\}"/u);
     assert.match(card, /data-token-tier="2"/u);
   }
 });
@@ -277,9 +277,9 @@ test('tier 0 groups without recipe extensions have no lifecycle or incomplete la
 test('duplicate leaf keys resolve to their exact JSON paths', () => {
   assertBuildPassed();
   const space = html.match(/href="([^"]+#L16)"[^>]+data-token-path="base\.space\.repeat"/u)?.[1];
-  const blur = html.match(/href="([^"]+#L25)"[^>]+data-token-path="base\.blur\.repeat"/u)?.[1];
+  const blur = html.match(/href="([^"]+#L33)"[^>]+data-token-path="base\.blur\.repeat"/u)?.[1];
   assert.ok(space, 'base.space.repeat should link to line 16');
-  assert.ok(blur, 'base.blur.repeat should link to line 25');
+  assert.ok(blur, 'base.blur.repeat should link to line 33');
 });
 
 test('every fixture token and family source line resolves to its full JSON path', () => {

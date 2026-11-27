@@ -19,6 +19,14 @@
           "value": 1,
           "unit": "px"
         }
+      },
+      "px-15": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      },
+      "px-8": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
       }
     },
     "blur": {
@@ -38,6 +46,36 @@
             "value": 3,
             "unit": "px"
           }
+        }
+      }
+    },
+    "opacity": {
+      "fraction-0-5": {
+        "$type": "number",
+        "$value": "__FIXTURE_number__"
+      }
+    },
+    "radius": {
+      "md": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      }
+    },
+    "size": {
+      "px-42": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      },
+      "px-44": {
+        "$type": "dimension",
+        "$value": "__FIXTURE_dimension__"
+      }
+    },
+    "type": {
+      "weight": {
+        "medium": {
+          "$type": "fontWeight",
+          "$value": "__FIXTURE_fontWeight__"
         }
       }
     }
