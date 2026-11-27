@@ -1,0 +1,10 @@
+{
+  "base": {
+    "color": {
+      "ink": {
+        "$type": "color",
+        "$value": "fixture-ink"
+      }
+    }
+  }
+}
