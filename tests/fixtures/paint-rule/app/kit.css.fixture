@@ -1,0 +1,7 @@
+.kit-painted {
+  background-color: var(--base-color-ink);
+}
+
+.kit-spaced {
+  padding: var(--base-space-md);
+}

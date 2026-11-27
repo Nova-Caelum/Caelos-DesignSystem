@@ -1,0 +1,12 @@
+{
+  "pagePaint": {
+    "catalog": "../../token_catalog/paint-families.json"
+  },
+  "icons": { "enabled": false },
+  "missing": {
+    "gap": { "severity": "off" },
+    "typography": { "severity": "off" },
+    "motion": { "severity": "off", "required": false }
+  },
+  "var": { "noFallback": false, "mustBeDefined": false }
+}

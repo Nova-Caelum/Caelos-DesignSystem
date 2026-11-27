@@ -1,0 +1,16 @@
+{
+  "base": {
+    "color": {
+      "ink": { "$type": "color", "$value": "placeholder" }
+    },
+    "radius": {
+      "md": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } }
+    },
+    "space": {
+      "md": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } }
+    },
+    "glow": {
+      "soft": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } }
+    }
+  }
+}

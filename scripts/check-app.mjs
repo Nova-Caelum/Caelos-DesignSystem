@@ -1,34 +1,83 @@
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const gate = new URL('./design-system-enforcer-gate/design-system-enforcer-gate.mjs', import.meta.url);
 const args = process.argv.slice(2);
-const result = spawnSync(process.execPath, [fileURLToPath(gate), '--json', ...args], { encoding: 'utf8' });
+const paintConfigPath = fileURLToPath(new URL('./design-system-enforcer-gate/app-pages-paint.config.json', import.meta.url));
 
-if (result.stdout) process.stdout.write(result.stdout);
-if (result.stderr) process.stderr.write(result.stderr);
-if (result.error || result.status === null) {
-  console.error(`check-app: could not run the gate: ${result.error?.message ?? 'no exit status'}`);
-  process.exitCode = 2;
-} else if ((result.status === 0 || result.status === 1) && !args.includes('-h') && !args.includes('--help')) {
-  let report;
-  try {
-    report = JSON.parse(result.stdout);
-  } catch {
-    console.error('check-app: the gate did not return JSON; check the gate configuration');
-    process.exitCode = 2;
+function invocation(args) {
+  let configPath = null, rootArg = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--config') configPath = args[++i];
+    else if (args[i] === '--only') i++;
+    else if (!args[i].startsWith('-')) rootArg = args[i];
   }
-  if (report) {
+  const root = resolve(rootArg ?? process.cwd());
+  return { root, configPath: configPath ? resolve(configPath) : join(root, 'design-system-enforcer-gate.config.json') };
+}
+
+function run(gateArgs, env = process.env) {
+  return spawnSync(process.execPath, [fileURLToPath(gate), '--json', ...gateArgs], { encoding: 'utf8', env });
+}
+
+function reportFor(result, label) {
+  if (result.error || result.status === null) {
+    console.error(`check-app: could not run the ${label}: ${result.error?.message ?? 'no exit status'}`);
+    return { status: 2 };
+  }
+  if (result.status !== 0 && result.status !== 1) return { status: result.status };
+  try {
+    const report = JSON.parse(result.stdout);
     const reasons = [];
     if (report.files === 0) reasons.push('scanned 0 files: check the folder argument and the gate config');
     if (report.tokens === 0) reasons.push('found 0 tokens: check the token-source paths and the gate config');
     if (reasons.length) {
-      console.error(`check-app: ${reasons.join('; ')}`);
-      process.exitCode = 2;
+      console.error(`check-app: ${label} ${reasons.join('; ')}`);
+      return { status: 2 };
+    }
+    return { status: result.status, report };
+  } catch {
+    console.error(`check-app: the ${label} did not return JSON; check the gate configuration`);
+    return { status: 2 };
+  }
+}
+
+const result = run(args);
+
+if (result.stdout) process.stdout.write(result.stdout);
+if (result.stderr) process.stderr.write(result.stderr);
+if (args.includes('-h') || args.includes('--help')) {
+  process.exitCode = result.status;
+} else {
+  const normal = reportFor(result, 'normal pass');
+  if (normal.status !== 0 && normal.status !== 1) {
+    process.exitCode = normal.status;
+  } else {
+    const { configPath } = invocation(args);
+    if (!existsSync(configPath)) {
+      console.error('check-app: paint pass skipped: app config has no pages key');
+      process.exitCode = normal.status;
     } else {
-      process.exitCode = result.status;
+      const appConfig = JSON.parse(readFileSync(configPath, 'utf8'));
+      if (!Object.hasOwn(appConfig, 'pages')) {
+        console.error('check-app: paint pass skipped: app config has no pages key');
+        process.exitCode = normal.status;
+      } else if (!Array.isArray(appConfig.pages) || appConfig.pages.length === 0 || appConfig.pages.some((page) => typeof page !== 'string' || page.trim() === '')) {
+        console.error('check-app: pages must be a non-empty list of globs');
+        process.exitCode = 2;
+      } else {
+        const paint = run(args, {
+          ...process.env,
+          CAELOS_PAGE_PAINT_CONFIG: paintConfigPath,
+          CAELOS_PAGE_PAINT_PAGES: JSON.stringify(appConfig.pages),
+        });
+        if (paint.stderr) process.stderr.write(paint.stderr);
+        const checked = reportFor(paint, 'paint pass');
+        if (checked.status !== 0 && paint.stdout) process.stderr.write(paint.stdout);
+        process.exitCode = checked.status || normal.status;
+      }
     }
   }
-} else {
-  process.exitCode = result.status;
 }

@@ -1,0 +1,5 @@
+:root {
+  --base-radius-md: 8px;
+  --base-space-md: 16px;
+  --base-glow-soft: 4px;
+}
